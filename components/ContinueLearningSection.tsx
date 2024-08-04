@@ -4,14 +4,14 @@ import {Button} from "@/components/ui/button";
 import {Progress} from "@/components/ui/progress";
 
 const ContinueLearningSection = () => (
-    <section>
+    <section className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Continue learning</h2>
         <div className="grid grid-cols-1 gap-4">
             {['Chemistry and Biology Puzzles', 'Group Theory', 'Computer Science Fundamentals'].map((course, index) => (
                 <Card key={index}>
                     <CardContent className="p-4">
                         <h3 className="font-bold mb-2">{course}</h3>
-                        <Progress value={33} className="mb-2" />
+                        <Progress value={33} className="mb-2"/>
                         <p className="text-sm text-gray-600">33% complete</p>
                     </CardContent>
                 </Card>
