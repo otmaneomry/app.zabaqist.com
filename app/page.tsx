@@ -1,9 +1,9 @@
-import {Button} from "@/components/ui/button";
+import MainContent from '@/components/MainContent';
 
 export default function Home() {
-  return (
-      <>
-          <Button className="">Start</Button>
-      </>
-  );
+    return (
+        <main>
+            <MainContent />
+        </main>
+    )
 }
