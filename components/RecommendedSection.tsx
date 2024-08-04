@@ -7,7 +7,7 @@ import StreakCard from "@/components/StreakCard";
 const RecommendedSection = () => (
     <section className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Recommended for you</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4">
             {[
                 { title: 'Introduction to Algorithms', level: 'CS & Programming · Level 3' },
                 { title: 'Solving Equations', level: 'Foundational Math · Level 1' },
@@ -23,5 +23,6 @@ const RecommendedSection = () => (
         </div>
     </section>
 );
+
 
 export default RecommendedSection;

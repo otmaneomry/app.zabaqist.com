@@ -5,9 +5,9 @@ import { Progress } from "@/components/ui/progress";
 
 const PremiumCard = () => (
     <Card className="bg-yellow-50">
-        <CardContent className="flex items-center justify-between p-4">
+        <CardContent className="flex items-center justify-between p-6">
             <div>
-                <p className="font-bold mb-1">Premium users are 6x more likely to reach their learning goals</p>
+                <p className="font-bold mb-2">Premium users are 6x more likely to reach their learning goals</p>
                 <Button variant="secondary">Learn more</Button>
             </div>
             <div className="text-4xl">🏆</div>

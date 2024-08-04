@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
 const ContinueLearningSection = () => (
-    <section className="mt-8">
+    <section>
         <h2 className="text-2xl font-bold mb-4">Continue learning</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4">
             {['Chemistry and Biology Puzzles', 'Group Theory', 'Computer Science Fundamentals'].map((course, index) => (
                 <Card key={index}>
                     <CardContent className="p-4">
