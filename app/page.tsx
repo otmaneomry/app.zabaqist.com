@@ -1,9 +1,9 @@
-import MainContent from '@/components/MainContent';
+import BrilliantLandingPage from "@/components/BrilliantLandingPage";
 
 export default function Home() {
     return (
         <main>
-            <MainContent />
+            <BrilliantLandingPage />
         </main>
     )
 }
