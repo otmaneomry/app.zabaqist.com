@@ -1,16 +1,24 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import Link from "next/link";
+import Link from 'next/link';
+import LoginModal from '@/components/frontend/LoginModal';
 
 const BrilliantLandingPage = () => {
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+    const openLoginModal = () => setIsLoginModalOpen(true);
+    const closeLoginModal = () => setIsLoginModalOpen(false);
+
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white flex flex-col">
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="text-2xl font-bold">Brilliant</div>
                     <div>
-                        <Button variant="outline" className="mr-2">Log in</Button>
+                        <Button variant="outline" className="mr-2" onClick={openLoginModal}>Log in</Button>
                         <Link href={"/home" as string}>
                             <Button as="a">Get started</Button>
                         </Link>
@@ -101,6 +109,8 @@ const BrilliantLandingPage = () => {
                     </div>
                 </section>
             </main>
+
+            <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
         </div>
     );
 };
