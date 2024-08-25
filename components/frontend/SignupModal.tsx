@@ -35,7 +35,7 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                     <Input type="email" placeholder="Email" />
                     <Button className="w-full">Sign up</Button>
                     <p className="text-xs text-center text-gray-500">
-                        By clicking above, I agree to Brilliant's <a href="#" className="text-blue-500">Terms</a> and <a href="#" className="text-blue-500">Privacy Policy</a>
+                        By clicking above, I agree to Brilliant&apos;s <a href="#" className="text-blue-500">Terms</a> and <a href="#" className="text-blue-500">Privacy Policy</a>
                     </p>
                     <div className="text-center text-sm">
                         Existing user? <button onClick={onSwitchToLogin} className="text-blue-500">Log in</button>
