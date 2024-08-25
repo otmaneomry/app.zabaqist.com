@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import Link from 'next/link';
-import LoginModal from '@/components/frontend/LoginModal';
+import LoginModal from './LoginModal';
+import {Card, CardContent} from "@/components/ui/card";
 
 const BrilliantLandingPage = () => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -26,11 +26,12 @@ const BrilliantLandingPage = () => {
                 </div>
             </header>
 
-            <main>
+            <main className="flex-grow">
                 <section className="py-20 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                     <div className="container mx-auto px-4 text-center">
                         <h1 className="text-5xl font-bold mb-6">Learn by doing</h1>
-                        <p className="text-xl mb-8">Guided interactive problem solving that&apos;s effective and fun. Master concepts in 15 minutes a day.</p>
+                        <p className="text-xl mb-8">Guided interactive problem solving that&apos;s effective and fun.
+                            Master concepts in 15 minutes a day.</p>
                         <Link href={"/home" as string}>
                             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" as="a">
                                 Get started
@@ -62,7 +63,7 @@ const BrilliantLandingPage = () => {
                         </div>
                         <p className="text-xl mb-8">Over 50,000 5-star reviews on iOS App Store and Google Play</p>
                         <div className="flex justify-center items-center space-x-4">
-                            <img src="/api/placeholder/120/40" alt="TrustPilot" className="h-10" />
+                            <img src="/api/placeholder/120/40" alt="TrustPilot" className="h-10"/>
                             <p>TrustScore 4.7 2,033 reviews</p>
                         </div>
                     </div>
@@ -75,25 +76,31 @@ const BrilliantLandingPage = () => {
                             <Card>
                                 <CardContent className="p-6">
                                     <h3 className="text-xl font-bold mb-4">Effective, hands-on learning</h3>
-                                    <p>Visual, interactive lessons make concepts feel intuitive — so even complex ideas just click. Our real-time feedback and simple explanations make learning efficient.</p>
+                                    <p>Visual, interactive lessons make concepts feel intuitive — so even complex ideas
+                                        just click. Our real-time feedback and simple explanations make learning
+                                        efficient.</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-6">
                                     <h3 className="text-xl font-bold mb-4">Learn at your level</h3>
-                                    <p>Students and professionals alike can hone dormant skills or learn new ones. Progress through lessons and challenges tailored to your level. Designed for ages 13 to 113.</p>
+                                    <p>Students and professionals alike can hone dormant skills or learn new ones.
+                                        Progress through lessons and challenges tailored to your level. Designed for
+                                        ages 13 to 113.</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-6">
                                     <h3 className="text-xl font-bold mb-4">Guided bite-sized lessons</h3>
-                                    <p>We make it easy to stay on track, see your progress, and build your problem-solving skills one concept at a time.</p>
+                                    <p>We make it easy to stay on track, see your progress, and build your
+                                        problem-solving skills one concept at a time.</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-6">
                                     <h3 className="text-xl font-bold mb-4">Stay motivated</h3>
-                                    <p>Form a real learning habit with fun content that&apos;s always well-paced, game-like progress tracking, and friendly reminders.</p>
+                                    <p>Form a real learning habit with fun content that&apos;s always well-paced,
+                                        game-like progress tracking, and friendly reminders.</p>
                                 </CardContent>
                             </Card>
                         </div>
