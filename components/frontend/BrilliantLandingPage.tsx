@@ -37,10 +37,37 @@ const BrilliantLandingPage = () => {
                                 Get started
                             </Button>
                         </Link>
-                        <div className="mt-12 flex space-x-8">
+                        <div className="mt-12 flex justify-center space-x-8">
                             {['Math', 'Data Analysis', 'Computer Science', 'Programming & AI', 'Science & Engineering'].map((subject, index) => (
                                 <div key={index} className="text-center">
-                                    <div className="w-12 h-12 bg-white/20 rounded-full mb-2"></div>
+                                    <div className="w-12 h-12 rounded-full">
+                                        <svg viewBox="0 0 32 32" focusable="false" className="chakra-icon css-1ngcqk8"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <g clip-path=":r1:">
+                                                <path
+                                                    d="M5.19922 12.2334L12.3992 7.5834L18.6992 9.9834H20.4992L26.6492 5.4834"
+                                                    stroke="black" stroke-width="1.06667"></path>
+                                                <rect x="2.19922" y="19.7334" width="6" height="9.6"
+                                                      fill="#FF8D23"></rect>
+                                                <rect x="9.40039" y="14.6338" width="6" height="14.7"
+                                                      fill="#FF8D23"></rect>
+                                                <rect x="23.8008" y="11.9336" width="6" height="17.4"
+                                                      fill="#FF8D23"></rect>
+                                                <rect x="16.5996" y="17.9336" width="6" height="11.4"
+                                                      fill="#FF8D23"></rect>
+                                                <circle cx="5.19961" cy="12.2338" r="2.1" fill="black"></circle>
+                                                <circle cx="12.4008" cy="7.73379" r="2.1" fill="black"></circle>
+                                                <circle cx="19.6" cy="10.1332" r="2.1" fill="black"></circle>
+                                                <circle cx="26.5004" cy="5.6332" r="2.1" fill="black"></circle>
+                                            </g>
+                                            <defs>
+                                                <clipPath id=":r1:">
+                                                    <rect width="28.8" height="28.8" fill="white"
+                                                          transform="translate(1.59961 0.533203)"></rect>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </div>
                                     <p>{subject}</p>
                                 </div>
                             ))}
@@ -63,7 +90,6 @@ const BrilliantLandingPage = () => {
                         </div>
                         <p className="text-xl mb-8">Over 50,000 5-star reviews on iOS App Store and Google Play</p>
                         <div className="flex justify-center items-center space-x-4">
-                            <img src="/api/placeholder/120/40" alt="TrustPilot" className="h-10"/>
                             <p>TrustScore 4.7 2,033 reviews</p>
                         </div>
                     </div>
