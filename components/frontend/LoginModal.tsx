@@ -7,7 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { EnvelopeIcon } from '@heroicons/react/24/outline';
 import SignupModal from './SignupModal';
 
-const LoginModal = ({ isOpen, onClose }) => {
+interface LoginModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     const [showEmailLogin, setShowEmailLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
 
