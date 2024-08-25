@@ -19,8 +19,10 @@ const BrilliantLandingPage = () => {
                     <div className="text-2xl font-bold">Brilliant</div>
                     <div>
                         <Button variant="outline" className="mr-2" onClick={openLoginModal}>Log in</Button>
-                        <Link href={"/home" as string}>
-                            <Button as="a">Get started</Button>
+                        <Link href="/home" className="inline-block">
+                            <Button size="lg">
+                                Get started
+                            </Button>
                         </Link>
                     </div>
                 </div>
@@ -32,8 +34,8 @@ const BrilliantLandingPage = () => {
                         <h1 className="text-5xl font-bold mb-6">Learn by doing</h1>
                         <p className="text-xl mb-8">Guided interactive problem solving that&apos;s effective and fun.
                             Master concepts in 15 minutes a day.</p>
-                        <Link href={"/home" as string}>
-                            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" as="a">
+                        <Link href="/home" className="inline-block">
+                            <Button size="lg">
                                 Get started
                             </Button>
                         </Link>
@@ -136,8 +138,10 @@ const BrilliantLandingPage = () => {
                 <section className="py-16 bg-gray-100">
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="text-3xl font-bold mb-8">Ready to start your learning journey?</h2>
-                        <Link href={"/home" as string}>
-                            <Button size="lg" as="a">Get started now</Button>
+                        <Link href="/home" className="inline-block">
+                            <Button size="lg">
+                                Get started
+                            </Button>
                         </Link>
                     </div>
                 </section>
