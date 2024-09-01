@@ -51,6 +51,13 @@ const SubjectIcon = ({ subject }) => {
             <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M5 3l7 12h-5l7 6-2-6h5L10 3" stroke="currentColor" strokeWidth="2"/>
             </svg>
+        ),
+        'flash' : (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                 stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                      d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/>
+            </svg>
         )
     };
 
