@@ -26,7 +26,7 @@ const StreakCard = () => {
                 <div className="flex justify-between mb-4">
                     {['Su', 'M', 'T', 'W', 'Th'].map((day, index) => (
                         <div  key={index}  className="flex flex-col items-center">
-                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-2">
+                            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      strokeWidth={1.5} stroke="currentColor" className="size-6">
                                     <path strokeLinecap="round" strokeLinejoin="round"
