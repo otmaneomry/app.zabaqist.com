@@ -3,7 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-const CourseCard = ({ title, icon, level }) => {
+interface CourseCardProps {
+    title: string;
+    icon: string;
+    level: string;
+}
+
+const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => {
     const progress = Math.floor(Math.random() * 101);
 
     return (

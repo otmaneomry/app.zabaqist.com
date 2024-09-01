@@ -3,7 +3,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
 
-const CourseCard = ({ title, level, icon }) => (
+
+interface CourseCardProps {
+    title: string;
+    icon: string;
+    level: string;
+}
+
+const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => (
     <Card className="overflow-hidden">
         <CardContent className="p-4 text-center">
             <div className="mb-2 flex justify-center">

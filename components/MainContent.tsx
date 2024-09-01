@@ -9,7 +9,7 @@ import React from "react";
 
 const MainContent = () => {
     return (
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-6 max-w-6xl">
 
             <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-4 space-y-6">
