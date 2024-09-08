@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {Button} from "@/components/ui/button";
-import {Home, BookOpen, Search, Trophy, Menu} from 'lucide-react';
+import {BookOpen, Home, Menu, Search, Trophy} from 'lucide-react';
 
 const Header = () => {
     const pathname = usePathname();
@@ -50,10 +50,15 @@ const Header = () => {
                         <Button variant="ghost" size="icon" className="text-gray-600">
                             <Search size={20}/>
                         </Button>
-                        <Button variant="outline" size="sm" className="hidden md:flex items-center space-x-1">
-                            <Trophy size={16}/>
-                            <span>Go premium</span>
-                        </Button>
+
+                        <Link href="/subscribe" className="inline-block">
+                            <Button size="sm" variant="outline"
+                                    className="rounded-2xl text-md border-2 border-green-600  hover:bg-white hover:text-green-600 hover:shadow-md text-green-600  ">
+                                <Trophy size={16}/>
+                                <span>Go premium</span>
+                            </Button>
+                        </Link>
+
                         <span className="text-xl">0</span>
                         <Button variant="ghost" size="icon" className="md:hidden">
                             <Menu size={20}/>
