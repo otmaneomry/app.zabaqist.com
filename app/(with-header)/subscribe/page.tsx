@@ -6,18 +6,24 @@ import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
 import {CheckCircle, X} from 'lucide-react';
 
-const PricingCard = ({selectedPlan, setSelectedPlan}) => (
+type PlanType = 'annual' | 'monthly';
+
+interface PricingCardProps {
+    selectedPlan: PlanType;
+    setSelectedPlan: React.Dispatch<React.SetStateAction<PlanType>>;
+}
+
+const PricingCard: React.FC<PricingCardProps> = ({ selectedPlan, setSelectedPlan }) => (
     <Card className="max-w-md mx-auto bg-white">
         <CardContent className="p-6">
             <div className="flex justify-between items-center mb-4">
                 <Button
                     variant={selectedPlan === 'annual' ? 'default' : 'outline'}
                     onClick={() => setSelectedPlan('annual')}
-                    className={`w-1/2 mr-2 ${selectedPlan === 'annual' ? 'bg-yellow-400 text-black' : ''} hover:bg-yellow-300`}
+                    className={`w-1/2 mr-2 ${selectedPlan === 'annual' ? 'bg-yellow-400 text-black' : ''}`}
                 >
                     Annual
-                    {selectedPlan === 'annual' &&
-                        <span className="ml-2 text-xs bg-yellow-500 px-1 rounded">MOST POPULAR</span>}
+                    {selectedPlan === 'annual' && <span className="ml-2 text-xs bg-yellow-500 px-1 rounded">MOST POPULAR</span>}
                 </Button>
                 <Button
                     variant={selectedPlan === 'monthly' ? 'default' : 'outline'}
@@ -38,9 +44,8 @@ const PricingCard = ({selectedPlan, setSelectedPlan}) => (
                     <p className="text-2xl font-bold">MAD 107.55<span className="text-sm">/month</span></p>
                 </div>
             )}
-            <Button className="w-full bg-green-500 hover:bg-green-600 text-white rounded-2xl">Subscribe now</Button>
-            <p className="text-xs mt-4 text-gray-500">*Billed as one payment. Renews annually, cancel anytime. You can
-                turn off auto-renew from your settings.</p>
+            <Button className="w-full bg-green-500 hover:bg-green-600 text-white">Subscribe now</Button>
+            <p className="text-xs mt-4 text-gray-500">*Billed as one payment. Renews annually, cancel anytime. You can turn off auto-renew from your settings.</p>
         </CardContent>
     </Card>
 );
@@ -63,7 +68,7 @@ const ReviewSection = () => (
             <Image src="/trustpilot.png" alt="Trustpilot" width={100} height={30}/>
         </div>
         <div className="text-center">
-            <p className="font-serif italic">"Advanced"</p>
+            <p className="font-serif italic">{`"Advanced"`}</p>
             <p className="text-xs">The Atlantic</p>
         </div>
     </div>
@@ -267,7 +272,7 @@ const GiftSection = () => (
 );
 
 const SubscribePage = () => {
-    const [selectedPlan, setSelectedPlan] = useState('annual');
+    const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
 
     return (
         <div className="min-h-screen">
