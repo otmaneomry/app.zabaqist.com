@@ -2,9 +2,10 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from 'lucide-react';
+import CourseCard from "@/components/CourseCard";
 
 const LearningPaths = () => {
-    const paths = [
+    const courses = [
         { title: 'Programming with Python', level: 'LEVEL 2', icon: '/brilliant-image/computer-science.png' },
         { title: 'Introduction to Algorithms', level: 'LEVEL 2', icon: '/brilliant-image/computer-science.png' },
         { title: 'Next Steps in Python', level: 'LEVEL 3', icon: '/brilliant-image/computer-science.png' },
@@ -32,12 +33,8 @@ const LearningPaths = () => {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {paths.map((path, index) => (
-                        <div key={index} className="bg-gray-100 rounded-lg p-4 text-center">
-                            <Image src={path.icon} alt={path.title} width={64} height={64} className="mx-auto mb-2" />
-                            <div className="text-xs text-gray-500 mb-1">{path.level}</div>
-                            <div className="text-sm font-semibold">{path.title}</div>
-                        </div>
+                    {courses.map((course, index) => (
+                        <CourseCard key={index} {...course} />
                     ))}
                 </div>
             </div>

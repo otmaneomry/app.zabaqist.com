@@ -16,7 +16,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => {
     return (
         <Card>
             <CardContent className="p-4 text-center">
-                <Link href={`/courses/${title.toLowerCase().replace(/\s+/g, '-')}`} aria-label={title}>
+                <Link href={`/courses/${title.toLowerCase().replace(/\s+/g, '-')}`} title={title}>
                     <div className="mb-2 flex justify-center">
                         <Image src={icon} alt={title} width={64} height={64}/>
                     </div>

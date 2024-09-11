@@ -1,26 +1,6 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Image from 'next/image';
-
-
-interface CourseCardProps {
-    title: string;
-    icon: string;
-    level: string;
-}
-
-const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => (
-    <Card className="overflow-hidden">
-        <CardContent className="p-4 text-center">
-            <div className="mb-2 flex justify-center">
-                <Image src={icon} alt={title} width={64} height={64} />
-            </div>
-            <p className="text-xs font-semibold text-purple-600 mb-1">{level}</p>
-            <h3 className="font-bold text-sm">{title}</h3>
-        </CardContent>
-    </Card>
-);
+import CourseCard from "@/components/CourseCard";
 
 const RecommendedSection = () => {
     const courses = [
