@@ -1,15 +1,14 @@
 import React from 'react';
-import {Card, CardContent} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
+import {Card, Button} from "@mantine/core";
 
 const ComebackCard = () => (
-    <Card>
-        <CardContent className="text-center py-6">
-            <div className="mb-4 text-4xl">🏆</div>
-            <h3 className="text-xl font-bold mb-2">It s comeback time!</h3>
-            <p className="mb-4">You finished #26 and kept your spot in the Hydrogen League</p>
-            <Button variant="outline" className="w-full">Continue</Button>
-        </CardContent>
+    <Card padding="lg">
+        <div style={{textAlign: 'center'}}>
+            <div style={{marginBottom: '1rem', fontSize: '2.25rem'}}>🏆</div>
+            <h3 style={{fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem'}}>It s comeback time!</h3>
+            <p style={{marginBottom: '1rem'}}>You finished #26 and kept your spot in the Hydrogen League</p>
+            <Button variant="outline" fullWidth>Continue</Button>
+        </div>
     </Card>
 );
 

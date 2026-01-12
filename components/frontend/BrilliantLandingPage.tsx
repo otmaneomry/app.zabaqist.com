@@ -1,13 +1,12 @@
 'use client';
 
 import React, {useState} from 'react';
-import {Button} from "@/components/ui/button";
+import { Button, Container, Title, Text, Group, Card, Flex, Stack, Box } from '@mantine/core';
+import { IconStar } from '@tabler/icons-react';
 import Link from 'next/link';
 import LoginModal from './LoginModal';
-import {Card, CardContent} from "@/components/ui/card";
 import SubjectIcon from "@/components/frontend/SubjectIcon";
 import Image from "next/image";
-import {Star} from "lucide-react";
 import FooterFrontEnd from "@/components/frontend/FooterFrontEnd";
 
 const BrilliantLandingPage = () => {
@@ -17,50 +16,56 @@ const BrilliantLandingPage = () => {
     const closeLoginModal = () => setIsLoginModalOpen(false);
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <div className="">
-                <div className="bg-gray-100 w-full">
-                    <header className="container mx-auto max-w-7xl">
-                        <div className="py-6 flex justify-between items-center">
-                            <div className="text-2xl font-bold">Brilliant</div>
-                            <div>
-                                <Button variant="outline" className="mr-2 rounded-2xl" onClick={openLoginModal}>Log
-                                    in</Button>
-                                <Link href="/home" className="inline-block">
-                                    <Button size="sm"
-                                            className="bg-green-500 hover:bg-green-600 text-white rounded-2xl">
-                                        Get started
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <div>
+                <div style={{ backgroundColor: '#f1f3f5', width: '100%' }}>
+                    <header>
+                        <Container size="xl" py="md">
+                            <Group justify="space-between" align="center">
+                                <Title order={2}>Brilliant</Title>
+                                <Group>
+                                    <Button variant="outline" radius="xl" onClick={openLoginModal}>
+                                        Log in
                                     </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </header>
-                </div>
-                <main className="flex-grow">
-                    <section className="py-10 bg-gray-100">
-                        <div className="container mx-auto max-w-7xl">
-                            <div className="flex flex-row">
-                                <div className="flex flex-col justify-center items-start w-1/2">
-                                    <h1 className="text-5xl font-bold mb-6">Learn by doing</h1>
-                                    <p className="text-xl mb-8 flex items-start text-left">Guided interactive problem
-                                        solving that&apos;s effective and fun. Master concepts in 15 minutes a day.</p>
-                                    <Link href="/home" className="inline-block">
-                                        <Button size="lg"
-                                                className="bg-green-500 hover:bg-green-600 text-white rounded-2xl border-2 border-blue-400">
+                                    <Link href="/home" style={{ textDecoration: 'none' }}>
+                                        <Button color="teal" size="sm">
                                             Get started
                                         </Button>
                                     </Link>
+                                </Group>
+                            </Group>
+                        </Container>
+                    </header>
+                </div>
+                <main style={{ flexGrow: 1 }}>
+                    <section style={{ padding: '2.5rem 0', backgroundColor: '#f1f3f5' }}>
+                        <Container size="xl">
+                            <Flex direction={{ base: 'column', md: 'row' }} gap="xl" align="center">
+                                <div style={{ flex: '0 0 50%' }}>
+                                    <Stack justify="center" align="flex-start">
+                                        <Title order={1} size="3.5rem" mb="lg">Learn by doing</Title>
+                                        <Text size="xl" mb="xl">
+                                            Guided interactive problem solving that&apos;s effective and fun.
+                                            Master concepts in 15 minutes a day.
+                                        </Text>
+                                        <Link href="/home" style={{ textDecoration: 'none' }}>
+                                            <Button
+                                                size="lg"
+                                                color="teal"
+                                            >
+                                                Get started
+                                            </Button>
+                                        </Link>
+                                    </Stack>
                                 </div>
-                                <section
-                                    className="relative w-full h-[40vh] md:h-[60vh] flex items-center justify-center overflow-hidden bg-gray-100">
-                                    <div
-                                        className="relative w-full h-full max-w-[1200px] max-h-[675px]">
+                                <Box style={{ position: 'relative', flex: '0 0 50%', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                    <div style={{ position: 'relative', width: '100%', height: '100%', maxWidth: '1200px', maxHeight: '675px' }}>
                                         <video
                                             autoPlay
                                             loop
                                             muted
                                             playsInline
-                                            className="absolute inset-0 w-full h-full object-contain"
+                                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
                                         >
                                             <source
                                                 src="https://brilliant.org/videos/homepage/lohp-hero-animation-dots.mp4"
@@ -68,39 +73,36 @@ const BrilliantLandingPage = () => {
                                             Your browser does not support the video tag.
                                         </video>
                                     </div>
-                                </section>
-                            </div>
+                                </Box>
+                            </Flex>
 
-                            <div className="mt-12 flex justify-between">
+                            <Group mt="xl" justify="space-between">
                                 {['Math', 'Data Analysis', 'Computer Science', 'Programming & AI', 'Science & Engineering'].map((subject, index) => (
                                     <SubjectIcon key={index} subject={subject}/>
                                 ))}
-                            </div>
-                        </div>
+                            </Group>
+                        </Container>
                     </section>
 
-                    <section className="container mx-auto max-w-7xl">
-                        <div className="container mx-auto">
-                            <div className="flex flex-col py-4">
-                                <h2 className="text-3xl font-bold text-center mb-2">Master concepts in 15 minutes a
-                                    day</h2>
-                                <p className="text-xl mb-4 text-center">
-                                    Whether you’re a complete beginner or ready to dive into machine learning and
-                                    beyond,
+                    <section>
+                        <Container size="xl">
+                            <Stack py="md">
+                                <Title order={2} ta="center" mb="xs">Master concepts in 15 minutes a day</Title>
+                                <Text size="xl" ta="center" mb="md">
+                                    Whether you're a complete beginner or ready to dive into machine learning and beyond,
                                     Brilliant makes it easy to level up fast with fun, bite-sized lessons.
-                                </p>
-                            </div>
-                            <div className="flex flex-row">
-                                <section
-                                    className="relative w-full h-[40vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
-                                    <div
-                                        className="relative w-full h-full max-w-[1200px] max-h-[675px]">
-                                    <video
+                                </Text>
+                            </Stack>
+
+                            <Flex direction={{ base: 'column', md: 'row' }} gap="md" align="center">
+                                <Box style={{ position: 'relative', flex: '0 0 50%', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                    <div style={{ position: 'relative', width: '100%', height: '100%', maxWidth: '1200px', maxHeight: '675px' }}>
+                                        <video
                                             autoPlay
                                             loop
                                             muted
                                             playsInline
-                                            className="absolute inset-0 w-full h-full object-contain"
+                                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
                                         >
                                             <source
                                                 src="https://brilliant.org/videos/homepage/hands-on-learning.mp4"
@@ -108,122 +110,138 @@ const BrilliantLandingPage = () => {
                                             Your browser does not support the video tag.
                                         </video>
                                     </div>
-                                </section>
+                                </Box>
 
-                                <div className="flex flex-col justify-center items-start w1-2">
-                                    <h1 className="text-3xl font-bold mb-2">Effective, hands-on learning</h1>
-                                    <p className="text-xl mb-4 flex items-start text-left">Guided
-                                        Visual, interactive lessons make concepts feel intuitive — so even complex ideas
-                                        just click. Our real-time feedback and simple explanations make learning
-                                        efficient.
-                                    </p>
+                                <div style={{ flex: '0 0 50%' }}>
+                                    <Stack justify="center" align="flex-start">
+                                        <Title order={2} mb="xs">Effective, hands-on learning</Title>
+                                        <Text size="xl" mb="md">
+                                            Visual, interactive lessons make concepts feel intuitive — so even complex ideas
+                                            just click. Our real-time feedback and simple explanations make learning efficient.
+                                        </Text>
+                                    </Stack>
                                 </div>
-                            </div>
+                            </Flex>
 
-                            <div className="flex flex-row">
-                                <div className="flex flex-col justify-center items-start w1-2">
-                                    <h1 className="text-3xl font-bold mb-2">Learn at your level</h1>
-                                    <p className="text-xl mb-4 flex items-start text-left">
-                                        Students and professionals alike can hone dormant skills or learn new ones.
-                                        Progress through lessons and challenges tailored to your level. Designed for
-                                        ages 13 to 113.
-                                    </p>
+                            <Flex direction={{ base: 'column', md: 'row' }} gap="md" mt="md" align="center">
+                                <div style={{ flex: '0 0 50%' }}>
+                                    <Stack justify="center" align="flex-start">
+                                        <Title order={2} mb="xs">Learn at your level</Title>
+                                        <Text size="xl" mb="md">
+                                            Students and professionals alike can hone dormant skills or learn new ones.
+                                            Progress through lessons and challenges tailored to your level. Designed for ages 13 to 113.
+                                        </Text>
+                                    </Stack>
                                 </div>
-                                <section
-                                    className="relative w-full h-[40vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
-                                    <div
-                                        className="relative w-full h-full max-w-[1200px] max-h-[675px]">
-                                        <Image src="https://brilliant.org/images/homepage/learn-at-your-level.svg"
-                                               alt="learn at your level" fill
-                                               style={{ objectFit: 'contain' }}/>
-
+                                <Box style={{ position: 'relative', flex: '0 0 50%', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                    <div style={{ position: 'relative', width: '100%', height: '100%', maxWidth: '1200px', maxHeight: '675px' }}>
+                                        <Image
+                                            src="https://brilliant.org/images/homepage/learn-at-your-level.svg"
+                                            alt="learn at your level"
+                                            fill
+                                            style={{ objectFit: 'contain' }}
+                                        />
                                     </div>
-                                </section>
-                            </div>
+                                </Box>
+                            </Flex>
 
-                            <div className="flex flex-row">
-                                <section
-                                    className="relative w-full h-[40vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
-                                    <div
-                                        className="relative w-full h-full max-w-[1200px] max-h-[675px]">
-                                        <Image src="https://brilliant.org/images/homepage/stay-motivated.svg"
-                                               alt="Stay motivated" fill
-                                               style={{ objectFit: 'contain' }}/>
-
+                            <Flex direction={{ base: 'column', md: 'row' }} gap="md" mt="md" align="center">
+                                <Box style={{ position: 'relative', flex: '0 0 50%', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                    <div style={{ position: 'relative', width: '100%', height: '100%', maxWidth: '1200px', maxHeight: '675px' }}>
+                                        <Image
+                                            src="https://brilliant.org/images/homepage/stay-motivated.svg"
+                                            alt="Stay motivated"
+                                            fill
+                                            style={{ objectFit: 'contain' }}
+                                        />
                                     </div>
-                                </section>
-                                <div className="flex flex-col justify-center items-start w1-2">
-                                    <h1 className="text-3xl font-bold mb-6">Stay motivated</h1>
-                                    <p className="text-xl mb-8 flex items-start text-left">
-                                        Form a real learning habit with fun content that’s always well-paced, game-like
-                                        progress tracking, and friendly reminders.
-                                    </p>
+                                </Box>
+                                <div style={{ flex: '0 0 50%' }}>
+                                    <Stack justify="center" align="flex-start">
+                                        <Title order={2} mb="lg">Stay motivated</Title>
+                                        <Text size="xl" mb="xl">
+                                            Form a real learning habit with fun content that's always well-paced, game-like
+                                            progress tracking, and friendly reminders.
+                                        </Text>
+                                    </Stack>
                                 </div>
-                            </div>
-
-                        </div>
+                            </Flex>
+                        </Container>
                     </section>
 
+                    <section style={{ padding: '1rem 0', backgroundColor: '#f1f3f5' }}>
+                        <Container size="xl" ta="center">
+                            <Title order={1} size="2.5rem" mb="xl">
+                                Join over 10 million people learning on Brilliant
+                            </Title>
 
-                    <section className="py-4 bg-gray-100">
-                        <div className="container mx-auto px-4 text-center">
-                            <h2 className="text-4xl font-bold mb-12">Join over 10 million people learning on
-                                Brilliant</h2>
-
-                            <div className="flex flex-wrap justify-around items-center gap-8 mb-8">
+                            <Flex wrap="wrap" justify="space-around" align="center" gap="xl" mb="lg">
                                 <Image
                                     src="https://brilliant.org/images/paywall/new-york-times.png"
-                                    alt="The New York Times" width={120} height={40}/>
+                                    alt="The New York Times"
+                                    width={120}
+                                    height={40}
+                                />
                                 <Image
                                     src="https://brilliant.org/images/paywall/the-atlantic.png"
-                                    alt="The Atlantic" width={120} height={40}/>
+                                    alt="The Atlantic"
+                                    width={120}
+                                    height={40}
+                                />
 
-                                <div className="flex flex-col items-center">
-                                    <div className="flex mb-2">
+                                <Stack align="center">
+                                    <Group mb="xs">
                                         {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className="w-5 h-5 text-yellow-400 fill-current"/>
+                                            <IconStar key={i} size={20} fill="#ffd43b" color="#ffd43b" />
                                         ))}
-                                    </div>
-                                    <p className="text-sm">
+                                    </Group>
+                                    <Text size="sm">
                                         Over 50,000 5-star reviews on<br/>
                                         iOS App Store and Google Play
-                                    </p>
-                                </div>
+                                    </Text>
+                                </Stack>
 
-                                <div className="flex flex-col items-center">
-                                    <div className="flex items-center mb-2">
-                                        <span className="font-bold text-lg mr-2">Trustpilot</span>
-                                        <div className="flex ml-2">
+                                <Stack align="center">
+                                    <Group align="center" mb="xs">
+                                        <Text fw={700} size="lg">Trustpilot</Text>
+                                        <Group gap="xs">
                                             {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className="w-5 h-5 text-green-500 fill-current"/>
+                                                <IconStar key={i} size={20} fill="#00b67a" color="#00b67a" />
                                             ))}
-                                        </div>
-                                    </div>
-                                    <p className="text-sm">TrustScore 4.7 | 2,033 reviews</p>
-                                </div>
+                                        </Group>
+                                    </Group>
+                                    <Text size="sm">TrustScore 4.7 | 2,033 reviews</Text>
+                                </Stack>
 
                                 <Image
                                     src="https://brilliant.org/images/paywall/app-of-the-day.png"
-                                    alt="Apple App of the Day" width={80} height={80}/>
+                                    alt="Apple App of the Day"
+                                    width={80}
+                                    height={80}
+                                />
                                 <Image
                                     src="https://brilliant.org/images/paywall/best-app.png"
-                                    alt="Google Play Best App" width={80} height={80}/>
-                            </div>
-                        </div>
+                                    alt="Google Play Best App"
+                                    width={80}
+                                    height={80}
+                                />
+                            </Flex>
+                        </Container>
                     </section>
 
-                    <section className="py-8">
-                        <div className="container mx-auto max-w-7xl px-4 text-center">
-                            <h2 className="text-3xl font-bold mb-8">Ready to start your learning journey?</h2>
-                            <Link href="/home" className="inline-block">
-                                <Button size="lg"
-                                        className="bg-green-500 hover:bg-green-600 text-white rounded-2xl border-2 border-blue-400">
+                    <section style={{ padding: '2rem 0' }}>
+                        <Container size="xl" ta="center">
+                            <Title order={2} mb="lg">Ready to start your learning journey?</Title>
+                            <Link href="/home" style={{ textDecoration: 'none' }}>
+                                <Button
+                                    size="lg"
+                                    color="teal"
+                                >
                                     Get started
                                 </Button>
                             </Link>
-                        </div>
+                        </Container>
                     </section>
-
                 </main>
             </div>
             <FooterFrontEnd/>

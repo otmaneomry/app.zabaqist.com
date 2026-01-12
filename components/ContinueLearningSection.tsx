@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {Card, Button} from "@mantine/core";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,21 +13,19 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => {
     const progress = Math.floor(Math.random() * 101);
 
     return (
-        <Card>
-            <CardContent className="p-4 text-center">
-                <Link href={`/courses/${title.toLowerCase().replace(/\s+/g, '-')}`} title={title}>
-                    <div className="mb-2 flex justify-center">
-                        <Image src={icon} alt={title} width={64} height={64}/>
-                    </div>
-                    <p className="text-xs font-semibold text-purple-600 mb-1">{level}</p>
-                    <h3 className="font-bold text-sm">
-                        {title}
-                    </h3>
-                    <div className="mt-4 h-1 bg-gray-200 rounded">
-                        <div className="h-1 bg-green-500 rounded" style={{width: `${progress}%`}}></div>
-                    </div>
-                </Link>
-            </CardContent>
+        <Card padding="md">
+            <Link href={`/courses/${title.toLowerCase().replace(/\s+/g, '-')}`} title={title} style={{textDecoration: 'none', color: 'inherit'}}>
+                <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center'}}>
+                    <Image src={icon} alt={title} width={64} height={64}/>
+                </div>
+                <p style={{fontSize: '0.75rem', fontWeight: 600, color: '#9333ea', marginBottom: '0.25rem', textAlign: 'center'}}>{level}</p>
+                <h3 style={{fontWeight: 'bold', fontSize: '0.875rem', textAlign: 'center'}}>
+                    {title}
+                </h3>
+                <div style={{marginTop: '1rem', height: '0.25rem', backgroundColor: '#e5e7eb', borderRadius: '0.125rem'}}>
+                    <div style={{height: '0.25rem', backgroundColor: '#22c55e', borderRadius: '0.125rem', width: `${progress}%`}}></div>
+                </div>
+            </Link>
         </Card>
     );
 };
@@ -42,13 +39,18 @@ const ContinueLearningSection: React.FC = () => {
 
     return (
         <section>
-            <h2 className="text-2xl font-bold mb-4">Continue learning</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Continue learning</h2>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '1rem',
+                marginBottom: '1rem'
+            }}>
                 {courses.map((course, index) => (
                     <CourseCard key={index} {...course} />
                 ))}
             </div>
-            <Button variant="outline" className="w-full">Show more</Button>
+            <Button variant="outline" fullWidth>Show more</Button>
         </section>
     );
 };

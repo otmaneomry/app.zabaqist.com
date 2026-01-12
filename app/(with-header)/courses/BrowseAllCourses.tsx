@@ -1,8 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search } from 'lucide-react';
+import { TextInput, Button } from "@mantine/core";
+import { IconSearch } from '@tabler/icons-react';
 
 const BrowseAllCourses = () => {
     const categories = ['New courses', 'Math', 'Data', 'Computer Science', 'Science'];
@@ -17,31 +16,42 @@ const BrowseAllCourses = () => {
 
     return (
         <section>
-            <h2 className="text-3xl font-bold mb-8">Browse all 70+ courses</h2>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem'}}>Browse all 70+ courses</h2>
 
-            <div className="relative mb-8">
-                <Input type="text" placeholder="Search" className="pl-10 pr-4 py-2 w-full" />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <div style={{position: 'relative', marginBottom: '2rem'}}>
+                <TextInput
+                    placeholder="Search"
+                    leftSection={<IconSearch size={20} style={{color: '#9ca3af'}} />}
+                    styles={{
+                        input: {
+                            paddingLeft: '2.5rem',
+                        }
+                    }}
+                />
             </div>
 
-            <div className="flex flex-wrap gap-2 mb-8">
+            <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '2rem'}}>
                 {categories.map((category, index) => (
-                    <Button key={index} variant={index === 0 ? "default" : "outline"} className="rounded-full">
+                    <Button
+                        key={index}
+                        variant={index === 0 ? "filled" : "outline"}
+                        radius="xl"
+                    >
                         {category}
                     </Button>
                 ))}
             </div>
 
-            <h3 className="text-2xl font-bold mb-6">New courses</h3>
+            <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem'}}>New courses</h3>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}} className="md:grid-cols-3 lg:grid-cols-6">
                 {courses.map((course, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-md p-4 text-center">
-                        <div className="relative h-24 mb-2">
+                    <div key={index} style={{backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '1rem', textAlign: 'center'}}>
+                        <div style={{position: 'relative', height: '6rem', marginBottom: '0.5rem'}}>
                             <Image src={course.icon} alt={course.title} layout="fill" objectFit="contain" />
                         </div>
-                        <div className="bg-green-500 text-white text-xs font-semibold py-1 px-2 rounded-full inline-block mb-2">NEW</div>
-                        <div className="text-sm font-semibold">{course.title}</div>
+                        <div style={{backgroundColor: '#22c55e', color: 'white', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '9999px', display: 'inline-block', marginBottom: '0.5rem'}}>NEW</div>
+                        <div style={{fontSize: '0.875rem', fontWeight: 600}}>{course.title}</div>
                     </div>
                 ))}
             </div>

@@ -1,16 +1,15 @@
 import React from 'react';
-import {Card, CardContent} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
+import {Card, Button} from "@mantine/core";
 
 const PremiumCard = () => (
-    <Card className="bg-yellow-50">
-        <CardContent className="flex items-center justify-between p-6">
+    <Card padding="lg" style={{backgroundColor: '#fefce8'}}>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
             <div>
-                <p className="font-bold mb-2">Premium users are 6x more likely to reach their learning goals</p>
-                <Button variant="secondary">Learn more</Button>
+                <p style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>Premium users are 6x more likely to reach their learning goals</p>
+                <Button variant="default">Learn more</Button>
             </div>
-            <div className="text-4xl">🏆</div>
-        </CardContent>
+            <div style={{fontSize: '2.25rem'}}>🏆</div>
+        </div>
     </Card>
 );
 

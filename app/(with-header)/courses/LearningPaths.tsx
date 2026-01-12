@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import { Button } from "@/components/ui/button";
-import { ChevronDown } from 'lucide-react';
+import { Button } from "@mantine/core";
+import { IconChevronDown } from '@tabler/icons-react';
 import CourseCard from "@/components/CourseCard";
 
 const LearningPaths = () => {
@@ -15,33 +15,36 @@ const LearningPaths = () => {
     ];
 
     return (
-        <section className="mb-16">
-            <h1 className="text-4xl font-bold mb-2">Learning Paths</h1>
-            <p className="text-gray-600 mb-8">Step-by-step paths to mastery</p>
+        <section style={{marginBottom: '4rem'}}>
+            <h1 style={{fontSize: '2.25rem', fontWeight: 'bold', marginBottom: '0.5rem'}}>Learning Paths</h1>
+            <p style={{color: '#4b5563', marginBottom: '2rem'}}>Step-by-step paths to mastery</p>
 
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                        <Image src="/brilliant-image/computer-science.png" alt="CS & Programming" width={48} height={48} className="mr-4" />
+            <div style={{backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '1.5rem', marginBottom: '2rem'}}>
+                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem'}}>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
+                        <Image src="/brilliant-image/computer-science.png" alt="CS & Programming" width={48} height={48} style={{marginRight: '1rem'}} />
                         <div>
-                            <div className="text-green-500 text-sm font-semibold">IN PROGRESS</div>
-                            <h2 className="text-2xl font-bold">CS & Programming</h2>
-                            <p className="text-gray-600">Develop skills in programming and algorithmic thinking</p>
+                            <div style={{color: '#22c55e', fontSize: '0.875rem', fontWeight: 600}}>IN PROGRESS</div>
+                            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold'}}>CS & Programming</h2>
+                            <p style={{color: '#4b5563'}}>Develop skills in programming and algorithmic thinking</p>
                         </div>
                     </div>
-                    <Button className="bg-black text-white">Continue</Button>
+                    <Button style={{backgroundColor: 'black', color: 'white'}}>Continue</Button>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}} className="md:grid-cols-3 lg:grid-cols-6">
                     {courses.map((course, index) => (
                         <CourseCard key={index} {...course} />
                     ))}
                 </div>
             </div>
 
-            <Button variant="outline" className="w-full flex items-center justify-center">
-                <span className="mr-2">View all learning paths</span>
-                <ChevronDown size={16} />
+            <Button
+                variant="outline"
+                style={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                rightSection={<IconChevronDown size={16} />}
+            >
+                View all learning paths
             </Button>
         </section>
     );

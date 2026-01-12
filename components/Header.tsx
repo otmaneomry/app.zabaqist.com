@@ -3,65 +3,97 @@
 import React from 'react';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
-import {Button} from "@/components/ui/button";
-import {BookOpen, Home, Menu, Search, Trophy} from 'lucide-react';
+import {Button} from "@mantine/core";
+import {IconBook, IconHome, IconMenu, IconSearch, IconTrophy} from '@tabler/icons-react';
 
 const Header = () => {
     const pathname = usePathname();
 
     const navItems = [
-        {href: '/home', label: 'Home', icon: Home},
-        {href: '/courses', label: 'Courses', icon: BookOpen},
+        {href: '/home', label: 'Home', icon: IconHome},
+        {href: '/courses', label: 'Courses', icon: IconBook},
     ];
 
     return (
-        <header className="bg-white shadow-sm">
-            <div className="container mx-auto max-w-6xl px-4 py-4">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-4">
-                        <Link href="/" className="text-2xl font-bold">Brilliant</Link>
-                        <nav className="hidden md:flex space-x-4">
+        <header style={{backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'}}>
+            <div style={{maxWidth: '72rem', margin: '0 auto', padding: '1rem'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                        <Link href="/" style={{fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: 'inherit'}}>Brilliant</Link>
+                        <nav style={{display: 'flex', gap: '1rem'}}>
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href;
+                                const Icon = item.icon;
                                 return (
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-colors relative
-    ${isActive
-                                            ? 'text-gray-900'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                        }`}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.25rem',
+                                            padding: '0.25rem 0.5rem',
+                                            borderRadius: '0.375rem',
+                                            transition: 'all 0.2s',
+                                            position: 'relative',
+                                            color: isActive ? '#111827' : '#4b5563',
+                                            textDecoration: 'none',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (!isActive) {
+                                                e.currentTarget.style.backgroundColor = '#f3f4f6';
+                                                e.currentTarget.style.color = '#111827';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (!isActive) {
+                                                e.currentTarget.style.backgroundColor = 'transparent';
+                                                e.currentTarget.style.color = '#4b5563';
+                                            }
+                                        }}
                                     >
-                                        <item.icon size={18}/>
+                                        <Icon size={18}/>
                                         <span>{item.label}</span>
-                                        <div className={`absolute bottom-0 left-0 w-full h-0.5 transition-colors
-    ${isActive
-                                            ? 'bg-gray-900'
-                                            : 'bg-transparent group-hover:bg-gray-300'
-                                        }`}
+                                        <div style={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            height: '2px',
+                                            backgroundColor: isActive ? '#111827' : 'transparent',
+                                            transition: 'background-color 0.2s'
+                                        }}
                                         ></div>
                                     </Link>
                                 );
                             })}
                         </nav>
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="icon" className="text-gray-600">
-                            <Search size={20}/>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                        <Button variant="subtle" color="gray" p="xs">
+                            <IconSearch size={20}/>
                         </Button>
 
-                        <Link href="/subscribe" className="inline-block">
-                            <Button size="sm" variant="outline"
-                                    className="rounded-2xl text-md border-2 border-green-600  hover:bg-white hover:text-green-600 hover:shadow-md text-green-600  ">
-                                <Trophy size={16}/>
-                                <span>Go premium</span>
+                        <Link href="/subscribe" style={{textDecoration: 'none'}}>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                color="teal"
+                                leftSection={<IconTrophy size={16}/>}
+                                styles={{
+                                    root: {
+                                        borderRadius: '1rem',
+                                        borderWidth: '2px',
+                                    }
+                                }}
+                            >
+                                Go premium
                             </Button>
                         </Link>
 
-                        <span className="text-xl">0</span>
-                        <Button variant="ghost" size="icon" className="md:hidden">
-                            <Menu size={20}/>
+                        <span style={{fontSize: '1.25rem'}}>0</span>
+                        <Button variant="subtle" color="gray" p="xs" className="md:hidden">
+                            <IconMenu size={20}/>
                         </Button>
                     </div>
                 </div>

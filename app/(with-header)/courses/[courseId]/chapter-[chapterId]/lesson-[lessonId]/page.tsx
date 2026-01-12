@@ -2,9 +2,8 @@
 
 import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button, Card, Container, Title, Text, Group, Stack } from "@mantine/core";
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 // Mock data - replace with actual data fetching in production
 const getLessonData = (courseId: string, chapterId: string, lessonId: string) => ({
@@ -34,31 +33,41 @@ const LessonPage = ({ params }: { params: Promise<{ courseId: string, chapterId:
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-            <div className="mb-4 flex justify-between items-center">
-                <Button variant="outline" onClick={() => router.back()}>
-                    <ChevronLeft className="mr-2" /> Back to course
+        <Container size="xl" py="xl">
+            <Group justify="space-between" align="center" mb="lg">
+                <Button
+                    variant="outline"
+                    leftSection={<IconChevronLeft size={16} />}
+                    onClick={() => router.back()}
+                >
+                    Back to course
                 </Button>
-                <div className="flex items-center">
-                    <Button variant="outline" className="mr-2">
-                        <ChevronLeft /> Previous
+                <Group>
+                    <Button
+                        variant="outline"
+                        leftSection={<IconChevronLeft size={16} />}
+                    >
+                        Previous
                     </Button>
-                    <Button variant="outline">
-                        Next <ChevronRight />
+                    <Button
+                        variant="outline"
+                        rightSection={<IconChevronRight size={16} />}
+                    >
+                        Next
                     </Button>
-                </div>
-            </div>
+                </Group>
+            </Group>
 
-            <Card>
-                <CardContent className="p-6">
-                    <h1 className="text-2xl font-bold mb-4">{lessonData.title}</h1>
-                    <p className="mb-4">{lessonData.content}</p>
-                    <p className="font-bold mb-4">{lessonData.question}</p>
-                    <div className="grid grid-cols-3 gap-4 mb-6">
+            <Card shadow="sm" padding="xl" radius="md" withBorder>
+                <Stack>
+                    <Title order={1} mb="md">{lessonData.title}</Title>
+                    <Text mb="md">{lessonData.content}</Text>
+                    <Text fw={700} mb="md">{lessonData.question}</Text>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
                         {lessonData.options.map((option) => (
                             <Button
                                 key={option}
-                                variant={selectedOption === option ? "default" : "outline"}
+                                variant={selectedOption === option ? "filled" : "outline"}
                                 onClick={() => handleOptionSelect(option)}
                             >
                                 {option}
@@ -66,17 +75,19 @@ const LessonPage = ({ params }: { params: Promise<{ courseId: string, chapterId:
                         ))}
                     </div>
                     {showExplanation && (
-                        <div className="mb-6">
-                            <p className="font-bold mb-2">Explanation:</p>
-                            <p>{lessonData.explanation}</p>
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <Text fw={700} mb="xs">Explanation:</Text>
+                            <Text>{lessonData.explanation}</Text>
                         </div>
                     )}
                     {showExplanation && (
-                        <Button onClick={handleContinue}>Continue</Button>
+                        <Button onClick={handleContinue} color="green">
+                            Continue
+                        </Button>
                     )}
-                </CardContent>
+                </Stack>
             </Card>
-        </div>
+        </Container>
     );
 };
 

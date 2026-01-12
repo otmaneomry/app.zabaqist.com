@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from "@/components/ui/button";
+import {Button} from "@mantine/core";
 import CourseCard from "@/components/CourseCard";
 
 const RecommendedSection = () => {
@@ -13,14 +13,19 @@ const RecommendedSection = () => {
     ];
 
     return (
-        <section className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Recommended for you</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+        <section style={{marginTop: '2rem'}}>
+            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Recommended for you</h2>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '1rem',
+                marginBottom: '1rem'
+            }}>
                 {courses.map((course, index) => (
                     <CourseCard key={index} {...course} />
                 ))}
             </div>
-            <Button variant="outline" className="w-full">Show more</Button>
+            <Button variant="outline" fullWidth>Show more</Button>
         </section>
     );
 };

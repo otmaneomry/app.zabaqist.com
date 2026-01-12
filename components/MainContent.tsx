@@ -4,40 +4,39 @@ import ComebackCard from "@/components/ComebackCard";
 import PremiumCard from "@/components/PremiumCard";
 import ContinueLearningSection from "@/components/ContinueLearningSection";
 import RecommendedSection from "@/components/RecommendedSection";
-import {ScrollArea} from "@/components/ui/scroll-area";
+import {ScrollArea} from "@mantine/core";
 import React from "react";
 
 const MainContent = () => {
     return (
-        <div className="container mx-auto p-6 max-w-6xl">
-
-            <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-4 space-y-6">
+        <div style={{maxWidth: '72rem', margin: '0 auto', padding: '1.5rem'}}>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.5rem'}}>
+                <div style={{gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
                     <section>
-                        <h2 className="text-2xl font-bold mb-4">Welcome, ma</h2>
-                        <div className="grid grid-cols-1 gap-4">
+                        <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Welcome, ma</h2>
+                        <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '1rem'}}>
                             <StreakCard/>
                             <ComebackCard/>
                         </div>
                     </section>
                 </div>
 
-                <ScrollArea className="col-span-8 h-[calc(100vh-100px)1]">
-                    <div className="space-y-6 pr-4">
+                <ScrollArea style={{gridColumn: 'span 8', height: 'calc(100vh - 100px)'}}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingRight: '1rem'}}>
                         <section>
-                            <h2 className="text-2xl font-bold mb-4">Jump back in</h2>
-                            <div className="grid grid-cols-1 gap-4">
+                            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Jump back in</h2>
+                            <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '1rem'}}>
                                 <JumpBackInCard/>
                                 <PremiumCard/>
                             </div>
                         </section>
                         <ContinueLearningSection/>
-                            <RecommendedSection/>
+                        <RecommendedSection/>
                     </div>
                 </ScrollArea>
             </div>
         </div>
-);
+    );
 };
 
 export default MainContent;

@@ -2,9 +2,8 @@
 
 import React, {useState} from 'react';
 import Image from 'next/image';
-import {Button} from "@/components/ui/button";
-import {Card, CardContent} from "@/components/ui/card";
-import {CheckCircle, X} from 'lucide-react';
+import {Button, Card} from "@mantine/core";
+import {IconCircleCheck, IconX} from '@tabler/icons-react';
 
 type PlanType = 'annual' | 'monthly';
 
@@ -14,87 +13,92 @@ interface PricingCardProps {
 }
 
 const PricingCard: React.FC<PricingCardProps> = ({ selectedPlan, setSelectedPlan }) => (
-    <Card className="max-w-md mx-auto bg-white">
-        <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-4">
+    <Card style={{maxWidth: '28rem', margin: '0 auto', backgroundColor: 'white'}}>
+        <div style={{padding: '1.5rem'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
                 <Button
-                    variant={selectedPlan === 'annual' ? 'default' : 'outline'}
+                    variant={selectedPlan === 'annual' ? 'filled' : 'outline'}
                     onClick={() => setSelectedPlan('annual')}
-                    className={`w-1/2 mr-2 ${selectedPlan === 'annual' ? 'bg-yellow-400 text-black' : ''}`}
+                    style={{
+                        width: '50%',
+                        marginRight: '0.5rem',
+                        backgroundColor: selectedPlan === 'annual' ? '#facc15' : undefined,
+                        color: selectedPlan === 'annual' ? 'black' : undefined,
+                    }}
                 >
                     Annual
-                    {selectedPlan === 'annual' && <span className="ml-2 text-xs bg-yellow-500 px-1 rounded">MOST POPULAR</span>}
+                    {selectedPlan === 'annual' && <span style={{marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#eab308', padding: '0 0.25rem', borderRadius: '0.25rem'}}>MOST POPULAR</span>}
                 </Button>
                 <Button
-                    variant={selectedPlan === 'monthly' ? 'default' : 'outline'}
+                    variant={selectedPlan === 'monthly' ? 'filled' : 'outline'}
                     onClick={() => setSelectedPlan('monthly')}
-                    className="w-1/2 ml-2"
+                    style={{width: '50%', marginLeft: '0.5rem'}}
                 >
                     Monthly
                 </Button>
             </div>
             {selectedPlan === 'annual' && (
-                <div className="text-center mb-4">
-                    <p className="text-sm line-through">MAD 53.59</p>
-                    <p className="text-2xl font-bold">MAD 42.87<span className="text-sm">/month*</span></p>
+                <div style={{textAlign: 'center', marginBottom: '1rem'}}>
+                    <p style={{fontSize: '0.875rem', textDecoration: 'line-through'}}>MAD 53.59</p>
+                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>MAD 42.87<span style={{fontSize: '0.875rem'}}>/month*</span></p>
                 </div>
             )}
             {selectedPlan === 'monthly' && (
-                <div className="text-center mb-4">
-                    <p className="text-2xl font-bold">MAD 107.55<span className="text-sm">/month</span></p>
+                <div style={{textAlign: 'center', marginBottom: '1rem'}}>
+                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>MAD 107.55<span style={{fontSize: '0.875rem'}}>/month</span></p>
                 </div>
             )}
-            <Button className="w-full bg-green-500 hover:bg-green-600 text-white">Subscribe now</Button>
-            <p className="text-xs mt-4 text-gray-500">*Billed as one payment. Renews annually, cancel anytime. You can turn off auto-renew from your settings.</p>
-        </CardContent>
+            <Button style={{width: '100%', backgroundColor: '#22c55e', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#16a34a'}}}}>Subscribe now</Button>
+            <p style={{fontSize: '0.75rem', marginTop: '1rem', color: '#6b7280'}}>*Billed as one payment. Renews annually, cancel anytime. You can turn off auto-renew from your settings.</p>
+        </div>
     </Card>
 );
 
 const ReviewSection = () => (
-    <div className="flex justify-center items-center space-x-8 my-12">
-        <div className="text-center">
-            <p className="font-serif italic">{`"Tantalizing"`}</p>
-            <p className="text-xs">The New York Times</p>
+    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem', margin: '3rem 0'}}>
+        <div style={{textAlign: 'center'}}>
+            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Tantalizing"`}</p>
+            <p style={{fontSize: '0.75rem'}}>The New York Times</p>
         </div>
-        <div className="text-center">
-            <div className="flex">
+        <div style={{textAlign: 'center'}}>
+            <div style={{display: 'flex'}}>
                 {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-400">★</span>
+                    <span key={i} style={{color: '#facc15'}}>★</span>
                 ))}
             </div>
-            <p className="text-sm">Over 50,000 5-star reviews</p>
+            <p style={{fontSize: '0.875rem'}}>Over 50,000 5-star reviews</p>
         </div>
-        <div className="text-center">
+        <div style={{textAlign: 'center'}}>
             <Image src="/trustpilot.png" alt="Trustpilot" width={100} height={30}/>
         </div>
-        <div className="text-center">
-            <p className="font-serif italic">{`"Advanced"`}</p>
-            <p className="text-xs">The Atlantic</p>
+        <div style={{textAlign: 'center'}}>
+            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Advanced"`}</p>
+            <p style={{fontSize: '0.75rem'}}>The Atlantic</p>
         </div>
     </div>
 );
 
 const LevelUpSection = () => (
-    <div className="my-12">
-        <h2 className="text-3xl font-bold text-center mb-8">Level up with Premium</h2>
-        <div className="flex justify-center items-center">
-            <ul className="space-y-4 w-1/3">
+    <div style={{margin: '3rem 0'}}>
+        <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Level up with Premium</h2>
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <ul style={{width: '33.333%', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
                 <li>🚀 Learn efficiently</li>
                 <li>📚 Master the essentials</li>
                 <li>🧠 Apply your learnings</li>
                 <li>📊 Stay on track</li>
             </ul>
-            <div className="w-1/3 flex justify-center">
+            <div style={{width: '33.333%', display: 'flex', justifyContent: 'center'}}>
                 <section
-                    className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden">
+                    style={{position: 'relative', width: '100%', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'}}>
                     <div
-                        className="relative w-full h-full max-w-[1200px] max-h-[675px]">
+                        style={{position: 'relative', width: '100%', height: '100%', maxWidth: '1200px', maxHeight: '675px'}}>
                         <video
                             autoPlay
                             loop
                             muted
                             playsInline
-                            className="absolute inset-0 w-full h-full object-contain"
+                            style={{position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain'}}
                         >
                             <source
                                 src="https://brilliant.org/videos/paywall/value-props/apply-your-learnings.mp4"
@@ -104,8 +108,8 @@ const LevelUpSection = () => (
                     </div>
                 </section>
             </div>
-            <div className="w-1/3">
-                <h3 className="font-bold mb-2">Effective, hands-on learning</h3>
+            <div style={{width: '33.333%'}}>
+                <h3 style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>Effective, hands-on learning</h3>
                 <p>Unlimited access to 70+ interactive courses with real-time feedback and simple explanations to make
                     learning efficient.</p>
             </div>
@@ -124,28 +128,28 @@ const CoursesSection = () => {
     ];
 
     return (
-        <div className="my-12">
-            <h2 className="text-3xl font-bold text-center mb-8">Build quantitative + technical problem solving
+        <div style={{margin: '3rem 0'}}>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Build quantitative + technical problem solving
                 skills</h2>
-            <div className="flex justify-center mb-4">
+            <div style={{display: 'flex', justifyContent: 'center', marginBottom: '1rem'}}>
                 {tabs.map(tab => (
                     <Button
                         key={tab}
-                        variant={activeTab === tab ? 'default' : 'outline'}
+                        variant={activeTab === tab ? 'filled' : 'outline'}
                         onClick={() => setActiveTab(tab)}
-                        className="mx-1"
+                        style={{margin: '0 0.25rem'}}
                     >
                         {tab}
                     </Button>
                 ))}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}}>
                 <div>
-                    <h3 className="font-bold mb-4">Courses in {activeTab}</h3>
-                    <ul className="space-y-2">
+                    <h3 style={{fontWeight: 'bold', marginBottom: '1rem'}}>Courses in {activeTab}</h3>
+                    <ul style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
                         {courses.map((course, index) => (
-                            <li key={index} className="flex items-center">
-                                <span className="mr-2">📚</span> {course}
+                            <li key={index} style={{display: 'flex', alignItems: 'center'}}>
+                                <span style={{marginRight: '0.5rem'}}>📚</span> {course}
                             </li>
                         ))}
                     </ul>
@@ -182,19 +186,19 @@ const ComparisonSection = () => {
     ];
 
     return (
-        <div className="my-12">
-            <h2 className="text-3xl font-bold text-center mb-4">No commitment, cancel anytime</h2>
-            <p className="text-center mb-8">Unlock it all with Premium</p>
-            <div className="grid grid-cols-3 gap-4">
+        <div style={{margin: '3rem 0'}}>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem'}}>No commitment, cancel anytime</h2>
+            <p style={{textAlign: 'center', marginBottom: '2rem'}}>Unlock it all with Premium</p>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem'}}>
                 <div></div>
-                <div className="font-bold text-center">Free</div>
-                <div className="font-bold text-center">Premium</div>
+                <div style={{fontWeight: 'bold', textAlign: 'center'}}>Free</div>
+                <div style={{fontWeight: 'bold', textAlign: 'center'}}>Premium</div>
                 {features.map((feature, index) => (
                     <React.Fragment key={index}>
-                        <div>{feature.name}<p className="text-sm text-gray-500">{feature.description}</p></div>
-                        <div className="text-center">{feature.free ? <CheckCircle className="inline text-green-500"/> :
-                            <X className="inline text-red-500"/>}</div>
-                        <div className="text-center"><CheckCircle className="inline text-green-500"/></div>
+                        <div>{feature.name}<p style={{fontSize: '0.875rem', color: '#6b7280'}}>{feature.description}</p></div>
+                        <div style={{textAlign: 'center'}}>{feature.free ? <IconCircleCheck style={{display: 'inline', color: '#22c55e'}} /> :
+                            <IconX style={{display: 'inline', color: '#ef4444'}} />}</div>
+                        <div style={{textAlign: 'center'}}><IconCircleCheck style={{display: 'inline', color: '#22c55e'}} /></div>
                     </React.Fragment>
                 ))}
             </div>
@@ -203,69 +207,70 @@ const ComparisonSection = () => {
 };
 
 const SuperchargeSection = () => (
-    <div className="my-12 text-center flex justify-between">
-        <div className="w-1/2 flex justify-center items-center flex-col">
-            <h2 className="text-3xl font-bold mb-8">Supercharge your learning</h2>
-            <ul className="inline-block text-left mb-8">
-                <li className="flex items-center mb-2">
-                    <span className="mr-2">📚</span> 70+ courses in math, programming, data analysis, computer science,
+    <div style={{margin: '3rem 0', textAlign: 'center', display: 'flex', justifyContent: 'space-between'}}>
+        <div style={{width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem'}}>Supercharge your learning</h2>
+            <ul style={{display: 'inline-block', textAlign: 'left', marginBottom: '2rem'}}>
+                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
+                    <span style={{marginRight: '0.5rem'}}>📚</span> 70+ courses in math, programming, data analysis, computer science,
                     and
                     more
                 </li>
-                <li className="flex items-center mb-2">
-                    <span className="mr-2">🚫</span> No in-app purchases or ads
+                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
+                    <span style={{marginRight: '0.5rem'}}>🚫</span> No in-app purchases or ads
                 </li>
-                <li className="flex items-center mb-2">
-                    <span className="mr-2">🆕</span> New content added regularly
+                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
+                    <span style={{marginRight: '0.5rem'}}>🆕</span> New content added regularly
                 </li>
-                <li className="flex items-center mb-2">
-                    <span className="mr-2">📱</span> One subscription across all devices
+                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
+                    <span style={{marginRight: '0.5rem'}}>📱</span> One subscription across all devices
                 </li>
             </ul>
-            <Button className="bg-green-500 hover:bg-green-600 text-white">Subscribe now</Button>
+            <Button style={{backgroundColor: '#22c55e', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#16a34a'}}}}>Subscribe now</Button>
         </div>
 
-        <Image src={"/brilliant-image/suppercharging.png"} alt={"Gift plan"} width={512} height={512} className="w-1/2 flex"/>
+        <Image src={"/brilliant-image/suppercharging.png"} alt={"Gift plan"} width={512} height={512} style={{width: '50%', display: 'flex'}}/>
     </div>
 );
 
 const GiftSection = () => (
-    <div className="my-12">
-        <h2 className="text-4xl font-bold text-center mb-8">Share the gift of Premium</h2>
-        <div className="flex justify-center space-x-8">
-            <Card className="w-1/2">
-                <CardContent className="p-6">
-                    <div className="mb-2 flex justify-center items-center">
+    <div style={{margin: '3rem 0'}}>
+        <h2 style={{fontSize: '2.25rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Share the gift of Premium</h2>
+        <div style={{display: 'flex', justifyContent: 'center', gap: '2rem'}}>
+            <Card style={{width: '50%'}}>
+                <div style={{padding: '1.5rem'}}>
+                    <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Image src={"https://brilliant.org/images/paywall/brandRefresh/gift-plan.svg"} alt={"Gift plan"}
                                width={128} height={128}/>
-                        <div className="pl-2 py-4">
-                            <h3 className="font-bold">Gift plan</h3>
-                            <p className="mt-4">Share your love of math and science — give a subscription to Brilliant
+                        <div style={{paddingLeft: '0.5rem', paddingTop: '1rem', paddingBottom: '1rem'}}>
+                            <h3 style={{fontWeight: 'bold'}}>Gift plan</h3>
+                            <p style={{marginTop: '1rem'}}>Share your love of math and science — give a subscription to Brilliant
                                 Premium.</p>
                             <Button variant="outline"
-                                    className="mt-8 w-full border-2 hover:border-gray-950 hover:bg-gray-50 rounded-2xl">Gift
+                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem'}}
+                                    styles={{root: {':hover': {borderColor: '#030712', backgroundColor: '#f9fafb'}}}}>Gift
                                 Premium</Button>
                         </div>
                     </div>
-                </CardContent>
+                </div>
             </Card>
-            <Card className="w-1/2">
-
-                <CardContent className="p-6">
-                    <div className="mb-2 flex justify-center items-center">
+            <Card style={{width: '50%'}}>
+                <div style={{padding: '1.5rem'}}>
+                    <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Image src={"https://brilliant.org/images/paywall/brandRefresh/group-plan.svg"}
                                alt={"Group plan"}
                                width={128} height={128}/>
-                        <div className="pl-2 py-4">
-                            <h3 className="font-bold">Group plan</h3>
-                            <p className="mt-4">Want to share Brilliant Premium with your family, class, or team? Learn
+                        <div style={{paddingLeft: '0.5rem', paddingTop: '1rem', paddingBottom: '1rem'}}>
+                            <h3 style={{fontWeight: 'bold'}}>Group plan</h3>
+                            <p style={{marginTop: '1rem'}}>Want to share Brilliant Premium with your family, class, or team? Learn
                                 about our group plans.</p>
                             <Button variant="outline"
-                                    className="mt-8 w-full border-2 hover:border-gray-950 hover:bg-gray-50 rounded-2xl">Learn
+                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem'}}
+                                    styles={{root: {':hover': {borderColor: '#030712', backgroundColor: '#f9fafb'}}}}>Learn
                                 more</Button>
                         </div>
                     </div>
-                </CardContent>
+                </div>
             </Card>
         </div>
     </div>
@@ -275,46 +280,46 @@ const SubscribePage = () => {
     const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
 
     return (
-        <div className="min-h-screen">
-            <div className="bg-gradient-to-r from-blue-800 to-indigo-900 w-full">
-                <div className="container mx-auto px-4 py-8 max-w-6xl text-white text-center">
-                    <h1 className="text-5xl font-bold mt-8">Unlock the full learning experience</h1>
-                    <p className="mt-4">Reach your learning goals fast with unlimited access to all courses</p>
-                    <p className="my-8">⚡ Youtube Sponsor discount applied</p>
+        <div style={{minHeight: '100vh'}}>
+            <div style={{background: 'linear-gradient(to right, #1e40af, #4338ca)', width: '100%'}}>
+                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem', color: 'white', textAlign: 'center'}}>
+                    <h1 style={{fontSize: '3rem', fontWeight: 'bold', marginTop: '2rem'}}>Unlock the full learning experience</h1>
+                    <p style={{marginTop: '1rem'}}>Reach your learning goals fast with unlimited access to all courses</p>
+                    <p style={{margin: '2rem 0'}}>⚡ Youtube Sponsor discount applied</p>
                     <PricingCard selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan}/>
                 </div>
             </div>
-            <div className="bg-gray-100">
-                <div className="container mx-auto px-4 py-8 max-w-6xl ">
+            <div style={{backgroundColor: '#f3f4f6'}}>
+                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
                     <ReviewSection/>
                 </div>
             </div>
-            <div className="">
-                <div className="container mx-auto px-4 py-8 max-w-6xl ">
+            <div>
+                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
                     <LevelUpSection/>
                 </div>
             </div>
 
-            <div className="bg-gray-100">
-                <div className="container mx-auto px-4 py-8 max-w-6xl ">
+            <div style={{backgroundColor: '#f3f4f6'}}>
+                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
                     <CoursesSection/>
                 </div>
             </div>
 
-            <div className="">
-                <div className="container mx-auto px-4 py-8 max-w-6xl ">
+            <div>
+                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
                     <ComparisonSection/>
                 </div>
             </div>
 
-            <div className="bg-gray-100">
-                <div className="container mx-auto px-4 py-8 max-w-6xl ">
+            <div style={{backgroundColor: '#f3f4f6'}}>
+                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
                     <SuperchargeSection/>
                 </div>
             </div>
 
-            <div className="">
-                <div className="container mx-auto px-4 py-8 max-w-6xl ">
+            <div>
+                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
                     <GiftSection/>
                 </div>
             </div>

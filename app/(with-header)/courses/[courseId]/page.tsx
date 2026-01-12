@@ -3,9 +3,8 @@
 import React, { useState, use } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown, Lock } from 'lucide-react';
+import { Container, Card, Button, Text, Title, Stack, Group, Box } from "@mantine/core";
+import { IconChevronUp, IconChevronDown, IconLock } from '@tabler/icons-react';
 
 // Mock data - replace with actual data fetching in production
 const getCourseData = (courseId: string) => ({
@@ -47,59 +46,66 @@ const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <Card className="md:col-span-1">
-                    <CardContent className="p-6">
-                        <div className="flex flex-col items-start">
-                            <Image src="/brilliant-image/computer-science.png" alt="CS & Programming" width={64}
-                                   height={64} className="mr-4"/>
-                            <div>
-                                <h2 className="text-2xl font-bold mt-2">{courseData.title}</h2>
-                                <p className="text-gray-600 mt-2">{courseData.description}</p>
-                                <p className="text-sm text-gray-500 mt-2">
-                                    <span className="mr-2">📚</span>{courseData.lessons} Lessons
-                                </p>
-                            </div>
+        <Container size="xl" py="xl">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
+                <Card shadow="sm" padding="lg" radius="md" withBorder>
+                    <Stack>
+                        <Image
+                            src="/brilliant-image/computer-science.png"
+                            alt="CS & Programming"
+                            width={64}
+                            height={64}
+                        />
+                        <div>
+                            <Title order={2} mb="xs">{courseData.title}</Title>
+                            <Text c="dimmed" mb="xs">{courseData.description}</Text>
+                            <Text size="sm" c="dimmed">
+                                <span style={{ marginRight: '0.5rem' }}>📚</span>
+                                {courseData.lessons} Lessons
+                            </Text>
                         </div>
-                    </CardContent>
+                    </Stack>
                 </Card>
 
-                <div className="md:col-span-2">
+                <div>
                     {courseData.chapters.map((chapter) => (
-                        <div key={chapter.id} className="mb-4">
+                        <div key={chapter.id} style={{ marginBottom: '1rem' }}>
                             <Button
                                 variant="outline"
-                                className="w-full justify-between py-4 px-6"
+                                fullWidth
+                                justify="space-between"
+                                style={{ padding: '1rem 1.5rem', height: 'auto' }}
                                 onClick={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
+                                rightSection={expandedChapter === chapter.id ? <IconChevronUp size={20} /> : <IconChevronDown size={20} />}
                             >
-                <span className="flex items-center">
-                  {chapter.isCompleted && <span className="mr-2 text-green-500">✓</span>}
-                    {chapter.isLocked && <Lock className="mr-2 w-4 h-4" />}
-                    {chapter.title}
-                </span>
-                                {expandedChapter === chapter.id ? <ChevronUp /> : <ChevronDown />}
+                                <Group>
+                                    {chapter.isCompleted && <Text c="green" fw={700}>✓</Text>}
+                                    {chapter.isLocked && <IconLock size={16} />}
+                                    {chapter.title}
+                                </Group>
                             </Button>
                             {expandedChapter === chapter.id && (
-                                <div className="mt-2 p-4 bg-gray-100 rounded">
+                                <Box mt="xs" p="md" style={{ backgroundColor: '#f1f3f5', borderRadius: '8px' }}>
                                     {chapter.lessons.map((lesson) => (
                                         <Button
                                             key={lesson.id}
-                                            variant="ghost"
-                                            className="w-full justify-start py-2 px-4 mb-2"
+                                            variant="subtle"
+                                            fullWidth
+                                            justify="flex-start"
+                                            style={{ padding: '0.5rem 1rem', marginBottom: '0.5rem' }}
                                             onClick={() => handleLessonClick(chapter.id, lesson.id)}
                                         >
-                                            {lesson.isCompleted && <span className="mr-2 text-green-500">✓</span>}
+                                            {lesson.isCompleted && <Text c="green" fw={700} mr="xs">✓</Text>}
                                             {lesson.title}
                                         </Button>
                                     ))}
-                                </div>
+                                </Box>
                             )}
                         </div>
                     ))}
                 </div>
             </div>
-        </div>
+        </Container>
     );
 };
 
