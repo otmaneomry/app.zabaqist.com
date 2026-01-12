@@ -6,12 +6,12 @@ import { IconSearch } from '@tabler/icons-react';
 const BrowseAllCourses = () => {
     const categories = ['Toutes', 'Algèbre', 'Analyse', 'Géométrie', 'Probabilités'];
     const courses = [
-        { title: 'Fonctions Logarithmiques', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Dérivées et Primitives', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Nombres Complexes', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Suites Numériques', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Géométrie dans l\'Espace', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Probabilités Continues', icon: '/brilliant-image/foundational-math.png' },
+        { title: 'Fonctions Logarithmiques', icon: '/brilliant-image/data-analysis.png' },
+        { title: 'Dérivées et Primitives', icon: '/brilliant-image/science.png' },
+        { title: 'Nombres Complexes', icon: '/brilliant-image/computer-science.png' },
+        { title: 'Suites Numériques', icon: '/brilliant-image/programming-python.png' },
+        { title: 'Géométrie dans l\'Espace', icon: '/brilliant-image/how-llms-work.png' },
+        { title: 'Probabilités Continues', icon: '/brilliant-image/suppercharging.png' },
     ];
 
     return (

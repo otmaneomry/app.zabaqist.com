@@ -59,7 +59,7 @@ const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                     <Stack>
                         <Image
-                            src="/brilliant-image/foundational-math.png"
+                            src="/brilliant-image/data-analysis.png"
                             alt="Mathématiques - Analyse"
                             width={64}
                             height={64}

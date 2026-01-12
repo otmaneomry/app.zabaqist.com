@@ -32,9 +32,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => {
 
 const ContinueLearningSection: React.FC = () => {
     const courses: CourseCardProps[] = [
-        { title: "Dérivées et Primitives", icon: '/brilliant-image/foundational-math.png', level: "ANALYSE · BAC" },
-        { title: "Nombres Complexes", icon: "/brilliant-image/foundational-math.png", level: "ALGÈBRE · BAC" },
-        { title: "Géométrie dans l'Espace", icon: "/brilliant-image/foundational-math.png", level: "GÉOMÉTRIE · BAC" }
+        { title: "Dérivées et Primitives", icon: '/brilliant-image/suppercharging.png', level: "ANALYSE · BAC" },
+        { title: "Nombres Complexes", icon: "/brilliant-image/Designing_Programs_Course_Card.png", level: "ALGÈBRE · BAC" },
+        { title: "Géométrie dans l'Espace", icon: "/brilliant-image/search-fundamentals.png", level: "GÉOMÉTRIE · BAC" }
     ];
 
     return (

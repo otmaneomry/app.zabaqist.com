@@ -4,12 +4,12 @@ import CourseCard from "@/components/CourseCard";
 
 const RecommendedSection = () => {
     const courses = [
-        { title: 'Fonctions Exponentielles', level: 'ANALYSE · BAC', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Équations Différentielles', level: 'ANALYSE · BAC', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Matrices et Déterminants', level: 'ALGÈBRE · BAC',  icon: '/brilliant-image/foundational-math.png'},
-        { title: 'Intégrales', level: 'ANALYSE · BAC',  icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Probabilités Conditionnelles', level: 'PROBABILITÉS · BAC',  icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Limites et Continuité', level: 'ANALYSE · BAC', icon: '/brilliant-image/foundational-math.png' },
+        { title: 'Fonctions Exponentielles', level: 'ANALYSE · BAC', icon: '/brilliant-image/science.png' },
+        { title: 'Équations Différentielles', level: 'ANALYSE · BAC', icon: '/brilliant-image/computer-science.png' },
+        { title: 'Matrices et Déterminants', level: 'ALGÈBRE · BAC',  icon: '/brilliant-image/programming-python.png'},
+        { title: 'Intégrales', level: 'ANALYSE · BAC',  icon: '/brilliant-image/how-llms-work.png' },
+        { title: 'Probabilités Conditionnelles', level: 'PROBABILITÉS · BAC',  icon: '/brilliant-image/suppercharging.png' },
+        { title: 'Limites et Continuité', level: 'ANALYSE · BAC', icon: '/brilliant-image/Designing_Programs_Course_Card.png' },
     ];
 
     return (
