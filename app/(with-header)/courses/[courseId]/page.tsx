@@ -9,29 +9,37 @@ import { IconChevronUp, IconChevronDown, IconLock } from '@tabler/icons-react';
 // Mock data - replace with actual data fetching in production
 const getCourseData = (courseId: string) => ({
     id: courseId,
-    title: "How LLMs Work",
-    description: "Take a peek under the hood of large language models (LLMs) to understand how they work.",
-    lessons: 7,
+    title: "Fonctions Logarithmiques",
+    description: "Maîtrisez les fonctions logarithmiques, leurs propriétés et applications dans le programme du Baccalauréat Marocain.",
+    lessons: 8,
     chapters: [
         {
             id: 1,
-            title: "Intro to Language Models",
+            title: "Introduction aux Logarithmes",
             lessons: [
-                { id: 1, title: "Predicting the Next Word", isCompleted: false },
-                { id: 2, title: "Calculating Word Probabilities", isCompleted: false },
+                { id: 1, title: "Définition et Propriétés", isCompleted: false },
+                { id: 2, title: "Logarithme Népérien", isCompleted: false },
             ],
             isCompleted: false,
         },
         {
             id: 2,
-            title: "Improving Models",
+            title: "Équations Logarithmiques",
             lessons: [
-                { id: 1, title: "Creativity and Coherence", isCompleted: false },
-                { id: 2, title: "Preprocessing", isCompleted: false },
+                { id: 1, title: "Résolution d'Équations", isCompleted: false },
+                { id: 2, title: "Inéquations Logarithmiques", isCompleted: false },
             ],
             isLocked: true,
         },
-        // Add more chapters as needed
+        {
+            id: 3,
+            title: "Applications",
+            lessons: [
+                { id: 1, title: "Dérivées de Fonctions Logarithmiques", isCompleted: false },
+                { id: 2, title: "Études de Fonctions", isCompleted: false },
+            ],
+            isLocked: true,
+        },
     ]
 });
 
@@ -51,8 +59,8 @@ const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                     <Stack>
                         <Image
-                            src="/brilliant-image/computer-science.png"
-                            alt="CS & Programming"
+                            src="/brilliant-image/foundational-math.png"
+                            alt="Mathématiques - Analyse"
                             width={64}
                             height={64}
                         />
@@ -61,7 +69,7 @@ const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
                             <Text c="dimmed" mb="xs">{courseData.description}</Text>
                             <Text size="sm" c="dimmed">
                                 <span style={{ marginRight: '0.5rem' }}>📚</span>
-                                {courseData.lessons} Lessons
+                                {courseData.lessons} Leçons
                             </Text>
                         </div>
                     </Stack>
@@ -79,7 +87,7 @@ const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
                                 rightSection={expandedChapter === chapter.id ? <IconChevronUp size={20} /> : <IconChevronDown size={20} />}
                             >
                                 <Group>
-                                    {chapter.isCompleted && <Text c="green" fw={700}>✓</Text>}
+                                    {chapter.isCompleted && <Text c="teal" fw={700}>✓</Text>}
                                     {chapter.isLocked && <IconLock size={16} />}
                                     {chapter.title}
                                 </Group>
@@ -95,7 +103,7 @@ const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
                                             style={{ padding: '0.5rem 1rem', marginBottom: '0.5rem' }}
                                             onClick={() => handleLessonClick(chapter.id, lesson.id)}
                                         >
-                                            {lesson.isCompleted && <Text c="green" fw={700} mr="xs">✓</Text>}
+                                            {lesson.isCompleted && <Text c="teal" fw={700} mr="xs">✓</Text>}
                                             {lesson.title}
                                         </Button>
                                     ))}

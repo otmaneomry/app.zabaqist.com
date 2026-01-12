@@ -4,23 +4,23 @@ import { TextInput, Button } from "@mantine/core";
 import { IconSearch } from '@tabler/icons-react';
 
 const BrowseAllCourses = () => {
-    const categories = ['New courses', 'Math', 'Data', 'Computer Science', 'Science'];
+    const categories = ['Toutes', 'Algèbre', 'Analyse', 'Géométrie', 'Probabilités'];
     const courses = [
-        { title: 'Real-World Algebra', icon: '/brilliant-image/programming-python.png' },
-        { title: 'How LLMs Work', icon: '/brilliant-image/foundational-math.png' },
-        { title: 'Clustering', icon: '/brilliant-image/Designing_Programs_Course_Card.png' },
-        { title: 'Vectors', icon: '/brilliant-image/how-llms-work.png' },
-        { title: 'Designing Programs', icon: '/brilliant-image/science.png' },
-        { title: 'Applied Python', icon: '/brilliant-image/search-fundamentals.png' },
+        { title: 'Fonctions Logarithmiques', icon: '/brilliant-image/foundational-math.png' },
+        { title: 'Dérivées et Primitives', icon: '/brilliant-image/foundational-math.png' },
+        { title: 'Nombres Complexes', icon: '/brilliant-image/foundational-math.png' },
+        { title: 'Suites Numériques', icon: '/brilliant-image/foundational-math.png' },
+        { title: 'Géométrie dans l\'Espace', icon: '/brilliant-image/foundational-math.png' },
+        { title: 'Probabilités Continues', icon: '/brilliant-image/foundational-math.png' },
     ];
 
     return (
         <section>
-            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem'}}>Browse all 70+ courses</h2>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem'}}>Toutes les thématiques</h2>
 
             <div style={{position: 'relative', marginBottom: '2rem'}}>
                 <TextInput
-                    placeholder="Search"
+                    placeholder="Rechercher une thématique..."
                     leftSection={<IconSearch size={20} style={{color: '#9ca3af'}} />}
                     styles={{
                         input: {
@@ -42,15 +42,15 @@ const BrowseAllCourses = () => {
                 ))}
             </div>
 
-            <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem'}}>New courses</h3>
+            <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem'}}>Thématiques populaires</h3>
 
             <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}} className="md:grid-cols-3 lg:grid-cols-6">
                 {courses.map((course, index) => (
                     <div key={index} style={{backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '1rem', textAlign: 'center'}}>
                         <div style={{position: 'relative', height: '6rem', marginBottom: '0.5rem'}}>
-                            <Image src={course.icon} alt={course.title} layout="fill" objectFit="contain" />
+                            <Image src={course.icon} alt={course.title} fill style={{objectFit: 'contain'}} />
                         </div>
-                        <div style={{backgroundColor: '#22c55e', color: 'white', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '9999px', display: 'inline-block', marginBottom: '0.5rem'}}>NEW</div>
+                        <div style={{backgroundColor: '#2CB0A1', color: 'white', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '9999px', display: 'inline-block', marginBottom: '0.5rem'}}>BAC</div>
                         <div style={{fontSize: '0.875rem', fontWeight: 600}}>{course.title}</div>
                     </div>
                 ))}

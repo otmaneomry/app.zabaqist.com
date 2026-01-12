@@ -19,7 +19,7 @@ const Header = () => {
             <div style={{maxWidth: '72rem', margin: '0 auto', padding: '1rem'}}>
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
-                        <Link href="/" style={{fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: 'inherit'}}>Brilliant</Link>
+                        <Link href="/" style={{fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: 'inherit'}}>Zabaqist</Link>
                         <nav style={{display: 'flex', gap: '1rem'}}>
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href;

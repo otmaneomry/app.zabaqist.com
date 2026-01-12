@@ -32,7 +32,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
             radius="lg"
         >
             <Text size="sm" c="dimmed" mb="lg">
-                Discover your personalized learning path and start your journey with Brilliant.
+                Discover your personalized learning path and start your journey with Zabaqist.
             </Text>
 
             <Stack gap="md">
@@ -79,7 +79,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
                 </Button>
 
                 <Text size="xs" ta="center" c="dimmed">
-                    By clicking above, I agree to Brilliant&apos;s{' '}
+                    By clicking above, I agree to Zabaqist&apos;s{' '}
                     <Anchor size="xs" href="#" c="#456DFF" fw={500}>Terms</Anchor> and{' '}
                     <Anchor size="xs" href="#" c="#456DFF" fw={500}>Privacy Policy</Anchor>
                 </Text>

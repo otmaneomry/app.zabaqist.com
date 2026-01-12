@@ -22,34 +22,34 @@ const PricingCard: React.FC<PricingCardProps> = ({ selectedPlan, setSelectedPlan
                     style={{
                         width: '50%',
                         marginRight: '0.5rem',
-                        backgroundColor: selectedPlan === 'annual' ? '#facc15' : undefined,
-                        color: selectedPlan === 'annual' ? 'black' : undefined,
+                        backgroundColor: selectedPlan === 'annual' ? '#2CB0A1' : undefined,
+                        color: selectedPlan === 'annual' ? 'white' : undefined,
                     }}
                 >
-                    Annual
-                    {selectedPlan === 'annual' && <span style={{marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#eab308', padding: '0 0.25rem', borderRadius: '0.25rem'}}>MOST POPULAR</span>}
+                    Annuel
+                    {selectedPlan === 'annual' && <span style={{marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#26a092', padding: '0 0.25rem', borderRadius: '0.25rem'}}>POPULAIRE</span>}
                 </Button>
                 <Button
                     variant={selectedPlan === 'monthly' ? 'filled' : 'outline'}
                     onClick={() => setSelectedPlan('monthly')}
                     style={{width: '50%', marginLeft: '0.5rem'}}
                 >
-                    Monthly
+                    Mensuel
                 </Button>
             </div>
             {selectedPlan === 'annual' && (
                 <div style={{textAlign: 'center', marginBottom: '1rem'}}>
-                    <p style={{fontSize: '0.875rem', textDecoration: 'line-through'}}>MAD 53.59</p>
-                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>MAD 42.87<span style={{fontSize: '0.875rem'}}>/month*</span></p>
+                    <p style={{fontSize: '0.875rem', textDecoration: 'line-through'}}>199 DH</p>
+                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>149 DH<span style={{fontSize: '0.875rem'}}>/mois*</span></p>
                 </div>
             )}
             {selectedPlan === 'monthly' && (
                 <div style={{textAlign: 'center', marginBottom: '1rem'}}>
-                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>MAD 107.55<span style={{fontSize: '0.875rem'}}>/month</span></p>
+                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>299 DH<span style={{fontSize: '0.875rem'}}>/mois</span></p>
                 </div>
             )}
-            <Button style={{width: '100%', backgroundColor: '#22c55e', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#16a34a'}}}}>Subscribe now</Button>
-            <p style={{fontSize: '0.75rem', marginTop: '1rem', color: '#6b7280'}}>*Billed as one payment. Renews annually, cancel anytime. You can turn off auto-renew from your settings.</p>
+            <Button style={{width: '100%', backgroundColor: '#2CB0A1', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#26a092'}}}}>S'abonner maintenant</Button>
+            <p style={{fontSize: '0.75rem', marginTop: '1rem', color: '#6b7280'}}>*Facturé en un seul paiement. Renouvellement annuel, annulation à tout moment. Vous pouvez désactiver le renouvellement automatique depuis vos paramètres.</p>
         </div>
     </Card>
 );
@@ -57,36 +57,37 @@ const PricingCard: React.FC<PricingCardProps> = ({ selectedPlan, setSelectedPlan
 const ReviewSection = () => (
     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem', margin: '3rem 0'}}>
         <div style={{textAlign: 'center'}}>
-            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Tantalizing"`}</p>
-            <p style={{fontSize: '0.75rem'}}>The New York Times</p>
+            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Excellent"`}</p>
+            <p style={{fontSize: '0.75rem'}}>Ministère de l'Éducation</p>
         </div>
         <div style={{textAlign: 'center'}}>
             <div style={{display: 'flex'}}>
                 {[...Array(5)].map((_, i) => (
-                    <span key={i} style={{color: '#facc15'}}>★</span>
+                    <span key={i} style={{color: '#2CB0A1'}}>★</span>
                 ))}
             </div>
-            <p style={{fontSize: '0.875rem'}}>Over 50,000 5-star reviews</p>
+            <p style={{fontSize: '0.875rem'}}>Plus de 10,000 avis 5 étoiles</p>
         </div>
         <div style={{textAlign: 'center'}}>
-            <Image src="/trustpilot.png" alt="Trustpilot" width={100} height={30}/>
+            <p style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#2CB0A1'}}>Zabaqist</p>
+            <p style={{fontSize: '0.75rem'}}>Maroc</p>
         </div>
         <div style={{textAlign: 'center'}}>
-            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Advanced"`}</p>
-            <p style={{fontSize: '0.75rem'}}>The Atlantic</p>
+            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Innovant"`}</p>
+            <p style={{fontSize: '0.75rem'}}>Parents & Étudiants</p>
         </div>
     </div>
 );
 
 const LevelUpSection = () => (
     <div style={{margin: '3rem 0'}}>
-        <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Level up with Premium</h2>
+        <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Passez au niveau supérieur avec Premium</h2>
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <ul style={{width: '33.333%', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-                <li>🚀 Learn efficiently</li>
-                <li>📚 Master the essentials</li>
-                <li>🧠 Apply your learnings</li>
-                <li>📊 Stay on track</li>
+                <li>🚀 Apprentissage efficace</li>
+                <li>📚 Maîtrisez l'essentiel</li>
+                <li>🧠 Appliquez vos connaissances</li>
+                <li>📊 Suivez vos progrès</li>
             </ul>
             <div style={{width: '33.333%', display: 'flex', justifyContent: 'center'}}>
                 <section
@@ -109,28 +110,26 @@ const LevelUpSection = () => (
                 </section>
             </div>
             <div style={{width: '33.333%'}}>
-                <h3 style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>Effective, hands-on learning</h3>
-                <p>Unlimited access to 70+ interactive courses with real-time feedback and simple explanations to make
-                    learning efficient.</p>
+                <h3 style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>Apprentissage pratique et efficace</h3>
+                <p>Accès illimité aux thématiques interactives du Baccalauréat avec retours en temps réel et explications simples pour un apprentissage efficace.</p>
             </div>
         </div>
     </div>
 );
 
 const CoursesSection = () => {
-    const [activeTab, setActiveTab] = useState('Math');
-    const tabs = ['Math', 'Data Analysis', 'CS & Programming', 'Science', 'Electives'];
+    const [activeTab, setActiveTab] = useState('Analyse');
+    const tabs = ['Analyse', 'Algèbre', 'Géométrie', 'Probabilités', 'Statistiques'];
     const courses = [
-        "Scientific Thinking", "The Chemical Reaction", "Physics of the Everyday",
-        "Quantum Mechanics", "Special Relativity", "Quantum Computing",
-        "Computational Biology", "Knowledge and Uncertainty", "Classical Mechanics",
-        "Electricity and Magnetism"
+        "Limites et Continuité", "Dérivées et Primitives", "Intégrales",
+        "Fonctions Logarithmiques", "Fonctions Exponentielles", "Suites Numériques",
+        "Équations Différentielles", "Développements Limités", "Calcul Intégral",
+        "Études de Fonctions"
     ];
 
     return (
         <div style={{margin: '3rem 0'}}>
-            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Build quantitative + technical problem solving
-                skills</h2>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Développez vos compétences en mathématiques</h2>
             <div style={{display: 'flex', justifyContent: 'center', marginBottom: '1rem'}}>
                 {tabs.map(tab => (
                     <Button
@@ -145,7 +144,7 @@ const CoursesSection = () => {
             </div>
             <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}}>
                 <div>
-                    <h3 style={{fontWeight: 'bold', marginBottom: '1rem'}}>Courses in {activeTab}</h3>
+                    <h3 style={{fontWeight: 'bold', marginBottom: '1rem'}}>Thématiques en {activeTab}</h3>
                     <ul style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
                         {courses.map((course, index) => (
                             <li key={index} style={{display: 'flex', alignItems: 'center'}}>
@@ -165,40 +164,40 @@ const CoursesSection = () => {
 const ComparisonSection = () => {
     const features = [
         {
-            name: "Guided courses",
+            name: "Thématiques guidées",
             free: true,
             premium: true,
-            description: "In math, science, programming, data analysis, and more"
+            description: "Algèbre, Analyse, Géométrie, Probabilités et plus"
         },
         {
-            name: "Bonus math, science, & CS puzzles",
+            name: "Exercices bonus de mathématiques",
             free: true,
             premium: true,
-            description: "Hundreds of additional bite-sized challenges"
+            description: "Des centaines de défis supplémentaires"
         },
-        {name: "No limits", free: false, premium: true, description: "Access our full library of content"},
+        {name: "Sans limites", free: false, premium: true, description: "Accès à toute notre bibliothèque de contenu"},
         {
-            name: "Fully unlocked learning paths",
+            name: "Parcours d'apprentissage déverrouillés",
             free: false,
             premium: true,
-            description: "Step-by-step pathways to develop your problem solving skills in math, science, data, and programming"
+            description: "Parcours étape par étape pour développer vos compétences en mathématiques du Baccalauréat"
         },
     ];
 
     return (
         <div style={{margin: '3rem 0'}}>
-            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem'}}>No commitment, cancel anytime</h2>
-            <p style={{textAlign: 'center', marginBottom: '2rem'}}>Unlock it all with Premium</p>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem'}}>Sans engagement, annulez à tout moment</h2>
+            <p style={{textAlign: 'center', marginBottom: '2rem'}}>Débloquez tout avec Premium</p>
             <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem'}}>
                 <div></div>
-                <div style={{fontWeight: 'bold', textAlign: 'center'}}>Free</div>
+                <div style={{fontWeight: 'bold', textAlign: 'center'}}>Gratuit</div>
                 <div style={{fontWeight: 'bold', textAlign: 'center'}}>Premium</div>
                 {features.map((feature, index) => (
                     <React.Fragment key={index}>
                         <div>{feature.name}<p style={{fontSize: '0.875rem', color: '#6b7280'}}>{feature.description}</p></div>
-                        <div style={{textAlign: 'center'}}>{feature.free ? <IconCircleCheck style={{display: 'inline', color: '#22c55e'}} /> :
+                        <div style={{textAlign: 'center'}}>{feature.free ? <IconCircleCheck style={{display: 'inline', color: '#2CB0A1'}} /> :
                             <IconX style={{display: 'inline', color: '#ef4444'}} />}</div>
-                        <div style={{textAlign: 'center'}}><IconCircleCheck style={{display: 'inline', color: '#22c55e'}} /></div>
+                        <div style={{textAlign: 'center'}}><IconCircleCheck style={{display: 'inline', color: '#2CB0A1'}} /></div>
                     </React.Fragment>
                 ))}
             </div>
@@ -209,24 +208,22 @@ const ComparisonSection = () => {
 const SuperchargeSection = () => (
     <div style={{margin: '3rem 0', textAlign: 'center', display: 'flex', justifyContent: 'space-between'}}>
         <div style={{width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem'}}>Supercharge your learning</h2>
+            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem'}}>Boostez votre apprentissage</h2>
             <ul style={{display: 'inline-block', textAlign: 'left', marginBottom: '2rem'}}>
                 <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>📚</span> 70+ courses in math, programming, data analysis, computer science,
-                    and
-                    more
+                    <span style={{marginRight: '0.5rem'}}>📚</span> Toutes les thématiques du Baccalauréat Marocain en mathématiques
                 </li>
                 <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>🚫</span> No in-app purchases or ads
+                    <span style={{marginRight: '0.5rem'}}>🚫</span> Pas d'achats intégrés ni de publicités
                 </li>
                 <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>🆕</span> New content added regularly
+                    <span style={{marginRight: '0.5rem'}}>🆕</span> Nouveau contenu ajouté régulièrement
                 </li>
                 <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>📱</span> One subscription across all devices
+                    <span style={{marginRight: '0.5rem'}}>📱</span> Un abonnement sur tous vos appareils
                 </li>
             </ul>
-            <Button style={{backgroundColor: '#22c55e', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#16a34a'}}}}>Subscribe now</Button>
+            <Button style={{backgroundColor: '#2CB0A1', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#26a092'}}}}>S'abonner maintenant</Button>
         </div>
 
         <Image src={"/brilliant-image/suppercharging.png"} alt={"Gift plan"} width={512} height={512} style={{width: '50%', display: 'flex'}}/>
@@ -235,20 +232,19 @@ const SuperchargeSection = () => (
 
 const GiftSection = () => (
     <div style={{margin: '3rem 0'}}>
-        <h2 style={{fontSize: '2.25rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Share the gift of Premium</h2>
+        <h2 style={{fontSize: '2.25rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Partagez le cadeau de Premium</h2>
         <div style={{display: 'flex', justifyContent: 'center', gap: '2rem'}}>
             <Card style={{width: '50%'}}>
                 <div style={{padding: '1.5rem'}}>
                     <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Image src={"https://brilliant.org/images/paywall/brandRefresh/gift-plan.svg"} alt={"Gift plan"}
+                        <Image src={"https://brilliant.org/images/paywall/brandRefresh/gift-plan.svg"} alt={"Offrir un abonnement"}
                                width={128} height={128}/>
                         <div style={{paddingLeft: '0.5rem', paddingTop: '1rem', paddingBottom: '1rem'}}>
-                            <h3 style={{fontWeight: 'bold'}}>Gift plan</h3>
-                            <p style={{marginTop: '1rem'}}>Share your love of math and science — give a subscription to Brilliant
-                                Premium.</p>
+                            <h3 style={{fontWeight: 'bold'}}>Offrir un abonnement</h3>
+                            <p style={{marginTop: '1rem'}}>Partagez votre passion pour les mathématiques — offrez un abonnement Zabaqist Premium.</p>
                             <Button variant="outline"
-                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem'}}
-                                    styles={{root: {':hover': {borderColor: '#030712', backgroundColor: '#f9fafb'}}}}>Gift
+                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: '#2CB0A1'}}
+                                    styles={{root: {':hover': {borderColor: '#26a092', backgroundColor: '#e6faf8'}}}}>Offrir
                                 Premium</Button>
                         </div>
                     </div>
@@ -258,16 +254,15 @@ const GiftSection = () => (
                 <div style={{padding: '1.5rem'}}>
                     <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Image src={"https://brilliant.org/images/paywall/brandRefresh/group-plan.svg"}
-                               alt={"Group plan"}
+                               alt={"Abonnement de groupe"}
                                width={128} height={128}/>
                         <div style={{paddingLeft: '0.5rem', paddingTop: '1rem', paddingBottom: '1rem'}}>
-                            <h3 style={{fontWeight: 'bold'}}>Group plan</h3>
-                            <p style={{marginTop: '1rem'}}>Want to share Brilliant Premium with your family, class, or team? Learn
-                                about our group plans.</p>
+                            <h3 style={{fontWeight: 'bold'}}>Abonnement de groupe</h3>
+                            <p style={{marginTop: '1rem'}}>Vous souhaitez partager Zabaqist Premium avec votre famille, classe ou équipe? Découvrez nos forfaits de groupe.</p>
                             <Button variant="outline"
-                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem'}}
-                                    styles={{root: {':hover': {borderColor: '#030712', backgroundColor: '#f9fafb'}}}}>Learn
-                                more</Button>
+                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: '#2CB0A1'}}
+                                    styles={{root: {':hover': {borderColor: '#26a092', backgroundColor: '#e6faf8'}}}}>En savoir
+                                plus</Button>
                         </div>
                     </div>
                 </div>
@@ -281,11 +276,11 @@ const SubscribePage = () => {
 
     return (
         <div style={{minHeight: '100vh'}}>
-            <div style={{background: 'linear-gradient(to right, #1e40af, #4338ca)', width: '100%'}}>
+            <div style={{background: 'linear-gradient(to right, #2CB0A1, #26a092)', width: '100%'}}>
                 <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem', color: 'white', textAlign: 'center'}}>
-                    <h1 style={{fontSize: '3rem', fontWeight: 'bold', marginTop: '2rem'}}>Unlock the full learning experience</h1>
-                    <p style={{marginTop: '1rem'}}>Reach your learning goals fast with unlimited access to all courses</p>
-                    <p style={{margin: '2rem 0'}}>⚡ Youtube Sponsor discount applied</p>
+                    <h1 style={{fontSize: '3rem', fontWeight: 'bold', marginTop: '2rem'}}>Déverrouillez l'expérience d'apprentissage complète</h1>
+                    <p style={{marginTop: '1rem'}}>Atteignez vos objectifs rapidement avec un accès illimité à toutes les thématiques du Bac</p>
+                    <p style={{margin: '2rem 0'}}>⚡ Offre spéciale pour étudiants marocains</p>
                     <PricingCard selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan}/>
                 </div>
             </div>

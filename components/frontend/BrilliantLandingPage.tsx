@@ -22,7 +22,7 @@ const BrilliantLandingPage = () => {
                     <header>
                         <Container size="xl" py="md">
                             <Group justify="space-between" align="center">
-                                <Title order={2}>Brilliant</Title>
+                                <Title order={2}>Zabaqist</Title>
                                 <Group>
                                     <Button variant="outline" radius="xl" onClick={openLoginModal}>
                                         Log in
@@ -89,8 +89,8 @@ const BrilliantLandingPage = () => {
                             <Stack py="md">
                                 <Title order={2} ta="center" mb="xs">Master concepts in 15 minutes a day</Title>
                                 <Text size="xl" ta="center" mb="md">
-                                    Whether you're a complete beginner or ready to dive into machine learning and beyond,
-                                    Brilliant makes it easy to level up fast with fun, bite-sized lessons.
+                                    Whether you're a complete beginner or ready to dive into advanced mathematics and beyond,
+                                    Zabaqist makes it easy to level up fast with fun, bite-sized lessons.
                                 </Text>
                             </Stack>
 
@@ -172,7 +172,7 @@ const BrilliantLandingPage = () => {
                     <section style={{ padding: '1rem 0', backgroundColor: '#f1f3f5' }}>
                         <Container size="xl" ta="center">
                             <Title order={1} size="2.5rem" mb="xl">
-                                Join over 10 million people learning on Brilliant
+                                Join thousands of Moroccan students mastering math on Zabaqist
                             </Title>
 
                             <Flex wrap="wrap" justify="space-around" align="center" gap="xl" mb="lg">

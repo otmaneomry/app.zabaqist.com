@@ -10,7 +10,7 @@ const FooterFrontEnd = () => {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div>
-                        <h2 className="text-2xl font-bold mb-4">Brilliant</h2>
+                        <h2 className="text-2xl font-bold mb-4">Zabaqist</h2>
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold mb-3">Product</h3>
@@ -51,7 +51,7 @@ const FooterFrontEnd = () => {
                         <Link href="/california-privacy" className="text-sm">California privacy policy</Link>
                     </div>
                     <p className="text-sm text-gray-400">
-                        © {currentYear} Brilliant Worldwide, Inc., Brilliant and the Brilliant Logo are trademarks of Brilliant Worldwide, Inc.
+                        © {currentYear} Zabaqist. All rights reserved. Zabaqist and the Zabaqist Logo are trademarks of Zabaqist.
                     </p>
                 </div>
             </div>

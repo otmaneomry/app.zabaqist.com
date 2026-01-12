@@ -7,7 +7,7 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 
 const theme = createTheme({
-    /** Brilliant.org inspired theme */
+    /** Zabaqist theme - inspired by Brilliant.org */
     primaryColor: 'teal',
     colors: {
         teal: [
@@ -15,7 +15,7 @@ const theme = createTheme({
             '#d1f5f0',
             '#b3ede6',
             '#8ee3d9',
-            '#2CB0A1', // Brilliant's primary teal
+            '#2CB0A1', // Zabaqist's primary teal
             '#26a092',
             '#208f82',
             '#1a7e73',

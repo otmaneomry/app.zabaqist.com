@@ -18,12 +18,12 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => {
                 <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center'}}>
                     <Image src={icon} alt={title} width={64} height={64}/>
                 </div>
-                <p style={{fontSize: '0.75rem', fontWeight: 600, color: '#9333ea', marginBottom: '0.25rem', textAlign: 'center'}}>{level}</p>
+                <p style={{fontSize: '0.75rem', fontWeight: 600, color: '#2CB0A1', marginBottom: '0.25rem', textAlign: 'center'}}>{level}</p>
                 <h3 style={{fontWeight: 'bold', fontSize: '0.875rem', textAlign: 'center'}}>
                     {title}
                 </h3>
                 <div style={{marginTop: '1rem', height: '0.25rem', backgroundColor: '#e5e7eb', borderRadius: '0.125rem'}}>
-                    <div style={{height: '0.25rem', backgroundColor: '#22c55e', borderRadius: '0.125rem', width: `${progress}%`}}></div>
+                    <div style={{height: '0.25rem', backgroundColor: '#2CB0A1', borderRadius: '0.125rem', width: `${progress}%`}}></div>
                 </div>
             </Link>
         </Card>
@@ -32,14 +32,14 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level }) => {
 
 const ContinueLearningSection: React.FC = () => {
     const courses: CourseCardProps[] = [
-        { title: "How LLMs Work", icon: '/brilliant-image/how-llms-work.png', level: "SCIENCE" },
-        { title: "Designing Programs", icon: "/brilliant-image/Designing_Programs_Course_Card.png", level: "MATH" },
-        { title: "Computer Science Fundamentals", icon: "/brilliant-image/computer-science.png", level: "CS & PROGRAMMING · LEVEL 2" }
+        { title: "Dérivées et Primitives", icon: '/brilliant-image/foundational-math.png', level: "ANALYSE · BAC" },
+        { title: "Nombres Complexes", icon: "/brilliant-image/foundational-math.png", level: "ALGÈBRE · BAC" },
+        { title: "Géométrie dans l'Espace", icon: "/brilliant-image/foundational-math.png", level: "GÉOMÉTRIE · BAC" }
     ];
 
     return (
         <section>
-            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Continue learning</h2>
+            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Continuer l'apprentissage</h2>
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -50,7 +50,7 @@ const ContinueLearningSection: React.FC = () => {
                     <CourseCard key={index} {...course} />
                 ))}
             </div>
-            <Button variant="outline" fullWidth>Show more</Button>
+            <Button variant="outline" fullWidth>Voir plus</Button>
         </section>
     );
 };
