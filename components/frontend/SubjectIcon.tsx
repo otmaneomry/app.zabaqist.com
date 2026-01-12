@@ -5,13 +5,13 @@ interface SubjectIconProps {
 }
 
 const SubjectIcon: React.FC<SubjectIconProps> = ({ subject }) => {
-    const iconContent: { [key: string]: JSX.Element } = {
+    const iconContent: { [key: string]: React.ReactElement } = {
         'Math': (
             <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path=":r1:">
+                <g clipPath=":r1:">
                     <path
                         d="M5.19922 12.2334L12.3992 7.5834L18.6992 9.9834H20.4992L26.6492 5.4834"
-                        stroke="black" stroke-width="1.06667"></path>
+                        stroke="black" strokeWidth="1.06667"></path>
                     <rect x="2.19922" y="19.7334" width="6" height="9.6"
                           fill="#FF8D23"></rect>
                     <rect x="9.40039" y="14.6338" width="6" height="14.7"
@@ -41,10 +41,10 @@ const SubjectIcon: React.FC<SubjectIconProps> = ({ subject }) => {
         ),
         'Computer Science': (
             <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path=":r1:">
+                <g clipPath=":r1:">
                     <path
                         d="M5.19922 12.2334L12.3992 7.5834L18.6992 9.9834H20.4992L26.6492 5.4834"
-                        stroke="black" stroke-width="1.06667"></path>
+                        stroke="black" strokeWidth="1.06667"></path>
                     <rect x="2.19922" y="19.7334" width="6" height="9.6"
                           fill="#FF8D23"></rect>
                     <rect x="9.40039" y="14.6338" width="6" height="14.7"
@@ -74,10 +74,10 @@ const SubjectIcon: React.FC<SubjectIconProps> = ({ subject }) => {
         ),
         'Science & Engineering': (
             <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path=":r1:">
+                <g clipPath=":r1:">
                     <path
                         d="M5.19922 12.2334L12.3992 7.5834L18.6992 9.9834H20.4992L26.6492 5.4834"
-                        stroke="black" stroke-width="1.06667"></path>
+                        stroke="black" strokeWidth="1.06667"></path>
                     <rect x="2.19922" y="19.7334" width="6" height="9.6"
                           fill="#FF8D23"></rect>
                     <rect x="9.40039" y="14.6338" width="6" height="14.7"

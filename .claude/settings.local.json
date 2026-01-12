@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx npm-check-updates:*)",
+      "Bash(npm view:*)",
+      "Bash(node:*)",
+      "Bash(npm --version)",
+      "Bash(yarn install:*)",
+      "Bash(npm run build:*)",
+      "Bash(pkill:*)",
+      "Bash(npm run lint)",
+      "Bash(awk:*)",
+      "Bash(xargs kill:*)",
+      "Bash(npm search:*)",
+      "Bash(npm install:*)",
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build)",
+      "Bash(npm uninstall:*)",
+      "Bash(for file in app/page.tsx app/(with-header)/courses/page.tsx app/(with-header)/home/page.tsx app/(with-header)/subscribe/page.tsx)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)",
+      "Bash(grep:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

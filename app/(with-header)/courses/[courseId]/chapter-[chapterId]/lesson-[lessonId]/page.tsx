@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,9 +15,10 @@ const getLessonData = (courseId: string, chapterId: string, lessonId: string) =>
     explanation: 'On" and "about" both make sense, but "truck" does not, even if you wrote a lot of emails about trucks.',
 });
 
-const LessonPage = ({ params }: { params: { courseId: string, chapterId: string, lessonId: string } }) => {
+const LessonPage = ({ params }: { params: Promise<{ courseId: string, chapterId: string, lessonId: string }> }) => {
+    const { courseId, chapterId, lessonId } = use(params);
     const router = useRouter();
-    const lessonData = getLessonData(params.courseId, params.chapterId, params.lessonId);
+    const lessonData = getLessonData(courseId, chapterId, lessonId);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showExplanation, setShowExplanation] = useState(false);
 

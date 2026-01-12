@@ -134,8 +134,8 @@ const BrilliantLandingPage = () => {
                                     <div
                                         className="relative w-full h-full max-w-[1200px] max-h-[675px]">
                                         <Image src="https://brilliant.org/images/homepage/learn-at-your-level.svg"
-                                               alt="learn at your level" className="" layout="fill"
-                                               objectFit="contain"/>
+                                               alt="learn at your level" fill
+                                               style={{ objectFit: 'contain' }}/>
 
                                     </div>
                                 </section>
@@ -147,8 +147,8 @@ const BrilliantLandingPage = () => {
                                     <div
                                         className="relative w-full h-full max-w-[1200px] max-h-[675px]">
                                         <Image src="https://brilliant.org/images/homepage/stay-motivated.svg"
-                                               alt="Stay motivated" className="" layout="fill"
-                                               objectFit="contain"/>
+                                               alt="Stay motivated" fill
+                                               style={{ objectFit: 'contain' }}/>
 
                                     </div>
                                 </section>
@@ -172,10 +172,10 @@ const BrilliantLandingPage = () => {
 
                             <div className="flex flex-wrap justify-around items-center gap-8 mb-8">
                                 <Image
-                                    src="https://brilliant.org/_next/image/?url=%2Fimages%2Fpaywall%2Fnew-york-times.png&w=384&q=75"
+                                    src="https://brilliant.org/images/paywall/new-york-times.png"
                                     alt="The New York Times" width={120} height={40}/>
                                 <Image
-                                    src="https://brilliant.org/_next/image/?url=%2Fimages%2Fpaywall%2Fthe-atlantic.png&w=128&q=75"
+                                    src="https://brilliant.org/images/paywall/the-atlantic.png"
                                     alt="The Atlantic" width={120} height={40}/>
 
                                 <div className="flex flex-col items-center">
@@ -192,7 +192,7 @@ const BrilliantLandingPage = () => {
 
                                 <div className="flex flex-col items-center">
                                     <div className="flex items-center mb-2">
-                                        <Image src="/trustpilot-logo.png" alt="Trustpilot" width={100} height={24}/>
+                                        <span className="font-bold text-lg mr-2">Trustpilot</span>
                                         <div className="flex ml-2">
                                             {[...Array(5)].map((_, i) => (
                                                 <Star key={i} className="w-5 h-5 text-green-500 fill-current"/>
@@ -203,10 +203,10 @@ const BrilliantLandingPage = () => {
                                 </div>
 
                                 <Image
-                                    src="https://brilliant.org/_next/image/?url=%2Fimages%2Fpaywall%2Fapp-of-the-day.png&w=256&q=75"
+                                    src="https://brilliant.org/images/paywall/app-of-the-day.png"
                                     alt="Apple App of the Day" width={80} height={80}/>
                                 <Image
-                                    src="https://brilliant.org/_next/image/?url=%2Fimages%2Fpaywall%2Fbest-app.png&w=256&q=75"
+                                    src="https://brilliant.org/images/paywall/best-app.png"
                                     alt="Google Play Best App" width={80} height={80}/>
                             </div>
                         </div>

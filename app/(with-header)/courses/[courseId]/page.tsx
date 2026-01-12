@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, use } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,13 +36,14 @@ const getCourseData = (courseId: string) => ({
     ]
 });
 
-const CoursePage = ({ params }: { params: { courseId: string } }) => {
-    const courseData = getCourseData(params.courseId);
+const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
+    const { courseId } = use(params);
+    const courseData = getCourseData(courseId);
     const [expandedChapter, setExpandedChapter] = useState<number | null>(null);
     const router = useRouter();
 
     const handleLessonClick = (chapterId: number, lessonId: number) => {
-        router.push(`/courses/${params.courseId}/chapter-${chapterId}/lesson-${lessonId}`);
+        router.push(`/courses/${courseId}/chapter-${chapterId}/lesson-${lessonId}`);
     };
 
     return (

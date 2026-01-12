@@ -2,7 +2,12 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-        domains: ['brilliant.org'],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'brilliant.org',
+            },
+        ],
     },
 }
 
