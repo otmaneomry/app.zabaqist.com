@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Card } from '@mantine/core'
 import dynamic from 'next/dynamic'
 
@@ -19,6 +19,7 @@ interface GeogebraViewerProps {
   showMenuBar?: boolean
   material_id?: string
   appletOnLoad?: (api: any) => void
+  commands?: string[]
 }
 
 /**
@@ -50,8 +51,33 @@ export default function GeogebraViewer({
   showAlgebraInput = true,
   showMenuBar = false,
   material_id,
-  appletOnLoad
+  appletOnLoad,
+  commands = []
 }: GeogebraViewerProps) {
+  const [isReady, setIsReady] = useState(false)
+
+  const handleAppletOnLoad = (api: any) => {
+    // Version 2.0 - Fixed to always call callback
+    console.log('🔵 GeoGebra applet loaded (v2.0)')
+    console.log('🔵 API parameter from react-geogebra:', api)
+    console.log('🔵 API parameter type:', typeof api)
+
+    // Always call the custom callback regardless of api parameter
+    // The callback will handle getting the API from window.ggbApplet
+    if (appletOnLoad) {
+      console.log('🔵 Calling custom appletOnLoad callback (will use window.ggbApplet)...')
+      try {
+        appletOnLoad(api) // Pass whatever we got, callback will use window.ggbApplet instead
+      } catch (error) {
+        console.error('❌ Error in appletOnLoad callback:', error)
+      }
+    } else {
+      console.log('⚠️ No custom appletOnLoad callback provided')
+    }
+
+    setIsReady(true)
+  }
+
   return (
     <Card shadow="sm" padding="md" radius="md" withBorder>
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -63,7 +89,7 @@ export default function GeogebraViewer({
           showAlgebraInput={showAlgebraInput}
           showMenuBar={showMenuBar}
           material_id={material_id}
-          appletOnLoad={appletOnLoad}
+          appletOnLoad={handleAppletOnLoad}
         />
       </div>
     </Card>

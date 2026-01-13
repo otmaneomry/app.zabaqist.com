@@ -350,23 +350,65 @@ export default function FonctionsLogarithmiquesPage() {
                   height={600}
                   showAlgebraInput={true}
                   showToolBar={true}
-                  appletOnLoad={(api) => {
-                    // Draw ln(x) function
-                    api.evalCommand('f(x) = ln(x)')
-                    api.setColor('f', 32, 176, 161) // Teal color
+                  appletOnLoad={() => {
+                    // Wait for applet to be fully ready, then use global window.ggbApplet
+                    setTimeout(() => {
+                      console.log('GeoGebra delayed initialization starting...')
 
-                    // Add point at (1, 0)
-                    api.evalCommand('A = (1, 0)')
-                    api.setCaption('A', '(1, 0)')
-                    api.setLabelVisible('A', true)
+                      // Get the API from the global window object
+                      const api = (window as any).ggbApplet
 
-                    // Add point at (e, 1)
-                    api.evalCommand('B = (e, 1)')
-                    api.setCaption('B', '(e, 1)')
-                    api.setLabelVisible('B', true)
+                      if (!api) {
+                        console.error('❌ window.ggbApplet is not available!')
+                        console.log('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('ggb')))
+                        return
+                      }
 
-                    // Add asymptote x=0
-                    api.evalCommand('SetVisibleInView(yAxis, 1, true)')
+                      console.log('✓ Got API from window.ggbApplet')
+
+                      try {
+                        // Set coordinate system to properly frame the logarithmic function
+                        api.setCoordSystem(-1, 8, -3, 3)
+                        console.log('✓ Coordinate system set: x(-1 to 8), y(-3 to 3)')
+
+                        // Create the ln(x) function
+                        const result = api.evalCommand('f(x) = ln(x)')
+                        console.log('✓ evalCommand("f(x) = ln(x)") result:', result)
+
+                        // Verify function was created
+                        const exists = api.exists('f')
+                        console.log('✓ Function f exists:', exists)
+
+                        if (exists) {
+                          // Style the function curve
+                          api.setColor('f', 32, 176, 161) // Teal color
+                          api.setLineThickness('f', 4)
+                          console.log('✓ Function styled (teal, thickness 4)')
+
+                          // Add point at (1, 0) - where ln(1) = 0
+                          api.evalCommand('A = (1, 0)')
+                          api.setPointStyle('A', 3) // Circle
+                          api.setPointSize('A', 5)
+                          api.setCaption('A', '(1, 0)')
+                          api.setLabelVisible('A', true)
+                          console.log('✓ Point A (1, 0) added')
+
+                          // Add point at (e, 1) - where ln(e) = 1
+                          api.evalCommand('B = (e, 1)')
+                          api.setPointStyle('B', 3) // Circle
+                          api.setPointSize('B', 5)
+                          api.setCaption('B', '(e, 1)')
+                          api.setLabelVisible('B', true)
+                          console.log('✓ Point B (e, 1) added')
+
+                          console.log('🎉 GeoGebra initialization complete!')
+                        } else {
+                          console.error('❌ Function f was not created!')
+                        }
+                      } catch (error) {
+                        console.error('❌ GeoGebra initialization error:', error)
+                      }
+                    }, 2000) // Wait 2 seconds for full initialization
                   }}
                 />
               </Card>
