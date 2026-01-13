@@ -47,7 +47,7 @@ const JumpBackInCard = () => {
                     marginBottom: '1rem',
                     color: '#1f2937'
                 }}>Fonctions Logarithmiques</h3>
-                <Link href="/quiz/1" style={{textDecoration: 'none'}}>
+                <Link href="/courses/fonctions-logarithmiques" style={{textDecoration: 'none'}}>
                     <Button
                         fullWidth
                         color="teal"
@@ -55,7 +55,7 @@ const JumpBackInCard = () => {
                             transition: 'all 0.2s ease'
                         }}
                     >
-                        Commencer le quiz
+                        Continuer le cours
                     </Button>
                 </Link>
             </div>

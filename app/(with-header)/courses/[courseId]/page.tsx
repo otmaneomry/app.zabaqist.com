@@ -1,15 +1,27 @@
 'use client';
 
-import React, { useState, use } from 'react';
+import React, { useState, use, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Container, Card, Button, Text, Title, Stack, Group, Box } from "@mantine/core";
-import { IconChevronUp, IconChevronDown, IconLock } from '@tabler/icons-react';
+import { Container, Card, Button, Text, Title, Stack, Group, Box, Badge } from "@mantine/core";
+import { IconChevronUp, IconChevronDown, IconLock, IconBook, IconTrophy, IconArrowLeft } from '@tabler/icons-react';
+
+// Course title mapping
+const courseTitles: Record<string, string> = {
+    'algèbre': 'Algèbre',
+    'analyse': 'Analyse',
+    'géométrie': 'Géométrie',
+    'probabilités': 'Probabilités',
+    'suites-numériques': 'Suites Numériques',
+    'nombres-complexes': 'Nombres Complexes',
+    'fonctions-logarithmiques': 'Fonctions Logarithmiques'
+};
 
 // Mock data - replace with actual data fetching in production
 const getCourseData = (courseId: string) => ({
     id: courseId,
-    title: "Fonctions Logarithmiques",
+    title: courseTitles[courseId] || "Cours de Mathématiques",
     description: "Maîtrisez les fonctions logarithmiques, leurs propriétés et applications dans le programme du Baccalauréat Marocain.",
     lessons: 8,
     chapters: [
@@ -49,9 +61,106 @@ const CoursePage = ({ params }: { params: Promise<{ courseId: string }> }) => {
     const [expandedChapter, setExpandedChapter] = useState<number | null>(null);
     const router = useRouter();
 
+    // Redirect to full course page for fonctions-logarithmiques
+    useEffect(() => {
+        if (courseId === 'fonctions-logarithmiques') {
+            router.push('/courses/fonctions-logarithmiques');
+        }
+    }, [courseId, router]);
+
     const handleLessonClick = (chapterId: number, lessonId: number) => {
         router.push(`/courses/${courseId}/chapter-${chapterId}/lesson-${lessonId}`);
     };
+
+    // Show coming soon page for other courses
+    if (courseId !== 'fonctions-logarithmiques') {
+        return (
+            <Container size="lg" py="xl">
+                <Stack gap="xl">
+                    {/* Back Button */}
+                    <Button
+                        variant="subtle"
+                        color="teal"
+                        leftSection={<IconArrowLeft size={16} />}
+                        component={Link}
+                        href="/courses"
+                        style={{ alignSelf: 'flex-start' }}
+                    >
+                        Retour aux cours
+                    </Button>
+
+                    {/* Course Header */}
+                    <div>
+                        <Badge color="teal" size="lg" mb="sm">
+                            MATHÉMATIQUES · BAC
+                        </Badge>
+                        <Title order={1} mb="md">
+                            {courseData.title}
+                        </Title>
+                        <Text size="lg" c="dimmed" mb="xl">
+                            Cours du programme de Baccalauréat Marocain
+                        </Text>
+                    </div>
+
+                    {/* Coming Soon Card */}
+                    <Card shadow="lg" padding="xl" radius="md" withBorder>
+                        <Stack align="center" gap="lg" py="xl">
+                            <div style={{ fontSize: '4rem' }}>📚</div>
+                            <Title order={2} ta="center">
+                                Cours en développement
+                            </Title>
+                            <Text size="lg" c="dimmed" ta="center" maw={600}>
+                                Ce cours fait partie du programme de Mathématiques du Baccalauréat Marocain.
+                                Le contenu détaillé sera bientôt disponible !
+                            </Text>
+
+                            <Group gap="md" mt="md">
+                                <Button
+                                    variant="light"
+                                    color="teal"
+                                    leftSection={<IconBook size={16} />}
+                                    component={Link}
+                                    href="/courses/fonctions-logarithmiques"
+                                >
+                                    Voir un exemple de cours
+                                </Button>
+                                <Button
+                                    color="teal"
+                                    leftSection={<IconTrophy size={16} />}
+                                    component={Link}
+                                    href="/quiz/1"
+                                >
+                                    Passer un quiz
+                                </Button>
+                            </Group>
+                        </Stack>
+                    </Card>
+
+                    {/* Demo Course Card */}
+                    <Card shadow="sm" padding="xl" radius="md" withBorder style={{ background: 'linear-gradient(135deg, #2CB0A1 0%, #1a8f83 100%)' }}>
+                        <Stack align="center" gap="md">
+                            <Title order={3} c="white" ta="center">
+                                Découvrez notre cours complet
+                            </Title>
+                            <Text size="lg" c="white" ta="center">
+                                Explorez le cours "Fonctions Logarithmiques" pour voir un exemple de cours interactif avec KaTeX et GeoGebra
+                            </Text>
+                            <Button
+                                size="lg"
+                                variant="white"
+                                color="teal"
+                                component={Link}
+                                href="/courses/fonctions-logarithmiques"
+                                leftSection={<IconBook size={20} />}
+                            >
+                                Voir le cours complet
+                            </Button>
+                        </Stack>
+                    </Card>
+                </Stack>
+            </Container>
+        );
+    }
 
     return (
         <Container size="xl" py="xl">

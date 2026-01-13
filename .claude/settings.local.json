@@ -20,7 +20,8 @@
       "Bash(for file in app/page.tsx app/(with-header)/courses/page.tsx app/(with-header)/home/page.tsx app/(with-header)/subscribe/page.tsx)",
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []
