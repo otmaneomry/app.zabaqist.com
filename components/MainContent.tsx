@@ -1,41 +1,53 @@
+'use client';
+
 import StreakCard from "./StreakCard";
 import JumpBackInCard from "@/components/JumpBackInCard";
 import ComebackCard from "@/components/ComebackCard";
 import PremiumCard from "@/components/PremiumCard";
 import ContinueLearningSection from "@/components/ContinueLearningSection";
 import RecommendedSection from "@/components/RecommendedSection";
-import {ScrollArea} from "@mantine/core";
+import {ScrollArea, Container, Grid, Stack, Title} from "@mantine/core";
 import React from "react";
 
 const MainContent = () => {
     return (
-        <div style={{maxWidth: '72rem', margin: '0 auto', padding: '1.5rem'}}>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.5rem'}}>
-                <div style={{gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
-                    <section>
-                        <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Welcome, ma</h2>
-                        <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '1rem'}}>
-                            <StreakCard/>
-                            <ComebackCard/>
-                        </div>
-                    </section>
-                </div>
-
-                <ScrollArea style={{gridColumn: 'span 8', height: 'calc(100vh - 100px)'}}>
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingRight: '1rem'}}>
+        <Container size="xl" px="md" style={{width: '100%'}}>
+            <Grid gutter="lg">
+                {/* Left Sidebar */}
+                <Grid.Col span={{base: 12, lg: 4}}>
+                    <Stack gap="lg">
                         <section>
-                            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Jump back in</h2>
-                            <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '1rem'}}>
-                                <JumpBackInCard/>
-                                <PremiumCard/>
-                            </div>
+                            <Title order={2} mb="md" style={{color: '#1f2937'}}>
+                                Welcome back!
+                            </Title>
+                            <Stack gap="md">
+                                <StreakCard/>
+                                <ComebackCard/>
+                            </Stack>
                         </section>
-                        <ContinueLearningSection/>
-                        <RecommendedSection/>
-                    </div>
-                </ScrollArea>
-            </div>
-        </div>
+                    </Stack>
+                </Grid.Col>
+
+                {/* Main Content Area */}
+                <Grid.Col span={{base: 12, lg: 8}}>
+                    <ScrollArea h={{base: 'auto', lg: 'calc(100vh - 100px)'}}>
+                        <Stack gap="xl" pr={{base: 0, lg: 'md'}}>
+                            <section>
+                                <Title order={2} mb="md" style={{color: '#1f2937'}}>
+                                    Jump back in
+                                </Title>
+                                <Stack gap="md">
+                                    <JumpBackInCard/>
+                                    <PremiumCard/>
+                                </Stack>
+                            </section>
+                            <ContinueLearningSection/>
+                            <RecommendedSection/>
+                        </Stack>
+                    </ScrollArea>
+                </Grid.Col>
+            </Grid>
+        </Container>
     );
 };
 

@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, TextInput, Modal, Stack, Text, Anchor, Group } from "@mantine/core";
+import { Button, TextInput, Modal, Stack, Text, Anchor, Group, PasswordInput } from "@mantine/core";
 import { IconMail } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
+import { useUserStore } from '@/stores/useUserStore';
+import { authApi } from '@/lib/api';
 import SignupModal from './SignupModal';
 
 interface LoginModalProps {
@@ -11,8 +14,14 @@ interface LoginModalProps {
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+    const router = useRouter();
+    const setUser = useUserStore(state => state.setUser);
     const [showEmailLogin, setShowEmailLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleEmailLogin = () => {
         setShowEmailLogin(true);
@@ -24,6 +33,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
     const handleSwitchToLogin = () => {
         setShowSignup(false);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await authApi.login(email.toLowerCase(), password);
+            setUser(response.data);
+            onClose();
+            router.push('/home');
+        } catch (err: any) {
+            setError(err.message || 'Email ou mot de passe incorrect');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (showSignup) {
@@ -46,15 +72,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         <Modal
             opened={isOpen}
             onClose={onClose}
-            title={showEmailLogin ? "Login" : "The best way to learn math and computer science."}
+            title={showEmailLogin ? "Connexion" : "La meilleure façon d'apprendre les mathématiques"}
             size="md"
             centered
             radius="lg"
         >
             <Text size="sm" c="dimmed" mb="lg">
                 {showEmailLogin
-                    ? "Enter your credentials to access your account."
-                    : "Choose your preferred method to log in and start learning."}
+                    ? "Entrez vos identifiants pour accéder à votre compte."
+                    : "Choisissez votre méthode préférée pour vous connecter et commencer à apprendre."}
             </Text>
 
             {!showEmailLogin ? (
@@ -72,7 +98,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                 </svg>
                             }
                         >
-                            Log in with Google
+                            Se connecter avec Google
                         </Button>
                         <Button
                             variant="default"
@@ -83,7 +109,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                 </svg>
                             }
                         >
-                            Log in with Facebook
+                            Se connecter avec Facebook
                         </Button>
                         <Button
                             variant="default"
@@ -94,7 +120,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                 </svg>
                             }
                         >
-                            Continue with Apple
+                            Continuer avec Apple
                         </Button>
                         <Button
                             variant="default"
@@ -112,51 +138,60 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             onClick={handleEmailLogin}
                             leftSection={<IconMail size={20} />}
                         >
-                            Log in with Email
+                            Se connecter avec Email
                         </Button>
                     </Stack>
                     <Text ta="center" mt="xl" size="sm">
-                        New user?{' '}
-                        <Anchor component="button" onClick={handleSwitchToSignup} c="#456DFF" fw={500}>
-                            Sign up
+                        Nouveau?{' '}
+                        <Anchor component="button" onClick={handleSwitchToSignup} c="#2CB0A1" fw={500}>
+                            S'inscrire
                         </Anchor>
                     </Text>
                 </>
             ) : (
                 <>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <Stack gap="md">
                             <TextInput
                                 type="email"
                                 placeholder="Email"
                                 size="md"
                                 radius="md"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
                             />
-                            <TextInput
-                                type="password"
-                                placeholder="Password"
+                            <PasswordInput
+                                placeholder="Mot de passe"
                                 size="md"
                                 radius="md"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
                             />
+                            {error && (
+                                <Text c="red" size="sm" ta="center">
+                                    {error}
+                                </Text>
+                            )}
                             <Button
+                                type="submit"
                                 fullWidth
                                 size="md"
                                 color="teal"
                                 style={{ height: '48px' }}
+                                loading={loading}
                             >
-                                Log in
+                                Se connecter
                             </Button>
                         </Stack>
                     </form>
                     <Group justify="space-between" mt="lg">
-                        <Anchor size="sm" href="#" c="#456DFF" fw={500}>Reset password</Anchor>
-                        <Anchor component="button" size="sm" onClick={handleSwitchToSignup} c="#456DFF" fw={500}>
-                            New user? Sign up
+                        <Anchor size="sm" href="#" c="#2CB0A1" fw={500}>Mot de passe oublié?</Anchor>
+                        <Anchor component="button" size="sm" onClick={handleSwitchToSignup} c="#2CB0A1" fw={500}>
+                            Nouveau? S'inscrire
                         </Anchor>
                     </Group>
-                    <Text size="xs" ta="center" mt="lg" c="dimmed">
-                        This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply
-                    </Text>
                 </>
             )}
         </Modal>

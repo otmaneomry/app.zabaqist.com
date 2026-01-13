@@ -3,7 +3,7 @@ import {Card} from "@mantine/core";
 
 const StreakCard = () => {
     return (
-        <Card padding="lg">
+        <Card padding="lg" radius="lg" withBorder>
             <div style={{marginBottom: '1rem'}}>
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
