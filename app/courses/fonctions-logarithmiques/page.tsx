@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react'
 import { Container, Title, Text, Stack, Card, Tabs, Button, Group, Badge, Divider } from '@mantine/core'
-import { IconBook, IconChartLine, IconCalculator, IconTrophy } from '@tabler/icons-react'
+import { IconBook, IconChartLine, IconCalculator, IconTrophy, IconNotebook, IconSchool } from '@tabler/icons-react'
 import Link from 'next/link'
 import MathContent from '@/components/math/MathContent'
 import GeogebraViewer from '@/components/math/GeogebraViewer'
+import ExerciseWithSolution from '@/components/learning/ExerciseWithSolution'
+import DevoirAssignment from '@/components/learning/DevoirAssignment'
 
 export default function FonctionsLogarithmiquesPage() {
   const [activeTab, setActiveTab] = useState<string | null>('introduction')
@@ -53,6 +55,12 @@ export default function FonctionsLogarithmiquesPage() {
             </Tabs.Tab>
             <Tabs.Tab value="graphique" leftSection={<IconChartLine size={16} />}>
               Graphique
+            </Tabs.Tab>
+            <Tabs.Tab value="exercices" leftSection={<IconNotebook size={16} />}>
+              Exercices
+            </Tabs.Tab>
+            <Tabs.Tab value="devoir" leftSection={<IconSchool size={16} />}>
+              Devoir
             </Tabs.Tab>
           </Tabs.List>
 
@@ -317,6 +325,168 @@ export default function FonctionsLogarithmiquesPage() {
                 </Stack>
               </Card>
             </Stack>
+          </Tabs.Panel>
+
+          {/* Exercices Tab */}
+          <Tabs.Panel value="exercices" pt="xl">
+            <Stack gap="lg">
+              <Card shadow="sm" padding="lg" radius="md" withBorder bg="blue.0">
+                <Text size="lg" fw={600} mb="sm">
+                  📝 Exercices corrigés
+                </Text>
+                <Text c="dimmed">
+                  Pratiquez avec ces exercices détaillés. Chaque exercice inclut des indices et une solution étape par étape avec explications.
+                </Text>
+              </Card>
+
+              <ExerciseWithSolution
+                number={1}
+                question="Calculer : \\ln(e^3) + \\ln(e^2) - \\ln(e)"
+                hint="Utilisez la propriété : ln(a) + ln(b) = ln(ab) et ln(a) - ln(b) = ln(a/b)"
+                difficulty="Facile"
+                steps={[
+                  {
+                    title: "Simplifier chaque terme",
+                    content: "\\ln(e^3) = 3, \\quad \\ln(e^2) = 2, \\quad \\ln(e) = 1",
+                    explanation: "Car ln(e^n) = n pour tout n réel"
+                  },
+                  {
+                    title: "Effectuer les opérations",
+                    content: "3 + 2 - 1 = 4",
+                    explanation: "Simple addition et soustraction"
+                  }
+                ]}
+                finalAnswer="4"
+              />
+
+              <ExerciseWithSolution
+                number={2}
+                question="Résoudre l'équation : \\ln(x) = 3"
+                hint="Utilisez la fonction exponentielle qui est la fonction réciproque du logarithme"
+                difficulty="Moyen"
+                steps={[
+                  {
+                    title: "Appliquer l'exponentielle aux deux membres",
+                    content: "e^{\\ln(x)} = e^3",
+                    explanation: "On applique exp() des deux côtés pour éliminer le ln"
+                  },
+                  {
+                    title: "Simplifier avec la propriété fondamentale",
+                    content: "x = e^3",
+                    explanation: "Car e^{ln(x)} = x (propriété de la fonction réciproque)"
+                  },
+                  {
+                    title: "Vérification",
+                    content: "\\ln(e^3) = 3 \\cdot \\ln(e) = 3 \\times 1 = 3 \\quad \\checkmark",
+                    explanation: "On vérifie que la solution satisfait l'équation"
+                  }
+                ]}
+                finalAnswer="x = e^3 \\approx 20.09"
+              />
+
+              <ExerciseWithSolution
+                number={3}
+                question="Simplifier : \\ln(8) + \\ln(2) - \\ln(4)"
+                hint="Utilisez les propriétés des logarithmes et écrivez les nombres en puissances de 2"
+                difficulty="Moyen"
+                steps={[
+                  {
+                    title: "Écrire en puissances de 2",
+                    content: "\\ln(2^3) + \\ln(2) - \\ln(2^2)",
+                    explanation: "8 = 2³, 2 = 2¹, 4 = 2²"
+                  },
+                  {
+                    title: "Appliquer ln(a^n) = n·ln(a)",
+                    content: "3\\ln(2) + \\ln(2) - 2\\ln(2)",
+                    explanation: "Propriété de la puissance dans le logarithme"
+                  },
+                  {
+                    title: "Factoriser ln(2)",
+                    content: "(3 + 1 - 2)\\ln(2) = 2\\ln(2)",
+                    explanation: "On factorise par ln(2)"
+                  },
+                  {
+                    title: "Simplifier",
+                    content: "\\ln(2^2) = \\ln(4)",
+                    explanation: "Car 2·ln(2) = ln(2²)"
+                  }
+                ]}
+                finalAnswer="\\ln(4)"
+              />
+
+              <ExerciseWithSolution
+                number={4}
+                question="Dériver f(x) = \\ln(x^2 + 3x + 2)"
+                hint="Utilisez la formule de dérivée composée : (ln(u))' = u'/u"
+                difficulty="Difficile"
+                steps={[
+                  {
+                    title: "Identifier u(x)",
+                    content: "u(x) = x^2 + 3x + 2",
+                    explanation: "La fonction à l'intérieur du logarithme"
+                  },
+                  {
+                    title: "Calculer u'(x)",
+                    content: "u'(x) = 2x + 3",
+                    explanation: "Dérivée d'un polynôme"
+                  },
+                  {
+                    title: "Appliquer la formule (ln(u))' = u'/u",
+                    content: "f'(x) = \\frac{u'(x)}{u(x)} = \\frac{2x + 3}{x^2 + 3x + 2}",
+                    explanation: "Formule de dérivation du logarithme d'une fonction composée"
+                  },
+                  {
+                    title: "Factoriser le dénominateur (optionnel)",
+                    content: "f'(x) = \\frac{2x + 3}{(x + 1)(x + 2)}",
+                    explanation: "x² + 3x + 2 = (x + 1)(x + 2)"
+                  }
+                ]}
+                finalAnswer="f'(x) = \\frac{2x + 3}{x^2 + 3x + 2}"
+              />
+            </Stack>
+          </Tabs.Panel>
+
+          {/* Devoir Tab */}
+          <Tabs.Panel value="devoir" pt="xl">
+            <DevoirAssignment
+              title="Devoir Maison - Fonctions Logarithmiques"
+              dueDate="15 Janvier 2026"
+              duration="2 heures"
+              totalPoints={50}
+              instructions="Répondez aux questions suivantes en détaillant vos calculs. La rédaction et la rigueur mathématique seront prises en compte dans la notation."
+              questions={[
+                {
+                  id: 1,
+                  question: "Calculer sans calculatrice : ln(e⁵) - ln(e²) + 2ln(e)",
+                  points: 8,
+                  type: 'calculation'
+                },
+                {
+                  id: 2,
+                  question: "Résoudre l'équation : ln(x - 1) + ln(x + 1) = ln(8)",
+                  points: 12,
+                  type: 'calculation'
+                },
+                {
+                  id: 3,
+                  question: "Démontrer que pour tous réels a et b strictement positifs : ln(a/b) = ln(a) - ln(b)",
+                  points: 10,
+                  type: 'proof'
+                },
+                {
+                  id: 4,
+                  question: "Soit f(x) = x·ln(x). Calculer f'(x) et déterminer le tableau de variations de f sur ]0, +∞[",
+                  points: 12,
+                  type: 'application'
+                },
+                {
+                  id: 5,
+                  question: "Résoudre l'inéquation : ln(x² - 4) > ln(5)",
+                  points: 8,
+                  type: 'calculation'
+                }
+              ]}
+            />
           </Tabs.Panel>
         </Tabs>
 
