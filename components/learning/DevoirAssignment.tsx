@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, Text, Stack, Button, Badge, Group, Progress, Textarea } from '@mantine/core'
 import { IconCheck, IconClock, IconPencil } from '@tabler/icons-react'
 import MathContent from '@/components/math/MathContent'
+import { markHomeworkStarted, markHomeworkCompleted } from '@/lib/progressTracking'
 
 interface Question {
   id: number
@@ -19,6 +20,7 @@ interface DevoirProps {
   totalPoints: number
   questions: Question[]
   instructions?: string
+  courseId?: string
 }
 
 export default function DevoirAssignment({
@@ -27,7 +29,8 @@ export default function DevoirAssignment({
   duration,
   totalPoints,
   questions,
-  instructions
+  instructions,
+  courseId = 'fonctions-logarithmiques'
 }: DevoirProps) {
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [submitted, setSubmitted] = useState(false)
@@ -35,6 +38,21 @@ export default function DevoirAssignment({
   const handleAnswerChange = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }))
   }
+
+  // Track when homework is started (first answer typed)
+  useEffect(() => {
+    const answeredQuestions = Object.keys(answers).filter(key => answers[Number(key)].trim().length > 0)
+    if (answeredQuestions.length > 0) {
+      markHomeworkStarted(courseId)
+    }
+  }, [answers, courseId])
+
+  // Track when homework is submitted
+  useEffect(() => {
+    if (submitted) {
+      markHomeworkCompleted(courseId)
+    }
+  }, [submitted, courseId])
 
   const calculateProgress = () => {
     const answeredQuestions = Object.keys(answers).filter(key => answers[Number(key)].trim().length > 0).length

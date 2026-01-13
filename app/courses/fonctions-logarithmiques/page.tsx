@@ -1,20 +1,103 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Container, Title, Text, Stack, Card, Tabs, Button, Group, Badge, Divider } from '@mantine/core'
-import { IconBook, IconChartLine, IconCalculator, IconTrophy, IconNotebook, IconSchool } from '@tabler/icons-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Container, Title, Text, Stack, Card, Tabs, Button, Group, Badge, Divider, Progress, Paper } from '@mantine/core'
+import { IconBook, IconChartLine, IconCalculator, IconTrophy, IconNotebook, IconSchool, IconClock } from '@tabler/icons-react'
 import Link from 'next/link'
 import MathContent from '@/components/math/MathContent'
 import GeogebraViewer from '@/components/math/GeogebraViewer'
 import ExerciseWithSolution from '@/components/learning/ExerciseWithSolution'
 import DevoirAssignment from '@/components/learning/DevoirAssignment'
+import {
+  getCourseProgress,
+  markTabCompleted,
+  addTimeSpent,
+  getCompletionPercentage,
+  getFormattedTimeSpent
+} from '@/lib/progressTracking'
+
+const COURSE_ID = 'fonctions-logarithmiques'
 
 export default function FonctionsLogarithmiquesPage() {
   const [activeTab, setActiveTab] = useState<string | null>('introduction')
+  const [completionPercentage, setCompletionPercentage] = useState(0)
+  const [timeSpent, setTimeSpent] = useState('0m')
+  const timeIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const startTimeRef = useRef<number>(Date.now())
+
+  // Load progress on mount
+  useEffect(() => {
+    const progress = getCourseProgress(COURSE_ID)
+    if (progress) {
+      setActiveTab(progress.lastVisitedTab)
+      setTimeSpent(getFormattedTimeSpent(COURSE_ID))
+    }
+    setCompletionPercentage(getCompletionPercentage(COURSE_ID, 6))
+
+    // Track time spent
+    startTimeRef.current = Date.now()
+    timeIntervalRef.current = setInterval(() => {
+      const secondsElapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
+      if (secondsElapsed >= 10) {
+        addTimeSpent(COURSE_ID, secondsElapsed)
+        setTimeSpent(getFormattedTimeSpent(COURSE_ID))
+        startTimeRef.current = Date.now()
+      }
+    }, 10000) // Update every 10 seconds
+
+    return () => {
+      if (timeIntervalRef.current) {
+        clearInterval(timeIntervalRef.current)
+      }
+      // Save final time on unmount
+      const finalSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000)
+      if (finalSeconds > 0) {
+        addTimeSpent(COURSE_ID, finalSeconds)
+      }
+    }
+  }, [])
+
+  // Track tab changes
+  useEffect(() => {
+    if (activeTab) {
+      markTabCompleted(COURSE_ID, activeTab)
+      setCompletionPercentage(getCompletionPercentage(COURSE_ID, 6))
+    }
+  }, [activeTab])
+
+  // Refresh progress periodically to catch exercise/homework updates
+  useEffect(() => {
+    const progressInterval = setInterval(() => {
+      setCompletionPercentage(getCompletionPercentage(COURSE_ID, 6))
+    }, 2000) // Check every 2 seconds
+
+    return () => clearInterval(progressInterval)
+  }, [])
 
   return (
     <Container size="lg" py="xl">
       <Stack gap="xl">
+        {/* Progress Indicator */}
+        <Paper shadow="sm" p="md" radius="md" withBorder>
+          <Stack gap="xs">
+            <Group justify="space-between">
+              <Text size="sm" fw={600} c="dimmed">
+                Progression du cours
+              </Text>
+              <Group gap="lg">
+                <Group gap="xs">
+                  <IconClock size={16} />
+                  <Text size="sm" c="dimmed">{timeSpent}</Text>
+                </Group>
+                <Text size="sm" fw={700} c="teal">
+                  {completionPercentage}%
+                </Text>
+              </Group>
+            </Group>
+            <Progress value={completionPercentage} color="teal" size="lg" radius="xl" />
+          </Stack>
+        </Paper>
+
         {/* Course Header */}
         <div>
           <Badge color="teal" size="lg" mb="sm">

@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, Text, Stack, Button, Collapse, Stepper, Badge, Group } from '@mantine/core'
 import { IconCheck, IconBulb, IconEye } from '@tabler/icons-react'
 import MathContent from '@/components/math/MathContent'
+import { markExerciseAttempted, markExerciseCompleted } from '@/lib/progressTracking'
 
 interface Step {
   title: string
@@ -18,6 +19,7 @@ interface ExerciseProps {
   steps: Step[]
   finalAnswer: string
   difficulty?: 'Facile' | 'Moyen' | 'Difficile'
+  courseId?: string
 }
 
 export default function ExerciseWithSolution({
@@ -26,11 +28,26 @@ export default function ExerciseWithSolution({
   hint,
   steps,
   finalAnswer,
-  difficulty = 'Moyen'
+  difficulty = 'Moyen',
+  courseId = 'fonctions-logarithmiques'
 }: ExerciseProps) {
   const [showHint, setShowHint] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
   const [activeStep, setActiveStep] = useState(0)
+
+  // Track when hint is viewed (exercise attempted)
+  useEffect(() => {
+    if (showHint) {
+      markExerciseAttempted(courseId, number)
+    }
+  }, [showHint, courseId, number])
+
+  // Track when solution is viewed (exercise completed)
+  useEffect(() => {
+    if (showSolution) {
+      markExerciseCompleted(courseId, number)
+    }
+  }, [showSolution, courseId, number])
 
   const difficultyColors = {
     'Facile': 'green',
