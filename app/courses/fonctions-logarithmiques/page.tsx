@@ -465,9 +465,13 @@ export default function FonctionsLogarithmiquesPage() {
               </Card>
 
               <ExerciseWithSolution
+                courseId="fonctions-logarithmiques"
                 number={1}
-                question="Calculer : \\ln(e^3) + \\ln(e^2) - \\ln(e)"
+                question={String.raw`\text{Calculer : } \ln(e^3) + \ln(e^2) - \ln(e)`}
                 hint="Utilisez la propriété : ln(a) + ln(b) = ln(ab) et ln(a) - ln(b) = ln(a/b)"
+                correctAnswer="4"
+                maxAttempts={3}
+                points={10}
                 difficulty="Facile"
                 steps={[
                   {
@@ -485,9 +489,13 @@ export default function FonctionsLogarithmiquesPage() {
               />
 
               <ExerciseWithSolution
+                courseId="fonctions-logarithmiques"
                 number={2}
-                question="Résoudre l'équation : \\ln(x) = 3"
+                question={String.raw`\text{Résoudre l'équation : } \ln(x) = 3`}
                 hint="Utilisez la fonction exponentielle qui est la fonction réciproque du logarithme"
+                correctAnswer="e^3"
+                maxAttempts={3}
+                points={15}
                 difficulty="Moyen"
                 steps={[
                   {
@@ -510,9 +518,13 @@ export default function FonctionsLogarithmiquesPage() {
               />
 
               <ExerciseWithSolution
+                courseId="fonctions-logarithmiques"
                 number={3}
-                question="Simplifier : \\ln(8) + \\ln(2) - \\ln(4)"
+                question={String.raw`\text{Simplifier : } \ln(8) + \ln(2) - \ln(4)`}
                 hint="Utilisez les propriétés des logarithmes et écrivez les nombres en puissances de 2"
+                correctAnswer="\\ln(4)"
+                maxAttempts={3}
+                points={12}
                 difficulty="Moyen"
                 steps={[
                   {
@@ -540,9 +552,13 @@ export default function FonctionsLogarithmiquesPage() {
               />
 
               <ExerciseWithSolution
+                courseId="fonctions-logarithmiques"
                 number={4}
-                question="Dériver f(x) = \\ln(x^2 + 3x + 2)"
+                question={String.raw`\text{Dériver } f(x) = \ln(x^2 + 3x + 2)`}
                 hint="Utilisez la formule de dérivée composée : (ln(u))' = u'/u"
+                correctAnswer="\\frac{2x+3}{x^2+3x+2}"
+                maxAttempts={3}
+                points={15}
                 difficulty="Difficile"
                 steps={[
                   {
@@ -582,33 +598,43 @@ export default function FonctionsLogarithmiquesPage() {
               questions={[
                 {
                   id: 1,
-                  question: "Calculer sans calculatrice : ln(e⁵) - ln(e²) + 2ln(e)",
+                  question: String.raw`\text{Calculer sans calculatrice : } \ln(e^5) - \ln(e^2) + 2\ln(e)`,
                   points: 8,
-                  type: 'calculation'
+                  type: 'calculation',
+                  solution: String.raw`5 - 2 + 2 = 5`,
+                  hint: "Utilisez la propriété ln(eⁿ) = n"
                 },
                 {
                   id: 2,
-                  question: "Résoudre l'équation : ln(x - 1) + ln(x + 1) = ln(8)",
+                  question: String.raw`\text{Résoudre l'équation : } \ln(x - 1) + \ln(x + 1) = \ln(8)`,
                   points: 12,
-                  type: 'calculation'
+                  type: 'calculation',
+                  solution: String.raw`x = 3`,
+                  hint: "Utilisez ln(a) + ln(b) = ln(ab), puis (x-1)(x+1) = 8, donc x² - 1 = 8, x² = 9"
                 },
                 {
                   id: 3,
-                  question: "Démontrer que pour tous réels a et b strictement positifs : ln(a/b) = ln(a) - ln(b)",
+                  question: String.raw`\text{Démontrer que pour tous réels } a \text{ et } b \text{ strictement positifs : } \ln(a/b) = \ln(a) - \ln(b)`,
                   points: 10,
-                  type: 'proof'
+                  type: 'proof',
+                  solution: String.raw`\text{Soit } y = \frac{a}{b}, \text{ alors } a = by. \text{ En appliquant ln : } \ln(a) = \ln(by) = \ln(b) + \ln(y). \text{ Donc } \ln(y) = \ln(a) - \ln(b), \text{ c'est-à-dire } \ln(\frac{a}{b}) = \ln(a) - \ln(b)`,
+                  hint: "Posez y = a/b, donc a = by. Appliquez ln aux deux côtés et utilisez ln(ab) = ln(a) + ln(b)"
                 },
                 {
                   id: 4,
-                  question: "Soit f(x) = x·ln(x). Calculer f'(x) et déterminer le tableau de variations de f sur ]0, +∞[",
+                  question: String.raw`\text{Soit } f(x) = x \cdot \ln(x). \text{ Calculer } f'(x) \text{ et déterminer le tableau de variations de } f \text{ sur } ]0, +\infty[`,
                   points: 12,
-                  type: 'application'
+                  type: 'application',
+                  solution: String.raw`f'(x) = \ln(x) + 1. \text{ S'annule en } x = \frac{1}{e}. \text{ Décroissante sur } ]0, \frac{1}{e}[, \text{ croissante sur } ]\frac{1}{e}, +\infty[. \text{ Minimum en } x = \frac{1}{e} : f(\frac{1}{e}) = -\frac{1}{e}`,
+                  hint: "Utilisez la règle du produit (uv)' = u'v + uv'. Puis étudiez le signe de f'(x)"
                 },
                 {
                   id: 5,
-                  question: "Résoudre l'inéquation : ln(x² - 4) > ln(5)",
+                  question: String.raw`\text{Résoudre l'inéquation : } \ln(x^2 - 4) > \ln(5)`,
                   points: 8,
-                  type: 'calculation'
+                  type: 'calculation',
+                  solution: String.raw`x \in ]-\infty, -3[ \cup ]3, +\infty[`,
+                  hint: "La fonction ln est strictement croissante, donc x² - 4 > 5 et x² - 4 > 0. Résolvez x² > 9 avec x² > 4"
                 }
               ]}
             />

@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, Text, Stack, Button, Badge, Group, Progress, Textarea } from '@mantine/core'
-import { IconCheck, IconClock, IconPencil } from '@tabler/icons-react'
+import { Card, Text, Stack, Button, Badge, Group, Progress, Divider, Alert } from '@mantine/core'
+import { IconCheck, IconClock, IconPencil, IconEye, IconEyeOff, IconBulb } from '@tabler/icons-react'
 import MathContent from '@/components/math/MathContent'
+import SimpleMathInput from '@/components/input/SimpleMathInput'
 import { markHomeworkStarted, markHomeworkCompleted } from '@/lib/progressTracking'
 
 interface Question {
@@ -11,6 +12,8 @@ interface Question {
   question: string
   points: number
   type: 'calculation' | 'proof' | 'application'
+  solution?: string // Solution/answer in LaTeX format
+  hint?: string // Optional hint for the solution
 }
 
 interface DevoirProps {
@@ -34,6 +37,7 @@ export default function DevoirAssignment({
 }: DevoirProps) {
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [submitted, setSubmitted] = useState(false)
+  const [showSolutions, setShowSolutions] = useState(false)
 
   const handleAnswerChange = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }))
@@ -146,23 +150,46 @@ export default function DevoirAssignment({
                   </Badge>
                 </Group>
 
-                <div>
-                  <MathContent block={q.question.includes('\\')}>{q.question}</MathContent>
+                <div style={{ fontSize: '1.05rem', fontWeight: 600 }}>
+                  <MathContent>{q.question}</MathContent>
                 </div>
 
-                <Textarea
-                  placeholder="Écrivez votre réponse ici..."
-                  minRows={4}
+                <SimpleMathInput
                   value={answers[q.id] || ''}
-                  onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                  onChange={(latex) => handleAnswerChange(q.id, latex)}
+                  placeholder="Tapez votre réponse en LaTeX..."
                   disabled={submitted}
-                  styles={{
-                    input: {
-                      fontFamily: 'monospace',
-                      fontSize: '14px'
-                    }
-                  }}
+                  showPreview={true}
+                  minRows={3}
                 />
+
+                {/* Show solution after submission if available and toggle is on */}
+                {submitted && showSolutions && q.solution && (
+                  <>
+                    <Divider label="Solution" labelPosition="center" mt="md" />
+
+                    <Card bg="teal.0" p="md" radius="md">
+                      <Stack gap="sm">
+                        <Group gap="xs">
+                          <IconBulb size={20} color="teal" />
+                          <Text fw={600} c="teal">
+                            Réponse attendue :
+                          </Text>
+                        </Group>
+
+                        <Card bg="white" p="sm" radius="sm">
+                          <MathContent>{q.solution}</MathContent>
+                        </Card>
+
+                        {q.hint && (
+                          <Alert color="blue" variant="light" icon={<IconBulb size={16} />}>
+                            <Text size="sm">{q.hint}</Text>
+                          </Alert>
+                        )}
+                      </Stack>
+                    </Card>
+                  </>
+                )}
               </Stack>
             </Card>
           ))}
@@ -180,19 +207,34 @@ export default function DevoirAssignment({
             Soumettre le devoir
           </Button>
         ) : (
-          <Card bg="green.0" p="lg" radius="md">
-            <Group gap="md">
-              <IconCheck size={32} color="green" />
-              <div>
-                <Text fw={700} c="green" size="lg">
-                  Devoir soumis avec succès !
-                </Text>
-                <Text size="sm" c="dimmed">
-                  Votre professeur corrigera votre travail prochainement.
-                </Text>
-              </div>
-            </Group>
-          </Card>
+          <Stack gap="md">
+            <Card bg="green.0" p="lg" radius="md">
+              <Group gap="md">
+                <IconCheck size={32} color="green" />
+                <div>
+                  <Text fw={700} c="green" size="lg">
+                    Devoir soumis avec succès !
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    Votre professeur corrigera votre travail prochainement.
+                  </Text>
+                </div>
+              </Group>
+            </Card>
+
+            {/* Toggle solutions button if any question has a solution */}
+            {questions.some(q => q.solution) && (
+              <Button
+                size="md"
+                variant={showSolutions ? "filled" : "light"}
+                color="teal"
+                leftSection={showSolutions ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                onClick={() => setShowSolutions(!showSolutions)}
+              >
+                {showSolutions ? 'Masquer les solutions' : 'Afficher les solutions'}
+              </Button>
+            )}
+          </Stack>
         )}
       </Stack>
     </Card>

@@ -1,9 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, Text, Stack, Button, Collapse, Stepper, Badge, Group } from '@mantine/core'
-import { IconCheck, IconBulb, IconEye } from '@tabler/icons-react'
+import { Card, Text, Stack, Button, Collapse, Stepper, Badge, Group, Alert } from '@mantine/core'
+import { IconCheck, IconBulb, IconEye, IconX, IconAlertCircle } from '@tabler/icons-react'
 import MathContent from '@/components/math/MathContent'
+import SimpleMathInput from '@/components/input/SimpleMathInput'
+import { validateAnswer, getContextualHint } from '@/lib/mathValidation'
 import { markExerciseAttempted, markExerciseCompleted } from '@/lib/progressTracking'
 
 interface Step {
@@ -20,6 +22,9 @@ interface ExerciseProps {
   finalAnswer: string
   difficulty?: 'Facile' | 'Moyen' | 'Difficile'
   courseId?: string
+  correctAnswer?: string  // LaTeX format for validation
+  maxAttempts?: number
+  points?: number
 }
 
 export default function ExerciseWithSolution({
@@ -29,11 +34,21 @@ export default function ExerciseWithSolution({
   steps,
   finalAnswer,
   difficulty = 'Moyen',
-  courseId = 'fonctions-logarithmiques'
+  courseId = 'fonctions-logarithmiques',
+  correctAnswer,
+  maxAttempts = 3,
+  points = 10
 }: ExerciseProps) {
   const [showHint, setShowHint] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
   const [activeStep, setActiveStep] = useState(0)
+
+  // Answer validation states
+  const [studentAnswer, setStudentAnswer] = useState('')
+  const [attempts, setAttempts] = useState(0)
+  const [isCorrect, setIsCorrect] = useState(false)
+  const [feedback, setFeedback] = useState('')
+  const [contextualHint, setContextualHint] = useState('')
 
   // Track when hint is viewed (exercise attempted)
   useEffect(() => {
@@ -49,11 +64,52 @@ export default function ExerciseWithSolution({
     }
   }, [showSolution, courseId, number])
 
+  // Mark as completed when answer is correct
+  useEffect(() => {
+    if (isCorrect) {
+      markExerciseCompleted(courseId, number)
+    }
+  }, [isCorrect, courseId, number])
+
+  const handleCheckAnswer = () => {
+    if (!correctAnswer) {
+      // No validation available, just show solution
+      setShowSolution(true)
+      return
+    }
+
+    const validation = validateAnswer(studentAnswer, correctAnswer)
+    setAttempts(prev => prev + 1)
+    markExerciseAttempted(courseId, number)
+
+    if (validation.isCorrect) {
+      setIsCorrect(true)
+      setFeedback(validation.message)
+      setContextualHint('')
+    } else {
+      setIsCorrect(false)
+      setFeedback(validation.message)
+
+      // Show contextual hint after wrong attempt
+      const newHint = getContextualHint(studentAnswer, correctAnswer, hint)
+      setContextualHint(newHint)
+
+      // Auto-show solution after max attempts
+      if (attempts + 1 >= maxAttempts) {
+        setTimeout(() => {
+          setShowSolution(true)
+        }, 2000)
+      }
+    }
+  }
+
   const difficultyColors = {
     'Facile': 'green',
     'Moyen': 'yellow',
     'Difficile': 'red'
   }
+
+  const canAttempt = attempts < maxAttempts && !isCorrect
 
   return (
     <Card shadow="sm" padding="xl" radius="md" withBorder mb="lg">
@@ -73,8 +129,75 @@ export default function ExerciseWithSolution({
           <Text fw={500} mb="sm">
             Énoncé :
           </Text>
-          <MathContent block={question.includes('\\')}>{question}</MathContent>
+          <MathContent>{question}</MathContent>
+          {points && (
+            <Badge mt="sm" color="gray" variant="outline">
+              {points} points
+            </Badge>
+          )}
         </Card>
+
+        {/* Answer Input (if correctAnswer is provided) */}
+        {correctAnswer && !isCorrect && (
+          <>
+            <SimpleMathInput
+              value={studentAnswer}
+              onChange={setStudentAnswer}
+              label="Votre réponse:"
+              placeholder="Entrez votre réponse en LaTeX..."
+              disabled={!canAttempt}
+              showPreview={true}
+            />
+
+            <Group justify="space-between">
+              <Text size="sm" c="dimmed">
+                Tentative {attempts} / {maxAttempts}
+              </Text>
+              <Button
+                color="teal"
+                onClick={handleCheckAnswer}
+                disabled={!studentAnswer.trim() || !canAttempt}
+              >
+                Vérifier la réponse
+              </Button>
+            </Group>
+
+            {/* Feedback */}
+            {feedback && (
+              <Alert
+                icon={isCorrect ? <IconCheck size={16} /> : <IconX size={16} />}
+                color={isCorrect ? 'green' : 'red'}
+                title={isCorrect ? 'Correct !' : 'Incorrect'}
+              >
+                {feedback}
+              </Alert>
+            )}
+
+            {/* Contextual Hint */}
+            {contextualHint && !isCorrect && (
+              <Alert icon={<IconAlertCircle size={16} />} color="orange" title="Indice">
+                {contextualHint}
+              </Alert>
+            )}
+          </>
+        )}
+
+        {/* Success Message */}
+        {isCorrect && (
+          <Card bg="green.0" p="md" radius="md">
+            <Group gap="md">
+              <IconCheck size={32} color="green" />
+              <div>
+                <Text fw={700} c="green" size="lg">
+                  Bravo ! Vous avez trouvé la bonne réponse
+                </Text>
+                <Text size="sm" c="dimmed">
+                  Vous avez réussi en {attempts} tentative{attempts > 1 ? 's' : ''} et gagné {points} points !
+                </Text>
+              </div>
+            </Group>
+          </Card>
+        )}
 
         {/* Hint Button */}
         {hint && (

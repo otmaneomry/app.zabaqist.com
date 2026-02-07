@@ -16,6 +16,7 @@
     "@tabler/icons-react": "^3.36.1",
     "katex": "^0.16.27",
     "lucide-react": "^0.562.0",
+    "mathquill": "^0.10.1-a",
     "next": "16.1.1",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
@@ -25,6 +26,7 @@
     "react-geogebra": "^1.2.5",
     "react-hook-form": "^7.71.0",
     "react-katex": "^3.1.0",
+    "react-mathquill": "^1.0.4",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
