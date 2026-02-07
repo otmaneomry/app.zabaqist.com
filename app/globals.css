@@ -73,22 +73,63 @@
   }
 }
 
-/* Professional Typography Enhancements */
+/* Professional Typography Enhancements - MOBILE FIRST */
 @layer components {
-  /* Math content readability improvements */
+  /* Base styles (Mobile) - Default for all screens */
   .katex {
-    font-size: 1.1em;
+    font-size: 1em;  /* Mobile-friendly size */
   }
 
-  /* Display mode (block) math - larger and more prominent */
   .katex-display {
-    font-size: 1.15em;
-    margin: 1.5rem 0;
+    font-size: 1.05em;
+    margin: 1rem 0;
   }
 
   /* Ensure proper line height for mixed text and math */
   p .katex,
   span .katex {
     line-height: 1;
+  }
+
+  /* Touch-friendly buttons (mobile-first) */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent horizontal overflow on small screens */
+  .katex-html {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  /* Tablet and up - Progressive Enhancement */
+  @media (min-width: 769px) {
+    .katex {
+      font-size: 1.05em;  /* Slightly larger on tablet */
+    }
+
+    .katex-display {
+      font-size: 1.1em;
+      margin: 1.25rem 0;
+    }
+
+    /* Desktop buttons can be smaller */
+    button {
+      min-height: auto;
+      min-width: auto;
+    }
+  }
+
+  /* Desktop - Full Experience */
+  @media (min-width: 1025px) {
+    .katex {
+      font-size: 1.1em;  /* Largest on desktop */
+    }
+
+    .katex-display {
+      font-size: 1.15em;
+      margin: 1.5rem 0;
+    }
   }
 }

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Container, Title, Text, Stack, Card, Tabs, Button, Group, Badge, Divider, Progress, Paper } from '@mantine/core'
+import { Container, Title, Text, Stack, Card, Tabs, Button, Group, Badge, Divider, Progress, Paper, ScrollArea } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import { IconBook, IconChartLine, IconCalculator, IconTrophy, IconNotebook, IconSchool, IconClock } from '@tabler/icons-react'
 import Link from 'next/link'
 import MathContent from '@/components/math/MathContent'
@@ -24,6 +25,11 @@ export default function FonctionsLogarithmiquesPage() {
   const [timeSpent, setTimeSpent] = useState('0m')
   const timeIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const startTimeRef = useRef<number>(Date.now())
+
+  // Mobile-First Responsive breakpoints
+  const isTablet = useMediaQuery('(min-width: 769px)')   // Tablet and up
+  const isDesktop = useMediaQuery('(min-width: 1025px)') // Desktop and up
+  // Mobile is default (< 769px)
 
   // Load progress on mount
   useEffect(() => {
@@ -126,26 +132,36 @@ export default function FonctionsLogarithmiquesPage() {
 
         {/* Course Content Tabs */}
         <Tabs value={activeTab} onChange={setActiveTab}>
-          <Tabs.List>
-            <Tabs.Tab value="introduction" leftSection={<IconBook size={16} />}>
-              Introduction
-            </Tabs.Tab>
-            <Tabs.Tab value="proprietes" leftSection={<IconCalculator size={16} />}>
-              Propriétés
-            </Tabs.Tab>
-            <Tabs.Tab value="derivees" leftSection={<IconChartLine size={16} />}>
-              Dérivées
-            </Tabs.Tab>
-            <Tabs.Tab value="graphique" leftSection={<IconChartLine size={16} />}>
-              Graphique
-            </Tabs.Tab>
-            <Tabs.Tab value="exercices" leftSection={<IconNotebook size={16} />}>
-              Exercices
-            </Tabs.Tab>
-            <Tabs.Tab value="devoir" leftSection={<IconSchool size={16} />}>
-              Devoir
-            </Tabs.Tab>
-          </Tabs.List>
+          <ScrollArea
+            type="auto"
+            offsetScrollbars
+            scrollbarSize={8}
+            styles={{
+              root: { maxWidth: '100%' },
+              viewport: { paddingBottom: isTablet ? 0 : 8 }  // Padding on mobile, none on tablet+
+            }}
+          >
+            <Tabs.List style={{ flexWrap: 'nowrap', minWidth: 'max-content' }}>
+              <Tabs.Tab value="introduction" leftSection={<IconBook size={16} />}>
+                Introduction
+              </Tabs.Tab>
+              <Tabs.Tab value="proprietes" leftSection={<IconCalculator size={16} />}>
+                Propriétés
+              </Tabs.Tab>
+              <Tabs.Tab value="derivees" leftSection={<IconChartLine size={16} />}>
+                Dérivées
+              </Tabs.Tab>
+              <Tabs.Tab value="graphique" leftSection={<IconChartLine size={16} />}>
+                Graphique
+              </Tabs.Tab>
+              <Tabs.Tab value="exercices" leftSection={<IconNotebook size={16} />}>
+                Exercices
+              </Tabs.Tab>
+              <Tabs.Tab value="devoir" leftSection={<IconSchool size={16} />}>
+                Devoir
+              </Tabs.Tab>
+            </Tabs.List>
+          </ScrollArea>
 
           {/* Introduction Tab */}
           <Tabs.Panel value="introduction" pt="xl">
@@ -346,9 +362,9 @@ export default function FonctionsLogarithmiquesPage() {
                 </Text>
                 <GeogebraViewer
                   appName="graphing"
-                  width={800}
-                  height={600}
-                  showAlgebraInput={true}
+                  width={isDesktop ? 800 : isTablet ? 600 : 350}   // Mobile: 350, Tablet: 600, Desktop: 800
+                  height={isDesktop ? 600 : isTablet ? 500 : 350}  // Mobile: 350, Tablet: 500, Desktop: 600
+                  showAlgebraInput={isTablet}  // Show on tablet and up
                   showToolBar={true}
                   appletOnLoad={() => {
                     // Wait for applet to be fully ready, then use global window.ggbApplet
