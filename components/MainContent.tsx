@@ -14,7 +14,7 @@ const MainContent = () => {
     const t = useTranslations('dashboard');
     return (
         <Container size="xl" px="md" style={{width: '100%'}}>
-            <Grid gutter="lg">
+            <Grid gap="lg">
                 {/* Left Sidebar */}
                 <Grid.Col span={{base: 12, lg: 4}}>
                     <Stack gap="lg">

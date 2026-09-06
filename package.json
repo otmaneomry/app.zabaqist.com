@@ -11,8 +11,8 @@
     "check": "tsc --noEmit && eslint ."
   },
   "dependencies": {
-    "@mantine/core": "^7.15.2",
-    "@mantine/hooks": "^7.15.2",
+    "@mantine/core": "^9.6.0",
+    "@mantine/hooks": "^9.6.0",
     "@tabler/icons-react": "^3.36.1",
     "katex": "^0.18.7",
     "next": "^16.3.4",
