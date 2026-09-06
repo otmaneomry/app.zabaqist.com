@@ -194,7 +194,8 @@
     "legal": "En continuant, tu acceptes les <terms>conditions d’utilisation</terms> et la <privacy>politique de confidentialité</privacy> de Zabaqist.",
     "signInError": "La connexion a échoué. Réessaie.",
     "beta": "Gratuit pendant la bêta · lancement septembre 2026",
-    "account": "Mon compte"
+    "account": "Mon compte",
+    "notAllowed": "Ce compte n’est pas encore invité. Zabaqist est en bêta fermée jusqu’au lancement — écris-nous pour rejoindre la liste."
   },
   "onboarding": {
     "back": "Retour",

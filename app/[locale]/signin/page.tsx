@@ -64,9 +64,11 @@ export default async function SignInPage({
         {error && (
           <p
             role="alert"
-            className="mt-6 rounded-xl border border-zb-rose/30 bg-zb-rose-soft px-4 py-3 text-center text-sm font-medium text-zb-rose-deep"
+            className="mt-6 rounded-xl border border-zb-rose/30 bg-zb-rose-soft px-4 py-3 text-center text-sm font-medium leading-relaxed text-zb-rose-deep"
           >
-            {t('signInError')}
+            {/* An uninvited account is not a failure — say which it is, or the
+                reader retries the same address forever. */}
+            {error === 'not-allowed' ? t('notAllowed') : t('signInError')}
           </p>
         )}
 

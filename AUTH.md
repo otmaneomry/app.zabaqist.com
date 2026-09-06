@@ -105,6 +105,54 @@ E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111 &
 npm run test:course     # 178 vérifications
 ```
 
+## Bêta fermée — qui a le droit d'entrer
+
+Tant que le produit n'est pas public, seules les adresses présentes dans
+`public.allowed_emails` peuvent se connecter. La liste est **dans la base**, pas
+dans le code : inviter quelqu'un est une ligne SQL, pas un déploiement.
+
+```sql
+insert into public.allowed_emails (email, note)
+values (public.normalize_email('prenom.nom@gmail.com'), 'Prof de maths')
+on conflict (email) do nothing;
+```
+
+Le contrôle a lieu dans `app/auth/callback/route.ts`, juste après l'échange du
+code : si l'adresse n'est pas invitée, la session est immédiatement fermée et
+l'élève revient sur `/signin?error=not-allowed`, avec un message qui dit que
+c'est une bêta fermée — sinon il réessaie indéfiniment la même adresse.
+
+Deux détails qui comptent :
+
+- **La table n'a aucune policy RLS.** Elle est donc invisible via la clé
+  publishable, qui part dans chaque navigateur. Le seul accès est
+  `is_email_allowed(addr)`, une fonction `security definer` qui ne rend qu'un
+  booléen : impossible d'en extraire la liste des invités.
+- **Gmail ignore les points.** `omry.otmane@gmail.com` et `omryotmane@gmail.com`
+  sont le même compte, et Google renvoie la forme sans points — une liste qui
+  stocke la forme pointée refuserait la connexion réelle.
+  `public.normalize_email()` normalise les deux côtés.
+
+## La base
+
+`supabase/migrations/0001_init.sql`, à coller dans **Supabase → SQL Editor**.
+Réexécutable sans casse.
+
+| Table | Remplace |
+| --- | --- |
+| `profiles` | `lib/filiere.ts`, `lib/onboarding.ts` |
+| `course_progress` | `lib/progressTracking.ts` |
+| `checkpoints` | `lib/courseProgress.ts` |
+| `activity` | `lib/activity.ts` |
+| `allowed_emails` | — (bêta fermée) |
+
+Chaque table porte la même règle RLS : `auth.uid()` doit être le propriétaire de
+la ligne. C'est Postgres qui décide, pas le code serveur — la raison même du
+passage à Supabase Auth.
+
+Le profil est créé par un trigger sur `auth.users`, donc dès la première
+connexion, sans aller-retour depuis l'application.
+
 ## Reste à faire
 
 La progression, l'XP, la filière et les réponses du tunnel vivent encore dans
@@ -113,5 +161,7 @@ La progression, l'XP, la filière et les réponses du tunnel vivent encore dans
 `lib/progressTracking.ts`.
 
 **Un élève connecté sur son téléphone ne voit toujours rien de ce qu'il a fait
-sur son ordinateur.** La base existe désormais, et RLS est en place pour la
-protéger — il reste à créer les tables et à y brancher ces cinq fichiers.
+sur son ordinateur.** Les tables existent maintenant et RLS les protège ; il
+reste à brancher ces cinq fichiers dessus — lire au montage, écrire au
+changement, et garder `localStorage` comme cache hors ligne plutôt que comme
+source de vérité.
