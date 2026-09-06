@@ -34,11 +34,20 @@ export default function CourseProgressCard({
   activeId,
   viewIds,
   xpByView,
+  markVisited = true,
 }: {
   slug: string
   activeId: string
   viewIds: string[]
   xpByView: Record<string, number>
+  /**
+   * Whether being on this page counts as having READ `activeId`.
+   *
+   * False on the course path: looking at the map is not reading the first
+   * section, and marking it would light the second node before the reader has
+   * opened the first.
+   */
+  markVisited?: boolean
 }) {
   const t = useTranslations('course')
   const [timeSpent, setTimeSpent] = useState('0m')
@@ -61,12 +70,12 @@ export default function CourseProgressCard({
   // Opening a section is what marks it read. localStorage does not exist during
   // SSR, so this can only run after mount.
   useEffect(() => {
-    markTabCompleted(slug, activeId)
+    if (markVisited) markTabCompleted(slug, activeId)
     // Only this page knows the chapter's sections and what each is worth;
     // the home and landing pages read it back from here.
     rememberCourseShape(slug, xpByView)
     refresh()
-  }, [slug, activeId, idsKey, refresh])
+  }, [slug, activeId, idsKey, markVisited, refresh])
 
   // Time on the chapter, flushed every 10s and once more on the way out — the
   // same cadence the hand-written course page uses.
@@ -123,12 +132,12 @@ export default function CourseProgressCard({
                 ✦ {totals.xp} XP
               </Text>
             )}
-            <Text size="sm" fw={700} c="teal">
+            <Text size="sm" fw={700} c="mint">
               {pct}%
             </Text>
           </Group>
         </Group>
-        <Progress value={pct} color="teal" size="lg" radius="xl" />
+        <Progress value={pct} color="mint" size="lg" radius="xl" />
         <Text size="xs" c="dimmed">
           {t('sectionsSeen', { done: totals.sectionsDone, total: viewIds.length })}
         </Text>

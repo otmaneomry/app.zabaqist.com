@@ -3,6 +3,8 @@
  * Saves student progress to localStorage
  */
 
+import { logSectionRead, logSeconds } from './activity'
+
 export interface CourseProgress {
   courseId: string
   lastVisitedTab: string
@@ -76,6 +78,9 @@ export function markTabCompleted(courseId: string, tabId: string): void {
 
   if (!progress.completedTabs.includes(tabId)) {
     progress.completedTabs.push(tabId)
+    // Dated history for the dashboard — only on the FIRST open, so revisiting
+    // a section does not inflate the chart.
+    logSectionRead()
   }
   progress.lastVisitedTab = tabId
 
@@ -176,6 +181,7 @@ export function addTimeSpent(courseId: string, seconds: number): void {
   if (!progress) return
 
   progress.timeSpent += seconds
+  logSeconds(seconds)
   saveCourseProgress(progress)
 }
 

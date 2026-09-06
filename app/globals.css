@@ -3,20 +3,58 @@
 @tailwind utilities;
 
 @layer base {
-  /* Zabaqist brand palette — the "Mint Tea" scheme the landing page is drawn
-     in (see zabaqist-turbo/tooling/tailwind/theme.css). Kept as its own set of
-     tokens rather than folded into the shadcn ones below: the course pages are
-     built on the existing teal and are not repainted by this. */
+  /* ── Zabaqist · Mint Tea ──────────────────────────────────────────────
+     The brand palette, taken from zabaqist.com's tokens.css so the app and the
+     marketing site are one product rather than two that share a name.
+
+     Two values are deliberately NOT the prettier originals — they are measured
+     accessibility fixes, and lightening them back reintroduces a real failure:
+       · --zb-gold-deep was #b8841a = 3.22:1 on cream. Fails AA in BOTH
+         directions (used as text ON cream and as a surface UNDER cream).
+         It is now 5.49:1.
+       · --zb-ink-3 was oklch(0.65 …) = 3.13:1 on cream. Also failed.
+     Do not "brighten" either one. */
   :root {
-    --zb-mint: #1f6452;
-    --zb-mint-deep: #14453a;
-    --zb-mint-soft: #e4efeb;
-    --zb-gold: #e0a92e;
-    --zb-gold-warm: #b8860b;
-    --zb-cream: #faf6ed;
-    --zb-cream-2: #f2ebdc;
-    --zb-ink: #17241f;
-    --zb-line: #e3e9e6;
+    --zb-cream:        oklch(0.99 0.005 85);
+    --zb-cream-2:      oklch(0.97 0.01 85);
+    --zb-cream-3:      oklch(0.92 0.015 85);
+
+    --zb-mint:         oklch(0.50 0.10 165);   /* brand surface */
+    --zb-mint-deep:    oklch(0.38 0.09 165);
+    --zb-mint-soft:    oklch(0.88 0.04 165);
+    --zb-mint-tint:    oklch(0.96 0.02 165);
+
+    --zb-gold:         #e8b04a;                /* accent */
+    --zb-gold-deep:    #8a5f14;                /* 5.49:1 on cream */
+    --zb-gold-soft:    oklch(0.96 0.04 82);
+    --zb-on-accent:    oklch(0.22 0.02 75);    /* text ON the gold */
+
+    --zb-ink:          oklch(0.22 0.02 165);
+    --zb-ink-2:        oklch(0.45 0.02 165);
+    --zb-ink-3:        oklch(0.47 0.02 165);
+
+    --zb-rose:         oklch(0.48 0.16 25);    /* the error colour */
+    --zb-rose-soft:    oklch(0.95 0.03 25);
+    --zb-rose-deep:    oklch(0.40 0.16 25);
+
+    --zb-line:         oklch(0.92 0.015 85);
+
+    /* Green-tinted, not neutral grey: a shadow on a cream ground picks up the
+       ground, and a grey one reads as dirt. */
+    --zb-shadow-sm: 0 1px 2px rgba(20,40,30,0.04), 0 1px 1px rgba(20,40,30,0.03);
+    --zb-shadow-md: 0 2px 4px rgba(20,40,30,0.05), 0 6px 18px rgba(20,40,30,0.06);
+    --zb-shadow-lg: 0 6px 12px rgba(20,40,30,0.08), 0 18px 40px rgba(20,40,30,0.10);
+
+    /* ── The khatim as a SYSTEM ────────────────────────────────────────────
+       The mark is the marker: one shape, used everywhere it MEANS something
+       ("this is an item in a list") and nowhere it doesn't. That is the
+       difference between a brand mark and a star sprinkled about as chrome —
+       and it is what makes this not look like every other learning app.
+       Geometry is the derived khatim (inner = 0.7654 × outer), the same
+       constant as `KHATIM` in components/landing/Zellige.tsx. */
+    --zb-star-mark:       url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpolygon%20points%3D%2212.00%2C1.00%2015.22%2C4.22%2019.78%2C4.22%2019.78%2C8.78%2023.00%2C12.00%2019.78%2C15.22%2019.78%2C19.78%2015.22%2C19.78%2012.00%2C23.00%208.78%2C19.78%204.22%2C19.78%204.22%2C15.22%201.00%2C12.00%204.22%2C8.78%204.22%2C4.22%208.78%2C4.22%22%20fill%3D%22%232c5f4f%22%2F%3E%3C%2Fsvg%3E");
+    --zb-star-mark-gold:  url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpolygon%20points%3D%2212.00%2C1.00%2015.22%2C4.22%2019.78%2C4.22%2019.78%2C8.78%2023.00%2C12.00%2019.78%2C15.22%2019.78%2C19.78%2015.22%2C19.78%2012.00%2C23.00%208.78%2C19.78%204.22%2C19.78%204.22%2C15.22%201.00%2C12.00%204.22%2C8.78%204.22%2C4.22%208.78%2C4.22%22%20fill%3D%22%238a5f14%22%2F%3E%3C%2Fsvg%3E");
+    --zb-star-mark-cream: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpolygon%20points%3D%2212.00%2C1.00%2015.22%2C4.22%2019.78%2C4.22%2019.78%2C8.78%2023.00%2C12.00%2019.78%2C15.22%2019.78%2C19.78%2015.22%2C19.78%2012.00%2C23.00%208.78%2C19.78%204.22%2C19.78%204.22%2C15.22%201.00%2C12.00%204.22%2C8.78%204.22%2C4.22%208.78%2C4.22%22%20fill%3D%22%23fdfcf8%22%2F%3E%3C%2Fsvg%3E");
   }
 
   :root {
@@ -87,6 +125,41 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
+}
+
+/* The khatim as a list marker. `inset-inline-start` so it mirrors in RTL
+   without a second rule. Applied to the course document's bullets: the brand
+   mark IS the bullet, which is the one place a star means something —
+   the difference between a brand mark and chrome sprinkled about. */
+.zb-star-list { list-style: none; padding-inline-start: 0; }
+.zb-star-list > li { position: relative; padding-inline-start: 26px; }
+.zb-star-list > li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0.62em;
+  width: 11px;
+  height: 11px;
+  transform: translateY(-50%);
+  background: var(--zb-star-mark) center / contain no-repeat;
+}
+.zb-star-list-gold > li::before { background-image: var(--zb-star-mark-gold); }
+.zb-star-list-cream > li::before { background-image: var(--zb-star-mark-cream); }
+
+/* Arabic typography guard. Letter-spacing breaks cursive joins and italic
+   fakes a slant the script has no tradition for — both are hard bans, so they
+   live here rather than being remembered per component.
+   Tagged `ar-MA`, which `:lang(ar)` matches (`ary` would not). */
+*:lang(ar) {
+  letter-spacing: normal;
+  font-style: normal;
+}
+
+/* KaTeX ships its own LTR context; notation stays LTR on the Arabic route. */
+.course-doc .katex,
+.course-doc .katex-display {
+  direction: ltr;
+  text-align: initial;
 }
 
 /* Markdown course documents (components/course/CourseDoc.tsx).

@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, Text, Stack, Checkbox, Radio, Group } from '@mantine/core'
 
 export interface Response {
@@ -31,6 +32,7 @@ export default function MultipleChoiceQuestion({
   onResponseToggle,
   showResults = false
 }: MultipleChoiceQuestionProps) {
+  const t = useTranslations('quiz')
   const allowMultiple = question.allow_multiple || question.responses.filter(r => r.correct_answer === 1).length > 1
 
   return (
@@ -42,7 +44,7 @@ export default function MultipleChoiceQuestion({
             <Text size="sm" c="dimmed" fw={500}>
               QUESTION {question.id}
             </Text>
-            <Text size="sm" c="teal" fw={600}>
+            <Text size="sm" c="mint" fw={600}>
               {question.points} points
             </Text>
           </Group>
@@ -65,12 +67,14 @@ export default function MultipleChoiceQuestion({
                 backgroundColor = '#d1fae5' // Light green
                 borderColor = '#10b981' // Green
               } else if (isSelected && !isCorrect) {
-                backgroundColor = '#fee2e2' // Light red
+                // Amber, never red: amber means "not yet", red means "failed".
+                // See BRILLIANT_WORKFLOW.md §4.
+                backgroundColor = '#FEF6E0' // Light amber
                 borderColor = '#ef4444' // Red
               }
             } else if (isSelected) {
               backgroundColor = '#e0f2f1' // Light teal
-              borderColor = '#2CB0A1' // Teal
+              borderColor = 'var(--zb-mint)' // Teal
             }
 
             return (
@@ -91,7 +95,7 @@ export default function MultipleChoiceQuestion({
                     <Checkbox
                       checked={isSelected}
                       onChange={() => !showResults && onResponseToggle(response.id)}
-                      color="teal"
+                      color="mint"
                       disabled={showResults}
                       styles={{
                         input: {
@@ -103,7 +107,7 @@ export default function MultipleChoiceQuestion({
                     <Radio
                       checked={isSelected}
                       onChange={() => !showResults && onResponseToggle(response.id)}
-                      color="teal"
+                      color="mint"
                       disabled={showResults}
                       styles={{
                         radio: {
@@ -120,9 +124,11 @@ export default function MultipleChoiceQuestion({
                       ✓ Correct
                     </Text>
                   )}
+                  {/* The missed-answer marker is deliberately the lowest-contrast
+                      element here, while the correct one is the highest. */}
                   {showResults && isSelected && !isCorrect && (
-                    <Text c="red" fw={600} size="sm">
-                      ✗ Incorrect
+                    <Text c="dimmed" fw={500} size="sm">
+                      {t('notThisOne')}
                     </Text>
                   )}
                 </Group>
@@ -133,7 +139,7 @@ export default function MultipleChoiceQuestion({
 
         {allowMultiple && !showResults && (
           <Text size="sm" c="dimmed" ta="center">
-            Sélectionnez toutes les réponses correctes
+            {t('selectAll')}
           </Text>
         )}
       </Stack>

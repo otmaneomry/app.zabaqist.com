@@ -13,7 +13,7 @@ import type { View } from '@/lib/courseDoc'
 
 const TONE: Record<View['kind'], string> = {
   cours: 'border-gray-200 bg-gray-50 text-gray-600',
-  methode: 'border-zb-teal/30 bg-zb-teal-soft text-zb-teal-dark',
+  methode: 'border-zb-mint/30 bg-zb-mint-soft text-zb-mint-deep',
   exercices: 'border-blue-200 bg-blue-50 text-blue-700',
   devoir: 'border-zb-gold/40 bg-zb-gold-soft text-zb-gold',
   bilan: 'border-gray-200 bg-gray-50 text-gray-600',

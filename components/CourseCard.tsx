@@ -43,7 +43,7 @@ const CourseCard: React.FC<CourseCardProps> = ({title, icon, level}) => {
                 <p style={{
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    color: '#2CB0A1',
+                    color: 'var(--zb-mint)',
                     marginBottom: '0.25rem',
                     textAlign: 'center',
                     letterSpacing: '0.05em'

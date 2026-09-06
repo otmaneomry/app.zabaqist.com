@@ -50,7 +50,7 @@ const BrowseAllCourses = () => {
                         <div style={{position: 'relative', height: '6rem', marginBottom: '0.5rem'}}>
                             <Image src={course.icon} alt={course.title} fill style={{objectFit: 'contain'}} />
                         </div>
-                        <div style={{backgroundColor: '#2CB0A1', color: 'white', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '9999px', display: 'inline-block', marginBottom: '0.5rem'}}>BAC</div>
+                        <div style={{backgroundColor: 'var(--zb-mint)', color: 'white', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '9999px', display: 'inline-block', marginBottom: '0.5rem'}}>BAC</div>
                         <div style={{fontSize: '0.875rem', fontWeight: 600}}>{course.title}</div>
                     </div>
                 ))}

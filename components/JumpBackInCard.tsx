@@ -98,7 +98,7 @@ const JumpBackInCard = () => {
                         className="rounded"
                     />
                 </div>
-                <p className="mb-2 text-sm font-semibold tracking-wider text-zb-teal">
+                <p className="mb-2 text-sm font-semibold tracking-wider text-zb-mint">
                     {courseLevel(entry, locale)}
                 </p>
                 <h3 className="mb-3 text-xl font-bold text-gray-800">{courseTitle(entry, locale)}</h3>
@@ -106,7 +106,7 @@ const JumpBackInCard = () => {
 
             {started && pct !== null && (
                 <div className="mb-4">
-                    <Progress value={pct} color="teal" size="sm" radius="xl"/>
+                    <Progress value={pct} color="mint" size="sm" radius="xl"/>
                     <Text size="xs" c="dimmed" mt={6}>
                         {t('percentRead', {pct})}
                     </Text>
@@ -114,7 +114,7 @@ const JumpBackInCard = () => {
             )}
 
             <Link href={href} className="no-underline">
-                <Button fullWidth color="teal">
+                <Button fullWidth color="mint">
                     {started ? t('resume') : t('start')}
                 </Button>
             </Link>

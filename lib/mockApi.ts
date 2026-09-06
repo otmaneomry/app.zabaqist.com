@@ -329,6 +329,6 @@ export const mockCountriesApi = {
 }
 
 // Test credentials for easy reference
-console.log("🔧 MOCK API ACTIVE - Test Credentials:")
-console.log("  Email: test@test.com | Password: password")
-console.log("  Email: demo@demo.com | Password: demo123")
+if (process.env.NODE_ENV !== 'production') console.log("🔧 MOCK API ACTIVE - Test Credentials:")
+if (process.env.NODE_ENV !== 'production') console.log("  Email: test@test.com | Password: password")
+if (process.env.NODE_ENV !== 'production') console.log("  Email: demo@demo.com | Password: demo123")

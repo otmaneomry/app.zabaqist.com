@@ -12,6 +12,7 @@
 import React, { useEffect, useState } from 'react'
 import { IconBulb } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
+import { logCheckpointTried } from '@/lib/activity'
 import {
   EMPTY_CHECKPOINT,
   readCheckpoint,
@@ -86,13 +87,18 @@ export default function Checkpoint({
             onChange={(e) => patch({ draft: e.target.value })}
             rows={3}
             placeholder={t('scratchPlaceholder')}
-            className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-zb-teal focus:ring-[3px] focus:ring-zb-teal/20"
+            className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-zb-mint focus:ring-[3px] focus:ring-zb-mint/20"
           />
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => patch({ tried: true })}
-              className="inline-flex h-9 items-center rounded-lg bg-zb-teal px-4 text-sm font-semibold text-white transition-colors hover:bg-zb-teal-dark"
+              onClick={() => {
+                // Dated history for the dashboard. Committing an attempt is the
+                // event worth counting — not typing, and not being right.
+                logCheckpointTried()
+                patch({ tried: true })
+              }}
+              className="inline-flex h-9 items-center rounded-lg bg-zb-mint px-4 text-sm font-semibold text-white transition-colors hover:bg-zb-mint-deep"
             >
               {t('iTried')} →
             </button>
@@ -138,6 +144,9 @@ export default function Checkpoint({
         <div className="mt-4 border-t border-zb-rose/20 pt-3.5">
           <p className="text-sm font-medium">{t('selfCheck')}</p>
           <div className="mt-2 flex flex-wrap gap-2">
+            {/* Success is amplified and "not yet" is muted — amber, never red.
+                A verdict is a self-report, not a grade, so nothing here scores
+                the student. See BRILLIANT_WORKFLOW.md §4. */}
             {VERDICTS.map((v) => (
               <button
                 key={v}
@@ -145,9 +154,11 @@ export default function Checkpoint({
                 onClick={() => patch({ verdict: v })}
                 aria-pressed={verdict === v}
                 className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                  verdict === v
-                    ? 'border-zb-teal bg-zb-teal-soft text-zb-teal-dark'
-                    : 'border-gray-300 bg-white hover:border-zb-teal/50'
+                  verdict !== v
+                    ? 'border-gray-300 bg-white hover:border-zb-mint/50'
+                    : v === 'got'
+                      ? 'border-zb-mint bg-zb-mint-soft text-zb-mint-deep'
+                      : 'border-zb-gold/40 bg-zb-gold-soft text-zb-gold'
                 }`}
               >
                 {t(`verdict-${v}`)}
@@ -155,7 +166,30 @@ export default function Checkpoint({
             ))}
           </div>
           {verdict && (
-            <p className="mt-3 text-sm text-gray-700">{t(`after-${verdict}`)}</p>
+            <>
+              <p className="mt-3 text-sm text-gray-700">
+                {t(`after-${verdict}`)}
+              </p>
+              {verdict !== 'got' && (
+                <div className="mt-3">
+                  {/* Retry is the primary action after a miss, and it costs
+                      nothing: the draft is cleared, the hints already opened
+                      stay opened, and no XP is taken back. */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patch({ tried: false, verdict: null, draft: '' })
+                    }
+                    className="inline-flex h-9 items-center rounded-lg bg-zb-mint px-4 text-sm font-semibold text-white transition-colors hover:bg-zb-mint-deep"
+                  >
+                    {t('retry')} →
+                  </button>
+                  <p className="mt-2 text-xs text-gray-500">
+                    {t('nothingLost')}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

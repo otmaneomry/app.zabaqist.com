@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, Text, Stack, Button, Collapse, Stepper, Badge, Group, Alert } from '@mantine/core'
-import { IconCheck, IconBulb, IconEye, IconX, IconAlertCircle } from '@tabler/icons-react'
+import { IconCheck, IconBulb, IconEye, IconRefresh, IconAlertCircle } from '@tabler/icons-react'
 import MathContent from '@/components/math/MathContent'
 import SimpleMathInput from '@/components/input/SimpleMathInput'
 import { validateAnswer, getContextualHint } from '@/lib/mathValidation'
@@ -23,7 +24,6 @@ interface ExerciseProps {
   difficulty?: 'Facile' | 'Moyen' | 'Difficile'
   courseId?: string
   correctAnswer?: string  // LaTeX format for validation
-  maxAttempts?: number
   points?: number
 }
 
@@ -36,9 +36,9 @@ export default function ExerciseWithSolution({
   difficulty = 'Moyen',
   courseId = 'fonctions-logarithmiques',
   correctAnswer,
-  maxAttempts = 3,
   points = 10
 }: ExerciseProps) {
+  const t = useTranslations('exercise')
   const [showHint, setShowHint] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
   const [activeStep, setActiveStep] = useState(0)
@@ -90,16 +90,9 @@ export default function ExerciseWithSolution({
       setIsCorrect(false)
       setFeedback(validation.message)
 
-      // Show contextual hint after wrong attempt
+      // A hint, offered — never the answer, and never forced.
       const newHint = getContextualHint(studentAnswer, correctAnswer, hint)
       setContextualHint(newHint)
-
-      // Auto-show solution after max attempts
-      if (attempts + 1 >= maxAttempts) {
-        setTimeout(() => {
-          setShowSolution(true)
-        }, 2000)
-      }
     }
   }
 
@@ -109,14 +102,19 @@ export default function ExerciseWithSolution({
     'Difficile': 'red'
   }
 
-  const canAttempt = attempts < maxAttempts && !isCorrect
+  // Retry is unlimited. The attempt counter reports honestly, but it is not a
+  // budget: a wrong answer costs one extra try and nothing else. Locking the
+  // input after three goes, and auto-revealing the solution, is exactly the
+  // punishment mechanic that makes learners quit maths.
+  // See BRILLIANT_WORKFLOW.md §4.
+  const canAttempt = !isCorrect
 
   return (
     <Card shadow="sm" padding="xl" radius="md" withBorder mb="lg">
       <Stack gap="md">
         {/* Header */}
         <Group justify="space-between">
-          <Text size="lg" fw={700} c="teal">
+          <Text size="lg" fw={700} c="mint">
             Exercice {number}
           </Text>
           <Badge color={difficultyColors[difficulty]} variant="light">
@@ -127,7 +125,7 @@ export default function ExerciseWithSolution({
         {/* Question */}
         <Card bg="blue.0" p="md" radius="md">
           <Text fw={500} mb="sm">
-            Énoncé :
+            {t('statement')}
           </Text>
           <MathContent>{question}</MathContent>
           {points && (
@@ -143,31 +141,38 @@ export default function ExerciseWithSolution({
             <SimpleMathInput
               value={studentAnswer}
               onChange={setStudentAnswer}
-              label="Votre réponse:"
-              placeholder="Entrez votre réponse en LaTeX..."
+              label={t('yourAnswer')}
+              placeholder={t('answerPlaceholder')}
               disabled={!canAttempt}
               showPreview={true}
             />
 
             <Group justify="space-between">
               <Text size="sm" c="dimmed">
-                Tentative {attempts} / {maxAttempts}
+                {attempts === 0
+                  ? t('takeYourTime')
+                  : t('attemptN', { n: attempts })}
               </Text>
               <Button
-                color="teal"
+                color="mint"
                 onClick={handleCheckAnswer}
                 disabled={!studentAnswer.trim() || !canAttempt}
               >
-                Vérifier la réponse
+                {t('check')}
               </Button>
             </Group>
 
             {/* Feedback */}
+            {/* Amber means "not yet"; red would mean "failed". The wrong-answer
+                icon is deliberately the lowest-contrast element here, while the
+                correct one is the highest — success amplified, failure muted. */}
             {feedback && (
               <Alert
-                icon={isCorrect ? <IconCheck size={16} /> : <IconX size={16} />}
-                color={isCorrect ? 'green' : 'red'}
-                title={isCorrect ? 'Correct !' : 'Incorrect'}
+                icon={
+                  isCorrect ? <IconCheck size={16} /> : <IconRefresh size={16} />
+                }
+                color={isCorrect ? 'green' : 'yellow'}
+                title={isCorrect ? t('correct') : t('tryAgain')}
               >
                 {feedback}
               </Alert>
@@ -175,7 +180,7 @@ export default function ExerciseWithSolution({
 
             {/* Contextual Hint */}
             {contextualHint && !isCorrect && (
-              <Alert icon={<IconAlertCircle size={16} />} color="orange" title="Indice">
+              <Alert icon={<IconAlertCircle size={16} />} color="orange" title={t('hint')}>
                 {contextualHint}
               </Alert>
             )}
@@ -189,10 +194,12 @@ export default function ExerciseWithSolution({
               <IconCheck size={32} color="green" />
               <div>
                 <Text fw={700} c="green" size="lg">
-                  Bravo ! Vous avez trouvé la bonne réponse
+                  {t('wellDone')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  Vous avez réussi en {attempts} tentative{attempts > 1 ? 's' : ''} et gagné {points} points !
+                  {attempts > 1
+                    ? t('pointsIn', { n: attempts, points })
+                    : t('points', { points })}
                 </Text>
               </div>
             </Group>
@@ -215,7 +222,7 @@ export default function ExerciseWithSolution({
                 <Group gap="xs" mb="xs">
                   <IconBulb size={20} color="orange" />
                   <Text fw={600} c="orange">
-                    Indice :
+                    {t('hintLabel')}
                   </Text>
                 </Group>
                 <Text>{hint}</Text>
@@ -227,7 +234,7 @@ export default function ExerciseWithSolution({
         {/* Solution Button */}
         <Button
           variant="filled"
-          color="teal"
+          color="mint"
           leftSection={<IconEye size={16} />}
           onClick={() => setShowSolution(!showSolution)}
         >
@@ -237,8 +244,8 @@ export default function ExerciseWithSolution({
         {/* Solution Steps */}
         <Collapse in={showSolution}>
           <Card bg="gray.0" p="lg" radius="md">
-            <Text size="lg" fw={700} mb="lg" c="teal">
-              Solution détaillée
+            <Text size="lg" fw={700} mb="lg" c="mint">
+              {t('solution')}
             </Text>
 
             <Stepper active={activeStep} onStepClick={setActiveStep} orientation="vertical">
@@ -268,7 +275,7 @@ export default function ExerciseWithSolution({
             {/* Final Answer */}
             <Card bg="green.0" p="md" radius="md" mt="xl">
               <Text fw={700} mb="sm" c="green">
-                Réponse finale :
+                {t('finalAnswer')}
               </Text>
               <MathContent block={finalAnswer.includes('\\')}>{finalAnswer}</MathContent>
             </Card>
@@ -280,14 +287,14 @@ export default function ExerciseWithSolution({
                 onClick={() => setActiveStep(Math.max(0, activeStep - 1))}
                 disabled={activeStep === 0}
               >
-                Étape précédente
+                {t('prevStep')}
               </Button>
               <Button
                 onClick={() => setActiveStep(Math.min(steps.length - 1, activeStep + 1))}
                 disabled={activeStep === steps.length - 1}
-                color="teal"
+                color="mint"
               >
-                Étape suivante
+                {t('nextStep')}
               </Button>
             </Group>
           </Card>

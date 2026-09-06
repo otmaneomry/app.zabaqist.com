@@ -83,7 +83,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level, href }) => 
                 <p style={{
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    color: '#2CB0A1',
+                    color: 'var(--zb-mint)',
                     marginBottom: '0.25rem',
                     textAlign: 'center',
                     letterSpacing: '0.05em'
@@ -105,7 +105,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, icon, level, href }) => 
                 }}>
                     <div style={{
                         height: '0.25rem',
-                        backgroundColor: '#2CB0A1',
+                        backgroundColor: 'var(--zb-mint)',
                         borderRadius: '0.125rem',
                         width: `${progress}%`,
                         transition: 'width 0.3s ease'

@@ -22,12 +22,12 @@ const PricingCard: React.FC<PricingCardProps> = ({ selectedPlan, setSelectedPlan
                     style={{
                         width: '50%',
                         marginRight: '0.5rem',
-                        backgroundColor: selectedPlan === 'annual' ? '#2CB0A1' : undefined,
+                        backgroundColor: selectedPlan === 'annual' ? 'var(--zb-mint)' : undefined,
                         color: selectedPlan === 'annual' ? 'white' : undefined,
                     }}
                 >
                     Annuel
-                    {selectedPlan === 'annual' && <span style={{marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#26a092', padding: '0 0.25rem', borderRadius: '0.25rem'}}>POPULAIRE</span>}
+                    {selectedPlan === 'annual' && <span style={{marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: 'var(--zb-mint-deep)', padding: '0 0.25rem', borderRadius: '0.25rem'}}>POPULAIRE</span>}
                 </Button>
                 <Button
                     variant={selectedPlan === 'monthly' ? 'filled' : 'outline'}
@@ -48,7 +48,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ selectedPlan, setSelectedPlan
                     <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>299 DH<span style={{fontSize: '0.875rem'}}>/mois</span></p>
                 </div>
             )}
-            <Button style={{width: '100%', backgroundColor: '#2CB0A1', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#26a092'}}}}>S'abonner maintenant</Button>
+            <Button style={{width: '100%', backgroundColor: 'var(--zb-mint)', color: 'white'}} styles={{root: {':hover': {backgroundColor: 'var(--zb-mint-deep)'}}}}>S'abonner maintenant</Button>
             <p style={{fontSize: '0.75rem', marginTop: '1rem', color: '#6b7280'}}>*Facturé en un seul paiement. Renouvellement annuel, annulation à tout moment. Vous pouvez désactiver le renouvellement automatique depuis vos paramètres.</p>
         </div>
     </Card>
@@ -63,13 +63,13 @@ const ReviewSection = () => (
         <div style={{textAlign: 'center'}}>
             <div style={{display: 'flex'}}>
                 {[...Array(5)].map((_, i) => (
-                    <span key={i} style={{color: '#2CB0A1'}}>★</span>
+                    <span key={i} style={{color: 'var(--zb-mint)'}}>★</span>
                 ))}
             </div>
             <p style={{fontSize: '0.875rem'}}>Plus de 10,000 avis 5 étoiles</p>
         </div>
         <div style={{textAlign: 'center'}}>
-            <p style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#2CB0A1'}}>Zabaqist</p>
+            <p style={{fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--zb-mint)'}}>Zabaqist</p>
             <p style={{fontSize: '0.75rem'}}>Maroc</p>
         </div>
         <div style={{textAlign: 'center'}}>
@@ -195,9 +195,9 @@ const ComparisonSection = () => {
                 {features.map((feature, index) => (
                     <React.Fragment key={index}>
                         <div>{feature.name}<p style={{fontSize: '0.875rem', color: '#6b7280'}}>{feature.description}</p></div>
-                        <div style={{textAlign: 'center'}}>{feature.free ? <IconCircleCheck style={{display: 'inline', color: '#2CB0A1'}} /> :
+                        <div style={{textAlign: 'center'}}>{feature.free ? <IconCircleCheck style={{display: 'inline', color: 'var(--zb-mint)'}} /> :
                             <IconX style={{display: 'inline', color: '#ef4444'}} />}</div>
-                        <div style={{textAlign: 'center'}}><IconCircleCheck style={{display: 'inline', color: '#2CB0A1'}} /></div>
+                        <div style={{textAlign: 'center'}}><IconCircleCheck style={{display: 'inline', color: 'var(--zb-mint)'}} /></div>
                     </React.Fragment>
                 ))}
             </div>
@@ -223,7 +223,7 @@ const SuperchargeSection = () => (
                     <span style={{marginRight: '0.5rem'}}>📱</span> Un abonnement sur tous vos appareils
                 </li>
             </ul>
-            <Button style={{backgroundColor: '#2CB0A1', color: 'white'}} styles={{root: {':hover': {backgroundColor: '#26a092'}}}}>S'abonner maintenant</Button>
+            <Button style={{backgroundColor: 'var(--zb-mint)', color: 'white'}} styles={{root: {':hover': {backgroundColor: 'var(--zb-mint-deep)'}}}}>S'abonner maintenant</Button>
         </div>
 
         <Image src={"/brilliant-image/suppercharging.png"} alt={"Gift plan"} width={512} height={512} style={{width: '50%', display: 'flex'}}/>
@@ -243,8 +243,8 @@ const GiftSection = () => (
                             <h3 style={{fontWeight: 'bold'}}>Offrir un abonnement</h3>
                             <p style={{marginTop: '1rem'}}>Partagez votre passion pour les mathématiques — offrez un abonnement Zabaqist Premium.</p>
                             <Button variant="outline"
-                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: '#2CB0A1'}}
-                                    styles={{root: {':hover': {borderColor: '#26a092', backgroundColor: '#e6faf8'}}}}>Offrir
+                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: 'var(--zb-mint)'}}
+                                    styles={{root: {':hover': {borderColor: 'var(--zb-mint-deep)', backgroundColor: '#e6faf8'}}}}>Offrir
                                 Premium</Button>
                         </div>
                     </div>
@@ -260,8 +260,8 @@ const GiftSection = () => (
                             <h3 style={{fontWeight: 'bold'}}>Abonnement de groupe</h3>
                             <p style={{marginTop: '1rem'}}>Vous souhaitez partager Zabaqist Premium avec votre famille, classe ou équipe? Découvrez nos forfaits de groupe.</p>
                             <Button variant="outline"
-                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: '#2CB0A1'}}
-                                    styles={{root: {':hover': {borderColor: '#26a092', backgroundColor: '#e6faf8'}}}}>En savoir
+                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: 'var(--zb-mint)'}}
+                                    styles={{root: {':hover': {borderColor: 'var(--zb-mint-deep)', backgroundColor: '#e6faf8'}}}}>En savoir
                                 plus</Button>
                         </div>
                     </div>
@@ -276,7 +276,7 @@ const SubscribePage = () => {
 
     return (
         <div style={{minHeight: '100vh'}}>
-            <div style={{background: 'linear-gradient(to right, #2CB0A1, #26a092)', width: '100%'}}>
+            <div style={{background: 'linear-gradient(to right, var(--zb-mint), var(--zb-mint-deep))', width: '100%'}}>
                 <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem', color: 'white', textAlign: 'center'}}>
                     <h1 style={{fontSize: '3rem', fontWeight: 'bold', marginTop: '2rem'}}>Déverrouillez l'expérience d'apprentissage complète</h1>
                     <p style={{marginTop: '1rem'}}>Atteignez vos objectifs rapidement avec un accès illimité à toutes les thématiques du Bac</p>

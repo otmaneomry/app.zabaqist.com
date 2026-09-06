@@ -36,7 +36,7 @@ export default function SignInPage() {
       setUser(response.data)
       // Connecting is when we ask for the filière — the programme differs
       // between SM and Sciences Exp, so everything after this depends on it.
-      router.push(readFiliere() ? '/home' : '/filiere?next=/home')
+      router.push(readFiliere() ? '/home' : '/demarrer')
     } catch (err: any) {
       setError(err.message || 'Email ou mot de passe incorrect')
     } finally {
@@ -47,7 +47,7 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card shadow="md" padding="xl" radius="md" className="w-full max-w-md">
-        <Title order={2} ta="center" mb="lg" style={{ color: '#2CB0A1' }}>
+        <Title order={2} ta="center" mb="lg" style={{ color: 'var(--zb-mint)' }}>
           Connexion à Zabaqist
         </Title>
 
@@ -55,9 +55,13 @@ export default function SignInPage() {
           Plateforme d'apprentissage des mathématiques
         </Text>
 
-        {/* TEMPORARY: Test credentials info */}
-        <Card padding="sm" radius="md" mb="xl" style={{ backgroundColor: '#E6F7F5', border: '1px solid #2CB0A1' }}>
-          <Text size="xs" fw={600} c="teal" mb="xs">
+        {/* Dev only. These are real, working credentials against the mock API —
+            printing them on a production sign-in page hands anyone an account.
+            `NODE_ENV` is inlined at build time, so this block is removed from
+            the production bundle entirely rather than merely hidden. */}
+        {process.env.NODE_ENV !== 'production' && (
+        <Card padding="sm" radius="md" mb="xl" style={{ backgroundColor: '#E6F7F5', border: '1px solid var(--zb-mint)' }}>
+          <Text size="xs" fw={600} c="mint" mb="xs">
             Connexion Test (temporaire)
           </Text>
           <Text size="xs" c="dimmed">
@@ -67,6 +71,7 @@ export default function SignInPage() {
             Mot de passe: <strong>password</strong>
           </Text>
         </Card>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextInput
@@ -102,7 +107,7 @@ export default function SignInPage() {
           <Button
             type="submit"
             fullWidth
-            color="teal"
+            color="mint"
             loading={loading}
             mb="md"
             size="md"
@@ -112,13 +117,13 @@ export default function SignInPage() {
 
           <Text size="sm" ta="center" c="dimmed">
             Pas encore de compte ?{' '}
-            <Link href="/signup" style={{ color: '#2CB0A1', fontWeight: 500, textDecoration: 'none' }}>
+            <Link href="/signup" style={{ color: 'var(--zb-mint)', fontWeight: 500, textDecoration: 'none' }}>
               S'inscrire
             </Link>
           </Text>
 
           <Text size="sm" ta="center" c="dimmed" mt="sm">
-            <Link href="/" style={{ color: '#2CB0A1', fontWeight: 500, textDecoration: 'none' }}>
+            <Link href="/" style={{ color: 'var(--zb-mint)', fontWeight: 500, textDecoration: 'none' }}>
               Retour à l'accueil
             </Link>
           </Text>

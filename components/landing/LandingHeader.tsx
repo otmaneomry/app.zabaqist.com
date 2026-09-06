@@ -54,7 +54,7 @@ export default function LandingHeader() {
           {xp > 0 && (
             <span
               dir="ltr"
-              className="hidden rounded-full bg-zb-saffron/20 px-3 py-1 text-xs font-semibold text-zb-gold-warm sm:inline"
+              className="hidden rounded-full bg-zb-gold/20 px-3 py-1 text-xs font-semibold text-zb-gold-deep sm:inline"
             >
               ✦ {xp} XP
             </span>

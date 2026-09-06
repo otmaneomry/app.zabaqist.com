@@ -11,11 +11,11 @@
  * Needs Chrome and playwright:  npm i -D playwright
  */
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 
 import { chromium } from 'playwright'
 import { listCourses, loadCourseDoc, tabsOf } from '../lib/courseDoc.ts'
-import { CHAPTERS_SX } from '../lib/programme.ts'
+import { CHAPTERS_SM, CHAPTERS_SX } from '../lib/programme.ts'
 
 /** UI copy is translated; assert against the catalogue, not against literals. */
 const messages = JSON.parse(
@@ -24,6 +24,9 @@ const messages = JSON.parse(
 const messagesAr = JSON.parse(
   readFileSync(new URL('../messages/ar.json', import.meta.url), 'utf8'),
 )
+
+/** Set by ClientLayout's mount effect — the signal that the page is interactive. */
+const HYDRATED = 'body.client-side-classes'
 
 const BASE = process.argv[2] ?? 'http://localhost:3111'
 const SLUG = process.argv[3] ?? 'limites-et-continuite'
@@ -103,6 +106,11 @@ section('Layout')
 // course, and not on the shell that wraps it.
 const pageWidth = async (page, u) => {
   await page.goto(u, { waitUntil: 'load' })
+  // Measure after hydration, not at `load`: a Mantine grid measured mid-layout
+  // reports a width it never actually paints, which showed up as a 1-in-3
+  // phantom overflow on /home.
+  await page.waitForSelector(HYDRATED, { timeout: 30000 })
+  await page.waitForTimeout(200)
   return page.evaluate(() => document.documentElement.scrollWidth)
 }
 for (const width of [390, 768, 1440]) {
@@ -141,18 +149,22 @@ page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
  * 0 mismatches across every page; only synthetic clicks faster than hydration
  * produce one. So wait, rather than whitelist the error.
  */
-const HYDRATED = 'body.client-side-classes' // set by ClientLayout's mount effect
 const settle = async (p) => {
   await p.waitForSelector(HYDRATED, { timeout: 30000 })
-  await p.waitForTimeout(150)
+  // `client-side-classes` lands when the ROOT layout mounts; the page's own
+  // client components (the path, the sticky card, the progress card) hydrate
+  // just after. Clicking in that gap makes React regenerate the subtree and log
+  // a mismatch on a page that is otherwise fine.
+  await p.waitForTimeout(450)
 }
 const open = async (u) => {
   await page.goto(u, { waitUntil: 'load' })
   await settle(page)
 }
 
-// Tabs navigate to the tab's first section.
-await open(url())
+// Tabs navigate to the tab's first section. Opened at a section, not at the
+// course root — the root is the path now, and the tabs live in the reader.
+await open(url(doc.views[0].id))
 const secondTab = tabs[1]
 await page.getByRole('tab', { name: secondTab.label }).click()
 await page.waitForURL(`**/courses/${SLUG}?s=${secondTab.viewIds[0]}`, { timeout: 15000 })
@@ -300,7 +312,8 @@ section('Landing page')
   const links = Object.fromEntries(
     await Promise.all(
       [
-        [messages.home.ctaPrimary, '/courses'],
+        // The primary CTA opens the onboarding funnel, not the catalogue.
+        [messages.home.ctaPrimary, '/demarrer'],
         [messages.home.ctaSecondary, `/courses/${SLUG}`],
         [messages.nav.parcours, '/courses'],
         [messages.nav.quiz, '/quiz/1'],
@@ -369,11 +382,418 @@ section('Landing page')
   await lp.close()
 }
 
+section('Progress dashboard')
+{
+  // Brilliant's "You" tab, with the public layer removed. See
+  // BRILLIANT_WORKFLOW.md §5 and §6 — Leagues are deliberately not ported.
+  const pr = JSON.parse(
+    readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'),
+  ).progress
+  const ctx = await browser.newContext({ viewport: { width: 1000, height: 1200 } })
+  const pg = await ctx.newPage()
+  const dErrors = []
+  pg.on('pageerror', (e) => dErrors.push(String(e)))
+  pg.on('console', (m) => m.type() === 'error' && dErrors.push(m.text()))
+  const settle = async () => {
+    await pg.waitForSelector(HYDRATED)
+    await pg.waitForTimeout(450)
+  }
+  const bars = () => pg.locator('[role="img"] > div').count()
+
+  await pg.goto(`${BASE}/progres`, { waitUntil: 'load' })
+  await settle()
+  ok(
+    await pg.locator(`text=${pr.empty}`).isVisible(),
+    'a device with no history says so instead of drawing a fake chart',
+  )
+
+  // Read three sections; the history is dated from that moment on.
+  for (const v of doc.views.slice(0, 3)) {
+    await pg.goto(url(v.id), { waitUntil: 'load' })
+    await settle()
+  }
+  await pg.goto(`${BASE}/progres`, { waitUntil: 'load' })
+  await settle()
+
+  const stats = await pg.locator('p[dir="ltr"]').allInnerTexts()
+  ok(stats[0] === '3', 'the snapshot counts the sections read', stats.join(' | '))
+
+  // Re-reading must not inflate the chart.
+  await pg.goto(url(doc.views[0].id), { waitUntil: 'load' })
+  await settle()
+  await pg.goto(`${BASE}/progres`, { waitUntil: 'load' })
+  await settle()
+  ok(
+    (await pg.locator('p[dir="ltr"]').first().innerText()) === '3',
+    'revisiting a section does not count twice',
+  )
+
+  // The bucket contract: 7 daily / 4 weekly / 12 monthly.
+  ok((await bars()) === 7, 'Week draws 7 daily buckets')
+  await pg.getByRole('tab', { name: pr.month }).click()
+  await pg.waitForTimeout(350)
+  ok(
+    (await bars()) === 4,
+    'Month draws 4 WEEKLY buckets over 28 days, not a calendar month',
+  )
+  await pg.getByRole('tab', { name: pr.year }).click()
+  await pg.waitForTimeout(350)
+  ok((await bars()) === 12, 'Year draws 12 monthly buckets')
+
+  // The only comparison this product makes.
+  await pg.getByRole('tab', { name: pr.week }).click()
+  await pg.waitForTimeout(350)
+  const shown = await pg.locator('main, body').first().innerText()
+  ok(
+    /période précédente|Première période/.test(shown),
+    'progress is compared against the reader\'s own previous window',
+  )
+  ok(
+    await pg.locator(`text=${pr.privacyNote.slice(0, 30)}`).isVisible(),
+    'the page states that nothing is shared or ranked',
+  )
+
+  // No public comparison layer, in any form.
+  const withoutNote = shown.replace(pr.privacyNote, '')
+  ok(
+    !/(ligue|league|classement|rang\b|podium|leaderboard)/i.test(withoutNote),
+    'no ranking, league or leaderboard anywhere on the page',
+  )
+
+  // Arabic route serves the same page.
+  const arRes = await fetch(`${BASE}/ar/progres`)
+  ok(arRes.ok, 'the dashboard serves on the Arabic route too')
+
+  ok(
+    dErrors.filter((e) => !/404|Failed to load resource/.test(e)).length === 0,
+    'no console errors on the dashboard',
+    dErrors.filter((e) => !/404|Failed to load resource/.test(e)).slice(0, 2).join(' | '),
+  )
+  await ctx.close()
+}
+
+section('Learning loop')
+{
+  // Wrong answers are amber, never red; nothing is taken; retry is unlimited
+  // and is the encouraged path. See BRILLIANT_WORKFLOW.md §4.
+  const c = JSON.parse(
+    readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'),
+  ).course
+  const ctx = await browser.newContext({ viewport: { width: 1000, height: 900 } })
+  const pg = await ctx.newPage()
+  const lErrors = []
+  pg.on('pageerror', (e) => lErrors.push(String(e)))
+  pg.on('console', (m) => m.type() === 'error' && lErrors.push(m.text()))
+  const settle = async () => {
+    await pg.waitForSelector(HYDRATED)
+    await pg.waitForTimeout(450)
+  }
+
+  const cp = doc.views.find((v) => v.checkpoints > 0)
+  await pg.goto(url(cp.id), { waitUntil: 'load' })
+  await settle()
+
+  // Scoped to the checkpoint's own chip: the progress card grows an XP chip of
+  // its own once there is something to show, which would otherwise become the
+  // first `text=/XP/` match and make this compare two different elements.
+  const cpXp = pg
+    .locator('section')
+    .filter({ hasText: c.yourTurn })
+    .first()
+    .locator('span[dir="ltr"]')
+    .first()
+  const xpBefore = await cpXp.innerText()
+  await pg.locator('textarea').first().fill('essai')
+  await pg.getByRole('button', { name: new RegExp(c.iTried) }).click()
+  await pg.getByRole('button', { name: c['verdict-not-yet'] }).click()
+  await pg.waitForTimeout(300)
+
+  ok(
+    await pg.getByRole('button', { name: new RegExp(c.retry) }).isVisible(),
+    'a miss offers retry as the primary action',
+  )
+  ok(
+    await pg.locator(`text=${c.nothingLost.slice(0, 20)}`).isVisible(),
+    'and says explicitly that nothing was lost',
+  )
+  ok(
+    (await cpXp.innerText()) === xpBefore,
+    'XP is unchanged by a miss',
+    `${xpBefore} → ${await cpXp.innerText()}`,
+  )
+  await pg.getByRole('button', { name: new RegExp(c.retry) }).click()
+  await pg.waitForTimeout(300)
+  ok(
+    await pg.locator('textarea').first().isVisible(),
+    'retry returns to the attempt, in place',
+  )
+
+  // The word "Incorrect" and the colour red are banned from the answering flow.
+  const shown = await pg.locator('body').innerText()
+  ok(!/incorrect/i.test(shown), 'the word "Incorrect" never appears')
+
+  // Finishing the chapter pays the total the card advertises, once.
+  await pg.evaluate((ids) => {
+    const all = JSON.parse(
+      localStorage.getItem('zabaqist_course_progress') ?? '{}',
+    )
+    all['limites-et-continuite'] = {
+      courseId: 'limites-et-continuite',
+      lastVisitedTab: ids[0],
+      completedTabs: ids,
+      exercisesAttempted: [],
+      exercisesCompleted: [],
+      homeworkStarted: false,
+      homeworkCompleted: false,
+      lastUpdated: new Date().toISOString(),
+      timeSpent: 0,
+    }
+    localStorage.setItem('zabaqist_course_progress', JSON.stringify(all))
+  }, doc.views.map((v) => v.id))
+
+  await pg.goto(`${BASE}/courses/${SLUG}`, { waitUntil: 'load' })
+  await settle()
+  ok(await pg.getByRole('dialog').isVisible(), 'finishing the chapter is celebrated')
+  const total = doc.views.reduce((n, v) => n + v.xp, 0)
+  ok(
+    (await pg.getByRole('dialog').innerText()).includes(String(total)),
+    'the celebration pays the total the course card advertises',
+    String(total),
+  )
+  ok(
+    !/premium|essai gratuit|abonn/i.test(await pg.getByRole('dialog').innerText()),
+    'no monetisation in the celebration',
+  )
+  await pg.getByRole('button', { name: new RegExp(c.doneCta) }).click()
+  await pg.goto(`${BASE}/courses/${SLUG}`, { waitUntil: 'load' })
+  await settle()
+  ok(
+    !(await pg.getByRole('dialog').isVisible().catch(() => false)),
+    'it fires once, not on every visit',
+  )
+
+  ok(
+    lErrors.filter((e) => !/404|Failed to load resource/.test(e)).length === 0,
+    'no console errors in the loop',
+    lErrors.filter((e) => !/404|Failed to load resource/.test(e)).slice(0, 2).join(' | '),
+  )
+  await ctx.close()
+}
+
+section('Course path')
+{
+  // The course landing is a journey with one node lit, not a document with a
+  // contents list on top. See BRILLIANT_WORKFLOW.md §3.
+  const c = JSON.parse(
+    readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'),
+  ).course
+  const ctx = await browser.newContext({ viewport: { width: 1100, height: 1000 } })
+  const pg = await ctx.newPage()
+  const pErrors = []
+  pg.on('pageerror', (e) => pErrors.push(String(e)))
+  pg.on('console', (m) => m.type() === 'error' && pErrors.push(m.text()))
+  const settle = async () => {
+    await pg.waitForSelector(HYDRATED)
+    await pg.waitForTimeout(450)
+  }
+  const path = `${BASE}/courses/${SLUG}`
+
+  await pg.goto(path, { waitUntil: 'load' })
+  await settle()
+
+  ok(
+    (await pg.locator('ol li a').count()) === doc.views.length,
+    `the path has one node per section (${doc.views.length})`,
+  )
+  ok(
+    (await pg.locator('.course-doc').count()) === 0,
+    'the landing view is the path, not the document',
+  )
+  ok(
+    (await pg.locator('[aria-current="step"]').count()) === 1,
+    'exactly one node is current',
+  )
+  ok(
+    (await pg.locator(`text=${c.youAreHere}`).count()) === 1,
+    'the "you are here" pin appears once',
+  )
+  ok(
+    (await pg.locator('.sticky a').last().innerText()).trim() === c.pathStart,
+    'a fresh device is offered Start, not Continue',
+  )
+
+  // Nothing is locked: an unreached section is still openable.
+  const last = pg.locator('ol li a').last()
+  ok(
+    (await last.getAttribute('href'))?.includes('?s='),
+    'unreached sections stay openable — desaturated, not locked',
+  )
+
+  // Looking at the map must not count as reading.
+  ok(
+    !(await pg.evaluate(() =>
+      localStorage.getItem('zabaqist_course_progress'),
+    )),
+    'opening the path marks nothing as read',
+  )
+
+  // Read one section, come back: the node is stamped and the verb flips.
+  await pg.goto(`${path}?s=${doc.views[0].id}`, { waitUntil: 'load' })
+  await settle()
+  ok(
+    (await pg.locator('.course-doc').count()) === 1,
+    'opening a node opens the reader',
+  )
+  await pg.goto(path, { waitUntil: 'load' })
+  await settle()
+  ok(
+    (await pg.locator('ol li a span:text-is("✓")').count()) === 1,
+    'the section just read is stamped done',
+  )
+  ok(
+    (await pg.locator('.sticky a').last().innerText()).trim() === c.pathContinue,
+    'and the CTA verb carries the state — Continue',
+  )
+
+  ok(
+    pErrors.filter((e) => !/404|Failed to load resource/.test(e)).length === 0,
+    'no console errors on the path',
+    pErrors.filter((e) => !/404|Failed to load resource/.test(e)).slice(0, 2).join(' | '),
+  )
+  await ctx.close()
+}
+
+section('Onboarding funnel')
+{
+  // The funnel asks for no account, alternates asking with giving, and never
+  // auto-advances. See BRILLIANT_WORKFLOW.md §1.
+  const ob = JSON.parse(
+    readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'),
+  ).onboarding
+  const ctx = await browser.newContext({ viewport: { width: 900, height: 1000 } })
+  const pg = await ctx.newPage()
+  const oErrors = []
+  pg.on('pageerror', (e) => oErrors.push(String(e)))
+  pg.on('console', (m) => m.type() === 'error' && oErrors.push(m.text()))
+  const settle = async () => {
+    await pg.waitForSelector(HYDRATED)
+    await pg.waitForTimeout(350)
+  }
+  const cont = () => pg.getByRole('button', { name: ob.continue })
+
+  await pg.goto(`${BASE}/demarrer`, { waitUntil: 'load' })
+  await settle()
+
+  // The welcome step shows no progress bar — you commit before learning the length.
+  ok(
+    (await pg.locator('header div[aria-hidden]').count()) === 0,
+    'the welcome step shows no progress bar',
+  )
+  ok(
+    (await pg.locator('footer').count()) === 0,
+    'the funnel ships no footer — every exit is removed',
+  )
+  await cont().click()
+  await pg.waitForTimeout(400)
+
+  ok(await cont().isDisabled(), 'Continue is disabled until the question is answered')
+  ok(
+    (await pg.locator('header div[aria-hidden]').count()) > 0,
+    'the progress bar mounts on the first question',
+  )
+  await pg.getByRole('radio').first().click()
+  await pg.waitForTimeout(200)
+  ok(!(await cont().isDisabled()), 'answering enables Continue')
+  ok(
+    (await pg.getByRole('radio', { checked: true }).count()) === 1,
+    'selecting does not auto-advance — the reader presses Continue',
+  )
+
+  // give → ask → ask → give → ask, then the reveal.
+  await cont().click()
+  await pg.waitForTimeout(400)
+  ok(
+    await pg.getByRole('button', { name: messages.preview.label1 }).isVisible(),
+    'the first give-step hands over a real interactive problem',
+  )
+
+  await cont().click()
+  await pg.waitForTimeout(400)
+  const cards = await pg.getByRole('radio').allInnerTexts()
+  ok(
+    cards.length === 2 && cards.join(' ').includes(messages.auth['filiere-sm']),
+    'the filière is asked by recognition, with a worked example per card',
+  )
+  ok(
+    (await pg.locator('.katex').count()) >= 2,
+    'each filière card carries real maths, not a label',
+  )
+
+  await pg.getByRole('radio').first().click()
+  await cont().click()
+  await pg.waitForTimeout(400)
+  await pg.getByRole('radio').first().click()
+  await cont().click()
+  await pg.waitForTimeout(400)
+  await cont().click()
+  await pg.waitForTimeout(400)
+  await pg.getByRole('radio').nth(1).click()
+  await cont().click()
+  await pg.waitForTimeout(600)
+
+  // The reveal: the promise rendered, with one chapter lit.
+  ok(
+    (await pg.locator('h1').innerText()).includes(messages.auth['filiere-sm']),
+    'the plan reveal names the programme that was chosen',
+  )
+  ok(
+    (await pg.locator(`text=${ob.planStartHere}`).count()) === 1,
+    'exactly one chapter is marked as the starting point',
+  )
+
+  const stored = await pg.evaluate(() => ({
+    filiere: localStorage.getItem('zabaqist:filiere'),
+    answers: localStorage.getItem('zabaqist:onboarding'),
+  }))
+  ok(
+    stored.filiere?.includes('sm') && stored.answers?.includes('completedAt'),
+    'the funnel records the filière and marks itself complete',
+  )
+
+  // Nothing in the funnel asks for an account.
+  ok(
+    (await pg.locator('input[type="email"], input[type="password"]').count()) === 0,
+    'the funnel never asks for an account',
+  )
+
+  ok(
+    oErrors.filter((e) => !/404|Failed to load resource/.test(e)).length === 0,
+    'no console errors in the funnel',
+    oErrors.filter((e) => !/404|Failed to load resource/.test(e)).slice(0, 2).join(' | '),
+  )
+  await ctx.close()
+}
+
 section('Filière')
 {
   // The whole point of asking: SM and Sciences Exp are different programmes,
   // so the answer has to change what the student is shown.
-  const titles = async (pg) => (await pg.locator('section h3').allInnerTexts()).join(' | ')
+  // Scoped to the catalogue section by its own h2: `/courses` also carries the
+  // browse-all grid, and the catalogue now nests course titles (h4) under a
+  // branch heading (h3), so a bare `section h3` reads the branch names instead.
+  const titles = async (pg) =>
+    (
+      await pg
+        .locator('section')
+        .filter({
+          has: pg.getByRole('heading', {
+            level: 2,
+            name: messages.catalog.title,
+          }),
+        })
+        .locator('li h4')
+        .allInnerTexts()
+    ).join(' | ')
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } })
   const pg = await ctx.newPage()
   const fErrors = []
@@ -473,14 +893,19 @@ section('Filière')
     await pg.locator('input[type="password"]').first().fill('password')
     await pg.getByRole('button', { name: /Se connecter|Connexion/i }).first().click()
   }
+  // Connecting without a filière resumes the onboarding funnel, which is where
+  // the question is asked; connecting again goes straight through.
   await signIn()
-  await pg.waitForURL('**/filiere**', { timeout: 15000 })
-  ok(true, 'signing in with no filière asks for one')
+  await pg.waitForURL('**/demarrer**', { timeout: 15000 })
+  ok(true, 'signing in with no filière opens the funnel')
 
-  await pg.getByRole('button', { name: messages.auth['filiere-sx'] }).click()
-  await pg.getByRole('button', { name: messages.auth['track-2bac-pc'], exact: true }).click()
-  await pg.getByRole('button', { name: new RegExp(messages.auth.confirm) }).click()
-  await pg.waitForURL('**/home', { timeout: 15000 })
+  // Answer it the short way — the funnel itself is covered above.
+  await pg.evaluate(() => {
+    localStorage.setItem(
+      'zabaqist:filiere',
+      JSON.stringify({ track: '2bac-pc', filiere: 'sx' }),
+    )
+  })
 
   await signIn()
   await pg.waitForURL('**/home', { timeout: 15000 })
@@ -528,11 +953,382 @@ ok(
 )
 await home.close()
 
+section('Migrated chapter')
+{
+  // The hand-written course became a document, and a ```geogebra fence keeps the
+  // interactive figure it used to declare in JSX.
+  const migrated = await loadCourseDoc('fonctions-logarithmiques')
+  ok(!!migrated, 'the chapter loads from content/course/')
+  const tabsHere = tabsOf(migrated.views).map((t) => t.label)
+  ok(
+    ['Introduction', 'Cours', 'Graphique', 'Exercices', 'Devoir', 'Résumé'].every(
+      (l) => tabsHere.includes(l),
+    ),
+    'all six parts survive the migration',
+    tabsHere.join(' · '),
+  )
+  ok(
+    migrated.views.reduce((n, v) => n + v.checkpoints, 0) >= 10,
+    'its exercises became checkpoints',
+    String(migrated.views.reduce((n, v) => n + v.checkpoints, 0)),
+  )
+  ok(
+    listCourses('sm').some((c) => c.slug === 'fonctions-logarithmiques') &&
+      listCourses('sx').some((c) => c.slug === 'fonctions-logarithmiques'),
+    'it is on both filières, as ln is',
+  )
+
+  const pg = await browser.newPage({ viewport: { width: 1100, height: 1000 } })
+  const gErrors = []
+  pg.on('pageerror', (e) => gErrors.push(String(e)))
+  await pg.goto(`${BASE}/courses/fonctions-logarithmiques?s=graphique`, {
+    waitUntil: 'load',
+  })
+  await pg.waitForSelector(HYDRATED)
+  await pg.waitForTimeout(5000)
+  ok(
+    (await pg.locator('iframe, .appletContainer, [id^="ggb"]').count()) > 0,
+    'the ```geogebra fence renders an interactive figure',
+  )
+  ok(
+    !(await pg.locator('body').innerText()).includes('"commands"'),
+    'and not its raw JSON as a code block',
+  )
+  ok(gErrors.length === 0, 'no page errors on the figure', gErrors.slice(0, 2).join(' | '))
+  await pg.close()
+}
+
+section('Programme complet (13 chapitres)')
+{
+  // The whole Sciences Mathématiques year is authored, split into the two
+  // series the pedagogue actually numbered: analysis and algebra. These checks
+  // exist because the failure mode is silent — a chapter that paginates into
+  // one giant view, or a catalogue row whose slug no chapter answers to, both
+  // still render a page.
+  const all = listCourses()
+  ok(all.length === 13, 'thirteen chapters in the catalogue', String(all.length))
+
+  const docs = new Map()
+  for (const c of all) docs.set(c.slug, await loadCourseDoc(c.slug))
+
+  ok(
+    all.every((c) => docs.get(c.slug)),
+    'every catalogue row has a document behind it',
+    all.filter((c) => !docs.get(c.slug)).map((c) => c.slug).join(', '),
+  )
+  ok(
+    all.every((c) => docs.get(c.slug).views.length >= 5),
+    'no chapter collapses into a handful of giant sections',
+    all
+      .filter((c) => docs.get(c.slug).views.length < 5)
+      .map((c) => `${c.slug}:${docs.get(c.slug).views.length}`)
+      .join(', '),
+  )
+  ok(
+    all.every((c) => {
+      const t = tabsOf(docs.get(c.slug).views)
+      return t.length >= 5 && new Set(t.map((x) => x.id)).size === t.length
+    }),
+    'every chapter has at least five tabs, all distinct',
+  )
+  ok(
+    all.every((c) => {
+      const kinds = new Set(docs.get(c.slug).views.map((v) => v.kind))
+      return kinds.has('cours') && kinds.has('exercices') && kinds.has('bilan')
+    }),
+    'every chapter has lesson, drill and review sections',
+  )
+
+  // The catalogue's `sections` / `exercises` are denormalised from the markdown
+  // and shown to students under a promise that nothing is invented. Re-derive
+  // them, so editing a chapter without updating its row fails here rather than
+  // quietly misreporting the programme.
+  const drift = all.filter((c) => {
+    const d = docs.get(c.slug)
+    const cp = d.views.reduce((n, v) => n + v.checkpoints, 0)
+    return d.views.length !== c.sections || cp !== c.exercises
+  })
+  ok(
+    drift.length === 0,
+    'catalogue section/exercise counts match the documents',
+    drift.map((c) => c.slug).join(', '),
+  )
+
+  // `critique/course/` is where the chapters are authored and `content/course/`
+  // is what the app reads. Both are committed, so a chapter edited in one and
+  // not the other drifts silently — the site would keep serving the stale copy.
+  const authoredDir = new URL('../critique/course/', import.meta.url)
+  const servedDir = new URL('../content/course/', import.meta.url)
+  const stale = readdirSync(authoredDir)
+    .filter((f) => f.endsWith('.md'))
+    .filter((f) => {
+      let served
+      try {
+        served = readFileSync(new URL(f, servedDir), 'utf8')
+      } catch {
+        return true // authored but never copied across
+      }
+      return served !== readFileSync(new URL(f, authoredDir), 'utf8')
+    })
+  ok(
+    stale.length === 0,
+    'content/course/ is in sync with critique/course/',
+    stale.join(', '),
+  )
+
+  // The plan a student is shown must be the plan they can open.
+  const catSm = listCourses('sm').map((c) => c.slug).sort()
+  const progSm = CHAPTERS_SM.map((c) => c.slug).sort()
+  ok(
+    JSON.stringify(catSm) === JSON.stringify(progSm),
+    'the SM programme and the SM catalogue are the same chapters',
+    [
+      ...progSm.filter((x) => !catSm.includes(x)).map((x) => `plan only: ${x}`),
+      ...catSm.filter((x) => !progSm.includes(x)).map((x) => `catalogue only: ${x}`),
+    ].join(', '),
+  )
+  ok(
+    CHAPTERS_SM.every((c, i) => c.n === i + 1) &&
+      CHAPTERS_SM.every((c) => c.branch === 'analyse' || c.branch === 'algebre'),
+    'the SM plan is numbered 1..13 and every chapter has a branch',
+  )
+  ok(
+    listCourses('sm').filter((c) => c.branch === 'analyse').length === 7 &&
+      listCourses('sm').filter((c) => c.branch === 'algebre').length === 6,
+    'SM splits 7 analyse / 6 algèbre',
+  )
+  ok(
+    listCourses('sx').every((c) => c.branch === 'analyse'),
+    'Sciences Exp is served the analysis thread only',
+    listCourses('sx').filter((c) => c.branch !== 'analyse').map((c) => c.slug).join(', '),
+  )
+
+  // Each chapter's path page and its first section, rendered for real. A
+  // chapter can load fine through the loader and still throw in the browser —
+  // that is how the parseSpec RSC boundary bug surfaced.
+  const pg = await browser.newPage({ viewport: { width: 1100, height: 900 } })
+  const broken = []
+  for (const c of all) {
+    const errs = []
+    const onErr = (e) => errs.push(`${c.slug}: ${e}`)
+    pg.on('pageerror', onErr)
+    const first = docs.get(c.slug).views[0].id
+    for (const u of [`${BASE}/courses/${c.slug}`, `${BASE}/courses/${c.slug}?s=${first}`]) {
+      const res = await pg.goto(u, { waitUntil: 'load' })
+      if (!res || res.status() >= 400) errs.push(`${c.slug}: HTTP ${res?.status()}`)
+    }
+    await pg.waitForSelector(HYDRATED, { timeout: 30000 })
+    const wide = await pg.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth + 1,
+    )
+    if (wide) errs.push(`${c.slug}: page scrolls sideways`)
+    pg.off('pageerror', onErr)
+    if (errs.length) broken.push(...errs)
+  }
+  ok(broken.length === 0, 'all 13 chapters render without errors', broken.slice(0, 3).join(' | '))
+
+  // The catalogue groups SM into its two branches; SX has one thread and gets
+  // no headings, because naming a distinction a student never meets is noise.
+  await pg.goto(`${BASE}/courses`, { waitUntil: 'load' })
+  await pg.waitForSelector(HYDRATED, { timeout: 30000 })
+  await pg.evaluate(() => {
+    localStorage.setItem(
+      'zabaqist:filiere',
+      JSON.stringify({ track: '2bac-sm-a', filiere: 'sm' }),
+    )
+  })
+  await pg.reload({ waitUntil: 'load' })
+  await pg.waitForSelector(HYDRATED, { timeout: 30000 })
+  await pg.waitForTimeout(400)
+  const catalogue = await pg.locator('body').innerText()
+  ok(
+    catalogue.includes('Analyse') && catalogue.includes('Algèbre'),
+    'the catalogue shows both branches for SM',
+  )
+  ok(
+    listCourses('sm').every((c) => catalogue.includes(c.title)),
+    'and lists all thirteen SM chapters',
+    listCourses('sm').filter((c) => !catalogue.includes(c.title)).map((c) => c.slug).join(', '),
+  )
+  await pg.close()
+}
+
+section('Chrome')
+{
+  // The footer used to link to seven pages that did not exist. Next prefetches
+  // footer links, so every page in the app logged seven 404s on load.
+  const pg = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  const failed = new Set()
+  pg.on('response', (r) => {
+    if (r.status() >= 400) failed.add(`${r.status()} ${new URL(r.url()).pathname}`)
+  })
+  for (const u of ['/home', '/courses', '/progres', '/']) {
+    await pg.goto(`${BASE}${u}`, { waitUntil: 'load' })
+    await pg.waitForTimeout(600)
+  }
+  ok(failed.size === 0, 'no page requests a URL that 404s', [...failed].join(', '))
+
+  // Back to a page with the GLOBAL footer: the landing page ships its own.
+  await pg.goto(`${BASE}/home`, { waitUntil: 'load' })
+  await pg.waitForSelector(HYDRATED)
+  ok(
+    (await pg.locator('footer a[href^="https://zabaqist.com"]').count()) >= 4,
+    'the footer points at the marketing site for the pages it publishes',
+    String(await pg.locator('footer a[href^="https://zabaqist.com"]').count()),
+  )
+  await pg.goto(`${BASE}/ar/home`, { waitUntil: 'load' })
+  await pg.waitForSelector(HYDRATED)
+  ok(
+    (await pg.locator('footer a[href^="https://zabaqist.com/ar/"]').count()) >= 3,
+    'and carries the locale across to it',
+  )
+  await pg.close()
+}
+
+{
+  // `QuizPlayer` / `MultipleChoiceQuestion` predate next-intl and were hardcoded
+  // French inside a bilingual app. (`ExerciseWithSolution` and
+  // `DevoirAssignment` were translated too, but the JSX course that used them
+  // has been migrated to markdown, so no route renders them any more.)
+  const ar = JSON.parse(
+    readFileSync(new URL('../messages/ar.json', import.meta.url), 'utf8'),
+  )
+  const quizHtml = await (await fetch(`${BASE}/ar/quiz/1`)).text()
+  ok(
+    quizHtml.includes(ar.quiz.loading) || quizHtml.includes(ar.quiz.previous),
+    'the quiz player speaks Arabic',
+  )
+  ok(
+    !/Chargement du quiz|Voir les corrections/.test(quizHtml),
+    'and no French is left in it on the Arabic route',
+  )
+}
+
+section('Brand identity')
+{
+  const pg = await browser.newPage({ viewport: { width: 1100, height: 900 } })
+  await pg.goto(`${BASE}/courses/${SLUG}?s=${doc.views[0].id}`, { waitUntil: 'load' })
+  await pg.waitForSelector(HYDRATED)
+  await pg.waitForTimeout(450)
+
+  // The khatim is the bullet. This is the thing that stops the product looking
+  // like every other learning app — see BRILLIANT_WORKFLOW.md and the note on
+  // `.zb-star-list` in app/globals.css.
+  const bullet = await pg.evaluate(() => {
+    const li = document.querySelector('.zb-star-list > li')
+    if (!li) return null
+    const cs = getComputedStyle(li, '::before')
+    return { w: cs.width, bg: cs.backgroundImage.slice(0, 30) }
+  })
+  ok(
+    bullet?.w === '11px' && bullet.bg.startsWith('url("data:image/svg'),
+    'list bullets are the khatim, not a disc',
+    JSON.stringify(bullet),
+  )
+
+  // One palette. The landing page and the course pages ran on two different
+  // greens; a stray `zb-teal` would mean that has come back.
+  const html = await pg.content()
+  ok(
+    !/zb-teal|zb-saffron|zb-gold-warm|#2CB0A1/i.test(html),
+    'no off-palette colour names survive',
+  )
+
+  // The two measured accessibility fixes in the palette. Someone "brightening"
+  // the gold back to #b8841a drops it to 3.22:1 and fails AA in both
+  // directions — this is the guard against that.
+  const contrast = await pg.evaluate(() => {
+    const rs = getComputedStyle(document.documentElement)
+    const cv = document.createElement('canvas')
+    cv.width = cv.height = 1
+    const ctx = cv.getContext('2d', { willReadFrequently: true })
+    // Paint and read back: parsing the computed string does not resolve
+    // oklch() to sRGB, and its components are not r,g,b.
+    const rgb = (v) => {
+      ctx.clearRect(0, 0, 1, 1)
+      ctx.fillStyle = '#000'
+      ctx.fillStyle = v
+      ctx.fillRect(0, 0, 1, 1)
+      const d = ctx.getImageData(0, 0, 1, 1).data
+      return [d[0], d[1], d[2]]
+    }
+    const lum = ([r, g, b]) => {
+      const f = (c) => {
+        c /= 255
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+      }
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+    }
+    const ratio = (a, b) => {
+      const [x, y] = [lum(rgb(a)), lum(rgb(b))].sort((m, n) => n - m)
+      return (x + 0.05) / (y + 0.05)
+    }
+    const t = (n) => rs.getPropertyValue(n).trim()
+    return {
+      goldOnCream: ratio(t('--zb-gold-deep'), t('--zb-cream')),
+      inkOnCream: ratio(t('--zb-ink-3'), t('--zb-cream')),
+      creamOnMint: ratio(t('--zb-cream'), t('--zb-mint')),
+      creamOnRose: ratio(t('--zb-cream'), t('--zb-rose')),
+    }
+  })
+  for (const [name, r] of Object.entries(contrast)) {
+    ok(r >= 4.5, `${name} clears AA`, `${r.toFixed(2)}:1`)
+  }
+  await pg.close()
+}
+
+section('Production readiness')
+{
+  // Things that must not reach a real deployment.
+  const creds = await (await fetch(`${BASE}/signin`)).text()
+  ok(
+    !creds.includes('test@test.com') && !/Mot de passe:.*<strong>password/.test(creds),
+    'the sign-in page does not print working test credentials',
+  )
+  ok(
+    (await fetch(`${BASE}/test-quiz`)).status === 404,
+    'the dev scratch route is not a production URL',
+  )
+  ok(
+    (await fetch(`${BASE}/courses/x/chapter-1/lesson-1`)).status === 404,
+    'the placeholder lesson route is gone',
+  )
+
+  const robots = await fetch(`${BASE}/robots.txt`)
+  const robotsTxt = await robots.text()
+  ok(robots.ok && /Sitemap:/.test(robotsTxt), 'robots.txt is served with a sitemap')
+  ok(
+    ['/demarrer', '/progres', '/signin'].every((p) =>
+      robotsTxt.includes(`Disallow: ${p}`),
+    ),
+    'the funnel, the private dashboard and auth are excluded from crawling',
+  )
+
+  const sm = await fetch(`${BASE}/sitemap.xml`)
+  const smXml = await sm.text()
+  ok(sm.ok && smXml.includes('<urlset'), 'sitemap.xml is served')
+  ok(
+    listCourses().every((c) => smXml.includes(`/courses/${c.slug}`)),
+    'every chapter is in the sitemap',
+  )
+  ok(
+    /hreflang="ar"/.test(smXml) && /hreflang="fr"/.test(smXml),
+    'and each entry pairs its two locales',
+  )
+}
+
 section('Regressions')
-const legacy = await fetch(`${BASE}/courses/fonctions-logarithmiques`)
+// `fonctions-logarithmiques` used to be a 684-line JSX page. Its content is
+// markdown now, and the URL still resolves — through the document pipeline.
+const migrated = await fetch(`${BASE}/courses/fonctions-logarithmiques`)
+const migratedHtml = await migrated.text()
 ok(
-  legacy.ok && (await legacy.text()).includes('Fonctions Logarithmiques'),
-  'the hand-written course still serves its own page',
+  migrated.ok && migratedHtml.includes('Chapitre 5'),
+  'the migrated course keeps its URL and is served from markdown',
+)
+ok(
+  migratedHtml.includes(messages.course.youAreHere),
+  'and gets the path treatment like every other chapter',
 )
 // Derived, not hardcoded: a chapter that has no markdown yet. Naming one
 // meant the check broke the day that chapter got written.
@@ -626,10 +1422,12 @@ section('Arabic (/ar)')
     // navigation the document still carries the previous page's RSC payload in
     // inline scripts, so the raw HTML reports French that is not on screen.
     const shown = await pg.locator('body').innerText()
+    // The course landing is the path, whose job is ONE next action — so the
+    // quiz CTA is not on it. Assert the chrome that view actually renders.
     const missing = [
       messagesAr.course.back,
-      messagesAr.course.quiz,
       messagesAr.course.progressTitle,
+      messagesAr.course.youAreHere,
     ].filter((v) => !shown.includes(v))
     ok(missing.length === 0, 'the course chrome is in Arabic', missing.join(' | '))
     ok(
@@ -640,7 +1438,13 @@ section('Arabic (/ar)')
 
     // The document keeps its own direction: a French chapter inside the
     // Arabic route must not be laid out RTL, or its punctuation and inline
-    // subscripts land on the wrong side.
+    // subscripts land on the wrong side. Checked in the reader — the course
+    // landing is the path, which carries no document.
+    await pg.goto(`${BASE}/ar/courses/${SLUG}?s=${doc.views[0].id}`, {
+      waitUntil: 'load',
+    })
+    await pg.waitForSelector(HYDRATED)
+    await pg.waitForTimeout(300)
     ok(
       (await pg.locator('.course-doc').first().getAttribute('dir')) === 'ltr',
       'the French chapter stays LTR on the Arabic route',

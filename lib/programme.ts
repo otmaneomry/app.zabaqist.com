@@ -1,15 +1,19 @@
 /**
- * The 2ème Bac Sciences Expérimentales (SVT / PC) maths programme.
+ * The two 2ème Bac maths programmes: Sciences Expérimentales (SVT / PC) and
+ * Sciences Mathématiques (SM A / B).
  *
- * Eleven chapters with their exam priority, used by the landing page's parcours
- * and by anything that needs the programme's shape. Slugs match
+ * Eleven and thirteen chapters with their exam priority, used by the landing
+ * page's parcours and by anything that needs a programme's shape. Slugs match
  * `lib/courseCatalog.ts`, so a chapter that has an authored markdown document
- * opens it and the rest fall through to the "coming soon" page.
+ * opens it and the rest fall through to the "coming soon" page — for SM every
+ * chapter is authored, so nothing falls through.
  *
- * Ported from zabaqist-turbo/apps/nextjs/src/content/programme-se.ts, French
- * only — this app is not bilingual.
+ * The Sciences Exp list is ported from
+ * zabaqist-turbo/apps/nextjs/src/content/programme-se.ts; the Arabic titles and
+ * objectives were authored here, not transliterated.
  */
 
+import type { Branch } from './courseCatalog.ts'
 import type { Filiere } from './filiere.ts'
 
 export type Semester = 1 | 2
@@ -17,8 +21,8 @@ export type PriorityKey = 'fondations' | 'coeur' | 'rentable' | 'soutien'
 
 export const PRIORITY_COLORS: Record<PriorityKey, string> = {
   fondations: 'var(--zb-gold)',
-  coeur: 'var(--zb-gold-warm)',
-  rentable: '#2CB0A1',
+  coeur: 'var(--zb-gold-deep)',
+  rentable: 'var(--zb-mint)',
   soutien: '#C2410C',
 }
 
@@ -47,6 +51,17 @@ export interface ChapterMeta {
   objective: string
   objectiveAr: string
   priority: PriorityKey
+  /**
+   * Which half of the programme this chapter belongs to — see `Branch` in
+   * `lib/courseCatalog.ts`.
+   *
+   * Optional because it only means something for Sciences Mathématiques, the
+   * one programme that is genuinely taught as two parallel series. Sciences
+   * Expérimentales runs a single thread that also happens to include a
+   * geometry chapter belonging to neither branch, so labelling it would be
+   * inventing a structure the student is never shown.
+   */
+  branch?: Branch
 }
 
 export type ContentLocale = 'fr' | 'ar'
@@ -188,33 +203,57 @@ export const CHAPTERS_SX: ChapterMeta[] = [
  * A chapter shared with the other filière, renumbered for this one. The text is
  * the pedagogue's; only its position in the year differs.
  */
-function chapterOf(slug: string, n: number, semester: Semester): ChapterMeta {
+function chapterOf(
+  slug: string,
+  n: number,
+  semester: Semester,
+  branch: Branch,
+): ChapterMeta {
   const base = CHAPTERS_SX.find((c) => c.slug === slug)
   if (!base) throw new Error(`unknown shared chapter: ${slug}`)
-  return { ...base, n, semester }
+  return { ...base, n, semester, branch }
 }
 
 /**
- * Sciences Mathématiques (SM A / B).
+ * Sciences Mathématiques (SM A / B) — 13 chapitres.
  *
- * The analysis core is shared with Sciences Expérimentales; the algebra half —
- * complexes, arithmetic in ℤ, algebraic structures, vector spaces — is what
- * makes SM a different programme rather than a longer one.
+ * The year runs as two parallel series, which is how the pedagogue numbered
+ * the source documents under `critique/course/`: an analysis thread
+ * (limites → suites → dérivation → ln → exp → intégrale → équations
+ * différentielles) and an algebra thread (complexes → arithmétique →
+ * probabilités → lois de composition → structures → espaces vectoriels).
+ * `branch` carries that split; `n` below is the position in the year, so the
+ * two threads interleave by semester the way a timetable does.
+ *
+ * The analysis core is shared with Sciences Expérimentales; the algebra half is
+ * what makes SM a different programme rather than a longer one.
+ *
+ * Every slug here has an authored chapter in `lib/courseCatalog.ts` — the plan
+ * a student is shown is the plan they can open. Two consequences of following
+ * the source rather than the older sketch this replaces:
+ *   · Suites comes before Dérivation. The dérivation chapter lists "Suites
+ *     numériques et raisonnement par récurrence" in its own `## Prérequis`.
+ *   · "Structures algébriques" was one chapter here and is two in the source —
+ *     the vocabulary (lois de composition interne) is taught before the
+ *     structures built out of it (groupes, anneaux, corps).
  *
  * Objectives are the pedagogue's own, taken from the `## Objectifs` of each
- * chapter under `critique/course/`; the SM course list is corroborated by
- * `@zabaqist/curriculum` (`bac2SmA`). Nothing here is invented.
+ * chapter; the SM course list is corroborated by `@zabaqist/curriculum`
+ * (`bac2SmA`). Nothing here is invented.
  */
 export const CHAPTERS_SM: ChapterMeta[] = [
-  chapterOf('limites-et-continuite', 1, 1),
-  chapterOf('derivation-etude-fonctions', 2, 1),
-  chapterOf('suites-numeriques', 3, 1),
+  /* ── Semestre 1 ─────────────────────────────────────────────────────── */
+  chapterOf('limites-et-continuite', 1, 1, 'analyse'),
+  chapterOf('suites-numeriques', 2, 1, 'analyse'),
+  chapterOf('derivation-etude-fonctions', 3, 1, 'analyse'),
+  chapterOf('fonctions-logarithmiques', 4, 1, 'analyse'),
   {
-    n: 4,
+    n: 5,
     slug: 'nombres-complexes',
     title: 'Nombres complexes',
     titleAr: 'الأعداد العقدية',
     semester: 1,
+    branch: 'algebre',
     priority: 'coeur',
     objective:
       'Maîtriser le calcul sur les nombres complexes et interpréter géométriquement leurs expressions.',
@@ -222,56 +261,74 @@ export const CHAPTERS_SM: ChapterMeta[] = [
       'إتقان الحساب على الأعداد العقدية وتأويل تعابيرها تأويلًا هندسيًا.',
   },
   {
-    n: 5,
+    n: 6,
     slug: 'arithmetique-dans-z',
     title: 'Arithmétique dans ℤ',
     titleAr: 'الحسابيات في ℤ',
     semester: 1,
+    branch: 'algebre',
     priority: 'rentable',
     objective:
       'Utiliser les congruences modulo n et mettre en œuvre les théorèmes de Bézout, de Gauss et de Fermat.',
     objectiveAr:
       'استعمال المتوافقات بترديد n، وتوظيف مبرهنات بيزو وغوص وفيرما.',
   },
-  chapterOf('fonctions-logarithmiques', 6, 1),
-  chapterOf('fonctions-exponentielles', 7, 2),
-  chapterOf('calcul-integral', 8, 2),
-  chapterOf('equations-differentielles', 9, 2),
+
+  /* ── Semestre 2 ─────────────────────────────────────────────────────── */
+  chapterOf('fonctions-exponentielles', 7, 2, 'analyse'),
+  chapterOf('calcul-integral', 8, 2, 'analyse'),
+  chapterOf('equations-differentielles', 9, 2, 'analyse'),
   {
     n: 10,
-    slug: 'structures-algebriques',
-    title: 'Structures algébriques',
-    titleAr: 'البنيات الجبرية',
-    semester: 2,
-    priority: 'fondations',
-    objective:
-      "Reconnaître une structure de groupe, d'anneau ou de corps, et exploiter les morphismes.",
-    objectiveAr:
-      'التعرّف على بنية زمرة أو حلقة أو جسم، وتوظيف التشاكلات.',
-  },
-  {
-    n: 11,
-    slug: 'espaces-vectoriels-reels',
-    title: 'Espaces vectoriels réels',
-    titleAr: 'الفضاءات المتجهية الحقيقية',
-    semester: 2,
-    priority: 'rentable',
-    objective:
-      "Reconnaître une structure d'espace vectoriel réel, ses sous-espaces et ses familles génératrices.",
-    objectiveAr:
-      'التعرّف على بنية فضاء متجهي حقيقي، وفضاءاته الجزئية وأسره المولّدة.',
-  },
-  {
-    n: 12,
     slug: 'calcul-probabilites',
     title: 'Calcul de probabilités',
     titleAr: 'حساب الاحتمالات',
     semester: 2,
+    branch: 'algebre',
     priority: 'rentable',
     objective:
       "Calculer des probabilités conditionnelles et choisir un modèle de dénombrement adapté à une expérience aléatoire.",
     objectiveAr:
       'حساب الاحتمالات الشرطية واختيار نموذج تعداد ملائم لتجربة عشوائية.',
+  },
+  {
+    n: 11,
+    slug: 'lois-composition-interne',
+    title: 'Lois de composition interne',
+    titleAr: 'قوانين التركيب الداخلي',
+    semester: 2,
+    branch: 'algebre',
+    priority: 'fondations',
+    objective:
+      "Vérifier qu'une opération est une loi de composition interne, et étudier stabilité, commutativité, associativité, élément neutre et éléments symétrisables.",
+    objectiveAr:
+      'التحقق من كون عملية ما قانون تركيب داخلي، ودراسة الاستقرار والتبادلية والتجميعية والعنصر المحايد والعناصر القابلة للتماثل.',
+  },
+  {
+    n: 12,
+    slug: 'groupes-anneaux-corps',
+    title: 'Groupes, anneaux et corps',
+    titleAr: 'الزمر والحلقات والأجسام',
+    semester: 2,
+    branch: 'algebre',
+    priority: 'rentable',
+    objective:
+      "Reconnaître une structure de groupe, d'anneau ou de corps, caractériser un sous-groupe et exploiter les morphismes.",
+    objectiveAr:
+      'التعرّف على بنية زمرة أو حلقة أو جسم، وتمييز زمرة جزئية، وتوظيف التشاكلات.',
+  },
+  {
+    n: 13,
+    slug: 'espaces-vectoriels-reels',
+    title: 'Espaces vectoriels réels',
+    titleAr: 'الفضاءات المتجهية الحقيقية',
+    semester: 2,
+    branch: 'algebre',
+    priority: 'rentable',
+    objective:
+      "Reconnaître une structure d'espace vectoriel réel, ses sous-espaces et ses familles génératrices.",
+    objectiveAr:
+      'التعرّف على بنية فضاء متجهي حقيقي، وفضاءاته الجزئية وأسره المولّدة.',
   },
 ]
 

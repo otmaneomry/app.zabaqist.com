@@ -28,7 +28,7 @@ const BrilliantLandingPage = () => {
                                         Log in
                                     </Button>
                                     <Link href="/home" style={{ textDecoration: 'none' }}>
-                                        <Button color="teal" size="sm">
+                                        <Button color="mint" size="sm">
                                             Get started
                                         </Button>
                                     </Link>
@@ -51,7 +51,7 @@ const BrilliantLandingPage = () => {
                                         <Link href="/home" style={{ textDecoration: 'none' }}>
                                             <Button
                                                 size="lg"
-                                                color="teal"
+                                                color="mint"
                                             >
                                                 Get started
                                             </Button>
@@ -235,7 +235,7 @@ const BrilliantLandingPage = () => {
                             <Link href="/home" style={{ textDecoration: 'none' }}>
                                 <Button
                                     size="lg"
-                                    color="teal"
+                                    color="mint"
                                 >
                                     Get started
                                 </Button>

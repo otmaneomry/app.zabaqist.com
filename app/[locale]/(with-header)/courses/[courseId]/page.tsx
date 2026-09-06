@@ -34,6 +34,9 @@ import { IconArrowLeft, IconTrophy } from '@tabler/icons-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 
 import CourseDoc from '@/components/course/CourseDoc'
+import ChapterComplete from '@/components/course/ChapterComplete'
+import CoursePath, { type PathNode } from '@/components/course/CoursePath'
+import StickyNextCard from '@/components/course/StickyNextCard'
 import CourseProgressCard from '@/components/course/CourseProgressCard'
 import CourseTabs from '@/components/course/CourseTabs'
 import SectionPicker from '@/components/course/SectionPicker'
@@ -102,6 +105,87 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
   const t = await getTranslations('course')
   const locale = (await getLocale()) as ContentLocale
 
+  /**
+   * With no `?s=`, the course IS the path — a journey with one node lit, not a
+   * document with a table of contents on top. Opening a section switches to the
+   * reader below. See BRILLIANT_WORKFLOW.md §3.
+   */
+  if (!requestedView) {
+    const nodes: PathNode[] = doc.views.map((v) => ({
+      id: v.id,
+      label: v.titles.join(' · ') || v.parent || doc.meta.title,
+      level: v.parent ?? v.titles[0] ?? doc.meta.title,
+      isGate: v.kind === 'devoir',
+      xp: v.xp,
+    }))
+
+    return (
+      <Container size="lg" py="xl">
+        <CourseProgressCard
+          slug={courseId}
+          activeId={view.id}
+          viewIds={viewIds}
+          xpByView={xpByView}
+          markVisited={false}
+        />
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-[320px_1fr] lg:gap-12">
+          {/* The course's identity, pinned. It names the level you are in and
+              what the chapter is — never how much is left. */}
+          <aside className="lg:sticky lg:top-6 lg:self-start">
+            <div className="rounded-2xl border border-zb-line bg-white p-6">
+              <LinkButton
+                href="/courses"
+                variant="subtle"
+                color="mint"
+                size="compact-sm"
+                leftSection={<IconArrowLeft size={16} />}
+                pl={0}
+              >
+                {t('back')}
+              </LinkButton>
+              <Badge color="mint" size="lg" mt="sm" mb="sm">
+                {courseLevel(doc.meta, locale)}
+              </Badge>
+              <Title order={2} mb="xs" dir={doc.meta.contentDir}>
+                {doc.title}
+              </Title>
+              <Text size="sm" c="dimmed">
+                {courseDescription(doc.meta, locale)}
+              </Text>
+              <Text size="sm" c="dimmed" mt="md">
+                {t('stats', {
+                  tabs: tabs.length,
+                  sections: doc.views.length,
+                  points: totalXp,
+                })}
+              </Text>
+            </div>
+          </aside>
+
+          <div className="min-w-0">
+            <CoursePath
+              slug={courseId}
+              nodes={nodes}
+              dir={doc.meta.contentDir}
+            />
+            <StickyNextCard
+              slug={courseId}
+              nodes={nodes.map(({ id, label }) => ({ id, label }))}
+              dir={doc.meta.contentDir}
+            />
+            {/* Fires once, when the last section has been read. */}
+            <ChapterComplete
+              slug={courseId}
+              viewIds={viewIds}
+              xpByView={xpByView}
+            />
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
   return (
     <Container size="lg" py="xl">
       <Stack gap="xl">
@@ -119,7 +203,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
             <LinkButton
               href="/courses"
               variant="subtle"
-              color="teal"
+              color="mint"
               size="compact-sm"
               leftSection={<IconArrowLeft size={16} />}
               pl={0}
@@ -127,7 +211,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
               {t('back')}
             </LinkButton>
           </div>
-          <Badge color="teal" size="lg" mb="sm">
+          <Badge color="mint" size="lg" mb="sm">
             {courseLevel(doc.meta, locale)}
           </Badge>
           <Title order={1} mb="md" dir={doc.meta.contentDir}>
@@ -139,7 +223,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
           <Group>
             <LinkButton
               href="/quiz/1"
-              color="teal"
+              color="mint"
               leftSection={<IconTrophy size={16} />}
             >
               {t('quiz')}
@@ -211,7 +295,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
               {next ? (
                 <Link
                   href={`/courses/${courseId}?s=${next.id}`}
-                  className="text-end font-medium text-zb-teal-dark hover:underline"
+                  className="text-end font-medium text-zb-mint-deep hover:underline"
                 >
                   {viewLabel(next)} →
                 </Link>
@@ -229,7 +313,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
           radius="md"
           withBorder
           style={{
-            background: 'linear-gradient(135deg, #2CB0A1 0%, #1a8f83 100%)',
+            background: 'linear-gradient(135deg, var(--zb-mint) 0%, var(--zb-mint-deep) 100%)',
           }}
         >
           <Stack align="center" gap="md">
@@ -243,7 +327,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
               href="/quiz/1"
               size="lg"
               variant="white"
-              color="teal"
+              color="mint"
               leftSection={<IconTrophy size={20} />}
             >
               {t('ctaButton')}

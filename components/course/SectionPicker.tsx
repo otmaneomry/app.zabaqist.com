@@ -72,8 +72,8 @@ export default function SectionPicker({
             title={it.label}
             className={`inline-flex max-w-full items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
               active
-                ? 'border-zb-teal bg-zb-teal text-white'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-zb-teal/50 hover:bg-zb-teal-soft'
+                ? 'border-zb-mint bg-zb-mint text-white'
+                : 'border-gray-200 bg-white text-gray-700 hover:border-zb-mint/50 hover:bg-zb-mint-soft'
             }`}
           >
             <span
@@ -82,7 +82,7 @@ export default function SectionPicker({
                 active
                   ? 'bg-white/80'
                   : seen.has(it.id)
-                    ? 'bg-zb-teal'
+                    ? 'bg-zb-mint'
                     : 'bg-gray-300'
               }`}
             />

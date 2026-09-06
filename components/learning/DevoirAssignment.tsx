@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React, { useState, useEffect } from 'react'
 import { Card, Text, Stack, Button, Badge, Group, Progress, Divider, Alert } from '@mantine/core'
 import { IconCheck, IconClock, IconPencil, IconEye, IconEyeOff, IconBulb } from '@tabler/icons-react'
@@ -35,6 +36,7 @@ export default function DevoirAssignment({
   instructions,
   courseId = 'fonctions-logarithmiques'
 }: DevoirProps) {
+  const t = useTranslations('homework')
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [showSolutions, setShowSolutions] = useState(false)
@@ -81,10 +83,10 @@ export default function DevoirAssignment({
         {/* Header */}
         <div>
           <Group justify="space-between" mb="sm">
-            <Text size="xl" fw={700} c="teal">
+            <Text size="xl" fw={700} c="mint">
               {title}
             </Text>
-            <Badge size="lg" color="teal">
+            <Badge size="lg" color="mint">
               {totalPoints} points
             </Badge>
           </Group>
@@ -110,7 +112,7 @@ export default function DevoirAssignment({
         {instructions && (
           <Card bg="blue.0" p="md" radius="md">
             <Text fw={600} mb="xs">
-              Instructions :
+              {t('instructions')}
             </Text>
             <Text size="sm">{instructions}</Text>
           </Card>
@@ -121,13 +123,13 @@ export default function DevoirAssignment({
           <div>
             <Group justify="space-between" mb="xs">
               <Text size="sm" fw={500}>
-                Progression
+                {t('progress')}
               </Text>
               <Text size="sm" c="dimmed">
                 {Object.keys(answers).filter(key => answers[Number(key)].trim().length > 0).length} / {questions.length} questions
               </Text>
             </Group>
-            <Progress value={calculateProgress()} color="teal" size="lg" radius="xl" />
+            <Progress value={calculateProgress()} color="mint" size="lg" radius="xl" />
           </div>
         )}
 
@@ -138,7 +140,7 @@ export default function DevoirAssignment({
               <Stack gap="md">
                 <Group justify="space-between">
                   <Group gap="sm">
-                    <Text fw={700} c="teal">
+                    <Text fw={700} c="mint">
                       Question {q.id}
                     </Text>
                     <Badge color={questionTypeColors[q.type]} variant="light" size="sm">
@@ -157,7 +159,7 @@ export default function DevoirAssignment({
                 <SimpleMathInput
                   value={answers[q.id] || ''}
                   onChange={(latex) => handleAnswerChange(q.id, latex)}
-                  placeholder="Tapez votre réponse en LaTeX..."
+                  placeholder={t('answerPlaceholder')}
                   disabled={submitted}
                   showPreview={true}
                   minRows={3}
@@ -166,14 +168,14 @@ export default function DevoirAssignment({
                 {/* Show solution after submission if available and toggle is on */}
                 {submitted && showSolutions && q.solution && (
                   <>
-                    <Divider label="Solution" labelPosition="center" mt="md" />
+                    <Divider label={t('solution')} labelPosition="center" mt="md" />
 
                     <Card bg="teal.0" p="md" radius="md">
                       <Stack gap="sm">
                         <Group gap="xs">
-                          <IconBulb size={20} color="teal" />
-                          <Text fw={600} c="teal">
-                            Réponse attendue :
+                          <IconBulb size={20} color="mint" />
+                          <Text fw={600} c="mint">
+                            {t('expected')}
                           </Text>
                         </Group>
 
@@ -199,12 +201,12 @@ export default function DevoirAssignment({
         {!submitted ? (
           <Button
             size="lg"
-            color="teal"
+            color="mint"
             leftSection={<IconPencil size={20} />}
             onClick={() => setSubmitted(true)}
             disabled={Object.keys(answers).length === 0}
           >
-            Soumettre le devoir
+            {t('submit')}
           </Button>
         ) : (
           <Stack gap="md">
@@ -213,10 +215,10 @@ export default function DevoirAssignment({
                 <IconCheck size={32} color="green" />
                 <div>
                   <Text fw={700} c="green" size="lg">
-                    Devoir soumis avec succès !
+                    {t('submitted')}
                   </Text>
                   <Text size="sm" c="dimmed">
-                    Votre professeur corrigera votre travail prochainement.
+                    {t('teacherNote')}
                   </Text>
                 </div>
               </Group>
@@ -227,7 +229,7 @@ export default function DevoirAssignment({
               <Button
                 size="md"
                 variant={showSolutions ? "filled" : "light"}
-                color="teal"
+                color="mint"
                 leftSection={showSolutions ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                 onClick={() => setShowSolutions(!showSolutions)}
               >

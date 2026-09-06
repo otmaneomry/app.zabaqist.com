@@ -16,14 +16,17 @@ import React, { useEffect, useState } from 'react';
 import {Link} from '@/i18n/navigation'
 import {usePathname} from '@/i18n/navigation';
 import {Button, Drawer} from "@mantine/core";
-import {IconBook, IconHome, IconMenu, IconSearch, IconTrophy} from '@tabler/icons-react';
+import {IconBook, IconChartBar, IconHome, IconMenu, IconSearch, IconTrophy} from '@tabler/icons-react';
 import {useTranslations} from 'next-intl';
 
 import LangSwitch from '@/components/landing/LangSwitch';
 
+// Three items, like the source: where you are, what there is, and how you are
+// doing. The third is private — see components/progress/ProgressDashboard.tsx.
 const NAV = [
     {href: '/home', key: 'home', icon: IconHome},
     {href: '/courses', key: 'courses', icon: IconBook},
+    {href: '/progres', key: 'progress', icon: IconChartBar},
 ] as const;
 
 const Header = () => {
@@ -81,7 +84,7 @@ const Header = () => {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                color="teal"
+                                color="mint"
                                 aria-label="Go premium"
                                 leftSection={<IconTrophy size={16}/>}
                                 classNames={{section: 'max-sm:!m-0'}}
@@ -138,7 +141,7 @@ const Header = () => {
                                 aria-current={isActive ? 'page' : undefined}
                                 className={`flex items-center gap-3 rounded-lg px-3 py-3 text-base no-underline transition-colors ${
                                     isActive
-                                        ? 'bg-zb-teal-soft font-semibold text-zb-teal-dark'
+                                        ? 'bg-zb-mint-soft font-semibold text-zb-mint-deep'
                                         : 'text-gray-700 hover:bg-gray-100'
                                 }`}
                             >
@@ -149,7 +152,7 @@ const Header = () => {
                     })}
                     <Link
                         href="/subscribe"
-                        className="mt-2 flex items-center gap-3 rounded-lg border-2 border-zb-teal px-3 py-3 text-base font-semibold text-zb-teal-dark no-underline"
+                        className="mt-2 flex items-center gap-3 rounded-lg border-2 border-zb-mint px-3 py-3 text-base font-semibold text-zb-mint-deep no-underline"
                     >
                         <IconTrophy size={20}/>
                         <span>Go premium</span>

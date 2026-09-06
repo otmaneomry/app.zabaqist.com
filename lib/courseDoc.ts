@@ -310,12 +310,21 @@ export interface CourseTab {
   viewIds: string[]
 }
 
-/** Short tab labels for the headings the chapters actually use. */
+/**
+ * Short tab labels for the headings the chapters actually use.
+ *
+ * The chapters were authored over months and do not name their sections
+ * identically — "Objectifs" vs "Capacités attendues", "Devoirs et synthèse" vs
+ * "Problèmes de synthèse", "Activités préparatoires" vs "Activité
+ * d'introduction". Those are the same tab to a reader, so they get the same
+ * label; `tabsOf` then folds consecutive same-label runs into one tab, which is
+ * also what pulls "Auto-évaluation" back under "Résumé" where it belongs.
+ */
 const TAB_LABEL: [RegExp, string][] = [
-  [/^histoire|^objectifs/i, 'Introduction'],
-  [/^activités préparatoires/i, 'Activités'],
-  [/^devoirs?/i, 'Devoir'],
-  [/^résumé|^resume/i, 'Résumé'],
+  [/^histoire|^objectifs|^capacités attendues/i, 'Introduction'],
+  [/^activités?\b/i, 'Activités'],
+  [/^devoirs?|^problèmes? de synthèse/i, 'Devoir'],
+  [/^résumé|^resume|^auto-évaluation/i, 'Résumé'],
 ]
 
 const tabLabel = (raw: string) =>
@@ -442,7 +451,11 @@ function splitIntoViews(body: string): View[] {
   const merged: View[] = []
   for (const sec of sections) {
     const last = merged[merged.length - 1]
-    if (last && isLight(last.body) && isLight(sec.body)) {
+    // Same KIND only. The merge exists so Histoire / Objectifs / Plan open as
+    // one front-matter page instead of four near-empty ones — but fusing
+    // `## Exercices` into `## Graphique` because both happen to be short loses
+    // a tab, and the tabs are the chapter's own plan.
+    if (last && last.kind === sec.kind && isLight(last.body) && isLight(sec.body)) {
       last.titles.push(...sec.titles)
       last.body = `${last.body}\n${sec.body}`
       continue

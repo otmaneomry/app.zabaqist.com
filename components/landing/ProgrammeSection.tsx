@@ -51,7 +51,7 @@ export default function ProgrammeSection() {
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-zb-gold-warm">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-zb-gold-deep">
               {t('pathKicker')}
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">

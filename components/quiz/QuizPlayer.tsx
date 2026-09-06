@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 import { Container, Button, Text, Stack, Progress, Group, Card, Title } from '@mantine/core'
 import { useRouter } from 'next/navigation'
@@ -13,6 +14,7 @@ interface QuizPlayerProps {
 }
 
 export default function QuizPlayer({ quizId }: QuizPlayerProps) {
+  const t = useTranslations('quiz')
   const router = useRouter()
   const user = useUserStore(state => state.user)
   const {
@@ -36,7 +38,7 @@ export default function QuizPlayer({ quizId }: QuizPlayerProps) {
       <Container size="md" py="xl">
         <Card shadow="sm" padding="xl" radius="md" withBorder>
           <Text ta="center" c="dimmed">
-            Chargement du quiz...
+            {t('loading')}
           </Text>
         </Card>
       </Container>
@@ -96,12 +98,12 @@ export default function QuizPlayer({ quizId }: QuizPlayerProps) {
       <Container size="md" py="xl">
         <Card shadow="lg" padding="xl" radius="md" withBorder>
           <Stack gap="xl" align="center">
-            <Title order={2} c="teal">
-              Quiz Terminé !
+            <Title order={2} c="mint">
+              {t('finished')}
             </Title>
 
             <div style={{ textAlign: 'center' }}>
-              <Text size="6rem" fw={700} c="teal">
+              <Text size="6rem" fw={700} c="mint">
                 {Math.round(percentage)}%
               </Text>
               <Text size="xl" c="dimmed" mt="md">
@@ -137,20 +139,20 @@ export default function QuizPlayer({ quizId }: QuizPlayerProps) {
               <Button
                 fullWidth
                 variant="outline"
-                color="teal"
+                color="mint"
                 onClick={() => {
                   setShowResults(false)
                   setCurrentQuestion(0)
                 }}
               >
-                Voir les corrections
+                {t('seeCorrections')}
               </Button>
               <Button
                 fullWidth
-                color="teal"
+                color="mint"
                 onClick={() => router.push('/courses')}
               >
-                Retour aux cours
+                {t('backToCourses')}
               </Button>
             </Group>
           </Stack>
@@ -174,7 +176,7 @@ export default function QuizPlayer({ quizId }: QuizPlayerProps) {
               </Text>
             </div>
           </Group>
-          <Progress value={progress} color="teal" size="lg" radius="xl" />
+          <Progress value={progress} color="mint" size="lg" radius="xl" />
         </Card>
 
         {/* Timer */}
@@ -196,14 +198,14 @@ export default function QuizPlayer({ quizId }: QuizPlayerProps) {
         <Group justify="space-between">
           <Button
             variant="outline"
-            color="teal"
+            color="mint"
             onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
           >
-            Précédent
+            {t('previous')}
           </Button>
           <Button
-            color="teal"
+            color="mint"
             onClick={handleNext}
             disabled={selectedResponses.length === 0}
           >

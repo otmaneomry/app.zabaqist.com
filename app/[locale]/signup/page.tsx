@@ -50,7 +50,7 @@ export default function SignUpPage() {
       setUser(response.data)
       // Connecting is when we ask for the filière — the programme differs
       // between SM and Sciences Exp, so everything after this depends on it.
-      router.push(readFiliere() ? '/home' : '/filiere?next=/home')
+      router.push(readFiliere() ? '/home' : '/demarrer')
     } catch (err: any) {
       setError(err.message || 'Erreur lors de l\'inscription')
     } finally {
@@ -61,7 +61,7 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <Card shadow="md" padding="xl" radius="md" className="w-full max-w-md">
-        <Title order={2} ta="center" mb="lg" style={{ color: '#2CB0A1' }}>
+        <Title order={2} ta="center" mb="lg" style={{ color: 'var(--zb-mint)' }}>
           Inscription à Zabaqist
         </Title>
 
@@ -69,7 +69,8 @@ export default function SignUpPage() {
           Rejoignez la communauté d'apprentissage des maths
         </Text>
 
-        {/* TEMPORARY: Mock API info */}
+        {/* Dev only — see the note on the sign-in page. */}
+        {process.env.NODE_ENV !== 'production' && (
         <Card padding="sm" radius="md" mb="xl" style={{ backgroundColor: '#FFF4E6', border: '1px solid #FFA94D' }}>
           <Text size="xs" fw={600} c="orange" mb="xs">
             Mode Test (API temporaire)
@@ -78,6 +79,7 @@ export default function SignUpPage() {
             Vous pouvez créer un compte ou utiliser les comptes test existants
           </Text>
         </Card>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextInput
@@ -158,7 +160,7 @@ export default function SignUpPage() {
           <Button
             type="submit"
             fullWidth
-            color="teal"
+            color="mint"
             loading={loading}
             mb="md"
             size="md"
@@ -168,13 +170,13 @@ export default function SignUpPage() {
 
           <Text size="sm" ta="center" c="dimmed">
             Déjà un compte ?{' '}
-            <Link href="/signin" style={{ color: '#2CB0A1', fontWeight: 500, textDecoration: 'none' }}>
+            <Link href="/signin" style={{ color: 'var(--zb-mint)', fontWeight: 500, textDecoration: 'none' }}>
               Se connecter
             </Link>
           </Text>
 
           <Text size="sm" ta="center" c="dimmed" mt="sm">
-            <Link href="/" style={{ color: '#2CB0A1', fontWeight: 500, textDecoration: 'none' }}>
+            <Link href="/" style={{ color: 'var(--zb-mint)', fontWeight: 500, textDecoration: 'none' }}>
               Retour à l'accueil
             </Link>
           </Text>

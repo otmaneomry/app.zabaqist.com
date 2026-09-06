@@ -19,6 +19,8 @@ import 'katex/dist/katex.min.css'
 
 import Checkpoint from '@/components/course/Checkpoint'
 import Reveal from '@/components/course/Reveal'
+import GeogebraBlock from '@/components/math/GeogebraBlock'
+import { parseSpec } from '@/lib/geogebraSpec'
 import { slugifyHeading } from '@/lib/courseDoc'
 import { checkpointKey } from '@/lib/courseProgress'
 
@@ -72,8 +74,8 @@ const TONES = {
     label: 'text-zb-gold',
   },
   teal: {
-    box: 'border-zb-teal/30 bg-zb-teal-soft',
-    label: 'text-zb-teal-dark',
+    box: 'border-zb-mint/30 bg-zb-mint-soft',
+    label: 'text-zb-mint-deep',
   },
   rose: {
     box: 'border-zb-rose/30 bg-zb-rose-soft',
@@ -133,7 +135,7 @@ export default function CourseDoc({
     h3: ({ children }) => (
       <h3
         id={slugifyHeading(textOf(children), seen)}
-        className="mt-10 scroll-mt-24 text-lg font-bold tracking-tight text-zb-teal-dark md:text-xl"
+        className="mt-10 scroll-mt-24 text-lg font-bold tracking-tight text-zb-mint-deep md:text-xl"
       >
         {children}
       </h3>
@@ -146,10 +148,11 @@ export default function CourseDoc({
     p: ({ children }) => (
       <p className="mt-4 leading-relaxed text-gray-800">{children}</p>
     ),
+    // The khatim is the bullet. One shape, used where it MEANS something —
+    // "this is an item in a list" — and nowhere it doesn't. See the note on
+    // `.zb-star-list` in app/globals.css.
     ul: ({ children }) => (
-      <ul className="mt-4 space-y-2 ps-5 [&>li]:list-disc [&>li]:marker:text-zb-teal">
-        {children}
-      </ul>
+      <ul className="zb-star-list mt-4 space-y-2">{children}</ul>
     ),
     // `start` must be forwarded: the chapters write `1)` `2)` `3)` with a
     // paragraph between each, which markdown parses as separate one-item lists.
@@ -169,7 +172,7 @@ export default function CourseDoc({
     a: ({ children, href }) => (
       <a
         href={href}
-        className="text-zb-teal-dark underline underline-offset-2"
+        className="text-zb-mint-deep underline underline-offset-2"
         rel="noopener noreferrer"
       >
         {children}
@@ -193,11 +196,20 @@ export default function CourseDoc({
         {children}
       </td>
     ),
-    code: ({ children }) => (
-      <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[0.9em]">
-        {children}
-      </code>
-    ),
+    // A ```geogebra fence is a figure, not code. Everything else stays code.
+    code: ({ children, className }) => {
+      if (/language-geogebra/.test(className ?? '')) {
+        const spec = parseSpec(textOf(children))
+        return spec ? <GeogebraBlock spec={spec} /> : null
+      }
+      return (
+        <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[0.9em]">
+          {children}
+        </code>
+      )
+    },
+    // react-markdown wraps a fence in <pre>; the figure supplies its own frame.
+    pre: ({ children }) => <>{children}</>,
     blockquote: ({ children }) => {
       const label = textOf(children).trim()
       const kind = CALLOUTS.find((c) => c.match.test(label))

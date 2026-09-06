@@ -36,7 +36,9 @@ export default function CountdownTimer({
       <CountdownCircleTimer
         isPlaying={isPlaying}
         duration={duration}
-        colors={['#2CB0A1', '#F7B801', '#F97316', '#EF4444']}
+        // `--zb-mint` resolved to sRGB: this library's types demand literal
+        // `#rrggbb`, so it cannot take the CSS variable.
+        colors={['#1c7a63', '#F7B801', '#F97316', '#EF4444']}
         colorsTime={[duration, duration / 2, duration / 4, 0]}
         onComplete={onComplete}
         size={180}

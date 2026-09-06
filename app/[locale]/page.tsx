@@ -47,7 +47,7 @@ export default async function Home() {
         <Zellige id="zellige-hero" density={88} opacity={0.06} />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-14 sm:px-6 lg:grid-cols-2 lg:py-20">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-zb-gold-warm">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-zb-gold-deep">
               {t('eyebrow')}
             </p>
             <h1 className="mt-5 text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
@@ -60,8 +60,10 @@ export default async function Home() {
               {t('sub')}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
+              {/* The funnel, not the catalogue: the reader is asked what they
+                  need before being shown eleven chapters. */}
               <Link
-                href="/courses"
+                href="/demarrer"
                 className="inline-flex h-12 items-center rounded-xl bg-zb-mint px-6 text-base font-semibold text-white no-underline transition-colors hover:bg-zb-mint-deep"
               >
                 {t('ctaPrimary')} →
@@ -94,7 +96,7 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-16">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-zb-gold-warm">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-zb-gold-deep">
                 {t('geoKicker')}
               </p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">

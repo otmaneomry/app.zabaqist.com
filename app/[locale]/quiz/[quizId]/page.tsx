@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React, { use, useEffect, useState } from 'react'
 import { useQuizStore } from '@/stores/useQuizStore'
 import { useUserStore } from '@/stores/useUserStore'
@@ -15,6 +16,7 @@ interface QuizPageProps {
 }
 
 export default function QuizPage({ params }: QuizPageProps) {
+  const t = useTranslations('quiz')
   const router = useRouter()
   const { quizId } = use(params)
   const user = useUserStore(state => state.user)
@@ -43,7 +45,7 @@ export default function QuizPage({ params }: QuizPageProps) {
       }
     } catch (err: any) {
       console.error('Error loading quiz:', err)
-      setError(err.message || 'Erreur lors du chargement du quiz')
+      setError(err.message || t('loadError'))
     } finally {
       setLoading(false)
     }
@@ -54,9 +56,9 @@ export default function QuizPage({ params }: QuizPageProps) {
       <Container size="md" py="xl">
         <Card shadow="sm" padding="xl" radius="md" withBorder>
           <div style={{ textAlign: 'center' }}>
-            <Loader color="teal" size="lg" />
+            <Loader color="mint" size="lg" />
             <Text mt="md" c="dimmed">
-              Chargement du quiz...
+              {t('loading')}
             </Text>
           </div>
         </Card>
@@ -81,7 +83,7 @@ export default function QuizPage({ params }: QuizPageProps) {
       <Container size="md" py="xl">
         <Card shadow="sm" padding="xl" radius="md" withBorder>
           <Text ta="center" c="dimmed">
-            Le quiz n'a pas pu être chargé. Veuillez rafraîchir la page.
+            {t('loadFailed')}
           </Text>
         </Card>
       </Container>

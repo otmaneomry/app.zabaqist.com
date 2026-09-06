@@ -24,12 +24,12 @@ const LearningPaths = () => {
                     <div style={{display: 'flex', alignItems: 'center'}}>
                         <Image src="/brilliant-image/how-llms-work.png" alt="Mathématiques BAC" width={48} height={48} style={{marginRight: '1rem'}} />
                         <div>
-                            <div style={{color: '#2CB0A1', fontSize: '0.875rem', fontWeight: 600}}>EN COURS</div>
+                            <div style={{color: 'var(--zb-mint)', fontSize: '0.875rem', fontWeight: 600}}>EN COURS</div>
                             <h2 style={{fontSize: '1.5rem', fontWeight: 'bold'}}>Mathématiques - Sciences Maths</h2>
                             <p style={{color: '#4b5563'}}>Programme complet du Baccalauréat Marocain</p>
                         </div>
                     </div>
-                    <Button style={{backgroundColor: '#2CB0A1', color: 'white'}}>Continuer</Button>
+                    <Button style={{backgroundColor: 'var(--zb-mint)', color: 'white'}}>Continuer</Button>
                 </div>
 
                 <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}} className="md:grid-cols-3 lg:grid-cols-6">

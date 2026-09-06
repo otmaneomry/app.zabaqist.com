@@ -46,7 +46,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             setUser(response.data);
             onClose();
             // Connecting is when we ask for the filière — see app/[locale]/filiere.
-            router.push(readFiliere() ? '/home' : '/filiere?next=/home');
+            router.push(readFiliere() ? '/home' : '/demarrer');
         } catch (err: any) {
             setError(err.message || 'Email ou mot de passe incorrect');
         } finally {
@@ -145,7 +145,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     </Stack>
                     <Text ta="center" mt="xl" size="sm">
                         Nouveau?{' '}
-                        <Anchor component="button" onClick={handleSwitchToSignup} c="#2CB0A1" fw={500}>
+                        <Anchor component="button" onClick={handleSwitchToSignup} c="var(--zb-mint)" fw={500}>
                             S'inscrire
                         </Anchor>
                     </Text>
@@ -180,7 +180,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                 type="submit"
                                 fullWidth
                                 size="md"
-                                color="teal"
+                                color="mint"
                                 style={{ height: '48px' }}
                                 loading={loading}
                             >
@@ -189,8 +189,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                         </Stack>
                     </form>
                     <Group justify="space-between" mt="lg">
-                        <Anchor size="sm" href="#" c="#2CB0A1" fw={500}>Mot de passe oublié?</Anchor>
-                        <Anchor component="button" size="sm" onClick={handleSwitchToSignup} c="#2CB0A1" fw={500}>
+                        <Anchor size="sm" href="#" c="var(--zb-mint)" fw={500}>Mot de passe oublié?</Anchor>
+                        <Anchor component="button" size="sm" onClick={handleSwitchToSignup} c="var(--zb-mint)" fw={500}>
                             Nouveau? S'inscrire
                         </Anchor>
                     </Group>

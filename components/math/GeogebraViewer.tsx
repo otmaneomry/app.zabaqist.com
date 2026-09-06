@@ -57,22 +57,16 @@ export default function GeogebraViewer({
   const [isReady, setIsReady] = useState(false)
 
   const handleAppletOnLoad = (api: any) => {
-    // Version 2.0 - Fixed to always call callback
-    console.log('🔵 GeoGebra applet loaded (v2.0)')
-    console.log('🔵 API parameter from react-geogebra:', api)
-    console.log('🔵 API parameter type:', typeof api)
 
-    // Always call the custom callback regardless of api parameter
-    // The callback will handle getting the API from window.ggbApplet
+    // The callback is called regardless of what `api` holds: react-geogebra
+    // does not always hand one over, and the applet's real API is on
+    // `window.ggbApplet` by then anyway.
     if (appletOnLoad) {
-      console.log('🔵 Calling custom appletOnLoad callback (will use window.ggbApplet)...')
       try {
-        appletOnLoad(api) // Pass whatever we got, callback will use window.ggbApplet instead
+        appletOnLoad(api)
       } catch (error) {
-        console.error('❌ Error in appletOnLoad callback:', error)
+        console.error('GeoGebra appletOnLoad failed:', error)
       }
-    } else {
-      console.log('⚠️ No custom appletOnLoad callback provided')
     }
 
     setIsReady(true)

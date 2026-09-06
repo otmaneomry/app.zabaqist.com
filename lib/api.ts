@@ -11,8 +11,14 @@ interface ApiOptions extends RequestInit {
   token?: string | null
 }
 
-// Toggle between mock and real API
-const USE_MOCK_API = true // Set to false when backend is ready
+/**
+ * Whether to answer from `lib/mockApi.ts` instead of the network.
+ *
+ * Still the default, because the backend is not ready — but it is now an
+ * environment decision, not a code edit. A deployment that has an API sets
+ * `NEXT_PUBLIC_USE_MOCK_API=false` and nothing else changes.
+ */
+export const USE_MOCK_API = process.env.NEXT_PUBLIC_USE_MOCK_API !== 'false'
 
 /**
  * Generic API call utility with automatic token injection

@@ -86,7 +86,7 @@ function StationNode({
   if (state === 'current')
     return (
       <div
-        className={`${base} bg-zb-saffron text-zb-ink shadow-[0_0_0_6px_rgba(224,169,46,0.25)]`}
+        className={`${base} bg-zb-gold text-zb-ink shadow-[0_0_0_6px_rgba(224,169,46,0.25)]`}
       >
         {n}
       </div>

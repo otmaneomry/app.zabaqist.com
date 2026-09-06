@@ -54,28 +54,29 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Zabaqist palette. The Mantine theme owns the teal ramp; these are the
-        // same values as flat tokens so the markdown course renderer (which is
-        // a server component and cannot use Mantine hooks) stays on-brand.
+        // Zabaqist · Mint Tea. One palette for the whole product — the
+        // landing page and the course pages used to run on two different
+        // greens. Values live in app/globals.css; see the note there about the
+        // two that are measured accessibility fixes.
         zb: {
-          // Landing-page palette ("Mint Tea").
           mint: "var(--zb-mint)",
           "mint-deep": "var(--zb-mint-deep)",
           "mint-soft": "var(--zb-mint-soft)",
-          saffron: "var(--zb-gold)",
-          "gold-warm": "var(--zb-gold-warm)",
+          "mint-tint": "var(--zb-mint-tint)",
+          gold: "var(--zb-gold)",
+          "gold-deep": "var(--zb-gold-deep)",
+          "gold-soft": "var(--zb-gold-soft)",
+          "on-accent": "var(--zb-on-accent)",
           cream: "var(--zb-cream)",
           "cream-2": "var(--zb-cream-2)",
+          "cream-3": "var(--zb-cream-3)",
           ink: "var(--zb-ink)",
+          "ink-2": "var(--zb-ink-2)",
+          "ink-3": "var(--zb-ink-3)",
+          rose: "var(--zb-rose)",
+          "rose-soft": "var(--zb-rose-soft)",
+          "rose-deep": "var(--zb-rose-deep)",
           line: "var(--zb-line)",
-          // Course-page palette. Unchanged.
-          teal: "#2CB0A1",
-          "teal-dark": "#1a8f83",
-          "teal-soft": "#e6faf8",
-          gold: "#B8860B",
-          "gold-soft": "#FDF6E3",
-          rose: "#C2410C",
-          "rose-soft": "#FFF4ED",
         },
       },
       borderRadius: {

@@ -57,7 +57,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
             setUser(response.data);
             onClose();
             // Connecting is when we ask for the filière — see app/[locale]/filiere.
-            router.push(readFiliere() ? '/home' : '/filiere?next=/home');
+            router.push(readFiliere() ? '/home' : '/demarrer');
         } catch (err: any) {
             setError(err.message || 'Erreur lors de l\'inscription');
         } finally {
@@ -124,7 +124,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
 
                     <Button
                         fullWidth
-                        color="teal"
+                        color="mint"
                         style={{ height: '48px' }}
                         onClick={() => setShowEmailSignup(true)}
                     >
@@ -133,13 +133,13 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
 
                     <Text size="xs" ta="center" c="dimmed">
                         En cliquant ci-dessus, j'accepte les{' '}
-                        <Anchor size="xs" href="#" c="#2CB0A1" fw={500}>Conditions</Anchor> et la{' '}
-                        <Anchor size="xs" href="#" c="#2CB0A1" fw={500}>Politique de confidentialité</Anchor> de Zabaqist
+                        <Anchor size="xs" href="#" c="var(--zb-mint)" fw={500}>Conditions</Anchor> et la{' '}
+                        <Anchor size="xs" href="#" c="var(--zb-mint)" fw={500}>Politique de confidentialité</Anchor> de Zabaqist
                     </Text>
 
                     <Text ta="center" size="sm">
                         Déjà un compte ?{' '}
-                        <Anchor component="button" onClick={onSwitchToLogin} c="#2CB0A1" fw={500}>
+                        <Anchor component="button" onClick={onSwitchToLogin} c="var(--zb-mint)" fw={500}>
                             Se connecter
                         </Anchor>
                     </Text>
@@ -206,7 +206,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
                             <Button
                                 type="submit"
                                 fullWidth
-                                color="teal"
+                                color="mint"
                                 style={{ height: '48px' }}
                                 loading={loading}
                             >
@@ -216,7 +216,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
                     </form>
                     <Text ta="center" size="sm" mt="md">
                         Déjà un compte ?{' '}
-                        <Anchor component="button" onClick={onSwitchToLogin} c="#2CB0A1" fw={500}>
+                        <Anchor component="button" onClick={onSwitchToLogin} c="var(--zb-mint)" fw={500}>
                             Se connecter
                         </Anchor>
                     </Text>
