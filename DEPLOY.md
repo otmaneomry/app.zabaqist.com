@@ -6,7 +6,7 @@
 npm run check        # tsc --noEmit && eslint .   → 0 erreur attendu
 npm run build
 npm start -- -p 3111 &
-npm run test:course  # 150 vérifications
+npm run test:course  # 169 vérifications
 ```
 
 ## Variables d'environnement
