@@ -12,6 +12,11 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    // `lib/courseDoc.ts` is imported directly by `scripts/test-course.mjs`,
+    // which runs under Node's type stripping — and Node's ESM loader will not
+    // resolve an extensionless specifier. Safe here: `noEmit` is on, so nothing
+    // is compiled with these paths.
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",

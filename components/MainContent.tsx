@@ -8,8 +8,10 @@ import ContinueLearningSection from "@/components/ContinueLearningSection";
 import RecommendedSection from "@/components/RecommendedSection";
 import {ScrollArea, Container, Grid, Stack, Title} from "@mantine/core";
 import React from "react";
+import {useTranslations} from "next-intl";
 
 const MainContent = () => {
+    const t = useTranslations('dashboard');
     return (
         <Container size="xl" px="md" style={{width: '100%'}}>
             <Grid gutter="lg">
@@ -34,7 +36,7 @@ const MainContent = () => {
                         <Stack gap="xl" pr={{base: 0, lg: 'md'}}>
                             <section>
                                 <Title order={2} mb="md" style={{color: '#1f2937'}}>
-                                    Jump back in
+                                    {t('jumpBackIn')}
                                 </Title>
                                 <Stack gap="md">
                                     <JumpBackInCard/>

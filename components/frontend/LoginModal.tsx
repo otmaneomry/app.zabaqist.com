@@ -5,6 +5,7 @@ import { Button, TextInput, Modal, Stack, Text, Anchor, Group, PasswordInput } f
 import { IconMail } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/stores/useUserStore';
+import { readFiliere } from '@/lib/filiere';
 import { authApi } from '@/lib/api';
 import SignupModal from './SignupModal';
 
@@ -44,7 +45,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             const response = await authApi.login(email.toLowerCase(), password);
             setUser(response.data);
             onClose();
-            router.push('/home');
+            // Connecting is when we ask for the filière — see app/[locale]/filiere.
+            router.push(readFiliere() ? '/home' : '/filiere?next=/home');
         } catch (err: any) {
             setError(err.message || 'Email ou mot de passe incorrect');
         } finally {

@@ -2,7 +2,7 @@
 
 import React from "react";
 import {Card} from "@mantine/core";
-import Link from "next/link";
+import {Link} from '@/i18n/navigation'
 import Image from "next/image";
 
 interface CourseCardProps {

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button, TextInput, Modal, Stack, Text, Anchor, Divider, PasswordInput, Select } from "@mantine/core";
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/stores/useUserStore';
+import { readFiliere } from '@/lib/filiere';
 import { authApi } from '@/lib/api';
 
 interface SignupModalProps {
@@ -55,7 +56,8 @@ const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwitchToLo
             });
             setUser(response.data);
             onClose();
-            router.push('/home');
+            // Connecting is when we ask for the filière — see app/[locale]/filiere.
+            router.push(readFiliere() ? '/home' : '/filiere?next=/home');
         } catch (err: any) {
             setError(err.message || 'Erreur lors de l\'inscription');
         } finally {

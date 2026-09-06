@@ -3,6 +3,22 @@
 @tailwind utilities;
 
 @layer base {
+  /* Zabaqist brand palette — the "Mint Tea" scheme the landing page is drawn
+     in (see zabaqist-turbo/tooling/tailwind/theme.css). Kept as its own set of
+     tokens rather than folded into the shadcn ones below: the course pages are
+     built on the existing teal and are not repainted by this. */
+  :root {
+    --zb-mint: #1f6452;
+    --zb-mint-deep: #14453a;
+    --zb-mint-soft: #e4efeb;
+    --zb-gold: #e0a92e;
+    --zb-gold-warm: #b8860b;
+    --zb-cream: #faf6ed;
+    --zb-cream-2: #f2ebdc;
+    --zb-ink: #17241f;
+    --zb-line: #e3e9e6;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -71,6 +87,23 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
+}
+
+/* Markdown course documents (components/course/CourseDoc.tsx).
+   A chapter's display formulas are routinely wider than a phone. Each one
+   scrolls inside its own box; the page itself must never scroll sideways. */
+.course-doc .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25rem;
+}
+
+/* Backstop for inline maths, which cannot be a scroll container: a long
+   formula inside a sentence is clipped rather than allowed to widen the page.
+   `clip` and not `hidden` — `hidden` would turn this into a scroll container
+   and break the sticky sidebar's scrolling context. */
+.course-doc {
+  overflow-x: clip;
 }
 
 /* Professional Typography Enhancements - MOBILE FIRST */

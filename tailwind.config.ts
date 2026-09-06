@@ -54,6 +54,29 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Zabaqist palette. The Mantine theme owns the teal ramp; these are the
+        // same values as flat tokens so the markdown course renderer (which is
+        // a server component and cannot use Mantine hooks) stays on-brand.
+        zb: {
+          // Landing-page palette ("Mint Tea").
+          mint: "var(--zb-mint)",
+          "mint-deep": "var(--zb-mint-deep)",
+          "mint-soft": "var(--zb-mint-soft)",
+          saffron: "var(--zb-gold)",
+          "gold-warm": "var(--zb-gold-warm)",
+          cream: "var(--zb-cream)",
+          "cream-2": "var(--zb-cream-2)",
+          ink: "var(--zb-ink)",
+          line: "var(--zb-line)",
+          // Course-page palette. Unchanged.
+          teal: "#2CB0A1",
+          "teal-dark": "#1a8f83",
+          "teal-soft": "#e6faf8",
+          gold: "#B8860B",
+          "gold-soft": "#FDF6E3",
+          rose: "#C2410C",
+          "rose-soft": "#FFF4ED",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -76,6 +99,10 @@ const config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
+        // Rubik carries Latin and Arabic to weight 800 — the landing page's
+        // headings are set in it. The rest of the app stays on Inter.
+        display: ["var(--font-display)", ...fontFamily.sans],
+        mono: ["var(--font-mono)", ...fontFamily.mono],
       },
     },
   },
