@@ -36,14 +36,15 @@ callback non enregistrée, avec `redirect_uri_mismatch`.
 | # | Tâche | Fichiers |
 | --- | --- | --- |
 | 1 | `next-auth@5` (Auth.js v5, la ligne App Router) + provider Google, sessions JWT | `auth.ts`, `package.json` |
-| 2 | **Composer le middleware** avec next-intl | `middleware.ts` |
+| 2 | **Composer le proxy** avec next-intl | `proxy.ts` |
 | 3 | Supprimer le simulacre : mock, store zustand, identifiants de test | `lib/api.ts`, `lib/mockApi.ts`, `stores/useUserStore.ts`, `app/[locale]/signin/`, `app/[locale]/signup/` |
-| 4 | Protéger les routes côté serveur | `middleware.ts`, `app/robots.ts` |
+| 4 | Protéger les routes côté serveur | `proxy.ts`, `app/robots.ts` |
 | 5 | Avatar + menu de déconnexion | `components/Header.tsx` |
 
-### Le point qui casse : le middleware
+### Le point qui casse : le proxy
 
-`middleware.ts` exécute aujourd'hui `createMiddleware(routing)` de next-intl.
+`proxy.ts` (l'ancien `middleware.ts` : Next 16 a renommé la convention)
+exécute aujourd'hui `createMiddleware(routing)` de next-intl.
 L'authentification doit **l'envelopper**, pas le remplacer — sinon la
 négociation de locale disparaît et toutes les routes `/ar` se cassent.
 

@@ -336,7 +336,7 @@ propre adresse partageable et indexable.
 | `i18n/routing.ts` | Locales, `localePrefix: 'as-needed'`, `lang` / `dir` par locale |
 | `i18n/navigation.ts` | `Link`, `useRouter`, `usePathname` conscients de la locale |
 | `i18n/request.ts` | Charge `messages/<locale>.json` par requête |
-| `middleware.ts` | Détection et préfixe de locale |
+| `proxy.ts` | Détection et préfixe de locale |
 | `messages/{fr,ar}.json` | Toute la copie d'interface, mêmes clés des deux côtés |
 | `components/landing/LangSwitch.tsx` | La bascule, dans les deux en-têtes |
 
