@@ -3,35 +3,22 @@
 /**
  * The landing page's own header.
  *
- * Separate from `components/Header.tsx`, which is the in-app chrome (search,
- * premium, streak counter). This one is the public face: brand, two links, and
- * the way in. The XP chip is real — it totals what the checkpoints stored on
- * this device — and stays hidden until there is something to show.
+ * Separate from `components/Header.tsx`, which is the in-app chrome (the three
+ * nav tabs, premium). This one is the public face: brand, two links, and the
+ * way in. Both share the same surface, height and wordmark, and both draw the
+ * XP chip from `components/ui/XpChip.tsx` so they cannot show two totals.
  */
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { useTranslations } from 'next-intl'
 
 import { Link } from '@/i18n/navigation'
 import LangSwitch from '@/components/landing/LangSwitch'
 import Logo from '@/components/landing/Logo'
-import { listCourses } from '@/lib/courseCatalog'
-import { totalXp } from '@/lib/courseProgress'
+import XpChip from '@/components/ui/XpChip'
 
 export default function LandingHeader() {
   const t = useTranslations('nav')
-  const [xp, setXp] = useState(0)
-
-  const refresh = useCallback(
-    () => setXp(totalXp(listCourses().map((c) => c.slug))),
-    [],
-  )
-
-  useEffect(() => {
-    refresh()
-    window.addEventListener('zabaqist:progress', refresh)
-    return () => window.removeEventListener('zabaqist:progress', refresh)
-  }, [refresh])
 
   return (
     <header className="sticky top-0 z-20 border-b border-zb-line bg-zb-cream/85 backdrop-blur-md">
@@ -51,14 +38,7 @@ export default function LandingHeader() {
 
         <div className="flex items-center gap-2 sm:gap-3">
           <LangSwitch />
-          {xp > 0 && (
-            <span
-              dir="ltr"
-              className="hidden rounded-full bg-zb-gold/20 px-3 py-1 text-xs font-semibold text-zb-gold-deep sm:inline"
-            >
-              ✦ {xp} XP
-            </span>
-          )}
+          <XpChip className="max-sm:hidden" />
           <Link
             href="/home"
             className="inline-flex h-9 items-center rounded-full bg-zb-mint px-4 text-sm font-semibold text-white no-underline transition-colors hover:bg-zb-mint-deep"

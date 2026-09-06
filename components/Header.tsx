@@ -1,167 +1,164 @@
-'use client';
+'use client'
 
 /**
- * Site header.
+ * The in-app header, for a reader who has signed in.
  *
- * Mobile-first because the audience is: below `md` the text nav moves into a
- * drawer behind the hamburger, and "Go premium" keeps only its icon. Before
- * this the two groups were laid out side by side at every width and totalled
- * ~600px, so every page scrolled sideways on a phone — including the ones with
- * nothing wide on them.
+ * It is deliberately the *same chrome* as `components/landing/LandingHeader.tsx`
+ * — same 64px height, same cream surface under a blur, same hairline border,
+ * same wordmark — because the public page and the app are one product and used
+ * not to look like it. This header was white with a drop shadow and a plain
+ * black "Zabaqist" set in the body font, so signing in swapped the brand for
+ * something anonymous. What changes after auth is the *navigation*, not the
+ * identity.
  *
- * The desktop layout is unchanged.
+ * Mobile-first, because the audience is: below `md` the nav moves into a drawer
+ * behind the hamburger and the premium CTA keeps only its icon. Laid side by
+ * side at every width the two groups totalled ~600px, which scrolled every page
+ * sideways on a phone — including pages with nothing wide on them.
  */
 
-import React, { useEffect, useState } from 'react';
-import {Link} from '@/i18n/navigation'
-import {usePathname} from '@/i18n/navigation';
-import {Button, Drawer} from "@mantine/core";
-import {IconBook, IconChartBar, IconHome, IconMenu, IconSearch, IconTrophy} from '@tabler/icons-react';
-import {useTranslations} from 'next-intl';
+import React, { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { Drawer } from '@mantine/core'
+import {
+  IconBook,
+  IconChartBar,
+  IconHome,
+  IconMenu2,
+  IconTrophy,
+} from '@tabler/icons-react'
 
-import LangSwitch from '@/components/landing/LangSwitch';
+import { Link, usePathname } from '@/i18n/navigation'
+import LangSwitch from '@/components/landing/LangSwitch'
+import Logo from '@/components/landing/Logo'
+import XpChip from '@/components/ui/XpChip'
 
 // Three items, like the source: where you are, what there is, and how you are
 // doing. The third is private — see components/progress/ProgressDashboard.tsx.
 const NAV = [
-    {href: '/home', key: 'home', icon: IconHome},
-    {href: '/courses', key: 'courses', icon: IconBook},
-    {href: '/progres', key: 'progress', icon: IconChartBar},
-] as const;
+  { href: '/home', key: 'home', icon: IconHome },
+  { href: '/courses', key: 'courses', icon: IconBook },
+  { href: '/progres', key: 'progress', icon: IconChartBar },
+] as const
 
-const Header = () => {
-    const t = useTranslations('nav');
-    const pathname = usePathname();
-    const [menuOpen, setMenuOpen] = useState(false);
+export default function Header() {
+  const t = useTranslations('nav')
+  const pathname = usePathname()
+  const [menuOpen, setMenuOpen] = useState(false)
 
-    // A tap in the drawer navigates; without this the drawer stays open over
-    // the page it just moved to.
-    useEffect(() => {
-        setMenuOpen(false);
-    }, [pathname]);
+  // A tap in the drawer navigates; without this the drawer stays open over the
+  // page it just moved to.
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
 
-    return (
-        <header className="bg-white shadow-sm">
-            <div className="mx-auto max-w-6xl px-4 py-4">
-                <div className="flex items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-4">
-                        <Link href="/" className="text-2xl font-bold text-inherit no-underline">
-                            Zabaqist
-                        </Link>
-                        {/* Below md these links live in the drawer instead. */}
-                        <nav className="hidden gap-4 md:flex">
-                            {NAV.map((item) => {
-                                const isActive = pathname === item.href;
-                                const Icon = item.icon;
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        aria-current={isActive ? 'page' : undefined}
-                                        className={`flex items-center gap-1 rounded-md border-b-2 px-2 py-1 no-underline transition-colors ${
-                                            isActive
-                                                ? 'border-gray-900 text-gray-900'
-                                                : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                                        }`}
-                                    >
-                                        <Icon size={18}/>
-                                        <span>{t(item.key)}</span>
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
+  // `/courses/<slug>` is still the Cours tab. Exact matching lit nothing at all
+  // as soon as the reader opened a chapter, which is most of the time.
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`)
 
-                    <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-                        <LangSwitch className="max-sm:hidden" />
-                        <Button variant="subtle" color="gray" p="xs" aria-label="Rechercher">
-                            <IconSearch size={20}/>
-                        </Button>
+  return (
+    <header className="sticky top-0 z-20 border-b border-zb-line bg-zb-cream/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-6">
+        <div className="flex min-w-0 items-center gap-6">
+          <Link href="/home" aria-label="Zabaqist" className="shrink-0 no-underline">
+            <Logo size={20} />
+          </Link>
 
-                        {/* Full CTA from sm up; icon only on a phone, where the
-                            label is what pushed the row past the viewport. */}
-                        <Link href="/subscribe" className="no-underline">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                color="mint"
-                                aria-label="Go premium"
-                                leftSection={<IconTrophy size={16}/>}
-                                classNames={{section: 'max-sm:!m-0'}}
-                                styles={{
-                                    root: {
-                                        borderRadius: '1rem',
-                                        borderWidth: '2px',
-                                    }
-                                }}
-                            >
-                                <span className="hidden sm:inline">Go premium</span>
-                            </Button>
-                        </Link>
+          {/* Below md these live in the drawer instead. */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {NAV.map(({ href, key, icon: Icon }) => {
+              const active = isActive(href)
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm no-underline transition-colors ${
+                    active
+                      ? 'bg-zb-mint-tint font-semibold text-zb-mint-deep'
+                      : 'font-medium text-zb-ink-2 hover:bg-zb-cream-2 hover:text-zb-ink'
+                  }`}
+                >
+                  <Icon size={17} stroke={1.8} />
+                  <span>{t(key)}</span>
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
 
-                        <span className="text-xl">0</span>
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <XpChip className="max-sm:hidden" />
+          <LangSwitch className="max-sm:hidden" />
 
-                        {/* Wrapped, not `className="md:hidden"` on the Button:
-                            Mantine's own `display: inline-flex` rule has the
-                            same specificity as Tailwind's `hidden` and is
-                            loaded after it, so it wins. The hamburger was
-                            showing on desktop for that reason. */}
-                        <div className="md:hidden">
-                            <Button
-                                variant="subtle"
-                                color="gray"
-                                p="xs"
-                                aria-label="Ouvrir le menu"
-                                aria-expanded={menuOpen}
-                                onClick={() => setMenuOpen(true)}
-                            >
-                                <IconMenu size={20}/>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          {/* Full label from sm up; icon only on a phone, where the label is
+              what pushed the row past the viewport. */}
+          <Link
+            href="/subscribe"
+            className="inline-flex h-9 items-center gap-2 rounded-full border-2 border-zb-mint px-3 text-sm font-semibold text-zb-mint-deep no-underline transition-colors hover:bg-zb-mint-tint sm:px-4"
+          >
+            <IconTrophy size={16} stroke={2} />
+            <span className="hidden sm:inline">{t('premium')}</span>
+            <span className="sr-only sm:hidden">{t('premium')}</span>
+          </Link>
 
-            <Drawer
-                opened={menuOpen}
-                onClose={() => setMenuOpen(false)}
-                position="right"
-                size="70%"
-                title="Menu"
-                hiddenFrom="md"
+          <div className="md:hidden">
+            <button
+              type="button"
+              aria-label={t('openMenu')}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(true)}
+              className="inline-flex size-9 items-center justify-center rounded-full text-zb-ink-2 transition-colors hover:bg-zb-cream-2 hover:text-zb-ink"
             >
-                <nav className="flex flex-col gap-1">
-                    {NAV.map((item) => {
-                        const isActive = pathname === item.href;
-                        const Icon = item.icon;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                aria-current={isActive ? 'page' : undefined}
-                                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-base no-underline transition-colors ${
-                                    isActive
-                                        ? 'bg-zb-mint-soft font-semibold text-zb-mint-deep'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                }`}
-                            >
-                                <Icon size={20}/>
-                                <span>{t(item.key)}</span>
-                            </Link>
-                        );
-                    })}
-                    <Link
-                        href="/subscribe"
-                        className="mt-2 flex items-center gap-3 rounded-lg border-2 border-zb-mint px-3 py-3 text-base font-semibold text-zb-mint-deep no-underline"
-                    >
-                        <IconTrophy size={20}/>
-                        <span>Go premium</span>
-                    </Link>
-                    <div className="mt-4"><LangSwitch /></div>
-                </nav>
-            </Drawer>
-        </header>
-    );
-};
+              <IconMenu2 size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
 
-export default Header;
+      <Drawer
+        opened={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        position="right"
+        size="78%"
+        title={<Logo size={18} />}
+        hiddenFrom="md"
+      >
+        <nav className="flex flex-col gap-1">
+          {NAV.map(({ href, key, icon: Icon }) => {
+            const active = isActive(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-base no-underline transition-colors ${
+                  active
+                    ? 'bg-zb-mint-tint font-semibold text-zb-mint-deep'
+                    : 'text-zb-ink-2 hover:bg-zb-cream-2 hover:text-zb-ink'
+                }`}
+              >
+                <Icon size={20} stroke={1.8} />
+                <span>{t(key)}</span>
+              </Link>
+            )
+          })}
+
+          <Link
+            href="/subscribe"
+            className="mt-2 flex items-center gap-3 rounded-lg border-2 border-zb-mint px-3 py-3 text-base font-semibold text-zb-mint-deep no-underline"
+          >
+            <IconTrophy size={20} />
+            <span>{t('premium')}</span>
+          </Link>
+
+          <div className="mt-5 flex items-center gap-3">
+            <LangSwitch />
+            <XpChip />
+          </div>
+        </nav>
+      </Drawer>
+    </header>
+  )
+}

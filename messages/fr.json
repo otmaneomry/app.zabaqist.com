@@ -16,7 +16,10 @@
     "signUp": "Commencer",
     "dashboard": "Mon tableau de bord",
     "courses": "Cours",
-    "progress": "Progression"
+    "progress": "Progression",
+    "premium": "Passer au premium",
+    "openMenu": "Ouvrir le menu",
+    "xpLabel": "{xp} points d’expérience gagnés"
   },
   "home": {
     "metaTitle": "Zabaqist · Apprends les maths en résolvant",
