@@ -79,7 +79,11 @@ export default function CourseProgressCard({
 
   // Time on the chapter, flushed every 10s and once more on the way out — the
   // same cadence the hand-written course page uses.
-  const since = useRef(Date.now())
+  // Seeded at 0 rather than Date.now(): reading the clock during render is
+  // impure and recomputed on every render, and the effect below overwrote the
+  // value on its first line regardless — the render-time reading was never
+  // the one that counted.
+  const since = useRef(0)
   useEffect(() => {
     since.current = Date.now()
     const flush = () => {

@@ -25,31 +25,41 @@ export default function QuizPage({ params }: QuizPageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Declared inside the effect, not above it: this loader has exactly one
+  // caller and the effect used to reach it before its own `const`, so the
+  // binding was in the temporal dead zone at the moment it was read.
   useEffect(() => {
-    // Load quiz data from mock API (no auth required)
-    loadQuizData()
-  }, [quizId])
+    let cancelled = false
 
-  const loadQuizData = async () => {
-    try {
-      setLoading(true)
+    const loadQuizData = async () => {
+      try {
+        setLoading(true)
+        // No auth token required for mock API.
+        const response = await quizApi.fetchAll(null)
+        const quiz = response.quizzes.find(
+          (q: any) => q.id === parseInt(quizId),
+        )
+        if (cancelled) return
 
-      // No auth token required for mock API
-      const response = await quizApi.fetchAll(null)
-      const quiz = response.quizzes.find((q: any) => q.id === parseInt(quizId))
-
-      if (quiz) {
-        setQuiz(quiz)
-      } else {
-        setError(`Quiz non trouvé (ID: ${quizId})`)
+        if (quiz) {
+          setQuiz(quiz)
+        } else {
+          setError(`Quiz non trouvé (ID: ${quizId})`)
+        }
+      } catch (err: any) {
+        if (cancelled) return
+        setError(err.message || t('loadError'))
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-    } catch (err: any) {
-      console.error('Error loading quiz:', err)
-      setError(err.message || t('loadError'))
-    } finally {
-      setLoading(false)
     }
-  }
+
+    loadQuizData()
+    // A quizId change mid-flight must not let the stale response win.
+    return () => {
+      cancelled = true
+    }
+  }, [quizId, setQuiz, t])
 
   if (loading) {
     return (

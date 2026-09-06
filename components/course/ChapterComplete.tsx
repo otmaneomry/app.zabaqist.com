@@ -39,6 +39,10 @@ export default function ChapterComplete({
   const t = useTranslations('course')
   const [open, setOpen] = useState(false)
   const [xp, setXp] = useState(0)
+  // `viewIds` is a fresh array each render; its contents are what matter, so
+  // depend on the joined key rather than the identity. Hoisted because a
+  // dependency has to be a plain expression, not a call.
+  const idsKey = viewIds.join(',')
 
   const check = useCallback(() => {
     const seen = getCourseProgress(slug)?.completedTabs ?? []
@@ -58,7 +62,7 @@ export default function ChapterComplete({
     setOpen(true)
     // xpByView is rebuilt each render but keyed by the ids.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, viewIds.join(',')])
+  }, [slug, idsKey])
 
   useEffect(() => {
     check()
