@@ -36,7 +36,7 @@ const intl = createMiddleware(routing)
  * `app/sitemap.ts` and `app/robots.ts` exist to have it indexed before the
  * September 2026 launch.
  */
-const PUBLIC = ['/', '/signin', '/signup', '/auth/callback']
+const PUBLIC = ['/', '/signin', '/signup']
 
 /** Strip the locale so one list covers both languages. */
 function withoutLocale(pathname: string): string {
@@ -95,7 +95,17 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // Everything except API routes, Next internals, and anything with a file
-  // extension (favicon, images, robots.txt).
-  matcher: '/((?!api|_next|_vercel|.*\\..*).*)',
+  /**
+   * Everything except API routes, the OAuth callback, Next internals, and
+   * anything with a file extension (favicon, images, robots.txt).
+   *
+   * `auth` has to be excluded, not merely allow-listed in PUBLIC. next-intl
+   * runs before the gate and does not recognise `auth` as a locale, so it
+   * rewrote `/auth/callback` to `/fr/auth/callback` — a path with no route
+   * behind it. Google returned with a valid code and the app answered 404.
+   * Skipping the proxy entirely is also correct on its own terms: the callback
+   * has no interface to translate and no session to check, since exchanging
+   * the code is what creates one.
+   */
+  matcher: '/((?!api|auth|_next|_vercel|.*\\..*).*)',
 }

@@ -1015,7 +1015,28 @@ section('Auth (Google)')
     'and no password field that leads nowhere',
   )
 
-  // 3. The public face stays public — the sitemap and robots.txt depend on it.
+  // 3. The OAuth callback must be reachable without a session, and must NOT be
+  //    locale-rewritten. next-intl ran before the gate and did not recognise
+  //    `auth` as a locale, so it rewrote /auth/callback to /fr/auth/callback —
+  //    Google returned with a valid code and the app answered 404. The matcher
+  //    now skips /auth entirely.
+  {
+    const res = await pg.goto(`${BASE}/auth/callback?code=invalid`, {
+      waitUntil: 'load',
+    })
+    ok(
+      res.status() !== 404,
+      'the OAuth callback is not swallowed by the locale rewrite',
+      `HTTP ${res.status()} at ${pg.url().replace(BASE, '')}`,
+    )
+    ok(
+      at() === '/signin',
+      'and an invalid code lands back on sign-in rather than crashing',
+      pg.url().replace(BASE, ''),
+    )
+  }
+
+  // 4. The public face stays public — the sitemap and robots.txt depend on it.
   for (const [path, label] of [
     ['/', 'the landing page'],
     ['/ar', 'the Arabic landing page'],
@@ -1028,7 +1049,7 @@ section('Auth (Google)')
     )
   }
 
-  // 4. With a session but no filière, the funnel is where you land — the
+  // 5. With a session but no filière, the funnel is where you land — the
   //    programme differs between SM and Sciences Exp, so nothing can be shown
   //    until that is answered.
   await signInAs(ctx)
@@ -1036,7 +1057,7 @@ section('Auth (Google)')
   await pg.waitForURL('**/demarrer**', { timeout: 15000 })
   ok(true, 'signing in with no filière opens the funnel')
 
-  // 5. Answered once, it is not asked again.
+  // 6. Answered once, it is not asked again.
   await pg.evaluate(() => {
     localStorage.setItem(
       'zabaqist:filiere',
@@ -1052,7 +1073,7 @@ section('Auth (Google)')
     pg.url().replace(BASE, ''),
   )
 
-  // 6. The account menu is the way out, and it names who is signed in.
+  // 7. The account menu is the way out, and it names who is signed in.
   //
   // Either language: step 3 visited /ar, which makes the locale sticky, so
   // pinning the French label here would be testing the cookie, not the menu.
