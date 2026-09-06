@@ -14,7 +14,7 @@
     "@mantine/core": "^7.15.2",
     "@mantine/hooks": "^7.15.2",
     "@tabler/icons-react": "^3.36.1",
-    "katex": "^0.16.27",
+    "katex": "^0.18.7",
     "next": "^16.3.4",
     "next-intl": "^4.14.2",
     "postcss-preset-mantine": "^1.18.0",
@@ -31,7 +31,7 @@
     "zustand": "^5.0.10"
   },
   "devDependencies": {
-    "@types/node": "^25",
+    "@types/node": "^26.4.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
