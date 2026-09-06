@@ -5,7 +5,7 @@
 ```bash
 npm run check        # tsc --noEmit && eslint .   → 0 erreur attendu
 npm run build
-AUTH_URL=http://localhost:3111 E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111 &
+E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111 &
 npm run test:course  # 178 vérifications
 ```
 
@@ -15,11 +15,9 @@ npm run test:course  # 178 vérifications
 | --- | --- | --- |
 | `NEXT_PUBLIC_USE_MOCK_API` | *(absente = mock actif)* | `false` **quand le backend existe** |
 | `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8000/api` | l'URL réelle de l'API |
-| `AUTH_SECRET` | — | **obligatoire** — `openssl rand -base64 32` |
-| `AUTH_GOOGLE_ID` | — | **obligatoire** — Google Cloud Console |
-| `AUTH_GOOGLE_SECRET` | — | **obligatoire** — Google Cloud Console |
-| `AUTH_URL` | — | **obligatoire** — l'URL publique exacte, port compris |
-| `E2E_AUTH_SECRET` | non défini | **ne jamais définir** — ouvre le provider de test |
+| `NEXT_PUBLIC_SUPABASE_URL` | — | **obligatoire** — `https://<ref>.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | — | **obligatoire** — clé publishable du projet |
+| `E2E_AUTH_SECRET` | non défini | **ne jamais définir** — ouvre le contournement de test |
 
 **L'API est encore simulée** (`lib/mockApi.ts`). C'est désormais une décision
 d'environnement et non une modification de code : un déploiement qui dispose

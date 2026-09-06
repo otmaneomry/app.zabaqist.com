@@ -1,19 +1,49 @@
-# Authentification Google
+# Authentification — Supabase + Google
 
 L'application est fermée : `proxy.ts` renvoie vers `/signin` toute visite d'une
-page protégée sans session. La connexion se fait **avec Google uniquement**.
+page protégée sans session. La connexion se fait **avec Google uniquement**,
+via **Supabase Auth**.
+
+## Pourquoi Supabase et pas Auth.js
+
+Auth.js a été écrit puis remplacé, en connaissance de cause. La raison tient en
+une ligne : `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` part dans **chaque
+navigateur**. Cette clé n'est sans danger que parce que Row Level Security se
+tient derrière — et RLS répond `auth.uid()` à partir du JWT **de Supabase**.
+
+Avec Auth.js, Postgres ne voyait jamais ce JWT : `auth.uid()` restait nul, RLS
+ne pouvait rien protéger, et toute la sécurité retombait sur du code serveur
+qu'il aurait fallu écrire sans jamais se tromper. Autrement dit, on aurait payé
+Supabase pour ne pas s'en servir.
 
 ## Ce qui tourne
 
 | | |
 | --- | --- |
-| Bibliothèque | `next-auth@5` (Auth.js v5) |
-| Session | JWT signé dans un cookie — **aucune base de données** |
-| Configuration | `auth.ts` |
-| Endpoints | `app/api/auth/[...nextauth]/route.ts` |
-| Portail | `proxy.ts` (locale + porte, composés) |
-| Page | `app/[locale]/signin/page.tsx` + `components/auth/GoogleButton.tsx` |
+| Bibliothèques | `@supabase/supabase-js`, `@supabase/ssr` |
+| Session | cookies Supabase, rafraîchis à chaque requête dans `proxy.ts` |
+| Client navigateur | `lib/supabase/client.ts` |
+| Client serveur | `lib/supabase/server.ts` |
+| Portail | `proxy.ts` — locale, rafraîchissement, porte |
+| Retour OAuth | `app/auth/callback/route.ts` |
+| Page | `app/[locale]/signin/` + `components/auth/GoogleButton.tsx` |
 | Menu compte | `components/auth/AccountMenu.tsx` |
+
+### L'ordre dans `proxy.ts` est le fichier entier
+
+1. **next-intl d'abord**, et c'est sa réponse qui est renvoyée : c'est elle qui
+   réécrit `/courses` en `/fr/courses` et pose `NEXT_LOCALE`.
+2. **Supabase rafraîchit ensuite, sur cette réponse-là.** Un composant serveur
+   ne peut pas écrire de cookie : si le rafraîchissement n'a pas lieu ici, il
+   n'a lieu nulle part, et l'élève est déconnecté sans raison à l'expiration du
+   jeton. *C'est le bug classique de Supabase sur Next : créer une seconde
+   réponse et écrire les jetons sur celle qu'on jette.*
+3. **La porte décide en dernier**, et ne remplace la réponse que pour rediriger
+   — en recopiant les cookies déjà posés.
+
+`getUser()` et non `getSession()` : le jeton est revalidé auprès de Supabase au
+lieu d'être cru sur parole depuis un cookie que le navigateur pourrait avoir
+écrit lui-même.
 
 ### Public / protégé
 
@@ -21,81 +51,67 @@ page protégée sans session. La connexion se fait **avec Google uniquement**.
 | --- | --- |
 | `/`, `/ar` | `/home`, `/progres`, `/demarrer`, `/filiere` |
 | `/signin`, `/signup` (redirige) | `/courses`, `/courses/[courseId]`, `/subscribe` |
-| `robots.txt`, `sitemap.xml` | `/quiz/[quizId]` |
+| `/auth/callback` | `/quiz/[quizId]` |
+| `robots.txt`, `sitemap.xml` | |
+
+`/auth/callback` **doit** rester public : une porte devant lui renverrait chaque
+connexion vers `/signin` avant même l'échange du code.
 
 ### Variables d'environnement
 
 ```bash
-AUTH_SECRET=            # openssl rand -base64 32
-AUTH_GOOGLE_ID=
-AUTH_GOOGLE_SECRET=
-AUTH_URL=http://localhost:3000        # en prod : l'URL publique exacte
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
 ```
 
-`AUTH_URL` doit correspondre **au port réellement servi**. Sinon `auth()`
-appelle son propre endpoint de session sur le mauvais port et chaque page
-rendue côté serveur tombe en `ECONNREFUSED`.
+C'est tout. Pas d'`AUTH_URL` : le callback est construit à partir de l'origine
+de la requête, donc localhost, une préversion et la production reviennent
+chacune chez elles sans variable à oublier.
 
-### Google Cloud Console
+### Console Google
 
-Les **Authorized redirect URIs** doivent contenir, à l'identique :
+Depuis le passage à Supabase, l'URI de redirection à déclarer n'est plus celle
+de l'application mais **celle de Supabase** :
 
-- `http://localhost:3000/api/auth/callback/google`
-- `https://<domaine-de-prod>/api/auth/callback/google`
-
-Le matcher de `proxy.ts` exclut `/api`, donc le callback n'est jamais préfixé
-par la locale — un `/fr/api/auth/callback/google` ne correspondrait à aucune URI
-enregistrée et toute connexion échouerait en `redirect_uri_mismatch`.
-
-## Ce qui a disparu
-
-`stores/useUserStore.ts` (zustand persisté), `authApi.login`, le formulaire
-email/mot de passe et les identifiants de test affichés sur la page. Il n'y a
-plus de page d'inscription séparée : Google ne distingue pas les deux cas, donc
-`/signup` redirige vers `/signin`.
-
-Le choix de la filière était décidé dans le `onSubmit` du faux formulaire. Le
-callback Google ne peut pas le faire — la filière est dans `localStorage` — donc
-`components/onboarding/FiliereGate.tsx` s'en charge côté client depuis `/home`.
+```
+https://<ref>.supabase.co/auth/v1/callback
+```
 
 ## Tests
 
-`scripts/test-course.mjs` ne peut pas piloter OAuth : le flux quitte l'origine,
-demande un vrai compte et affiche un écran de consentement. `auth.ts` expose
-donc un provider `credentials` d'identifiant `e2e`, **fermé par deux verrous** :
+OAuth ne se pilote pas depuis un script — le flux quitte l'origine et affiche un
+écran de consentement — et se connecter pour de vrai ferait dépendre 178
+vérifications locales d'un service distant. `lib/e2e.ts` définit donc un cookie
+`zb-e2e`, **fermé par deux verrous** :
 
-1. il n'existe pas si `E2E_AUTH_SECRET` n'est pas défini ;
-2. quand il existe, l'appelant doit présenter la valeur exacte.
+1. il n'est honoré que si `E2E_AUTH_SECRET` est défini ;
+2. il doit alors porter exactement cette valeur.
 
 Le garde n'est **pas** `NODE_ENV` : la suite tourne contre un build de
-production (`npm run build && npm start`), donc un test sur `NODE_ENV`
-supprimerait le provider précisément quand il sert.
+production, donc un test sur `NODE_ENV` désactiverait le contournement
+précisément quand il sert.
 
-Vérifié sur un serveur démarré sans la variable : `/api/auth/providers`
-n'annonce que `google`, l'appel au callback `e2e` ne pose aucun cookie de
-session, et `/home` répond toujours 307.
+Ce cookie **ne crée aucune session Supabase**. Une requête contournée n'a pas
+d'`auth.uid()`, donc RLS lui refuse toutes les lignes : la base ne fait jamais
+partie du marché, et l'identité de `E2E_USER` est une étiquette pour l'en-tête,
+pas une clé.
+
+Vérifié sur un serveur démarré sans la variable : `/home` répond 307 avec ou
+sans le cookie.
 
 ```bash
 npm run build
-AUTH_URL=http://localhost:3111 E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111 &
+E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111 &
 npm run test:course     # 178 vérifications
 ```
 
-## La décision qui reste ouverte
+## Reste à faire
 
-Les sessions JWT ne demandent aucune base de données, mais la progression,
-l'XP, la filière et les réponses du tunnel vivent toujours dans `localStorage`,
-répartis sur cinq fichiers : `lib/courseProgress.ts`, `lib/activity.ts`,
-`lib/filiere.ts`, `lib/onboarding.ts`, `lib/progressTracking.ts`.
+La progression, l'XP, la filière et les réponses du tunnel vivent encore dans
+`localStorage`, répartis sur cinq fichiers : `lib/courseProgress.ts`,
+`lib/activity.ts`, `lib/filiere.ts`, `lib/onboarding.ts`,
+`lib/progressTracking.ts`.
 
-**Un élève connecté sur son téléphone ne voit rien de ce qu'il a fait sur son
-ordinateur.** Le compte existe, le travail ne le suit pas.
-
-`auth.ts` conserve déjà le `sub` Google dans `session.user.id` — c'est la clé
-sur laquelle une base brancherait la progression. La porter plus tard invalide
-toutes les sessions existantes ; la garder dès maintenant ne coûte rien.
-
-| Option | Coût | Ce que ça donne |
-| --- | --- | --- |
-| **Rien de plus** | 0 | Ce qui tourne aujourd'hui. Progression par appareil. |
-| **Ajouter une base** | ~6-8 h | La progression suit le compte. Les cinq fichiers changent. |
+**Un élève connecté sur son téléphone ne voit toujours rien de ce qu'il a fait
+sur son ordinateur.** La base existe désormais, et RLS est en place pour la
+protéger — il reste à créer les tables et à y brancher ces cinq fichiers.

@@ -17,10 +17,10 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
-import { auth } from '@/auth'
 import { Link } from '@/i18n/navigation'
 import Logo from '@/components/landing/Logo'
 import GoogleButton from '@/components/auth/GoogleButton'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function SignInPage({
   searchParams,
@@ -28,9 +28,12 @@ export default async function SignInPage({
   searchParams: Promise<{ next?: string; error?: string }>
 }) {
   const { next, error } = await searchParams
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   // Already signed in: this page has nothing to offer.
-  if (session?.user) redirect(next && /^\/(?!\/)/.test(next) ? next : '/home')
+  if (user) redirect(next && /^\/(?!\/)/.test(next) ? next : '/home')
 
   const t = await getTranslations('auth')
   // The headline is authored with a line break so it falls the same way in both
