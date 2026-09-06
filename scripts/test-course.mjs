@@ -29,6 +29,70 @@ const messagesAr = JSON.parse(
 const HYDRATED = 'body.client-side-classes'
 
 const BASE = process.argv[2] ?? 'http://localhost:3111'
+
+/**
+ * Give a browser context a real session, without driving Google.
+ *
+ * Posts to the `e2e` credentials provider in `auth.ts`, which exists only when
+ * E2E_AUTH_SECRET is set and still checks the value. Auth.js requires the CSRF
+ * token from its own cookie, so fetch that first and let the context keep the
+ * cookies it sets.
+ */
+const E2E_SECRET = process.env.E2E_AUTH_SECRET
+/** The same sign-in, as a `cookie:` header for plain `fetch`. */
+async function sessionCookieHeader() {
+  if (!E2E_SECRET)
+    throw new Error('E2E_AUTH_SECRET is not set — run via `npm run test:course`')
+  const jar = new Map()
+  const keep = (res) => {
+    for (const c of res.headers.getSetCookie?.() ?? []) {
+      const [pair] = c.split(';')
+      const i = pair.indexOf('=')
+      jar.set(pair.slice(0, i), pair.slice(i + 1))
+    }
+  }
+  const header = () => [...jar].map(([k, v]) => `${k}=${v}`).join('; ')
+
+  const csrfRes = await fetch(`${BASE}/api/auth/csrf`)
+  keep(csrfRes)
+  const { csrfToken } = await csrfRes.json()
+
+  const res = await fetch(`${BASE}/api/auth/callback/e2e`, {
+    method: 'POST',
+    redirect: 'manual',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+      cookie: header(),
+    },
+    body: new URLSearchParams({
+      csrfToken,
+      email: 'test@test.com',
+      secret: E2E_SECRET,
+      callbackUrl: `${BASE}/home`,
+      json: 'true',
+    }),
+  })
+  keep(res)
+  return header()
+}
+
+async function signInAs(ctx, callbackUrl = '/home') {
+  if (!E2E_SECRET)
+    throw new Error('E2E_AUTH_SECRET is not set — run via `npm run test:course`')
+  const csrfRes = await ctx.request.get(`${BASE}/api/auth/csrf`)
+  const { csrfToken } = await csrfRes.json()
+  const res = await ctx.request.post(`${BASE}/api/auth/callback/e2e`, {
+    form: {
+      csrfToken,
+      email: 'test@test.com',
+      secret: E2E_SECRET,
+      callbackUrl: `${BASE}${callbackUrl}`,
+      json: 'true',
+    },
+  })
+  if (res.status() >= 400)
+    throw new Error(`e2e sign-in failed: HTTP ${res.status()}`)
+}
 const SLUG = process.argv[3] ?? 'limites-et-continuite'
 const url = (s) => `${BASE}/courses/${SLUG}${s ? `?s=${s}` : ''}`
 
@@ -80,16 +144,24 @@ ok(
 /* ---------------------------------------------------------------- */
 
 section('Server render')
+// These fetch the HTML directly rather than through a browser, so they need the
+// session cookie explicitly. Without it every request follows the gate's
+// redirect to /signin and returns a perfectly valid 200 with no maths on it —
+// the assertions below would fail while looking like a rendering bug.
+const COOKIE = await sessionCookieHeader()
+const get = (u) => fetch(u, { headers: { cookie: COOKIE } })
+
 let broken = []
 for (const v of doc.views) {
-  const res = await fetch(url(v.id))
+  const res = await get(url(v.id))
   const html = await res.text()
   if (!res.ok || html.includes('__next_error__')) broken.push(`${v.id} (${res.status})`)
+  if (/\/signin/.test(res.url)) broken.push(`${v.id} (redirected to sign-in)`)
 }
 ok(broken.length === 0, `all ${doc.views.length} sections return 200`, broken.join(', '))
 
 const heavy = doc.views.reduce((a, b) => (b.body.length > a.body.length ? b : a))
-const html = await (await fetch(url(heavy.id))).text()
+const html = await (await get(url(heavy.id))).text()
 ok(/class="katex/.test(html), 'KaTeX rendered server-side (no client math runtime)')
 ok(/katex-display/.test(html), 'block formulas are display math, not inline')
 ok(!html.includes(heavy.body.slice(0, 80)), 'raw markdown is not shipped to the client')
@@ -99,6 +171,43 @@ ok(!html.includes(heavy.body.slice(0, 80)), 'raw markdown is not shipped to the 
 /* ---------------------------------------------------------------- */
 
 const browser = await chromium.launch({ channel: 'chrome' })
+
+/**
+ * Every context in this file gets a session.
+ *
+ * Nearly all of the suite exercises pages that now sit behind `proxy.ts`, and
+ * each `browser.newPage()` is its own cookie jar. Rather than thread a sign-in
+ * through fifteen call sites, sign in once, keep the cookies, and hand them to
+ * every context created afterwards. Tests that need a signed-OUT browser opt
+ * back out with `{ storageState: undefined }` — see the Auth section.
+ */
+const authCtx = await browser.newContext()
+await signInAs(authCtx)
+const AUTH_STATE = await authCtx.storageState()
+// Signing in is not enough to stay on /home: FiliereGate sends a student who
+// has never picked a filière into the funnel. That is the intended flow, so
+// the default session carries a choice and the tests that care about the
+// unanswered case clear it themselves.
+AUTH_STATE.origins = [
+  {
+    origin: BASE,
+    localStorage: [
+      {
+        name: 'zabaqist:filiere',
+        value: JSON.stringify({ track: '2bac-pc', filiere: 'sx' }),
+      },
+    ],
+  },
+]
+await authCtx.close()
+{
+  const rawPage = browser.newPage.bind(browser)
+  const rawCtx = browser.newContext.bind(browser)
+  browser.newPage = (o = {}) =>
+    rawPage('storageState' in o ? o : { ...o, storageState: AUTH_STATE })
+  browser.newContext = (o = {}) =>
+    rawCtx('storageState' in o ? o : { ...o, storageState: AUTH_STATE })
+}
 
 section('Layout')
 // A chapter's display formulas are routinely wider than a phone. Each must
@@ -882,34 +991,102 @@ section('Filière')
   await ctx.close()
 }
 
+section('Auth (Google)')
 {
   // Connecting is where the question is asked — but only once.
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } })
+  //
+  // `storageState: undefined` opts out of the shared session this file injects:
+  // these checks are about what happens BEFORE there is one, so inheriting it
+  // would assert nothing.
+  const ctx = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    storageState: undefined,
+  })
   const pg = await ctx.newPage()
-  const signIn = async () => {
-    await pg.goto(`${BASE}/signin`, { waitUntil: 'load' })
-    await pg.waitForSelector(HYDRATED)
-    await pg.locator('input[type="email"], input[name="email"]').first().fill('test@test.com')
-    await pg.locator('input[type="password"]').first().fill('password')
-    await pg.getByRole('button', { name: /Se connecter|Connexion/i }).first().click()
+  // Visiting /ar makes the locale sticky in a cookie, which is the point of the
+  // feature — so these assertions compare paths with the prefix removed rather
+  // than pinning a language they are not about.
+  const at = () => new URL(pg.url()).pathname.replace(/^\/ar(?=\/|$)/, '') || '/'
+
+  // 1. Signed out, the gate turns you away and remembers where you were going.
+  await pg.goto(`${BASE}/home`, { waitUntil: 'load' })
+  ok(
+    at() === '/signin',
+    'a signed-out visitor cannot reach the dashboard',
+    pg.url().replace(BASE, ''),
+  )
+  ok(
+    new URL(pg.url()).searchParams.get('next') === '/home',
+    'and the gate remembers where they were headed',
+  )
+
+  // 2. The sign-in page offers Google and nothing that pretends to work.
+  await pg.waitForSelector(HYDRATED)
+  ok(
+    await pg.getByRole('button', { name: new RegExp(messages.auth.google) }).isVisible(),
+    'the sign-in page offers Google',
+  )
+  ok(
+    (await pg.locator('input[type="password"]').count()) === 0,
+    'and no password field that leads nowhere',
+  )
+
+  // 3. The public face stays public — the sitemap and robots.txt depend on it.
+  for (const [path, label] of [
+    ['/', 'the landing page'],
+    ['/ar', 'the Arabic landing page'],
+  ]) {
+    const res = await pg.goto(`${BASE}${path}`, { waitUntil: 'load' })
+    ok(
+      res.status() === 200 && new URL(pg.url()).pathname === path,
+      `${label} is reachable signed out`,
+      pg.url().replace(BASE, ''),
+    )
   }
-  // Connecting without a filière resumes the onboarding funnel, which is where
-  // the question is asked; connecting again goes straight through.
-  await signIn()
+
+  // 4. With a session but no filière, the funnel is where you land — the
+  //    programme differs between SM and Sciences Exp, so nothing can be shown
+  //    until that is answered.
+  await signInAs(ctx)
+  await pg.goto(`${BASE}/home`, { waitUntil: 'load' })
   await pg.waitForURL('**/demarrer**', { timeout: 15000 })
   ok(true, 'signing in with no filière opens the funnel')
 
-  // Answer it the short way — the funnel itself is covered above.
+  // 5. Answered once, it is not asked again.
   await pg.evaluate(() => {
     localStorage.setItem(
       'zabaqist:filiere',
       JSON.stringify({ track: '2bac-pc', filiere: 'sx' }),
     )
   })
+  await pg.goto(`${BASE}/home`, { waitUntil: 'load' })
+  await pg.waitForSelector(HYDRATED)
+  await pg.waitForTimeout(600)
+  ok(
+    at() === '/home',
+    'and answering it once is enough',
+    pg.url().replace(BASE, ''),
+  )
 
-  await signIn()
-  await pg.waitForURL('**/home', { timeout: 15000 })
-  ok(true, 'signing in again goes straight to the dashboard')
+  // 6. The account menu is the way out, and it names who is signed in.
+  //
+  // Either language: step 3 visited /ar, which makes the locale sticky, so
+  // pinning the French label here would be testing the cookie, not the menu.
+  const either = (k) =>
+    new RegExp(`${messages.auth[k]}|${messagesAr.auth[k]}`)
+  await pg.getByRole('button', { name: either('account') }).click()
+  ok(
+    await pg.getByRole('menuitem', { name: either('signOut') }).isVisible(),
+    'the account menu offers a way to sign out',
+  )
+  await pg.getByRole('menuitem', { name: either('signOut') }).click()
+  await pg.waitForURL(/\/(ar)?$/, { timeout: 15000 })
+  await pg.goto(`${BASE}/home`, { waitUntil: 'load' })
+  ok(
+    at() === '/signin',
+    'and signing out really ends the session',
+    pg.url().replace(BASE, ''),
+  )
   await ctx.close()
 }
 
@@ -1193,7 +1370,7 @@ section('Chrome')
   const ar = JSON.parse(
     readFileSync(new URL('../messages/ar.json', import.meta.url), 'utf8'),
   )
-  const quizHtml = await (await fetch(`${BASE}/ar/quiz/1`)).text()
+  const quizHtml = await (await get(`${BASE}/ar/quiz/1`)).text()
   ok(
     quizHtml.includes(ar.quiz.loading) || quizHtml.includes(ar.quiz.previous),
     'the quiz player speaks Arabic',
@@ -1286,11 +1463,11 @@ section('Production readiness')
     'the sign-in page does not print working test credentials',
   )
   ok(
-    (await fetch(`${BASE}/test-quiz`)).status === 404,
+    (await get(`${BASE}/test-quiz`)).status === 404,
     'the dev scratch route is not a production URL',
   )
   ok(
-    (await fetch(`${BASE}/courses/x/chapter-1/lesson-1`)).status === 404,
+    (await get(`${BASE}/courses/x/chapter-1/lesson-1`)).status === 404,
     'the placeholder lesson route is gone',
   )
 
@@ -1320,7 +1497,7 @@ section('Production readiness')
 section('Regressions')
 // `fonctions-logarithmiques` used to be a 684-line JSX page. Its content is
 // markdown now, and the URL still resolves — through the document pipeline.
-const migrated = await fetch(`${BASE}/courses/fonctions-logarithmiques`)
+const migrated = await get(`${BASE}/courses/fonctions-logarithmiques`)
 const migratedHtml = await migrated.text()
 ok(
   migrated.ok && migratedHtml.includes('Chapitre 5'),
@@ -1340,7 +1517,7 @@ ok(
   'a slug with no document still falls back to "coming soon"',
   pending,
 )
-const catalog = await fetch(`${BASE}/courses`)
+const catalog = await get(`${BASE}/courses`)
 ok(
   (await catalog.text()).includes(`/courses/${SLUG}`),
   'the chapter is listed on /courses',

@@ -29,9 +29,17 @@ import {
 } from '@tabler/icons-react'
 
 import { Link, usePathname } from '@/i18n/navigation'
+import AccountMenu from '@/components/auth/AccountMenu'
 import LangSwitch from '@/components/landing/LangSwitch'
 import Logo from '@/components/landing/Logo'
 import XpChip from '@/components/ui/XpChip'
+
+/** Only what the chrome draws — never the whole session object. */
+export interface HeaderUser {
+  name?: string | null
+  email?: string | null
+  image?: string | null
+}
 
 // Three items, like the source: where you are, what there is, and how you are
 // doing. The third is private — see components/progress/ProgressDashboard.tsx.
@@ -41,7 +49,7 @@ const NAV = [
   { href: '/progres', key: 'progress', icon: IconChartBar },
 ] as const
 
-export default function Header() {
+export default function Header({ user }: { user?: HeaderUser }) {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -102,6 +110,8 @@ export default function Header() {
             <span className="hidden sm:inline">{t('premium')}</span>
             <span className="sr-only sm:hidden">{t('premium')}</span>
           </Link>
+
+          {user && <AccountMenu {...user} />}
 
           <div className="md:hidden">
             <button

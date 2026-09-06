@@ -3,7 +3,6 @@
 import { useTranslations } from 'next-intl'
 import React, { use, useEffect, useState } from 'react'
 import { useQuizStore } from '@/stores/useQuizStore'
-import { useUserStore } from '@/stores/useUserStore'
 import { useRouter } from 'next/navigation'
 import { quizApi } from '@/lib/api'
 import QuizPlayer from '@/components/quiz/QuizPlayer'
@@ -19,8 +18,6 @@ export default function QuizPage({ params }: QuizPageProps) {
   const t = useTranslations('quiz')
   const router = useRouter()
   const { quizId } = use(params)
-  const user = useUserStore(state => state.user)
-  const isAuthenticated = useUserStore(state => state.isAuthenticated)
   const { setQuiz, currentQuiz } = useQuizStore()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

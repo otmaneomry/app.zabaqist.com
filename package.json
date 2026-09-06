@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:course": "node --experimental-strip-types scripts/test-course.mjs",
+    "test:course": "E2E_AUTH_SECRET=${E2E_AUTH_SECRET:-e2e-local-only} node --experimental-strip-types --no-warnings scripts/test-course.mjs",
     "check": "tsc --noEmit && eslint ."
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "@tabler/icons-react": "^3.36.1",
     "katex": "^0.18.7",
     "next": "^16.3.4",
+    "next-auth": "^5.0.0-beta.32",
     "next-intl": "^4.14.2",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",

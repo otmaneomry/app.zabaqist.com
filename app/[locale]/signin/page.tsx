@@ -1,134 +1,101 @@
-'use client'
+/**
+ * Sign in with Google.
+ *
+ * Server component: the session is read on the server and the Google flow is a
+ * server action, so no secret and no auth SDK reaches the client bundle. What
+ * used to be here was a mock — a react-hook-form posting to `lib/mockApi.ts`
+ * through a zustand store, with working test credentials printed on the page.
+ *
+ * The shape follows the reference in `workflow-briliant.org/11-signin.png`: one
+ * centred column, mark, headline, the provider button, then the legal line. The
+ * differences are deliberate. There is no email field, because email is not
+ * wired to anything and an input that silently does nothing is worse than an
+ * absent one. The button says what it does rather than showing a bare "G".
+ */
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useRouter } from '@/i18n/navigation'
-import { Button, Card, TextInput, PasswordInput, Title, Text } from '@mantine/core'
-import {Link} from '@/i18n/navigation'
-import { useUserStore } from '@/stores/useUserStore'
-import { authApi } from '@/lib/api'
-import { readFiliere } from '@/lib/filiere'
+import React from 'react'
+import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
-interface LoginForm {
-  email: string
-  password: string
-}
+import { auth } from '@/auth'
+import { Link } from '@/i18n/navigation'
+import Logo from '@/components/landing/Logo'
+import GoogleButton from '@/components/auth/GoogleButton'
 
-export default function SignInPage() {
-  const router = useRouter()
-  const setUser = useUserStore(state => state.setUser)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string; error?: string }>
+}) {
+  const { next, error } = await searchParams
+  const session = await auth()
+  // Already signed in: this page has nothing to offer.
+  if (session?.user) redirect(next && /^\/(?!\/)/.test(next) ? next : '/home')
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
-    defaultValues: {
-      email: '',
-      password: ''
-    }
-  })
-
-  const onSubmit = async (data: LoginForm) => {
-    setLoading(true)
-    setError('')
-
-    try {
-      const response = await authApi.login(data.email.toLowerCase(), data.password)
-      setUser(response.data)
-      // Connecting is when we ask for the filière — the programme differs
-      // between SM and Sciences Exp, so everything after this depends on it.
-      router.push(readFiliere() ? '/home' : '/demarrer')
-    } catch (err: any) {
-      setError(err.message || 'Email ou mot de passe incorrect')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const t = await getTranslations('auth')
+  // The headline is authored with a line break so it falls the same way in both
+  // languages instead of wherever the container happens to wrap.
+  const title = t('signInTitle').split('\n')
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card shadow="md" padding="xl" radius="md" className="w-full max-w-md">
-        <Title order={2} ta="center" mb="lg" style={{ color: 'var(--zb-mint)' }}>
-          Connexion à Zabaqist
-        </Title>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-zb-cream px-5 py-16">
+      <div className="w-full max-w-[380px]">
+        <div className="flex justify-center">
+          <Link href="/" aria-label="Zabaqist" className="no-underline">
+            <Logo size={30} compact />
+          </Link>
+        </div>
 
-        <Text size="sm" c="dimmed" ta="center" mb="md">
-          Plateforme d'apprentissage des mathématiques
-        </Text>
+        <h1 className="mt-7 text-center font-display text-[26px] font-bold leading-[1.25] tracking-tight text-zb-ink">
+          {title.map((line, i) => (
+            <span key={i} className="block">
+              {line}
+            </span>
+          ))}
+        </h1>
 
-        {/* Dev only. These are real, working credentials against the mock API —
-            printing them on a production sign-in page hands anyone an account.
-            `NODE_ENV` is inlined at build time, so this block is removed from
-            the production bundle entirely rather than merely hidden. */}
-        {process.env.NODE_ENV !== 'production' && (
-        <Card padding="sm" radius="md" mb="xl" style={{ backgroundColor: '#E6F7F5', border: '1px solid var(--zb-mint)' }}>
-          <Text size="xs" fw={600} c="mint" mb="xs">
-            Connexion Test (temporaire)
-          </Text>
-          <Text size="xs" c="dimmed">
-            Email: <strong>test@test.com</strong>
-          </Text>
-          <Text size="xs" c="dimmed">
-            Mot de passe: <strong>password</strong>
-          </Text>
-        </Card>
+        <p className="mt-3 text-center text-sm leading-relaxed text-zb-ink-2">
+          {t('signInSub')}
+        </p>
+
+        {error && (
+          <p
+            role="alert"
+            className="mt-6 rounded-xl border border-zb-rose/30 bg-zb-rose-soft px-4 py-3 text-center text-sm font-medium text-zb-rose-deep"
+          >
+            {t('signInError')}
+          </p>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextInput
-            label="Email"
-            placeholder="votre@email.com"
-            {...register('email', {
-              required: 'Email requis',
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Email invalide'
-              }
-            })}
-            error={errors.email?.message}
-            mb="md"
-          />
+        <div className="mt-8">
+          <GoogleButton next={next} label={t('google')} />
+        </div>
 
-          <PasswordInput
-            label="Mot de passe"
-            placeholder="Votre mot de passe"
-            {...register('password', {
-              required: 'Mot de passe requis'
-            })}
-            error={errors.password?.message}
-            mb="md"
-          />
+        <p className="mt-6 text-center text-xs leading-relaxed text-zb-ink-3">
+          {t.rich('legal', {
+            terms: (c) => (
+              <a
+                href="https://zabaqist.com/conditions"
+                className="underline underline-offset-2 hover:text-zb-ink-2"
+              >
+                {c}
+              </a>
+            ),
+            privacy: (c) => (
+              <a
+                href="https://zabaqist.com/confidentialite"
+                className="underline underline-offset-2 hover:text-zb-ink-2"
+              >
+                {c}
+              </a>
+            ),
+          })}
+        </p>
 
-          {error && (
-            <Text c="red" size="sm" mb="md" ta="center">
-              {error}
-            </Text>
-          )}
-
-          <Button
-            type="submit"
-            fullWidth
-            color="mint"
-            loading={loading}
-            mb="md"
-            size="md"
-          >
-            Se connecter
-          </Button>
-
-          <Text size="sm" ta="center" c="dimmed">
-            Pas encore de compte ?{' '}
-            <Link href="/signup" style={{ color: 'var(--zb-mint)', fontWeight: 500, textDecoration: 'none' }}>
-              S'inscrire
-            </Link>
-          </Text>
-
-          <Text size="sm" ta="center" c="dimmed" mt="sm">
-            <Link href="/" style={{ color: 'var(--zb-mint)', fontWeight: 500, textDecoration: 'none' }}>
-              Retour à l'accueil
-            </Link>
-          </Text>
-        </form>
-      </Card>
-    </div>
+        <p className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-zb-gold-deep">
+          {t('beta')}
+        </p>
+      </div>
+    </main>
   )
 }

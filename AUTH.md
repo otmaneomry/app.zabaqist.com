@@ -1,92 +1,101 @@
 # Authentification Google
 
-> **État actuel : il n'y a pas d'authentification.**
-> `stores/useUserStore.ts` est un store zustand persisté dans `localStorage`, et
-> `authApi.login` répond depuis `lib/mockApi.ts`. Aucune session serveur,
-> aucune route protégée : `/home`, `/courses` et `/progres` s'ouvrent en tapant
-> l'URL, connecté ou non. Ce document décrit ce qu'il faut faire pour que ça
-> cesse d'être vrai.
+L'application est fermée : `proxy.ts` renvoie vers `/signin` toute visite d'une
+page protégée sans session. La connexion se fait **avec Google uniquement**.
 
-## 1. Ce que toi seul peux faire — Google Cloud Console (~10 min)
+## Ce qui tourne
 
-1. [console.cloud.google.com](https://console.cloud.google.com) → nouveau projet **Zabaqist**
-2. **APIs & Services → OAuth consent screen** → *External* → nom de l'app, email
-   de support, logo
-3. **Credentials → Create credentials → OAuth client ID → Web application**
-4. **Authorized redirect URIs** — ajouter les deux :
-   - `http://localhost:3000/api/auth/callback/google`
-   - `https://<domaine-de-prod>/api/auth/callback/google`
-5. Reporter les identifiants dans `.env.local` :
-
-```bash
-AUTH_SECRET=            # openssl rand -base64 32
-AUTH_GOOGLE_ID=
-AUTH_GOOGLE_SECRET=
-AUTH_URL=http://localhost:3000        # en prod : l'URL publique
-```
-
-Rien ne fonctionne tant que l'étape 4 n'existe pas : Google refuse toute URL de
-callback non enregistrée, avec `redirect_uri_mismatch`.
-
-`.env.local` ne doit **jamais** être commité — vérifier qu'il est dans
-`.gitignore` avant de coller le secret.
-
-## 2. Ce qu'il y a à écrire (~2 h)
-
-| # | Tâche | Fichiers |
-| --- | --- | --- |
-| 1 | `next-auth@5` (Auth.js v5, la ligne App Router) + provider Google, sessions JWT | `auth.ts`, `package.json` |
-| 2 | **Composer le proxy** avec next-intl | `proxy.ts` |
-| 3 | Supprimer le simulacre : mock, store zustand, identifiants de test | `lib/api.ts`, `lib/mockApi.ts`, `stores/useUserStore.ts`, `app/[locale]/signin/`, `app/[locale]/signup/` |
-| 4 | Protéger les routes côté serveur | `proxy.ts`, `app/robots.ts` |
-| 5 | Avatar + menu de déconnexion | `components/Header.tsx` |
-
-### Le point qui casse : le proxy
-
-`proxy.ts` (l'ancien `middleware.ts` : Next 16 a renommé la convention)
-exécute aujourd'hui `createMiddleware(routing)` de next-intl.
-L'authentification doit **l'envelopper**, pas le remplacer — sinon la
-négociation de locale disparaît et toutes les routes `/ar` se cassent.
-
-Un coup de chance dans la configuration actuelle : le matcher exclut déjà
-`/api`, donc le callback OAuth n'est pas préfixé par la locale. C'est la
-première chose qui casse d'habitude dans une application Next bilingue.
+| | |
+| --- | --- |
+| Bibliothèque | `next-auth@5` (Auth.js v5) |
+| Session | JWT signé dans un cookie — **aucune base de données** |
+| Configuration | `auth.ts` |
+| Endpoints | `app/api/auth/[...nextauth]/route.ts` |
+| Portail | `proxy.ts` (locale + porte, composés) |
+| Page | `app/[locale]/signin/page.tsx` + `components/auth/GoogleButton.tsx` |
+| Menu compte | `components/auth/AccountMenu.tsx` |
 
 ### Public / protégé
 
 | Public | Protégé |
 | --- | --- |
-| `/`, `/ar` | `/home` |
-| `/signin` | `/courses`, `/courses/[courseId]` |
-| `robots.txt`, `sitemap.xml` | `/progres`, `/demarrer`, `/filiere`, `/subscribe` |
+| `/`, `/ar` | `/home`, `/progres`, `/demarrer`, `/filiere` |
+| `/signin`, `/signup` (redirige) | `/courses`, `/courses/[courseId]`, `/subscribe` |
+| `robots.txt`, `sitemap.xml` | `/quiz/[quizId]` |
 
-Les routes protégées doivent aussi passer en `disallow` dans `app/robots.ts`.
+### Variables d'environnement
 
-## 3. La décision qui compte : base de données ou non
+```bash
+AUTH_SECRET=            # openssl rand -base64 32
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
+AUTH_URL=http://localhost:3000        # en prod : l'URL publique exacte
+```
 
-Google + sessions JWT **ne demande aucune base de données**. Mais la progression,
-l'XP, les séries, la filière et les réponses du tunnel d'accueil vivent dans
-`localStorage`, répartis sur cinq fichiers : `lib/courseProgress.ts`,
-`lib/activity.ts`, `lib/filiere.ts`, `lib/onboarding.ts`,
-`lib/progressTracking.ts`.
+`AUTH_URL` doit correspondre **au port réellement servi**. Sinon `auth()`
+appelle son propre endpoint de session sur le mauvais port et chaque page
+rendue côté serveur tombe en `ECONNREFUSED`.
 
-Conséquence directe : **un élève se connecte avec Google sur son téléphone et
-ne voit rien de ce qu'il a fait sur son ordinateur.** Le compte et le travail
-restent sans lien. Pour un produit payant c'est un motif de remboursement, pas
-un détail.
+### Google Cloud Console
+
+Les **Authorized redirect URIs** doivent contenir, à l'identique :
+
+- `http://localhost:3000/api/auth/callback/google`
+- `https://<domaine-de-prod>/api/auth/callback/google`
+
+Le matcher de `proxy.ts` exclut `/api`, donc le callback n'est jamais préfixé
+par la locale — un `/fr/api/auth/callback/google` ne correspondrait à aucune URI
+enregistrée et toute connexion échouerait en `redirect_uri_mismatch`.
+
+## Ce qui a disparu
+
+`stores/useUserStore.ts` (zustand persisté), `authApi.login`, le formulaire
+email/mot de passe et les identifiants de test affichés sur la page. Il n'y a
+plus de page d'inscription séparée : Google ne distingue pas les deux cas, donc
+`/signup` redirige vers `/signin`.
+
+Le choix de la filière était décidé dans le `onSubmit` du faux formulaire. Le
+callback Google ne peut pas le faire — la filière est dans `localStorage` — donc
+`components/onboarding/FiliereGate.tsx` s'en charge côté client depuis `/home`.
+
+## Tests
+
+`scripts/test-course.mjs` ne peut pas piloter OAuth : le flux quitte l'origine,
+demande un vrai compte et affiche un écran de consentement. `auth.ts` expose
+donc un provider `credentials` d'identifiant `e2e`, **fermé par deux verrous** :
+
+1. il n'existe pas si `E2E_AUTH_SECRET` n'est pas défini ;
+2. quand il existe, l'appelant doit présenter la valeur exacte.
+
+Le garde n'est **pas** `NODE_ENV` : la suite tourne contre un build de
+production (`npm run build && npm start`), donc un test sur `NODE_ENV`
+supprimerait le provider précisément quand il sert.
+
+Vérifié sur un serveur démarré sans la variable : `/api/auth/providers`
+n'annonce que `google`, l'appel au callback `e2e` ne pose aucun cookie de
+session, et `/home` répond toujours 307.
+
+```bash
+npm run build
+AUTH_URL=http://localhost:3111 E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111 &
+npm run test:course     # 178 vérifications
+```
+
+## La décision qui reste ouverte
+
+Les sessions JWT ne demandent aucune base de données, mais la progression,
+l'XP, la filière et les réponses du tunnel vivent toujours dans `localStorage`,
+répartis sur cinq fichiers : `lib/courseProgress.ts`, `lib/activity.ts`,
+`lib/filiere.ts`, `lib/onboarding.ts`, `lib/progressTracking.ts`.
+
+**Un élève connecté sur son téléphone ne voit rien de ce qu'il a fait sur son
+ordinateur.** Le compte existe, le travail ne le suit pas.
+
+`auth.ts` conserve déjà le `sub` Google dans `session.user.id` — c'est la clé
+sur laquelle une base brancherait la progression. La porter plus tard invalide
+toutes les sessions existantes ; la garder dès maintenant ne coûte rien.
 
 | Option | Coût | Ce que ça donne |
 | --- | --- | --- |
-| **Auth seule** | ~2 h | Connexion réelle, routes fermées. Progression par appareil. |
-| **Auth + base** | ~6-8 h de plus | La progression suit le compte. Les cinq fichiers ci-dessus changent. |
-
-Si la base se fait un jour, la choisir **maintenant** : Supabase donne l'auth
-Google *et* Postgres en une seule intégration, alors que partir sur Auth.js seul
-puis ajouter une base demande de refaire la couche session.
-
-## 4. Tests
-
-24 des 169 vérifications de `scripts/test-course.mjs` se connectent via le
-formulaire simulé. OAuth Google ne se pilote pas ainsi : prévoir un provider
-`credentials` réservé aux tests, fermé par `NODE_ENV !== 'production'` — la même
-garde que celle qui retire déjà les identifiants de test du bundle de prod.
+| **Rien de plus** | 0 | Ce qui tourne aujourd'hui. Progression par appareil. |
+| **Ajouter une base** | ~6-8 h | La progression suit le compte. Les cinq fichiers changent. |

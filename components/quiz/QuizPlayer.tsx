@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 import { Container, Button, Text, Stack, Progress, Group, Card, Title } from '@mantine/core'
 import { useRouter } from 'next/navigation'
 import { useQuizStore } from '@/stores/useQuizStore'
-import { useUserStore } from '@/stores/useUserStore'
 import MultipleChoiceQuestion from './MultipleChoiceQuestion'
 import CountdownTimer from './CountdownTimer'
 
@@ -16,7 +15,6 @@ interface QuizPlayerProps {
 export default function QuizPlayer({ quizId }: QuizPlayerProps) {
   const t = useTranslations('quiz')
   const router = useRouter()
-  const user = useUserStore(state => state.user)
   const {
     currentQuiz,
     currentQuestionIndex,
