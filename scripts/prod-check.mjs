@@ -184,7 +184,14 @@ try {
 }
 
 // Untranslated user-facing copy: a bare French string sitting in JSX.
+//
+// `app/global-error.tsx` is the one place this is correct rather than lazy. It
+// REPLACES the root layout, so `NextIntlClientProvider` is not above it and
+// `useTranslations` would throw — inside an error boundary, which turns one
+// error into a blank page. It carries both languages inline instead.
+const COPY_OK = ['app/global-error.tsx']
 const hardcoded = src.filter((f) => {
+  if (COPY_OK.includes(f)) return false
   if (/messages|i18n|\.d\.ts$/.test(f)) return false
   return /<(p|h[1-6]|span|button|a)[^>]*>\s*[A-ZÀ-Ý][a-zà-ÿ]+(\s+[a-zà-ÿ']+){2,}\s*</m.test(read(f))
 })
@@ -198,6 +205,12 @@ const nextConfig = read('next.config.mjs') + read('next.config.js') + read('next
 check(/headers\s*\(/.test(nextConfig), 'should', 'security-headers',
   'no security headers configured in next.config',
   'no Content-Security-Policy, X-Frame-Options or Referrer-Policy is sent')
+
+// An error in the ROOT layout is not caught by `app/[locale]/error.tsx` — that
+// boundary lives inside the layout that threw. Without `app/global-error.tsx`
+// it falls through to Next's unbranded "Application error" on a white page.
+check(existsSync('app/global-error.tsx'), 'should', 'global-error',
+  'no global-error boundary: a root-layout throw shows Next\'s default page')
 
 const deps = JSON.parse(read('package.json') || '{}').dependencies ?? {}
 const hasMonitoring = Object.keys(deps).some((d) => /sentry|bugsnag|rollbar|datadog|highlight/.test(d))

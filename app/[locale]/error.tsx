@@ -7,8 +7,11 @@
  * broken and your work is gone". Neither half is usually true, so this says the
  * second part out loud: progress is on the device and has not moved.
  *
- * `reset()` re-renders the segment without a full reload — worth offering
- * first, because most of these are transient.
+ * `retry()` re-fetches and re-renders the segment, which is what these errors
+ * usually need: a Supabase hiccup or a dropped request succeeds on the second
+ * go. `reset()` — which this used before — only clears the boundary and
+ * re-renders the same already-failed payload, so the page tended to come back
+ * broken. Next 16 passes both; `retry` became stable in 16.3.
  *
  * There is no error-reporting service wired in. `console.error` is the honest
  * placeholder: it reaches the browser console and nowhere else, so until a
@@ -24,10 +27,10 @@ import Logo from '@/components/landing/Logo'
 
 export default function Error({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string }
-  reset: () => void
+  retry: () => void
 }) {
   const t = useTranslations('notFound')
 
@@ -58,7 +61,7 @@ export default function Error({
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <button
             type="button"
-            onClick={reset}
+            onClick={() => retry()}
             className="inline-flex h-11 w-full items-center justify-center rounded-full bg-zb-mint px-6 text-sm font-semibold text-white shadow-[0_3px_0_0_var(--zb-mint-deep),var(--zb-shadow-sm)] transition-colors hover:bg-zb-mint-deep sm:w-auto"
           >
             {t('errorRetry')}
