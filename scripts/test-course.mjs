@@ -1811,13 +1811,48 @@ section('Production readiness')
 
   const robots = await fetch(`${BASE}/robots.txt`)
   const robotsTxt = await robots.text()
-  ok(robots.ok && /Sitemap:/.test(robotsTxt), 'robots.txt is served with a sitemap')
-  ok(
-    ['/demarrer', '/progres', '/signin'].every((p) =>
-      robotsTxt.includes(`Disallow: ${p}`),
-    ),
-    'the funnel, the private dashboard and auth are excluded from crawling',
-  )
+  ok(robots.ok, 'robots.txt is served')
+
+  /**
+   * Three signals have to say the same thing, and they used to say three
+   * different things: the canonical pointed at zabaqist.com ("do not index
+   * me"), the sitemap listed app.zabaqist.com URLs ("index these"), and the
+   * robots meta said `index, follow`. Google resolves that by guessing.
+   *
+   * `NEXT_PUBLIC_ALLOW_INDEXING=1` is the switch. Unset — the closed beta, and
+   * how this suite runs — the app defers to the marketing site entirely.
+   */
+  const indexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === '1'
+  const homeHtml = await (await get(`${BASE}/`)).text()
+  const robotsMeta = /<meta name="robots" content="([^"]+)"/.exec(homeHtml)?.[1] ?? ''
+  const canonical = /<link rel="canonical" href="([^"]+)"/.exec(homeHtml)?.[1] ?? ''
+
+  if (indexing) {
+    ok(/Sitemap:/.test(robotsTxt), 'robots.txt offers a sitemap when indexing is on')
+    ok(
+      ['/demarrer', '/progres', '/signin'].every((p) =>
+        robotsTxt.includes(`Disallow: ${p}`),
+      ),
+      'the funnel, the private dashboard and auth are excluded from crawling',
+    )
+    ok(robotsMeta.startsWith('index'), 'and the robots meta agrees')
+    ok(
+      canonical.includes('app.zabaqist.com'),
+      'and the canonical claims the app itself',
+      canonical,
+    )
+  } else {
+    ok(/Disallow: \/\s*$/m.test(robotsTxt), 'the closed beta disallows crawling outright')
+    ok(!/Sitemap:/.test(robotsTxt), 'and offers no sitemap to crawl')
+    ok(robotsMeta.startsWith('noindex'), 'the robots meta says noindex')
+    // `follow` stays on: a crawler that arrives should still walk the links.
+    ok(/follow/.test(robotsMeta), 'while still allowing links to be followed')
+    ok(
+      canonical === 'https://zabaqist.com',
+      'and the canonical defers to the site that has public content',
+      canonical,
+    )
+  }
 
   const sm = await fetch(`${BASE}/sitemap.xml`)
   const smXml = await sm.text()

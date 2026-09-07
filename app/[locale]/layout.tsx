@@ -7,6 +7,7 @@ import "../globals.css";
 import ClientLayout from './ClientLayout';
 
 import {dir, htmlLang, routing} from "@/i18n/routing";
+import {siteUrl} from "@/lib/siteUrl";
 import type {Locale} from "@/i18n/routing";
 
 // Inline SVG favicons — the gold khatim on deep green, the same mark
@@ -41,9 +42,20 @@ const jetbrainsMono = JetBrains_Mono({
     display: 'swap',
 })
 
-// Copy and SEO fields mirror zabaqist.com, so the marketing site and the app
-// describe one product rather than two. Per-locale strings live in
-// messages/{fr,ar}.json under `meta`.
+// Copy mirrors zabaqist.com so the marketing site and the app describe one
+// product rather than two. Per-locale strings live in messages/{fr,ar}.json
+// under `meta`.
+//
+// Indexing does NOT mirror it, and that is the point. Three signals used to
+// disagree: the canonical pointed at zabaqist.com ("do not index me"), the
+// sitemap listed app.zabaqist.com URLs ("index these"), and robots said
+// `index, follow`. Google resolves that by guessing.
+//
+// While the beta is closed, the app has exactly one page a crawler can fetch —
+// this one — and it duplicates the marketing landing page. So the app defers:
+// canonical points home to zabaqist.com and the app itself is noindex, which
+// keeps every ranking signal on the one domain that has public content.
+// `NEXT_PUBLIC_ALLOW_INDEXING=1` flips it at launch, when the chapters open.
 export async function generateMetadata({
   params,
 }: {
@@ -52,7 +64,10 @@ export async function generateMetadata({
   const {locale} = await params;
   const l = hasLocale(routing.locales, locale) ? (locale as Locale) : routing.defaultLocale;
   const t = await getTranslations({locale: l, namespace: 'meta'});
-  const site = "https://zabaqist.com";
+  // Where the public, indexable version of this content lives.
+  const marketing = "https://zabaqist.com";
+  const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === '1';
+  const site = allowIndexing ? siteUrl() : marketing;
 
   return {
     metadataBase: new URL(site),
@@ -60,7 +75,10 @@ export async function generateMetadata({
     description: t('description'),
     keywords: t('keywords'),
     authors: [{name: "Équipe Zabaqist"}],
-    robots: {index: true, follow: true},
+    // `follow` stays on either way: a crawler that reaches the app should still
+    // walk its links, it just should not list the app's pages as their own
+    // results while zabaqist.com carries the same copy.
+    robots: {index: allowIndexing, follow: true},
     alternates: {
       canonical: l === 'fr' ? '/' : '/ar',
       languages: {fr: '/', ar: '/ar', 'x-default': '/'},

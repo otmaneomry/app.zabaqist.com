@@ -23,8 +23,7 @@
   },
   "home": {
     "metaTitle": "Zabaqist · Apprends les maths en résolvant",
-    "metaDescription": "Le programme officiel de maths du 2ᵉ Bac Sciences Expérimentales (SVT / PC), en leçons que tu manipules.",
-    "eyebrow": "2ᵉ Bac · Sciences Expérimentales · SVT / PC",
+    "eyebrow": "2ᵉ Bac · Sciences Maths A·B · Sciences Exp SVT·PC",
     "titleA": "Apprends",
     "titleB": "en",
     "titleC": "résolvant.",
@@ -210,7 +209,6 @@
     "chapterCount": "{count} chapitres",
     "current": "Ta filière",
     "gateTitle": "Choisis ta filière pour commencer",
-    "gateBody": "On affiche pour l'instant le programme de Sciences Expérimentales.",
     "signInTitle": "Crée ton profil pour\nrecevoir ton plan",
     "signInSub": "Le programme officiel de ta filière, en leçons que tu manipules.",
     "google": "Continuer avec Google",

@@ -11,6 +11,13 @@ import { siteUrl } from '@/lib/siteUrl'
  * into halfway.
  */
 export default function robots(): MetadataRoute.Robots {
+  // While the beta is closed the app defers to zabaqist.com, which carries the
+  // same landing copy and has public content behind it. Offering a sitemap and
+  // a canonical that point in opposite directions is what this used to do.
+  if (process.env.NEXT_PUBLIC_ALLOW_INDEXING !== '1') {
+    return { rules: { userAgent: '*', disallow: '/' } }
+  }
+
   return {
     rules: {
       userAgent: '*',
