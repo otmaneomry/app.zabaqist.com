@@ -1,0 +1,55 @@
+# The 189 browser checks, on every push — so a regression is caught by the
+# repository rather than by a student.
+#
+# Supabase credentials are fake on purpose. The suite never signs in for real
+# (OAuth cannot be scripted); it uses the `zb-e2e` bypass in lib/e2e.ts, and the
+# gate is written to fail closed when Supabase is unreachable. Putting the real
+# project's keys in CI would buy nothing and widen their blast radius.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ci.invalid
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+      E2E_AUTH_SECRET: ci-only-not-a-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Types and lint before anything slower.
+      - run: npm run check
+
+      # Structure, without the network: the live half skips itself when there
+      # are no real credentials, and says so.
+      - run: npm run db:check
+        continue-on-error: true
+
+      - run: npm run prod:check
+
+      - run: npm run build
+
+      - name: Install Chrome for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Start the built app
+        run: |
+          npm start -- -p 3111 &
+          npx wait-on http://localhost:3111 --timeout 60000
+
+      - run: npm run test:course

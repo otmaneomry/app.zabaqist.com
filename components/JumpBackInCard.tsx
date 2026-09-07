@@ -13,8 +13,8 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import {Button, Card, Progress, Text} from "@mantine/core";
-import Image from "next/image";
 import {Link} from '@/i18n/navigation'
+import CourseCover from '@/components/course/CourseCover';
 
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -39,14 +39,16 @@ interface Entry {
     titleAr: string;
     level: string;
     levelAr: string;
-    image: string;
+    seed: string;
+    tone: 'analyse' | 'algebre' | 'neutral';
 }
 
 /** Every course a student in this filière can be in the middle of. */
 const entriesFor = (f: Filiere): Entry[] => [
-    ...listCourses(f).map(({slug, title, titleAr, level, levelAr, image}) =>
-        ({slug, title, titleAr, level, levelAr, image})),
-    ...LEGACY_COURSES.filter((c) => c.filieres.includes(f)),
+    ...listCourses(f).map(({slug, title, titleAr, level, levelAr, branch}) =>
+        ({slug, title, titleAr, level, levelAr, seed: slug, tone: branch})),
+    ...LEGACY_COURSES.filter((c) => c.filieres.includes(f))
+        .map((c) => ({...c, seed: c.slug, tone: 'neutral' as const})),
 ];
 
 const JumpBackInCard = () => {
@@ -89,14 +91,8 @@ const JumpBackInCard = () => {
             className="transition-all hover:-translate-y-1 hover:shadow-lg"
         >
             <Link href={href} className="no-underline text-inherit">
-                <div className="relative mb-4 h-40 w-full">
-                    <Image
-                        src={entry.image}
-                        alt={courseTitle(entry, locale)}
-                        fill
-                        style={{objectFit: 'contain'}}
-                        className="rounded"
-                    />
+                <div className="mb-4 flex h-40 w-full items-center justify-center">
+                    <CourseCover seed={entry.seed} tone={entry.tone} className="h-32 w-32" />
                 </div>
                 <p className="mb-2 text-sm font-semibold tracking-wider text-zb-mint">
                     {courseLevel(entry, locale)}

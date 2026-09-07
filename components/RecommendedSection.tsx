@@ -1,20 +1,24 @@
+'use client';
+
 import React from 'react';
+import {useTranslations} from 'next-intl';
 import {Button} from "@mantine/core";
 import CourseCard from "@/components/CourseCard";
 
 const RecommendedSection = () => {
+    const t = useTranslations('catalog');
     const courses = [
-        { title: 'Fonctions Exponentielles', level: 'ANALYSE · BAC', icon: '/brilliant-image/science.png' },
-        { title: 'Équations Différentielles', level: 'ANALYSE · BAC', icon: '/brilliant-image/computer-science.png' },
-        { title: 'Matrices et Déterminants', level: 'ALGÈBRE · BAC',  icon: '/brilliant-image/programming-python.png'},
-        { title: 'Intégrales', level: 'ANALYSE · BAC',  icon: '/brilliant-image/how-llms-work.png' },
-        { title: 'Probabilités Conditionnelles', level: 'PROBABILITÉS · BAC',  icon: '/brilliant-image/suppercharging.png' },
-        { title: 'Limites et Continuité', level: 'ANALYSE · BAC', icon: '/brilliant-image/Designing_Programs_Course_Card.png' },
+        { title: 'Fonctions Exponentielles', level: 'ANALYSE · BAC', tone: 'analyse' as const },
+        { title: 'Équations Différentielles', level: 'ANALYSE · BAC', tone: 'algebre' as const },
+        { title: 'Matrices et Déterminants', level: 'ALGÈBRE · BAC',  tone: 'neutral' as const},
+        { title: 'Intégrales', level: 'ANALYSE · BAC',  tone: 'analyse' as const },
+        { title: 'Probabilités Conditionnelles', level: 'PROBABILITÉS · BAC',  tone: 'algebre' as const },
+        { title: 'Limites et Continuité', level: 'ANALYSE · BAC', tone: 'neutral' as const },
     ];
 
     return (
         <section style={{marginTop: '2rem'}}>
-            <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem'}}>Recommandé pour vous</h2>
+            <h2 className="mb-4 text-2xl font-bold tracking-tight text-zb-ink">{t('recommended')}</h2>
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',

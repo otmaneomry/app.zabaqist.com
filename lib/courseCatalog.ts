@@ -47,9 +47,14 @@ export interface CourseMeta {
   /** Niveau / filière badge shown in the hero. */
   level: string
   levelAr: string
-  /** Card art on the home page and the catalog. */
-  image: string
-  /** Semester in the Moroccan 2ème Bac programme. */
+  /**
+   * Semester in the Moroccan 2ème Bac programme.
+   *
+   * There is no `image`: card art is drawn by `components/course/CourseCover.tsx`
+   * from the slug and the branch. It used to be a path into
+   * `public/brilliant-image/` — a competitor's illustrations, which is a
+   * licensing problem on a product meant to be sold.
+   */
   semester: 1 | 2
   /**
    * How many sections the document paginates into, and how many checkpoints it
@@ -119,7 +124,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'حساب النهايات، ودراسة الاتصال، وتطبيق مبرهنة القيم الوسطية، وبناء الدوال العكسية.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/foundational-math.png',
     semester: 1,
     sections: 33,
     exercises: 16,
@@ -139,7 +143,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'البرهان بالترجع، ودراسة الرتابة والتقارب، ومعالجة المتتاليات المتجاورة والمتتاليات التراجعية.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/search-fundamentals.png',
     semester: 1,
     sections: 21,
     exercises: 8,
@@ -159,7 +162,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'الاشتقاق، وتطبيق مبرهنة التزايدات المنتهية، ودراسة التغيرات والتقعر، ثم رسم المنحنى كاملًا.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/science.png',
     semester: 1,
     sections: 15,
     exercises: 9,
@@ -179,7 +181,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'تعريف ln كدالة عكسية للأسية، وتوظيف خاصياتها، واشتقاقها، وقراءة منحناها.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/data-analysis.png',
     semester: 1,
     sections: 6,
     exercises: 12,
@@ -199,7 +200,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'بناء الدالة الأسية كدالة عكسية لـ ln، وتوظيف خاصياتها الجبرية ونهاياتها ومشتقاتها، واستعمالها في النمذجة.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/suppercharging.png',
     semester: 2,
     sections: 15,
     exercises: 6,
@@ -219,7 +219,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'الدوال الأصلية، وتكامل دالة متصلة، والمكاملة بالأجزاء وتغيير المتغير، والمساحات والحجوم.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/Designing_Programs_Course_Card.png',
     semester: 2,
     sections: 25,
     exercises: 13,
@@ -239,7 +238,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'حل المعادلتين ′y = ay + b و ″y + ay′ + by = 0، واستعمالهما لنمذجة دارة كهربائية أو تفكك إشعاعي.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/programming-python.png',
     semester: 2,
     sections: 7,
     exercises: 3,
@@ -261,7 +259,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'الشكل الجبري والمثلثي والأسي ؛ معادلات الدرجة الثانية وتحويلات المستوى.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/computer-science.png',
     semester: 1,
     sections: 33,
     exercises: 20,
@@ -281,7 +278,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'القابلية للقسمة، والقاسم المشترك الأكبر والمضاعف المشترك الأصغر، والمتوافقات بترديد n، ومبرهنات بيزو وغوص وفيرما.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/how-llms-work.png',
     semester: 1,
     sections: 19,
     exercises: 15,
@@ -301,7 +297,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'التعداد، والاحتمال الشرطي، والاستقلال، والمتغيرات العشوائية: اختيار النموذج الملائم لتجربة عشوائية.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/data-analysis.png',
     semester: 2,
     sections: 13,
     exercises: 10,
@@ -321,7 +316,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'التجميعية والتبادلية والعنصر المحايد والمماثل: المعجم الذي تُبنى منه كل بنية جبرية.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/foundational-math.png',
     semester: 2,
     sections: 18,
     exercises: 7,
@@ -341,7 +335,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'التعرّف على زمرة أو حلقة أو جسم، وتوظيف الزمر الجزئية والتشاكلات والعناصر القابلة للقلب.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/computer-science.png',
     semester: 2,
     sections: 16,
     exercises: 8,
@@ -361,7 +354,6 @@ export const COURSE_CATALOG: CourseMeta[] = [
       'الفضاءات المتجهية الجزئية، والأسر الحرة والمولّدة، والأساسات وبُعد فضاء متجهي حقيقي.',
     level: LEVEL,
     levelAr: LEVEL_AR,
-    image: '/brilliant-image/science.png',
     semester: 2,
     sections: 18,
     exercises: 7,
@@ -439,5 +431,5 @@ export const listByBranch = (
  */
 export const LEGACY_COURSES: Pick<
   CourseMeta,
-  'slug' | 'title' | 'titleAr' | 'level' | 'levelAr' | 'image' | 'filieres'
+  'slug' | 'title' | 'titleAr' | 'level' | 'levelAr' | 'filieres'
 >[] = []

@@ -1,5 +1,6 @@
 'use client';
 
+import CourseCover from '@/components/course/CourseCover';
 import React, {useState} from 'react';
 import Image from 'next/image';
 import {Button, Card} from "@mantine/core";
@@ -226,7 +227,7 @@ const SuperchargeSection = () => (
             <Button style={{backgroundColor: 'var(--zb-mint)', color: 'white'}} styles={{root: {':hover': {backgroundColor: 'var(--zb-mint-deep)'}}}}>S'abonner maintenant</Button>
         </div>
 
-        <Image src={"/brilliant-image/suppercharging.png"} alt={"Gift plan"} width={512} height={512} style={{width: '50%', display: 'flex'}}/>
+        <CourseCover seed="premium" tone="algebre" className="w-1/2" />
     </div>
 );
 

@@ -144,7 +144,11 @@ ok(!html.includes(heavy.body.slice(0, 80)), 'raw markdown is not shipped to the 
 /* 3. The browser: layout, gates, persistence                        */
 /* ---------------------------------------------------------------- */
 
-const browser = await chromium.launch({ channel: 'chrome' })
+// System Chrome locally, Playwright's own chromium in CI where there is no
+// branded install to find.
+const browser = await chromium.launch(
+  process.env.CI ? {} : { channel: 'chrome' },
+)
 
 /**
  * Every context in this file gets a session.

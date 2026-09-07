@@ -148,7 +148,10 @@
     "soonBody": "Ce chapitre fait partie du programme de mathématiques du Baccalauréat Marocain. Son contenu sera bientôt disponible.",
     "soonExample": "Voir un chapitre complet",
     "soonQuiz": "Passer un quiz",
-    "soonBack": "Retour aux cours"
+    "soonBack": "Retour aux cours",
+    "catalogAll": "Toutes les thématiques",
+    "catalogPopular": "Thématiques populaires",
+    "recommended": "Recommandé pour vous"
   },
   "dashboard": {
     "jumpBackIn": "Jump back in",
@@ -323,6 +326,10 @@
     "body": "La limite à gauche existe. La limite à droite existe. Elles ne sont même pas égales — et la valeur en 404, elle, n’existe pas du tout.",
     "caption": "f n’est pas définie en 404",
     "home": "Retour à l’accueil",
-    "revise": "Réviser les limites et la continuité"
+    "revise": "Réviser les limites et la continuité",
+    "errorTitle": "Quelque chose a mal tourné",
+    "errorBody": "L'erreur vient de nous, pas de toi. Ta progression est enregistrée sur cet appareil : elle n'a pas bougé.",
+    "errorRetry": "Réessayer",
+    "errorHome": "Retour à l'accueil"
   }
 }

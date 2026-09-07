@@ -1,3 +1,4 @@
+import CourseCover from '@/components/course/CourseCover';
 import React from 'react';
 import Image from 'next/image';
 import { Button } from "@mantine/core";
@@ -6,12 +7,12 @@ import CourseCard from "@/components/CourseCard";
 
 const LearningPaths = () => {
     const courses = [
-        { title: 'Algèbre', level: 'BAC', icon: '/brilliant-image/Designing_Programs_Course_Card.png' },
-        { title: 'Analyse', level: 'BAC', icon: '/brilliant-image/search-fundamentals.png' },
-        { title: 'Géométrie', level: 'BAC', icon: '/brilliant-image/data-analysis.png' },
-        { title: 'Probabilités', level: 'BAC', icon: '/brilliant-image/science.png' },
-        { title: 'Suites Numériques', level: 'BAC', icon: '/brilliant-image/computer-science.png' },
-        { title: 'Nombres Complexes', level: 'BAC', icon: '/brilliant-image/programming-python.png' },
+        { title: 'Algèbre', level: 'BAC', tone: 'algebre' as const },
+        { title: 'Analyse', level: 'BAC', tone: 'analyse' as const },
+        { title: 'Géométrie', level: 'BAC', tone: 'neutral' as const },
+        { title: 'Probabilités', level: 'BAC', tone: 'algebre' as const },
+        { title: 'Suites Numériques', level: 'BAC', tone: 'analyse' as const },
+        { title: 'Nombres Complexes', level: 'BAC', tone: 'algebre' as const },
     ];
 
     return (
@@ -22,7 +23,7 @@ const LearningPaths = () => {
             <div style={{backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '1.5rem', marginBottom: '2rem'}}>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem'}}>
                     <div style={{display: 'flex', alignItems: 'center'}}>
-                        <Image src="/brilliant-image/how-llms-work.png" alt="Mathématiques BAC" width={48} height={48} style={{marginRight: '1rem'}} />
+                        <CourseCover seed="zabaqist" tone="algebre" className="h-12 w-12" />
                         <div>
                             <div style={{color: 'var(--zb-mint)', fontSize: '0.875rem', fontWeight: 600}}>EN COURS</div>
                             <h2 style={{fontSize: '1.5rem', fontWeight: 'bold'}}>Mathématiques - Sciences Maths</h2>
