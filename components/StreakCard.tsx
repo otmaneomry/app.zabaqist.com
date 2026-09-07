@@ -9,7 +9,7 @@
  * it. A student who had read thirty sections saw the same numbers as one who
  * had read none — which makes the whole card noise the moment anyone notices.
  *
- * Now: `currentStreak()`, `lastDays(7)` and `lifetime()` from lib/activity.ts,
+ * Now: `currentStreak()`, `thisWeek()` and `lifetime()` from lib/activity.ts,
  * all computed from the same log the progress dashboard reads.
  *
  * The day marker is the khatim, not a lightning bolt. The bolt was Brilliant's
@@ -27,9 +27,10 @@ import {
   ACTIVITY_EVENT,
   currentStreak,
   dayKey,
-  lastDays,
   lifetime,
   longestStreak,
+  thisWeek,
+  type WeekDay,
 } from '@/lib/activity'
 
 /** The eight-point star as a polygon, sized to a box of `r * 2`. */
@@ -42,15 +43,35 @@ function starPoints(r: number): string {
   }).join(' ')
 }
 
-function DayMark({ worked, today }: { worked: boolean; today: boolean }) {
+/**
+ * Four states, and the distinction between the last two is the point: a day
+ * that has not arrived is not a day you missed. Showing Thursday as an empty
+ * slot on Monday would read as five failures before the week has begun.
+ */
+function DayMark({
+  worked,
+  today,
+  future,
+}: {
+  worked: boolean
+  today: boolean
+  future: boolean
+}) {
   return (
     <svg viewBox="0 0 34 34" className="size-full" aria-hidden>
       <polygon
         points={starPoints(17)}
+        // Never filled except when earned. A filled shape reads as "done", so
+        // filling a day that has not happened yet — even palely — claims
+        // something on the student's behalf. Both unearned states are outlines;
+        // the missed one is drawn a shade firmer, because a gap in the past is
+        // a fact and a gap in the future is only a space.
         className={
           worked
             ? 'fill-zb-mint'
-            : 'fill-transparent stroke-zb-line [stroke-width:1.5]'
+            : future
+              ? 'fill-transparent stroke-zb-line [stroke-width:1.5]'
+              : 'fill-transparent stroke-zb-ink-3/40 [stroke-width:1.5]'
         }
       />
       {/* Today is ringed rather than filled when unworked: it is still open,
@@ -70,7 +91,7 @@ interface Snapshot {
   streak: number
   best: number
   days: number
-  week: { key: string; date: Date; worked: boolean }[]
+  week: WeekDay[]
 }
 
 const EMPTY: Snapshot = { streak: 0, best: 0, days: 0, week: [] }
@@ -88,7 +109,7 @@ export default function StreakCard() {
       streak: currentStreak(),
       best: longestStreak(),
       days: life.days,
-      week: lastDays(7),
+      week: thisWeek(),
     })
   }, [])
 
@@ -131,16 +152,25 @@ export default function StreakCard() {
 
       <p className="mt-2 text-sm leading-relaxed text-zb-ink-2">{message}</p>
 
-      {/* Seven marks, oldest first, in the reader's own week. `dir="ltr"` keeps
-          time running left-to-right on the Arabic route too: a calendar strip
-          is a chart, and charts do not mirror. */}
+      {/* Monday to Sunday. `dir="ltr"` keeps time running left-to-right on the
+          Arabic route too: a calendar strip is a chart, and charts do not
+          mirror — a week that ran right-to-left would put Monday where the
+          reader looks for Sunday. */}
       <ul dir="ltr" className="mt-5 flex items-end justify-between gap-1.5">
         {s.week.map((d) => (
           <li key={d.key} className="flex flex-1 flex-col items-center gap-1.5">
             <span className="w-full max-w-8">
-              <DayMark worked={d.worked} today={d.key === todayKey} />
+              <DayMark
+                worked={d.worked}
+                today={d.key === todayKey}
+                future={d.future}
+              />
             </span>
-            <span className="font-mono text-[10px] uppercase text-zb-ink-3">
+            <span
+              className={`font-mono text-[10px] uppercase ${
+                d.future ? 'text-zb-ink-3/50' : 'text-zb-ink-3'
+              }`}
+            >
               {d.date.toLocaleDateString(locale, { weekday: 'narrow' })}
             </span>
           </li>

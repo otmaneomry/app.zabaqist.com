@@ -201,19 +201,37 @@ const shift = (d: Date, days: number) => {
   return n
 }
 
+export interface WeekDay {
+  key: string
+  date: Date
+  worked: boolean
+  /** Later than today: nothing could have been done yet. */
+  future: boolean
+}
+
 /**
- * The last `n` days, oldest first, each marked worked or not.
+ * This week, Monday to Sunday, in the student's own calendar.
  *
- * The student's own calendar days, like the rest of this file: their "today"
- * is theirs, not UTC's.
+ * A rolling seven days ending today would be easier, but it starts on a
+ * different weekday every morning — so the strip a student learned to read on
+ * Monday means something else by Thursday, and "the beginning of the strip"
+ * never lines up with the beginning of their week. A calendar week is the one
+ * they already have in their head.
+ *
+ * Monday-first: the Moroccan school week starts Monday, and that is the week
+ * this is measuring.
  */
-export function lastDays(n: number): { key: string; date: Date; worked: boolean }[] {
+export function thisWeek(): WeekDay[] {
   const log = readLog()
   const today = new Date()
-  return Array.from({ length: n }, (_, i) => {
-    const date = shift(today, i - (n - 1))
+  const todayKey = dayKey(today)
+  // getDay() is 0 for Sunday, so Sunday belongs to the week that just ended.
+  const monday = shift(today, today.getDay() === 0 ? -6 : 1 - today.getDay())
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = shift(monday, i)
     const key = dayKey(date)
-    return { key, date, worked: worked(log[key]) }
+    return { key, date, worked: worked(log[key]), future: key > todayKey }
   })
 }
 
