@@ -1084,16 +1084,27 @@ section('Auth (Google)')
     'the account menu offers a way to sign out',
   )
 
-  // Signing out really ends it. The button calls Supabase, which has no session
-  // to clear here — this suite never had one — so the bypass cookie is what
-  // stands in for it. Dropping it is the same thing from the gate's side.
-  await ctx.clearCookies()
+  // Signing out really ends it — by clicking the button, not by clearing
+  // cookies from the test. The action drops the e2e bypass alongside the
+  // Supabase session precisely so this can be exercised for real.
+  await pg.getByRole('menuitem', { name: either('signOut') }).click()
+  await pg.waitForURL(/\/(ar)?$/, { timeout: 15000 })
+  ok(
+    at() === '/',
+    'signing out lands back on the landing page',
+    pg.url().replace(BASE, ''),
+  )
+
   await pg.goto(`${BASE}/home`, { waitUntil: 'load' })
   ok(
     at() === '/signin',
-    'and without a session the dashboard closes again',
+    'and the dashboard is closed again afterwards',
     pg.url().replace(BASE, ''),
   )
+
+  // The bypass cookie is gone, not merely ignored.
+  const left = (await ctx.cookies()).filter((c) => c.name === 'zb-e2e')
+  ok(left.length === 0, 'and the session cookie is actually cleared')
   await ctx.close()
 }
 
