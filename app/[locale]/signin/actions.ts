@@ -24,10 +24,21 @@ export async function signInWithGoogle(next?: string) {
   const safe = next && /^\/(?!\/)/.test(next) ? next : '/home'
   const supabase = await createClient()
 
-  // Build the callback from the request's own host rather than a hardcoded URL,
-  // so localhost, a preview deployment and production each come back to
-  // themselves without a per-environment variable to forget.
-  const origin = (await headers()).get('origin') ?? ''
+  // Build the callback from the request's own host, so localhost, a preview
+  // deployment and production each come back to themselves.
+  //
+  // `origin` is absent on some server-action posts, and behind Vercel's proxy
+  // the real hostname is in x-forwarded-host — `host` there is the internal
+  // one. An empty origin makes `redirectTo` relative, Supabase rejects it as
+  // not-allow-listed, and silently falls back to its own Site URL, which is
+  // how a production sign-in ends up on http://localhost:3000.
+  const h = await headers()
+  const forwardedHost = h.get('x-forwarded-host') ?? h.get('host')
+  const proto = h.get('x-forwarded-proto') ?? 'https'
+  const origin =
+    h.get('origin') ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (forwardedHost ? `${proto}://${forwardedHost}` : '')
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
