@@ -150,8 +150,7 @@
     "soonQuiz": "اجتز اختبارًا",
     "soonBack": "العودة إلى الدروس",
     "catalogAll": "جميع المحاور",
-    "catalogPopular": "المحاور الأكثر طلبًا",
-    "recommended": "مقترَح لك"
+    "catalogPopular": "المحاور الأكثر طلبًا"
   },
   "dashboard": {
     "jumpBackIn": "تابع من حيث توقّفت",
@@ -301,35 +300,6 @@
     "legal": "قانوني",
     "privacy": "الخصوصية",
     "rights": "© {year} زباقيست · الدار البيضاء، المغرب"
-  },
-  "exercise": {
-    "statement": "نصّ التمرين :",
-    "yourAnswer": "جوابك :",
-    "answerPlaceholder": "اكتب جوابك بصيغة LaTeX…",
-    "check": "تحقّق من الجواب",
-    "takeYourTime": "خذ ما تحتاجه من وقت.",
-    "attemptN": "المحاولة {n}",
-    "correct": "صحيح !",
-    "tryAgain": "أعد المحاولة.",
-    "wellDone": "أحسنت ! وجدت الجواب الصحيح",
-    "pointsIn": "وجدته في {n} محاولات — و{points} نقطة مكتسبة.",
-    "points": "{points} نقطة مكتسبة.",
-    "hint": "إرشاد",
-    "hintLabel": "إرشاد :",
-    "solution": "الحل المفصّل",
-    "finalAnswer": "الجواب النهائي :",
-    "prevStep": "الخطوة السابقة",
-    "nextStep": "الخطوة التالية"
-  },
-  "homework": {
-    "instructions": "التعليمات :",
-    "progress": "التقدّم",
-    "answerPlaceholder": "اكتب جوابك بصيغة LaTeX…",
-    "submit": "سلّم الفرض",
-    "submitted": "تمّ تسليم الفرض بنجاح !",
-    "teacherNote": "سيصحّح أستاذك عملك قريبًا.",
-    "expected": "الجواب المنتظر :",
-    "solution": "الحل"
   },
   "notFound": {
     "eyebrow": "خطأ 404",

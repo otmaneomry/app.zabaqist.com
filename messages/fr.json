@@ -150,8 +150,7 @@
     "soonQuiz": "Passer un quiz",
     "soonBack": "Retour aux cours",
     "catalogAll": "Toutes les thématiques",
-    "catalogPopular": "Thématiques populaires",
-    "recommended": "Recommandé pour vous"
+    "catalogPopular": "Thématiques populaires"
   },
   "dashboard": {
     "jumpBackIn": "Reprends où tu en étais",
@@ -301,35 +300,6 @@
     "legal": "Légal",
     "privacy": "Confidentialité",
     "rights": "© {year} Zabaqist · Casablanca, Maroc"
-  },
-  "exercise": {
-    "statement": "Énoncé :",
-    "yourAnswer": "Votre réponse :",
-    "answerPlaceholder": "Entrez votre réponse en LaTeX…",
-    "check": "Vérifier la réponse",
-    "takeYourTime": "Prends le temps qu'il te faut.",
-    "attemptN": "Essai {n}",
-    "correct": "Correct !",
-    "tryAgain": "Encore un essai.",
-    "wellDone": "Bravo ! Vous avez trouvé la bonne réponse",
-    "pointsIn": "Trouvé en {n} essais — et {points} points gagnés.",
-    "points": "{points} points gagnés.",
-    "hint": "Indice",
-    "hintLabel": "Indice :",
-    "solution": "Solution détaillée",
-    "finalAnswer": "Réponse finale :",
-    "prevStep": "Étape précédente",
-    "nextStep": "Étape suivante"
-  },
-  "homework": {
-    "instructions": "Instructions :",
-    "progress": "Progression",
-    "answerPlaceholder": "Tapez votre réponse en LaTeX…",
-    "submit": "Soumettre le devoir",
-    "submitted": "Devoir soumis avec succès !",
-    "teacherNote": "Votre professeur corrigera votre travail prochainement.",
-    "expected": "Réponse attendue :",
-    "solution": "Solution"
   },
   "notFound": {
     "eyebrow": "Erreur 404",

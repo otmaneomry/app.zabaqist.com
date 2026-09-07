@@ -183,6 +183,27 @@ try {
   check(false, 'blocker', 'i18n-parse', 'a messages file does not parse')
 }
 
+// Copy nobody renders. `exercise` and `homework` — 25 keys about checking an
+// answer and a teacher grading your work — outlived the feature they were
+// written for by months, and one of them promised a correction no code could
+// deliver. Dead copy is worse than no copy: it gets translated, reviewed and
+// believed.
+try {
+  const defined = Object.entries(JSON.parse(read('messages/fr.json')))
+    .filter(([, v]) => v && typeof v === 'object')
+    .map(([k]) => k)
+  const all = src.map(read).join('\n')
+  const orphans = defined.filter(
+    (ns) =>
+      !new RegExp(`(use|get)Translations\\(\\s*['"\`]${ns}['"\`]`).test(all) &&
+      !new RegExp(`namespace:\\s*['"\`]${ns}['"\`]`).test(all),
+  )
+  check(orphans.length === 0, 'should', 'orphan-namespaces',
+    `${orphans.length} message namespace(s) are never rendered`, orphans.join(', '))
+} catch {
+  /* i18n-parse already reported it */
+}
+
 // Untranslated user-facing copy: a bare French string sitting in JSX.
 //
 // `app/global-error.tsx` is the one place this is correct rather than lazy. It
