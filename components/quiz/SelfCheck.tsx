@@ -22,12 +22,9 @@
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import Markdown from 'react-markdown'
-import rehypeKatex from 'rehype-katex'
-import remarkMath from 'remark-math'
 
-import 'katex/dist/katex.min.css'
-
+import BackLink from '@/components/quiz/BackLink'
+import ItemText from '@/components/quiz/ItemText'
 import { Link } from '@/i18n/navigation'
 import {
   clearSelfCheck,
@@ -41,31 +38,6 @@ const CHOICES: { id: Verdict; key: 'got' | 'close' | 'notYet'; tone: string }[] 
   { id: 'close', key: 'close', tone: 'border-zb-gold bg-zb-gold-soft text-zb-gold-deep' },
   { id: 'not-yet', key: 'notYet', tone: 'border-zb-rose/40 bg-zb-rose-soft text-zb-rose-deep' },
 ]
-
-/**
- * Items carry inline maths, so they render through the same pipeline as the
- * chapters — and under the same direction rule.
- *
- * The chapters are authored in French and served on the Arabic route too, so
- * an item is Latin text sitting inside an RTL page. With no direction of its
- * own the bidi algorithm moves the full stop to the left of the sentence,
- * which is how `.complexe et savoir passer de l'une à l'autre` reached the
- * screen. `contentDir` is the same field `CourseDoc` already reads, so a
- * chapter authored in Arabic later flips both together.
- */
-function Item({ text, dir }: { text: string; dir: 'ltr' | 'rtl' }) {
-  return (
-    <span dir={dir} className="block">
-      <Markdown
-        remarkPlugins={[remarkMath]}
-        rehypePlugins={[[rehypeKatex, { output: 'html', throwOnError: false }]]}
-        components={{ p: ({ children }) => <>{children}</> }}
-      >
-        {text}
-      </Markdown>
-    </span>
-  )
-}
 
 export default function SelfCheck({
   slug,
@@ -107,7 +79,9 @@ export default function SelfCheck({
 
   return (
     <div className="mx-auto w-full max-w-2xl px-5 py-10 sm:px-6">
-      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-zb-gold-deep">
+      <BackLink href={`/courses/${slug}`} label={t('backToChapter')} />
+
+      <p className="mt-4 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-zb-gold-deep">
         {chapter}
       </p>
       <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-zb-ink">
@@ -139,7 +113,7 @@ export default function SelfCheck({
               className="rounded-2xl border border-zb-line bg-white p-5 shadow-[var(--zb-shadow-sm)]"
             >
               <p className="text-[15px] leading-relaxed text-zb-ink">
-                <Item text={text} dir={contentDir} />
+                <ItemText text={text} dir={contentDir} />
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {CHOICES.map((c) => {
@@ -183,7 +157,7 @@ export default function SelfCheck({
             <ul className="zb-star-list mt-4 space-y-2 text-sm text-zb-ink">
               {shaky.map((text) => (
                 <li key={text}>
-                  <Item text={text} dir={contentDir} />
+                  <ItemText text={text} dir={contentDir} />
                 </li>
               ))}
             </ul>

@@ -31,7 +31,7 @@ export default function LandingHeader() {
           <Link href="/courses" className="no-underline hover:text-zb-ink">
             {t('parcours')}
           </Link>
-          <Link href="/quiz/1" className="no-underline hover:text-zb-ink">
+          <Link href="/quiz" className="no-underline hover:text-zb-ink">
             {t('quiz')}
           </Link>
         </nav>

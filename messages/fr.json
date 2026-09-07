@@ -5,7 +5,7 @@
   },
   "nav": {
     "parcours": "Parcours",
-    "quiz": "Quiz live",
+    "quiz": "Plan de révision",
     "about": "À propos",
     "start": "Commencer",
     "home": "Accueil",
@@ -356,5 +356,25 @@
     "backToChapter": "Retourner au chapitre",
     "restart": "Recommencer",
     "none": "Ce chapitre n’a pas encore d’auto-évaluation."
+  },
+  "revision": {
+    "title": "Plan de révision",
+    "metaDescription": "Ce que le programme te demande de savoir faire, chapitre par chapitre, et où sont tes lacunes.",
+    "sub": "{items} choses à savoir faire, réparties sur {chapters} chapitres. Tu les juges toi-même sur chaque chapitre ; cette page les rassemble et te dit par où reprendre.",
+    "stat-solid": "Je sais faire",
+    "stat-shaky": "À reprendre",
+    "stat-open": "Pas encore jugé",
+    "gapsTitle": "À reprendre en priorité",
+    "gapsBody": "{n, plural, one {Un point} other {# points}} que tu n’as pas encore marqués « je sais faire ». Le chapitre le plus fragile est en tête.",
+    "shakyCount": "{n} sur {total}",
+    "andMore": "et {n} de plus",
+    "openChapter": "Ouvrir le chapitre",
+    "mapTitle": "Le programme",
+    "mapBody": "Une étoile par chose à savoir faire : pleine quand tu dis savoir, dorée quand tu veux y revenir, vide tant que tu ne l’as pas jugée.",
+    "mapEmpty": "Une étoile par chose à savoir faire. Elles se remplissent au fur et à mesure que tu fais le point, chapitre par chapitre.",
+    "branchCount": "{n} chapitres",
+    "rowLabel": "{solid} acquises, {shaky} à reprendre, sur {total}",
+    "emptyCta": "Commencer par le premier chapitre",
+    "backToDashboard": "Mon tableau de bord"
   }
 }

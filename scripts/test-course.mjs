@@ -413,7 +413,7 @@ section('Landing page')
         [messages.home.ctaPrimary, '/demarrer'],
         [messages.home.ctaSecondary, `/courses/${SLUG}`],
         [messages.nav.parcours, '/courses'],
-        [messages.nav.quiz, '/quiz/1'],
+        [messages.nav.quiz, '/quiz'],
         [messages.nav.dashboard, '/home'],
       ].map(async ([name, want]) => [
         name,
@@ -1280,6 +1280,81 @@ section('Programme complet (13 chapitres)')
     'catalogue section/exercise counts match the documents',
     drift.map((c) => c.slug).join(', '),
   )
+
+  // `/quiz` is the index above the per-chapter self-assessments: every
+  // capability the programme asks for, with the reader's own gaps first.
+  {
+    const fr = JSON.parse(readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'))
+    const arMsg = JSON.parse(readFileSync(new URL('../messages/ar.json', import.meta.url), 'utf8'))
+    const ctx = await browser.newContext({ storageState: AUTH_STATE })
+    const rp = await ctx.newPage()
+
+    await rp.goto(`${BASE}/quiz`, { waitUntil: 'networkidle' })
+    ok(
+      (await rp.locator('h1').textContent())?.trim() === fr.revision.title,
+      'the revision plan renders',
+    )
+    // A reader who has judged nothing has no gaps. Ranking chapters they never
+    // opened would invent a weakness.
+    // Before anything is judged the page shows the programme, never a gap
+    // section: ranking chapters the reader never opened would invent one.
+    ok(
+      (await rp.locator('h2').first().textContent())?.trim() === fr.revision.mapTitle,
+      'and claims no gap before anything has been judged',
+    )
+    // `/quiz` and `/quiz/<slug>` sit outside `(with-header)`, so there is no
+    // site header and the browser's own button was the only way out. Both must
+    // carry their own exit, and the plan's must be in the server HTML: it would
+    // otherwise wait for hydration along with everything else on the page.
+    ok(
+      /href="\/home"/.test(await (await get(`${BASE}/quiz`)).text()),
+      'the plan offers a way back before it has read the device',
+    )
+    ok(
+      await rp.locator('a[href="/home"]').first().isVisible(),
+      'and it names where it goes',
+    )
+    {
+      const chk = await (await get(`${BASE}/quiz/${all[0].slug}`)).text()
+      ok(
+        chk.includes(`href="/courses/${all[0].slug}"`),
+        'a chapter self-assessment leads back to its own chapter',
+      )
+    }
+
+    // Every capability gets its own mark, so the strip is the programme.
+    const marks = await rp.locator('a[href*="/quiz/"] svg').count()
+    ok(marks >= 84, 'and draws one mark per capability', `${marks} marks`)
+    // Every chapter must be reachable from it, or it is a plan for part of the
+    // programme rather than for the programme.
+    const hrefs = await rp.locator('a[href*="/quiz/"]').evaluateAll((as) =>
+      as.map((a) => a.getAttribute('href')),
+    )
+    const missing = all.filter((c) => !hrefs.some((h) => h?.endsWith(`/quiz/${c.slug}`)))
+    ok(missing.length === 0, 'and links to all thirteen chapters', missing.map((c) => c.slug).join(', '))
+
+    // Answer one chapter badly and the plan must name it.
+    await rp.goto(`${BASE}/quiz/${all[0].slug}`, { waitUntil: 'networkidle' })
+    const items = await rp.locator('ol > li').count()
+    for (let i = 0; i < items; i++)
+      await rp.locator('ol > li').nth(i).locator('button').nth(i === 0 ? 2 : 0).click()
+    await rp.goto(`${BASE}/quiz`, { waitUntil: 'networkidle' })
+    ok(
+      (await rp.locator('h2').first().textContent())?.trim() === fr.revision.gapsTitle,
+      'a declared gap reaches the plan',
+    )
+    ok(
+      await rp.locator('ol > li').first().getByText(all[0].title).isVisible(),
+      'and names the chapter it came from',
+    )
+
+    await rp.goto(`${BASE}/ar/quiz`, { waitUntil: 'networkidle' })
+    ok(
+      (await rp.locator('h1').textContent())?.trim() === arMsg.revision.title,
+      'and the plan speaks Arabic on the Arabic route',
+    )
+    await ctx.close()
+  }
 
   // The self-assessment a chapter links to must be its OWN. Both CTAs on the
   // course page were hardcoded to `/quiz/1` — "the first chapter of the

@@ -115,7 +115,11 @@ check(logs.length === 0, 'should', 'console-logs',
   `${logs.length} file(s) still call console.log in shipped code`,
   logs.slice(0, 4).join(', '))
 
-const markers = src.filter((f) => /\b(TODO|FIXME|XXX|HACK)\b/.test(read(f)))
+// A marker is unfinished work left in the code, so the word has to stand on
+// its own. `\b` alone also matched `TODO-zabaqist.md` — a comment pointing at
+// the roadmap is a reference, not a loose end, and reporting it teaches people
+// to ignore this check.
+const markers = src.filter((f) => /\b(TODO|FIXME|XXX|HACK)\b(?![-.\w])/.test(read(f)))
 check(markers.length === 0, 'note', 'markers',
   `${markers.length} file(s) carry TODO/FIXME markers`, markers.slice(0, 4).join(', '))
 
