@@ -316,5 +316,13 @@
     "teacherNote": "Votre professeur corrigera votre travail prochainement.",
     "expected": "Réponse attendue :",
     "solution": "Solution"
+  },
+  "notFound": {
+    "eyebrow": "Erreur 404",
+    "title": "Cette page n’est pas continue",
+    "body": "La limite à gauche existe. La limite à droite existe. Elles ne sont même pas égales — et la valeur en 404, elle, n’existe pas du tout.",
+    "caption": "f n’est pas définie en 404",
+    "home": "Retour à l’accueil",
+    "revise": "Réviser les limites et la continuité"
   }
 }

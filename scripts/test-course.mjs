@@ -1348,6 +1348,59 @@ section('Programme complet (13 chapitres)')
   await pg.close()
 }
 
+section('404')
+{
+  // The joke is the curriculum: chapter 1 is "Limites et continuité", and a
+  // missing page is that chapter's opening object. These checks exist because
+  // the page silently did not render at first — an unmatched URL never enters
+  // the [locale] tree, so Next served its own black 404 and the branded one was
+  // unreachable. A catch-all route is what routes it there.
+  const pg = await browser.newPage({ viewport: { width: 900, height: 1000 } })
+
+  for (const [path, label] of [
+    ['/nope', 'French'],
+    ['/ar/nope', 'Arabic'],
+  ]) {
+    const res = await pg.goto(`${BASE}${path}`, { waitUntil: 'load' })
+    ok(res.status() === 404, `${label}: a missing page really answers 404`, `HTTP ${res.status()}`)
+  }
+
+  await pg.goto(`${BASE}/nope`, { waitUntil: 'load' })
+  const html = await pg.content()
+  ok(
+    /class="katex/.test(html),
+    'the limits are set in real notation, server-rendered',
+  )
+  ok(
+    (await pg.locator('svg circle[fill*="cream"], svg circle').count()) >= 2,
+    'the discontinuity is drawn with two hollow circles',
+  )
+  ok(
+    await pg.getByRole('heading', { level: 1 }).isVisible(),
+    'and it is the branded page, not the default black one',
+    (await pg.getByRole('heading', { level: 1 }).innerText()).slice(0, 40),
+  )
+  // Either language: visiting /ar above makes the locale sticky, so pinning the
+  // French label here would be testing the cookie rather than the link.
+  ok(
+    await pg
+      .getByRole('link', {
+        name: new RegExp(
+          `${messages.notFound.revise}|${messagesAr.notFound.revise}`,
+        ),
+      })
+      .isVisible(),
+    'it offers the chapter the joke is quoting',
+  )
+
+  // A catch-all is the lowest-priority match, but that is worth pinning: if it
+  // ever shadowed a real route, every page in the app would become a 404.
+  const real = await pg.goto(`${BASE}/courses/limites-et-continuite`, { waitUntil: 'load' })
+  ok(real.status() === 200, 'and it shadows no real route', `HTTP ${real.status()}`)
+
+  await pg.close()
+}
+
 section('Chrome')
 {
   // The footer used to link to seven pages that did not exist. Next prefetches
