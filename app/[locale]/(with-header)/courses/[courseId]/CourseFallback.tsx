@@ -58,7 +58,7 @@ const CourseFallback = ({courseId}: {courseId: string}) => {
                                 </LinkButton>
                             )}
                             <LinkButton
-                                href="/quiz/1"
+                                href={`/quiz/${courseId}`}
                                 color="mint"
                                 leftSection={<IconTrophy size={16} />}
                             >

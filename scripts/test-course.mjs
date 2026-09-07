@@ -1281,6 +1281,62 @@ section('Programme complet (13 chapitres)')
     drift.map((c) => c.slug).join(', '),
   )
 
+  // The self-assessment a chapter links to must be its OWN. Both CTAs on the
+  // course page were hardcoded to `/quiz/1` — "the first chapter of the
+  // catalogue" — so every chapter but Limites sent the reader to the wrong
+  // self-assessment, and Limites only looked right by coincidence.
+  {
+    const wrong = []
+    for (const c of all) {
+      const html = await (await get(`${BASE}/courses/${c.slug}?s=${docs.get(c.slug).views[0].id}`)).text()
+      if (/href="[^"]*\/quiz\/1"/.test(html)) wrong.push(c.slug)
+      // Any quiz link on the page must name this chapter.
+      for (const m of html.matchAll(/href="([^"]*\/quiz\/[^"]+)"/g))
+        if (!m[1].endsWith(`/quiz/${c.slug}`)) wrong.push(`${c.slug} -> ${m[1]}`)
+    }
+    ok(wrong.length === 0, 'every chapter links to its own self-assessment', wrong.slice(0, 3).join(', '))
+  }
+
+  // The end-of-chapter invitation is for the end of the chapter. It used to
+  // render under every section, so the intro offered to check what the reader
+  // knew before they had read a word of it.
+  {
+    const c = all[0]
+    const views = docs.get(c.slug).views
+    const fr = JSON.parse(readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'))
+    const first = await (await get(`${BASE}/courses/${c.slug}?s=${views[0].id}`)).text()
+    const last = await (await get(`${BASE}/courses/${c.slug}?s=${views[views.length - 1].id}`)).text()
+    // Count rendered links, not copy: next-intl ships the whole `course`
+    // namespace to the client, so every string in it appears in the HTML
+    // whether or not anything rendered it.
+    const links = (html) => (html.match(new RegExp(`href="/quiz/${c.slug}"`, 'g')) ?? []).length
+    ok(links(first) === 1, 'the first section offers the self-assessment once, in the header', `got ${links(first)}`)
+    ok(links(last) === 2, 'and the last adds the end-of-chapter card', `got ${links(last)}`)
+    // It must not promise a mark: nothing on the self-assessment is graded.
+    ok(
+      !/score|note\b|Quiz/i.test(fr.course.ctaBody + fr.course.ctaTitle + fr.course.ctaButton),
+      'and it promises no score, because nothing is graded',
+    )
+  }
+
+  // Every chapter must have a self-assessment: /quiz/<slug> is built from the
+  // pedagogue's own `## Auto-évaluation`, and a chapter without one has a quiz
+  // page with nothing on it.
+  const noChecklist = all.filter((c) => (docs.get(c.slug).checklist ?? []).length === 0)
+  ok(
+    noChecklist.length === 0,
+    'every chapter has an authored self-assessment',
+    noChecklist.map((c) => c.slug).join(', '),
+  )
+  ok(
+    all.every((c) => docs.get(c.slug).checklist.length >= 5),
+    'each with at least five items',
+    all
+      .filter((c) => docs.get(c.slug).checklist.length < 5)
+      .map((c) => `${c.slug}:${docs.get(c.slug).checklist.length}`)
+      .join(', '),
+  )
+
   // `critique/course/` is where the chapters are authored and `content/course/`
   // is what the app reads. Both are committed, so a chapter edited in one and
   // not the other drifts silently — the site would keep serving the stale copy.
@@ -1340,7 +1396,11 @@ section('Programme complet (13 chapitres)')
     const onErr = (e) => errs.push(`${c.slug}: ${e}`)
     pg.on('pageerror', onErr)
     const first = docs.get(c.slug).views[0].id
-    for (const u of [`${BASE}/courses/${c.slug}`, `${BASE}/courses/${c.slug}?s=${first}`]) {
+    for (const u of [
+      `${BASE}/courses/${c.slug}`,
+      `${BASE}/courses/${c.slug}?s=${first}`,
+      `${BASE}/quiz/${c.slug}`,
+    ]) {
       const res = await pg.goto(u, { waitUntil: 'load' })
       if (!res || res.status() >= 400) errs.push(`${c.slug}: HTTP ${res?.status()}`)
     }
@@ -1473,14 +1533,33 @@ section('Chrome')
   const ar = JSON.parse(
     readFileSync(new URL('../messages/ar.json', import.meta.url), 'utf8'),
   )
+  // The quiz is a chapter's own `## Auto-évaluation` now, so it is bilingual
+  // for the same reason the chapters are.
   const quizHtml = await (await get(`${BASE}/ar/quiz/1`)).text()
   ok(
-    quizHtml.includes(ar.quiz.loading) || quizHtml.includes(ar.quiz.previous),
-    'the quiz player speaks Arabic',
+    quizHtml.includes(ar.selfcheck.title) && quizHtml.includes(ar.selfcheck.got),
+    'the self-assessment speaks Arabic',
   )
   ok(
-    !/Chargement du quiz|Voir les corrections/.test(quizHtml),
+    !/Je sais faire|Pas encore/.test(quizHtml),
     'and no French is left in it on the Arabic route',
+  )
+  /**
+   * The chapters are authored in French and served on the Arabic route too, so
+   * each item is Latin text inside an RTL page. Without an explicit direction
+   * the bidi algorithm moves the full stop to the left of the sentence — the
+   * rendered line read `.complexe et savoir passer de l'une à l'autre`. The
+   * items carry the chapter's `contentDir`, the same field `CourseDoc` reads.
+   */
+  ok(
+    (quizHtml.match(/<span dir="ltr"/g) ?? []).length >= 3,
+    'and its French items keep their own writing direction',
+  )
+  // The interface stays in the reader's language: `contentDir` must not leak
+  // onto the chrome, or the whole page would flip back to LTR.
+  ok(
+    !new RegExp(`dir="ltr"[^>]*>\\s*${ar.selfcheck.title}`).test(quizHtml),
+    'while the interface around them stays Arabic',
   )
 }
 

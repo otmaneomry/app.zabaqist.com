@@ -228,3 +228,12 @@ Résoudre : $\ln(x^2 - 4) > \ln(5)$
 - $\ln(ab) = \ln a + \ln b$ ; $\ln\left(\frac{a}{b}\right) = \ln a - \ln b$ ; $\ln(a^n) = n\ln a$.
 - $(\ln x)' = \dfrac{1}{x}$ et $(\ln u)' = \dfrac{u'}{u}$.
 - $\lim_{x \to 0^+} \ln x = -\infty$, $\lim_{x \to +\infty} \ln x = +\infty$ ; croissante et concave.
+
+## Auto-évaluation
+
+- Déterminer le domaine de définition d'une expression contenant $\ln$.
+- Utiliser $\ln(ab)$, $\ln\left(\frac{a}{b}\right)$ et $\ln(a^n)$ pour simplifier une expression.
+- Résoudre une équation ou une inéquation faisant intervenir $\ln$.
+- Dériver une fonction de la forme $\ln(u)$ et en déduire ses variations.
+- Calculer les limites de $\ln$ en $0^+$ et en $+\infty$, et les utiliser dans une étude de fonction.
+- Lire la courbe de $\ln$ : croissance, concavité, asymptote verticale.

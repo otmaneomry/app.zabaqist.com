@@ -30,7 +30,7 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import { IconArrowLeft, IconTrophy } from '@tabler/icons-react'
+import { IconArrowLeft, IconListCheck } from '@tabler/icons-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 
 import CourseDoc from '@/components/course/CourseDoc'
@@ -222,9 +222,9 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
           </Text>
           <Group>
             <LinkButton
-              href="/quiz/1"
+              href={`/quiz/${courseId}`}
               color="mint"
-              leftSection={<IconTrophy size={16} />}
+              leftSection={<IconListCheck size={16} />}
             >
               {t('quiz')}
             </LinkButton>
@@ -306,7 +306,12 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
           </Stack>
         </div>
 
-        {/* Call to action */}
+        {/* Call to action.
+            Only on the last section: this asks the reader what they can do
+            now, and under the intro it was asking that before they had read
+            anything. `next` is null exactly at the end of the chapter, which
+            is the same condition the footer navigation already uses. */}
+        {!next && (
         <Card
           shadow="lg"
           padding="xl"
@@ -324,16 +329,17 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
               {t('ctaBody')}
             </Text>
             <LinkButton
-              href="/quiz/1"
+              href={`/quiz/${courseId}`}
               size="lg"
               variant="white"
               color="mint"
-              leftSection={<IconTrophy size={20} />}
+              leftSection={<IconListCheck size={20} />}
             >
               {t('ctaButton')}
             </LinkButton>
           </Stack>
         </Card>
+        )}
       </Stack>
     </Container>
   )

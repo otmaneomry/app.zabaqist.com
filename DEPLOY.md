@@ -48,15 +48,12 @@ Deux choses à ajouter en dehors de Vercel, sinon la connexion échoue :
 
 | Variable | Défaut | À définir en production |
 | --- | --- | --- |
-| `NEXT_PUBLIC_USE_MOCK_API` | *(absente = mock actif)* | `false` **quand le backend existe** |
-| `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8000/api` | l'URL réelle de l'API |
 | `NEXT_PUBLIC_SUPABASE_URL` | — | **obligatoire** — `https://<ref>.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | — | **obligatoire** — clé publishable du projet |
 | `E2E_AUTH_SECRET` | non défini | **ne jamais définir** — ouvre le contournement de test |
 
 **L'API est encore simulée** (`lib/mockApi.ts`). C'est désormais une décision
 d'environnement et non une modification de code : un déploiement qui dispose
-d'une API pose `NEXT_PUBLIC_USE_MOCK_API=false`.
 
 Tant que le mock est actif, la connexion accepte des comptes de test. Les
 identifiants ne sont plus affichés en production (`NODE_ENV`), mais **ils
@@ -70,7 +67,6 @@ publique.
 | Identifiants de test | affichés sur `/signin` et `/signup` | supprimés du bundle de production |
 | `/test-quiz` | route livrée | supprimée |
 | `…/chapter-N/lesson-M` | route de démonstration, bouton mort | supprimée |
-| `USE_MOCK_API` | constante `true` dans le code | pilotée par l'environnement |
 | `console.log` | 11, dont un à chaque chargement GeoGebra | 0 en production |
 | `robots.txt` / `sitemap.xml` | absents | générés, bilingues (`hreflang`) |
 | ESLint | cassé depuis la v9 (`.eslintrc.json` ignoré) | config plate, `npm run lint` fonctionne |

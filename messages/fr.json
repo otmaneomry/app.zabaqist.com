@@ -81,15 +81,15 @@
   },
   "course": {
     "back": "Retour aux cours",
-    "quiz": "Passer le Quiz",
+    "quiz": "Auto-évaluation",
     "stats": "{tabs} parties · {sections} sections · {points} points",
     "progressTitle": "Progression du cours",
     "sectionsSeen": "{done} / {total} sections consultées",
     "plan": "Plan du chapitre",
     "tabSections": "Sections de cet onglet",
-    "ctaTitle": "Prêt à tester vos connaissances ?",
-    "ctaBody": "Passez le quiz sur ce chapitre et obtenez votre score !",
-    "ctaButton": "Commencer le Quiz",
+    "ctaTitle": "Tu arrives au bout de ce chapitre",
+    "ctaBody": "Reprends ce que tu sais faire, point par point. Rien n’est noté : c’est toi qui juges.",
+    "ctaButton": "Faire le point",
     "solution": "Solution",
     "preuve": "Preuve",
     "reveal": "Afficher",
@@ -321,19 +321,6 @@
     "prevStep": "Étape précédente",
     "nextStep": "Étape suivante"
   },
-  "quiz": {
-    "loading": "Chargement du quiz…",
-    "previous": "Précédent",
-    "finished": "Quiz terminé !",
-    "backToCourses": "Retour aux cours",
-    "seeCorrections": "Voir les corrections",
-    "selectAll": "Sélectionnez toutes les réponses correctes",
-    "notThisOne": "Pas celle-ci",
-    "loadError": "Erreur lors du chargement du quiz",
-    "retry": "Réessayer",
-    "notFound": "Quiz introuvable",
-    "loadFailed": "Le quiz n'a pas pu être chargé. Veuillez rafraîchir la page."
-  },
   "homework": {
     "instructions": "Instructions :",
     "progress": "Progression",
@@ -355,5 +342,19 @@
     "errorBody": "L'erreur vient de nous, pas de toi. Ta progression est enregistrée sur cet appareil : elle n'a pas bougé.",
     "errorRetry": "Réessayer",
     "errorHome": "Retour à l'accueil"
+  },
+  "selfcheck": {
+    "title": "Auto-évaluation",
+    "subN": "{n, plural, one {Une question à te poser} other {# questions à te poser}} avant de refermer le chapitre. Personne ne corrige : c’est toi qui sais.",
+    "got": "Je sais faire",
+    "close": "Presque",
+    "notYet": "Pas encore",
+    "progress": "{answered} / {total}",
+    "resultTitle": "Ce qu’il te reste à revoir",
+    "resultAllGood": "Tu dis savoir faire les {n}. Reviens-y dans quelques jours pour vérifier que ça tient.",
+    "resultSome": "{n, plural, one {Un point} other {# points}} à reprendre. C’est exactement là qu’il faut passer ton temps.",
+    "backToChapter": "Retourner au chapitre",
+    "restart": "Recommencer",
+    "none": "Ce chapitre n’a pas encore d’auto-évaluation."
   }
 }

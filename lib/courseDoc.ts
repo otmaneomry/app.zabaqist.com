@@ -97,6 +97,18 @@ export interface CourseDocument {
   outline: Section[]
   /** The chapter paginated by section. */
   views: View[]
+  /**
+   * The `## Auto-évaluation` items — what the pedagogue says a student should
+   * be able to DO after this chapter.
+   *
+   * These are capability statements ("Calculer une limite en utilisant les
+   * opérations…"), not multiple-choice questions, and that is exactly why the
+   * chapter self-assessment at `/quiz/<slug>` is built on them: they are real,
+   * authored, and specific to the chapter. Generating quiz questions and
+   * declaring answers correct would mean inventing mathematics, which is the
+   * one thing this codebase must not do to someone sitting the Bac.
+   */
+  checklist: string[]
 }
 
 /* ------------------------------------------------------------------ */
@@ -288,7 +300,36 @@ export async function loadCourseDoc(
     })
   }
 
-  return { meta, title, body, outline, views: splitIntoViews(body) }
+  return {
+    meta,
+    title,
+    body,
+    outline,
+    views: splitIntoViews(body),
+    checklist: checklistOf(body),
+  }
+}
+
+/**
+ * The bullet list under `## Auto-évaluation`.
+ *
+ * Stops at the next `##`, so a chapter that ends on the section still reads
+ * cleanly. Returns `[]` for a chapter that has none — one does, and the page
+ * says so rather than inventing items to fill the space.
+ */
+function checklistOf(body: string): string[] {
+  const out: string[] = []
+  let inside = false
+  for (const line of body.split('\n')) {
+    if (/^## /.test(line)) {
+      inside = /^## auto-évaluation/i.test(line)
+      continue
+    }
+    if (!inside) continue
+    const m = /^[-*] +(.+)$/.exec(line.trim())
+    if (m?.[1]) out.push(m[1].trim())
+  }
+  return out
 }
 
 /* ------------------------------------------------------------------ */
