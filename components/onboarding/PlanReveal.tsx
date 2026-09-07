@@ -102,7 +102,7 @@ export default function PlanReveal({
           onClick={() => onStart(start.slug)}
           className="mt-10 h-14 w-full rounded-full bg-zb-ink text-base font-semibold text-white shadow-[0_3px_0_0_var(--zb-mint-deep),var(--zb-shadow-sm)] transition-transform active:translate-y-[2px] active:shadow-[0_1px_0_0_var(--zb-mint-deep)]"
         >
-          {t('planCta')} →
+          {t('planCta', { chapter: chapterTitle(start, locale) })} →
         </button>
 
         <p className="mt-4 text-center text-sm text-gray-500">

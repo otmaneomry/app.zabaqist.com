@@ -261,7 +261,7 @@
     "objectif-hint-60": "Objectif ambitieux.",
     "planEyebrow": "Ton parcours",
     "planStartHere": "Tu commences ici",
-    "planCta": "Commencer le chapitre 1",
+    "planCta": "Commencer par {chapter}",
     "planNote": "Tu peux changer de filière quand tu veux, sans rien perdre."
   },
   "progress": {

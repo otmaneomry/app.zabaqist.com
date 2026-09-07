@@ -130,6 +130,20 @@ for (const m of catalog.matchAll(/file: '([^']+)'/g))
   check(existsSync(path.join('content/course', m[1])), 'blocker', `md-${m[1]}`,
     `content/course/${m[1]} is in the catalogue but missing on disk`)
 
+// A chapter slug written into a link is a link that breaks silently the day the
+// programme is reordered or that chapter is renamed — it 404s, or worse lands on
+// the "coming soon" fallback, and nothing fails until a student reports it. The
+// 404 page is the one exception: it quotes the limits chapter because the joke on
+// it is about limits, so that link belongs to the copy rather than to the order.
+const SLUG_LINK_OK = ['app/[locale]/not-found.tsx']
+const slugs = [...catalog.matchAll(/slug: '([^']+)'/g)].map((m) => m[1])
+const hardLinks = src
+  .filter((f) => !SLUG_LINK_OK.includes(f))
+  .filter((f) => slugs.some((g) => read(f).includes(`href="/courses/${g}"`)))
+check(hardLinks.length === 0, 'should', 'hardcoded-chapter-links',
+  `${hardLinks.length} file(s) link to a chapter by literal slug`,
+  hardLinks.slice(0, 4).join(', '))
+
 const images = [...catalog.matchAll(/image: '([^']+)'/g)].map((m) => m[1])
 const missingImg = [...new Set(images)].filter((i) => !existsSync(path.join('public', i)))
 check(missingImg.length === 0, 'blocker', 'images-missing',

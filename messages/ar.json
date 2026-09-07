@@ -261,7 +261,7 @@
     "objectif-hint-60": "هدف طموح.",
     "planEyebrow": "مسارك",
     "planStartHere": "تبدأ من هنا",
-    "planCta": "ابدأ الفصل الأول",
+    "planCta": "ابدأ بـ {chapter}",
     "planNote": "يمكنك تغيير شعبتك متى شئت، دون أن تفقد شيئًا."
   },
   "progress": {

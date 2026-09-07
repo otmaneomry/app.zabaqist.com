@@ -18,6 +18,8 @@
 import React from 'react'
 import { getTranslations } from 'next-intl/server'
 
+import { listCourses } from '@/lib/courseCatalog'
+
 import { Link } from '@/i18n/navigation'
 
 import KhatimFigure from '@/components/landing/KhatimFigure'
@@ -32,6 +34,11 @@ import Zellige from '@/components/landing/Zellige'
 // actually ranks on. A page-level title would silently override them.
 
 export default async function Home() {
+  // The catalogue decides which chapter this opens. It used to be the literal
+  // slug `limites-et-continuite`, which silently 404s the moment that chapter
+  // is renamed or the programme is reordered.
+  const firstChapter = listCourses()[0]?.slug ?? ''
+
   const t = await getTranslations('home')
   const pillars = [1, 2, 3].map((i) => ({
     title: t(`pillar${i}Title`),
@@ -61,7 +68,7 @@ export default async function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               {/* The funnel, not the catalogue: the reader is asked what they
-                  need before being shown eleven chapters. */}
+                  need before being shown every chapter. */}
               <Link
                 href="/demarrer"
                 className="inline-flex h-12 items-center rounded-xl bg-zb-mint px-6 text-base font-semibold text-white no-underline transition-colors hover:bg-zb-mint-deep"
@@ -69,7 +76,7 @@ export default async function Home() {
                 {t('ctaPrimary')} →
               </Link>
               <Link
-                href="/courses/limites-et-continuite"
+                href={`/courses/${firstChapter}`}
                 className="inline-flex h-12 items-center rounded-xl border border-zb-line bg-white px-6 text-base font-semibold text-zb-ink no-underline transition-colors hover:border-zb-mint/50"
               >
                 {t('ctaSecondary')}
