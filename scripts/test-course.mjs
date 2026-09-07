@@ -1574,8 +1574,18 @@ section('Programme complet (13 chapitres)')
   await pg.waitForSelector(HYDRATED, { timeout: 30000 })
   await pg.waitForTimeout(400)
   const catalogue = await pg.locator('body').innerText()
+  // Case-INSENSITIVE, and that is the point of the check rather than a
+  // convenience. `innerText` returns text as rendered, and the branch headings
+  // are `text-transform: uppercase` — so they read "ANALYSE" / "ALGÈBRE" here,
+  // never the title case this compared against. It passed anyway, because the
+  // page also carried a hardcoded placeholder grid whose invented categories
+  // happened to include the words "Analyse" and "Algèbre" in title case. The
+  // assertion was green off the fiction and blind to the real catalogue; when
+  // the placeholder was removed (see courses/page.tsx) it went red while the
+  // thing it describes had never stopped working.
+  const cat = catalogue.toLocaleLowerCase('fr')
   ok(
-    catalogue.includes('Analyse') && catalogue.includes('Algèbre'),
+    cat.includes('analyse') && cat.includes('algèbre'),
     'the catalogue shows both branches for SM',
   )
   ok(
