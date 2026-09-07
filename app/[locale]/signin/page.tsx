@@ -21,6 +21,7 @@ import { Link } from '@/i18n/navigation'
 import Logo from '@/components/landing/Logo'
 import GoogleButton from '@/components/auth/GoogleButton'
 import { createClient } from '@/lib/supabase/server'
+import { supabaseConfigError } from '@/lib/supabase/config'
 
 /**
  * The marketing site's waitlist form, which already asks for filière, first
@@ -35,15 +36,28 @@ export default async function SignInPage({
   searchParams: Promise<{ next?: string; error?: string }>
 }) {
   const { next, error } = await searchParams
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // This page is public and must render even when Supabase is unconfigured or
+  // unreachable — it is where a reader is sent when anything else fails, so it
+  // is the one page that cannot itself depend on the service being up.
+  let user = null
+  try {
+    const supabase = await createClient()
+    user = (await supabase.auth.getUser()).data.user
+  } catch {
+    /* signed out, and the button below will say so when clicked */
+  }
   // Already signed in: this page has nothing to offer.
   if (user) redirect(next && /^\/(?!\/)/.test(next) ? next : '/home')
 
   const t = await getTranslations('auth')
   const notAllowed = error === 'not-allowed'
+
+  // In development, a failed sign-in is far more often a misconfigured key
+  // than a real outage, and "réessaie" invites retrying something that cannot
+  // work. Say what is wrong instead. `NODE_ENV` is inlined at build time, so
+  // this text is not in the production bundle at all.
+  const misconfigured =
+    process.env.NODE_ENV !== 'production' ? supabaseConfigError() : null
   // The headline is authored with a line break so it falls the same way in both
   // languages instead of wherever the container happens to wrap.
   const title = t('signInTitle').split('\n')
@@ -69,7 +83,18 @@ export default async function SignInPage({
           {t('signInSub')}
         </p>
 
-        {error && (
+        {misconfigured && (
+          <p
+            role="alert"
+            dir="ltr"
+            className="mt-6 rounded-xl border border-zb-gold/40 bg-zb-gold-soft px-4 py-3 text-start font-mono text-xs leading-relaxed text-zb-gold-deep"
+          >
+            <strong className="block">Configuration · dev only</strong>
+            {misconfigured}
+          </p>
+        )}
+
+        {error && !misconfigured && (
           <p
             role="alert"
             className="mt-6 rounded-xl border border-zb-rose/30 bg-zb-rose-soft px-4 py-3 text-center text-sm font-medium leading-relaxed text-zb-rose-deep"

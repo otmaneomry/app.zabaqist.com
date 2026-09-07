@@ -22,7 +22,13 @@ import { createClient } from '@/lib/supabase/server'
  */
 export async function signInWithGoogle(next?: string) {
   const safe = next && /^\/(?!\/)/.test(next) ? next : '/home'
-  const supabase = await createClient()
+
+  let supabase
+  try {
+    supabase = await createClient()
+  } catch {
+    redirect('/signin?error=1')
+  }
 
   // Build the callback from the request's own host, so localhost, a preview
   // deployment and production each come back to themselves.
@@ -55,12 +61,19 @@ export async function signInWithGoogle(next?: string) {
 }
 
 export async function signOutAction() {
-  const supabase = await createClient()
+  // Sign-out must work even when the service does not: clearing the cookies
+  // below is what actually ends the session on this device.
+  let supabase
+  try {
+    supabase = await createClient()
+  } catch {
+    supabase = null
+  }
 
   // `local`, not the default `global`. Global revokes every refresh token the
   // account holds, so signing out of a school computer would also sign the
   // student out on their phone — a punishment for tidying up after yourself.
-  await supabase.auth.signOut({ scope: 'local' })
+  await supabase?.auth.signOut({ scope: 'local' })
 
   // The e2e bypass IS the session in a test run, so sign-out has to end it too.
   // Otherwise the gate keeps letting the browser through and the check that

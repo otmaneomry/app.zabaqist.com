@@ -19,7 +19,7 @@ connecter**.
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<colle-la-vraie-cle-publishable>
 NEXT_PUBLIC_SITE_URL=https://app.zabaqist.com
 ```
 
@@ -34,6 +34,15 @@ Deux choses à ajouter en dehors de Vercel, sinon la connexion échoue :
 2. **Supabase → Authentication → URL Configuration** → ajouter le domaine
    Vercel dans *Site URL* et *Redirect URLs*, sinon Supabase refuse de
    renvoyer vers lui après Google.
+
+> **Coller la vraie valeur, jamais l'exemple.** Un placeholder collé tel quel
+> — `sb_publishable_` suivi de points de suspension — se retrouve dans un
+> en-tête HTTP, qui n'accepte que de l'ASCII : le client d'authentification
+> lève `Cannot convert argument to a ByteString`, **réessaie**, et chaque page
+> met 25 secondes sans qu'aucun message ne nomme la clé.
+> `lib/supabase/config.ts` refuse maintenant une clé non-ASCII ou trop courte
+> et le dit en clair, mais la vraie clé se prend dans
+> Supabase → Project Settings → API Keys.
 
 ## Variables d'environnement
 

@@ -10,8 +10,15 @@
 
 import { createBrowserClient } from '@supabase/ssr'
 
-export const createClient = () =>
-  createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-  )
+import { supabaseConfig } from './config'
+
+/**
+ * Throws when the configuration is unusable, rather than letting the auth
+ * client retry a request that can never succeed — see `./config.ts`. Callers
+ * here are all inside effects that already tolerate a rejection.
+ */
+export const createClient = () => {
+  const config = supabaseConfig()
+  if (!config) throw new Error('Supabase is not configured')
+  return createBrowserClient(config.url, config.key)
+}

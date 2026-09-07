@@ -25,6 +25,7 @@ import createMiddleware from 'next-intl/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { E2E_COOKIE, isE2E } from '@/lib/e2e'
+import { supabaseConfig } from '@/lib/supabase/config'
 import { routing } from '@/i18n/routing'
 
 const intl = createMiddleware(routing)
@@ -67,12 +68,13 @@ const hasE2EBypass = (req: NextRequest) =>
  * serving. An outage should cost reach, not the whole site.
  */
 async function currentUser(req: NextRequest, response: Response) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-  if (!url || !key) return null
+  // Missing OR malformed — a placeholder pasted into .env.local throws inside
+  // the auth client and is then *retried*, which cost 25 seconds a page.
+  const config = supabaseConfig()
+  if (!config) return null
 
   try {
-    const supabase = createServerClient(url, key, {
+    const supabase = createServerClient(config.url, config.key, {
       cookies: {
         getAll: () => req.cookies.getAll(),
         // Refresh onto `response` — never onto a fresh NextResponse, or the

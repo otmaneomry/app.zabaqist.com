@@ -26,7 +26,15 @@ export async function GET(request: NextRequest) {
 
   if (!code) return NextResponse.redirect(`${origin}/signin?error=1`)
 
-  const supabase = await createClient()
+  let supabase
+  try {
+    supabase = await createClient()
+  } catch {
+    // Unconfigured: say so on the sign-in page rather than throwing a 500 at
+    // someone who has just come back from Google.
+    return NextResponse.redirect(`${origin}/signin?error=1`)
+  }
+
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)
   if (error || !data.user?.email)
     return NextResponse.redirect(`${origin}/signin?error=1`)

@@ -14,12 +14,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+import { supabaseConfig } from './config'
+
 export async function createClient() {
   const store = await cookies()
+  const config = supabaseConfig()
+  if (!config) throw new Error('Supabase is not configured')
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    config.url,
+    config.key,
     {
       cookies: {
         getAll: () => store.getAll(),

@@ -61,7 +61,7 @@ connexion vers `/signin` avant même l'échange du code.
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<colle-la-vraie-cle-publishable>
 ```
 
 C'est tout. Pas d'`AUTH_URL` : le callback est construit à partir de l'origine

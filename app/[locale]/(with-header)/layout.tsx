@@ -24,10 +24,16 @@ import { createClient } from '@/lib/supabase/server'
 export default async function WithHeaderLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const supabase = await createClient()
-  const {
-    data: { user: account },
-  } = await supabase.auth.getUser()
+  // `proxy.ts` has already turned away anyone without a session, so this is
+  // for drawing an avatar. It must not take the page down when the service is
+  // unusable — an e2e-bypassed request reaches here with no Supabase at all.
+  let account = null
+  try {
+    const supabase = await createClient()
+    account = (await supabase.auth.getUser()).data.user
+  } catch {
+    /* no profile to draw */
+  }
 
   // Google's profile fields arrive under user_metadata, with two spellings of
   // the avatar depending on how the identity was linked.
