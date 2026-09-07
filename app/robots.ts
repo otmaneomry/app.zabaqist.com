@@ -13,8 +13,19 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/demarrer', '/filiere', '/progres', '/signin', '/signup', '/api/'],
+      // `/home` is the private dashboard and belongs here as much as /progres
+    // does; it was the one page in the signed-in shell nobody listed.
+    disallow: [
+      '/home',
+      '/demarrer',
+      '/filiere',
+      '/progres',
+      '/signin',
+      '/signup',
+      '/auth/',
+      '/api/',
+    ],
     },
-    sitemap: 'https://zabaqist.com/sitemap.xml',
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://app.zabaqist.com'}/sitemap.xml`,
   }
 }

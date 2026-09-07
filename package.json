@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "test:course": "E2E_AUTH_SECRET=${E2E_AUTH_SECRET:-e2e-local-only} node --experimental-strip-types --no-warnings scripts/test-course.mjs",
     "check": "tsc --noEmit && eslint .",
-    "db:check": "node --no-warnings scripts/db-check.mjs"
+    "db:check": "node --no-warnings scripts/db-check.mjs",
+    "prod:check": "node --no-warnings scripts/prod-check.mjs",
+    "loop": "npm run db:check && npm run prod:check"
   },
   "dependencies": {
     "@mantine/core": "^9.6.0",

@@ -74,6 +74,47 @@ C'est ce qui autorisera un jour le passage en L2 — pas l'ancienneté.
 `1` si un contrôle échoue, `0` sinon. Les avertissements ne font jamais échouer
 la commande : une boucle qui crie au loup finit par être ignorée.
 
+## Boucle 2 — prêt pour la production (L1)
+
+```bash
+npm run prod:check
+```
+
+396 contrôles, classés par ce qu'ils coûtent :
+
+| Niveau | Sens |
+| --- | --- |
+| **blocker** | empêche une mise en ligne ; fait échouer la commande |
+| **should** | dette réelle, à traiter avant le lancement |
+| **note** | jugement humain requis |
+
+Elle vérifie des choses **démontrables depuis l'arborescence** : aucun secret
+en clair ni fichier `.env` commité, `getUser()` et non `getSession()` dans la
+porte, les pages privées interdites aux robots, chaque chapitre du catalogue
+présent sur le disque, chaque image existante, parité des clés fr/ar, absence
+de `console.log` livré, en-têtes de sécurité, supervision d'erreurs, CI.
+
+Ce qu'elle ne fait **pas** : juger la qualité d'un texte ou d'une pédagogie.
+Cela appartient à une personne, pas à une boucle.
+
+### Elle a déjà trouvé ce qu'une relecture avait laissé passer
+
+- `app/robots.ts` n'interdisait pas `/home` — la seule page du shell connecté
+  que personne n'avait listée.
+- `app/sitemap.ts` et `app/robots.ts` annonçaient `zabaqist.com`, le site
+  vitrine, alors que chaque URL listée n'est servie que par cette application.
+  Les robots étaient envoyés vers des pages qui répondent 404 là-bas.
+
+Le second point, la boucle ne le voyait pas non plus au premier passage : il a
+été trouvé en relisant ce qu'elle signalait, puis **ajouté à la boucle**. C'est
+le cycle attendu — un vérificateur apprend de ce qu'il a manqué.
+
+## Les deux ensemble
+
+```bash
+npm run loop        # db:check && prod:check
+```
+
 ## Passer en L2
 
 Rien n'est automatique aujourd'hui. Pour mettre celle-ci sur un rythme :

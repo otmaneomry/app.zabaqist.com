@@ -3,7 +3,10 @@ import type { MetadataRoute } from 'next'
 import { listCourses } from '@/lib/courseCatalog'
 import { routing } from '@/i18n/routing'
 
-const SITE = 'https://zabaqist.com'
+// The app's own origin, not the marketing site's. Every entry below is a page
+// only this deployment serves; listing them under zabaqist.com pointed Google
+// at URLs that 404 there.
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://app.zabaqist.com'
 
 /**
  * Every indexable URL, in both locales.
