@@ -158,10 +158,6 @@ export async function pullAll(userId: string): Promise<boolean> {
         courseId: row.course_slug,
         lastVisitedTab: local?.lastVisitedTab || (row.last_visited_view ?? ''),
         completedTabs: [...views],
-        exercisesAttempted: local?.exercisesAttempted ?? [],
-        exercisesCompleted: local?.exercisesCompleted ?? [],
-        homeworkStarted: local?.homeworkStarted ?? false,
-        homeworkCompleted: local?.homeworkCompleted ?? false,
         lastUpdated: row.updated_at ?? local?.lastUpdated ?? new Date().toISOString(),
         timeSpent: Math.max(local?.timeSpent ?? 0, row.time_spent_seconds ?? 0),
       }

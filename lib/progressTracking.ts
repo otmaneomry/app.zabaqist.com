@@ -5,14 +5,22 @@
 
 import { logSectionRead, logSeconds } from './activity'
 
+/**
+ * What this device remembers about one chapter.
+ *
+ * It used to carry `exercisesAttempted`, `exercisesCompleted`,
+ * `homeworkStarted` and `homeworkCompleted` — four fields left from the
+ * hand-written JSX courses, which nothing has written or read since the
+ * markdown migration. `getCompletionPercentage` scored them on invented
+ * weights (40% for tabs over a hardcoded six, 30% for exercises "assume 4",
+ * 30% for homework) and had no callers at all: a second, wrong answer to the
+ * question `summarize()` already answers by counting sections against the
+ * chapter's real total.
+ */
 export interface CourseProgress {
   courseId: string
   lastVisitedTab: string
   completedTabs: string[]
-  exercisesAttempted: number[]
-  exercisesCompleted: number[]
-  homeworkStarted: boolean
-  homeworkCompleted: boolean
   lastUpdated: string
   timeSpent: number // in seconds
 }
@@ -68,10 +76,6 @@ export function markTabCompleted(courseId: string, tabId: string): void {
     courseId,
     lastVisitedTab: tabId,
     completedTabs: [],
-    exercisesAttempted: [],
-    exercisesCompleted: [],
-    homeworkStarted: false,
-    homeworkCompleted: false,
     lastUpdated: new Date().toISOString(),
     timeSpent: 0
   }
@@ -103,35 +107,6 @@ export function addTimeSpent(courseId: string, seconds: number): void {
   saveCourseProgress(progress)
 }
 
-/**
- * Calculate completion percentage
- */
-export function getCompletionPercentage(courseId: string, totalTabs: number = 6): number {
-  const progress = getCourseProgress(courseId)
-  if (!progress) return 0
-
-  let completed = 0
-  const weights = {
-    tabs: 0.4,          // 40% for viewing tabs
-    exercises: 0.3,     // 30% for exercises
-    homework: 0.3       // 30% for homework
-  }
-
-  // Tab completion
-  completed += (progress.completedTabs.length / totalTabs) * weights.tabs
-
-  // Exercise completion (assume 4 exercises)
-  completed += (progress.exercisesCompleted.length / 4) * weights.exercises
-
-  // Homework completion
-  if (progress.homeworkCompleted) {
-    completed += weights.homework
-  } else if (progress.homeworkStarted) {
-    completed += weights.homework * 0.5
-  }
-
-  return Math.round(completed * 100)
-}
 
 /**
  * Get formatted time spent
@@ -150,21 +125,3 @@ export function getFormattedTimeSpent(courseId: string): string {
   return `${minutes}m`
 }
 
-/**
- * Reset progress for a course (for testing)
- */
-export function resetCourseProgress(courseId: string): void {
-  if (typeof window === 'undefined') return
-
-  try {
-    const allProgress = localStorage.getItem(STORAGE_KEY)
-    if (!allProgress) return
-
-    const progressMap: Record<string, CourseProgress> = JSON.parse(allProgress)
-    delete progressMap[courseId]
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progressMap))
-  } catch (error) {
-    console.error('Error resetting progress:', error)
-  }
-}

@@ -638,10 +638,6 @@ section('Learning loop')
       courseId: 'limites-et-continuite',
       lastVisitedTab: ids[0],
       completedTabs: ids,
-      exercisesAttempted: [],
-      exercisesCompleted: [],
-      homeworkStarted: false,
-      homeworkCompleted: false,
       lastUpdated: new Date().toISOString(),
       timeSpent: 0,
     }
@@ -1131,42 +1127,56 @@ section('Auth (Google)')
 }
 
 section('Home page')
-// "Jump back in" must resume the course this device was actually on — the card
-// used to be a hardcoded link to a different course.
-const home = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+// The dashboard opens on one dominant panel: the chapter to continue, its plan,
+// and a single button. It replaced a resume card, a premium banner claiming
+// "6x more likely", and six recommended chapters that did not exist.
+const home = await browser.newPage({ viewport: { width: 1280, height: 1000 } })
 await home.goto(`${BASE}/home`, { waitUntil: 'load' })
 await home.waitForSelector(HYDRATED)
-await home.waitForTimeout(400)
-const jump = home.getByRole('link', { name: messages.dashboard.start })
-ok(await jump.isVisible(), 'fresh device: the card offers to start chapter 1')
+await home.waitForTimeout(500)
+
+const startCta = home.getByRole('link', { name: messages.dashboard.continueStart })
+ok(await startCta.isVisible(), 'fresh device: the panel offers to start chapter 1')
 ok(
-  (await jump.getAttribute('href')) === `/courses/${SLUG}`,
-  `"Jump back in" links to /courses/${SLUG}`,
-  await jump.getAttribute('href'),
+  (await startCta.getAttribute('href')) === `/courses/${SLUG}`,
+  'and starting opens the chapter path, not a section',
+  await startCta.getAttribute('href'),
 )
 ok(
-  await home.getByRole('link', { name: new RegExp(doc.meta.title, 'i') }).first().isVisible(),
-  'the chapter is listed under "Continuer l\'apprentissage"',
+  (await home.locator(`a[href^="/courses/${SLUG}?s="]`).count()) >= 5,
+  "the chapter's own plan is listed, each part linked",
 )
 
-// After reading a section it must resume there, not at the top.
+// After reading, the panel must resume at the next unread part.
 const resumeAt = doc.views[3]
 await home.goto(url(resumeAt.id), { waitUntil: 'load' })
 await home.waitForSelector(HYDRATED)
 await home.waitForTimeout(400)
 await home.goto(`${BASE}/home`, { waitUntil: 'load' })
 await home.waitForSelector(HYDRATED)
-await home.waitForTimeout(400)
-const resume = home.getByRole('link', { name: messages.dashboard.resume })
-ok(await resume.isVisible(), 'after reading, the card offers to resume')
+await home.waitForTimeout(500)
+
+const resume = home.getByRole('link', { name: /Reprendre/ })
+ok(await resume.isVisible(), 'after reading, the panel offers to resume')
 ok(
-  (await resume.getAttribute('href')) === `/courses/${SLUG}?s=${resumeAt.id}`,
-  'it resumes at the section last read',
+  (await resume.getAttribute('href'))?.startsWith(`/courses/${SLUG}?s=`),
+  'and resuming goes straight to a section',
   await resume.getAttribute('href'),
 )
 ok(
   /\d+%/.test(await home.locator('text=/%/').first().innerText()),
   'it shows real progress, not a placeholder',
+)
+
+// Nothing fabricated survives on this page.
+const homeText = await home.locator('body').innerText()
+ok(
+  !/Hydrogen League|6x more likely|Matrices et D/.test(homeText),
+  'no invented league, claim or chapter is left on the dashboard',
+)
+ok(
+  await home.getByRole('link', { name: new RegExp(doc.meta.title, 'i') }).first().isVisible(),
+  'the chapter is still reachable from the programme grid',
 )
 await home.close()
 

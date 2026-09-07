@@ -75,10 +75,14 @@ const proxy = read('proxy.ts')
 // A deployment missing NEXT_PUBLIC_SUPABASE_* must degrade, not 500 every
 // page including the public landing one. That is how the first Vercel deploy
 // failed.
-check(/catch\s*\{/.test(proxy) && /if \(!url \|\| !key\) return null/.test(proxy),
+// Assert the PROPERTY, not one spelling of it: the guard moved into
+// lib/supabase/config.ts, which also catches a malformed key the earlier
+// `if (!url || !key)` could not. Pinning the old line made this fail on an
+// improvement — a verifier has to track what is true, not what it once read.
+check(/catch\s*\{/.test(proxy) && /supabaseConfig\(\)/.test(proxy),
   'blocker', 'gate-resilient',
-  'proxy.ts throws when Supabase is missing or unreachable',
-  'an unset env var would 500 every page, landing included')
+  'proxy.ts does not guard against Supabase being missing or unreachable',
+  'an unset or malformed env var would 500 every page, landing included')
 
 check(/getUser\(\)/.test(proxy), 'blocker', 'gate-getuser',
   'proxy.ts does not revalidate the session with getUser()',

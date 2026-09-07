@@ -173,7 +173,15 @@
     "workSections": "فقرة مقروءة",
     "workTime": "دقيقة من القراءة",
     "workPrivate": "مرئي لك وحدك. لا ترتيب ولا مقارنة.",
-    "welcome": "أهلًا من جديد"
+    "welcome": "أهلًا من جديد",
+    "continueEyebrow": "{branch} · الفصل {n}",
+    "continueResume": "تابع: {tab}",
+    "continueStart": "ابدأ الفصل",
+    "continueDone": "انتهى الفصل",
+    "continueReview": "مراجعة الفصل",
+    "continuePct": "{pct}% من الفصل",
+    "nextUp": "بقية برنامجك",
+    "allChapters": "عرض الفصول الـ{n}"
   },
   "meta": {
     "title": "رياضيات الثانية باكالوريا المغرب — البرنامج الرسمي في دروس تُحرّكها بيدك | زباقيست",

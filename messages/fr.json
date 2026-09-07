@@ -173,7 +173,15 @@
     "workSections": "sections lues",
     "workTime": "minutes de lecture",
     "workPrivate": "Visible par toi seul. Aucun classement, aucune comparaison.",
-    "welcome": "Te revoilà"
+    "welcome": "Te revoilà",
+    "continueEyebrow": "{branch} · Chapitre {n}",
+    "continueResume": "Reprendre : {tab}",
+    "continueStart": "Commencer le chapitre",
+    "continueDone": "Chapitre terminé",
+    "continueReview": "Revoir le chapitre",
+    "continuePct": "{pct}% du chapitre",
+    "nextUp": "La suite de ton programme",
+    "allChapters": "Voir les {n} chapitres"
   },
   "meta": {
     "title": "Maths 2ème Bac Maroc — le programme officiel en leçons que tu manipules | Zabaqist",

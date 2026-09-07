@@ -48,7 +48,7 @@ const ContinueLearningSection: React.FC = () => {
 
     return (
         <section>
-            <h2 className="mb-4 text-2xl font-bold tracking-tight text-zb-ink">{t('continueLearning')}</h2>
+            <h2 className="mb-4 text-2xl font-bold tracking-tight text-zb-ink">{t('nextUp')}</h2>
             <div className="mb-4 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
                 {courses.map((course) => (
                     <CourseCard key={course.title} {...course} />
