@@ -59,7 +59,7 @@ Icons:            @tabler/icons-react
 ### Project Structure
 
 ```
-math-elearning/
+app.zabaqist.com/
 ├── app/
 │   ├── courses/
 │   │   └── fonctions-logarithmiques/
@@ -486,7 +486,7 @@ interface ExerciseWithSolution {
 
 ```bash
 # Clone repository
-cd /Users/otmane/www/zabaqist/math-elearning
+cd /Users/otmane/www/zabaqist/app.zabaqist.com
 
 # Install dependencies
 npm install
@@ -991,7 +991,7 @@ console.log(window.ggbApplet)
 ### Contact Information
 
 - **GitHub Issues:** https://github.com/anthropics/claude-code/issues
-- **Repository:** `/Users/otmane/www/zabaqist/math-elearning`
+- **Repository:** `/Users/otmane/www/zabaqist/app.zabaqist.com`
 
 ---
 

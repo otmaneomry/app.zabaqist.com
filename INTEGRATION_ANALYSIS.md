@@ -2,7 +2,7 @@
 ## Comparing Old Project vs Current MVP
 
 **Date**: 2026-01-13
-**Current Project**: `/Users/otmane/www/zabaqist/math-elearning` (New MVP - Mantine UI, Moroccan Bac focus)
+**Current Project**: `/Users/otmane/www/zabaqist/app.zabaqist.com` (New MVP - Mantine UI, Moroccan Bac focus)
 **Old Project**: `/Users/otmane/www/zabaqist/zabaqist-frontend` (Original full-featured platform)
 
 ---
@@ -544,7 +544,7 @@ Static course pages, no persistence
 ## File Structure After Integration
 
 ```
-math-elearning/ (current project)
+app.zabaqist.com/ (current project)
 ├── package.json (updated with all dependencies)
 ├── next.config.js
 ├── tailwind.config.ts

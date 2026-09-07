@@ -1137,7 +1137,7 @@ npm install --save-dev @types/katex
 ## File Structure After Implementation
 
 ```
-math-elearning/
+app.zabaqist.com/
 ├── app/
 │   ├── env.ts (NEW)
 │   ├── layout.tsx
@@ -1270,7 +1270,7 @@ Optional: Visit `/signin` to test login (credentials: `test@test.com` / `passwor
 ## File Structure (Current Implementation)
 
 ```
-math-elearning/
+app.zabaqist.com/
 ├── app/
 │   ├── env.ts ✅
 │   ├── signin/page.tsx ✅
