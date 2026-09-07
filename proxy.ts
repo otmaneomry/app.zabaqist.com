@@ -51,31 +51,56 @@ function withoutLocale(pathname: string): string {
 const hasE2EBypass = (req: NextRequest) =>
   isE2E(req.cookies.get(E2E_COOKIE)?.value)
 
-export default async function proxy(req: NextRequest) {
-  const response = intl(req)
+/**
+ * Who is asking, or null.
+ *
+ * Never throws. Two ways this used to take the whole site down with a 500 on
+ * every request, including the public landing page:
+ *
+ *   · a missing env var — `createServerClient(undefined!, undefined!)` throws
+ *     immediately, and a Vercel deployment without the two NEXT_PUBLIC_SUPABASE
+ *     variables set is exactly that;
+ *   · Supabase being unreachable — the `getUser()` call rejects.
+ *
+ * Both now resolve to "nobody is signed in", which fails CLOSED: protected
+ * routes redirect to sign-in rather than opening, and the marketing page keeps
+ * serving. An outage should cost reach, not the whole site.
+ */
+async function currentUser(req: NextRequest, response: Response) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  if (!url || !key) return null
 
-  // Refresh onto `response` — never onto a fresh NextResponse.
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
+  try {
+    const supabase = createServerClient(url, key, {
       cookies: {
         getAll: () => req.cookies.getAll(),
+        // Refresh onto `response` — never onto a fresh NextResponse, or the
+        // rotated tokens are written to the object we throw away.
         setAll: (list) => {
           for (const { name, value, options } of list) {
             req.cookies.set(name, value)
-            response.cookies.set(name, value, options)
+            ;(response as unknown as { cookies: { set: (n: string, v: string, o?: unknown) => void } })
+              .cookies.set(name, value, options)
           }
         },
       },
-    },
-  )
+    })
 
-  // `getUser`, not `getSession`: it revalidates the token with Supabase rather
-  // than trusting a cookie the browser could have written.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    // `getUser`, not `getSession`: it revalidates the token with Supabase
+    // rather than trusting a cookie the browser could have written.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    return user ?? null
+  } catch {
+    return null
+  }
+}
+
+export default async function proxy(req: NextRequest) {
+  const response = intl(req)
+  const user = await currentUser(req, response)
 
   const path = withoutLocale(req.nextUrl.pathname)
   if (user || PUBLIC.includes(path) || hasE2EBypass(req)) return response

@@ -9,6 +9,32 @@ E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111 &
 npm run test:course  # 178 vérifications
 ```
 
+## Vercel — à faire avant le premier déploiement
+
+Les deux variables Supabase doivent être définies **dans le projet Vercel**,
+pour `Production` *et* `Preview`. Sans elles, `proxy.ts` ne peut plus joindre
+Supabase ; il dégrade désormais proprement (les pages publiques répondent, les
+pages privées renvoient vers la connexion) mais **personne ne peut se
+connecter**.
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
+NEXT_PUBLIC_SITE_URL=https://app.zabaqist.com
+```
+
+Ne **jamais** définir `E2E_AUTH_SECRET` sur Vercel : cela ouvre le
+contournement de test.
+
+Deux choses à ajouter en dehors de Vercel, sinon la connexion échoue :
+
+1. **Google Cloud Console** → l'URI de redirection reste celle de Supabase
+   (`https://<ref>.supabase.co/auth/v1/callback`) — inchangée par le
+   déploiement.
+2. **Supabase → Authentication → URL Configuration** → ajouter le domaine
+   Vercel dans *Site URL* et *Redirect URLs*, sinon Supabase refuse de
+   renvoyer vers lui après Google.
+
 ## Variables d'environnement
 
 | Variable | Défaut | À définir en production |

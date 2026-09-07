@@ -72,6 +72,14 @@ for (const f of src) {
 /* ── The gate ─────────────────────────────────────────────────────────── */
 
 const proxy = read('proxy.ts')
+// A deployment missing NEXT_PUBLIC_SUPABASE_* must degrade, not 500 every
+// page including the public landing one. That is how the first Vercel deploy
+// failed.
+check(/catch\s*\{/.test(proxy) && /if \(!url \|\| !key\) return null/.test(proxy),
+  'blocker', 'gate-resilient',
+  'proxy.ts throws when Supabase is missing or unreachable',
+  'an unset env var would 500 every page, landing included')
+
 check(/getUser\(\)/.test(proxy), 'blocker', 'gate-getuser',
   'proxy.ts does not revalidate the session with getUser()',
   'getSession() trusts a cookie the browser could have written')
