@@ -183,6 +183,34 @@ try {
   check(false, 'blocker', 'i18n-parse', 'a messages file does not parse')
 }
 
+// A sitemap is a list of pages you are asking Google to index. It listed
+// `/courses` and all thirteen chapters while `proxy.ts` answered a crawler with
+// a 307 to `/signin` — which `robots.ts` disallows, so the crawler could not
+// even follow it. Both now read `lib/publicPaths.ts`; this checks they still do.
+{
+  const pub = read('lib/publicPaths.ts')
+  const sm = read('app/sitemap.ts')
+  check(/INDEXABLE_PATHS/.test(sm), 'should', 'sitemap-source',
+    'app/sitemap.ts does not build its list from lib/publicPaths.ts')
+  check(/PUBLIC_PATHS/.test(read('proxy.ts')), 'should', 'gate-source',
+    'proxy.ts does not gate on lib/publicPaths.ts')
+  // Anything robots.ts disallows must not be offered for indexing.
+  // Only the disallow array: a naive scan also picks up `allow: '/'`, which
+  // made this report the landing page as blocked by robots on a clean tree.
+  const block = /disallow:\s*\[([\s\S]*?)\]/.exec(read('app/robots.ts'))?.[1] ?? ''
+  const disallowed = [...block.matchAll(/'([^']+)'/g)].map((m) => m[1])
+  const indexable = [...pub.matchAll(/INDEXABLE_PATHS = \[([^\]]*)\]/g)]
+    .flatMap((m) => [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]))
+  const clash = indexable.filter((p) => disallowed.includes(p))
+  check(clash.length === 0, 'blocker', 'sitemap-vs-robots',
+    'a path is both indexable and disallowed', clash.join(', '))
+}
+
+// An absolute URL built from an env var that is localhost on every developer's
+// machine. Shipped, it tells crawlers the sitemap lives on their own computer.
+check(/localhost|127\.0\.0\.1/.test(read('lib/siteUrl.ts')), 'should', 'site-url-guard',
+  'lib/siteUrl.ts does not reject a localhost origin in production')
+
 // Copy nobody renders. `exercise` and `homework` — 25 keys about checking an
 // answer and a teacher grading your work — outlived the feature they were
 // written for by months, and one of them promised a correction no code could

@@ -26,6 +26,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 import { E2E_COOKIE, isE2E } from '@/lib/e2e'
 import { supabaseConfig } from '@/lib/supabase/config'
+import { PUBLIC_PATHS } from '@/lib/publicPaths'
 import { routing } from '@/i18n/routing'
 
 const intl = createMiddleware(routing)
@@ -35,9 +36,10 @@ const intl = createMiddleware(routing)
  *
  * The landing page stays public on purpose: it is the marketing surface, and
  * `app/sitemap.ts` and `app/robots.ts` exist to have it indexed before the
- * September 2026 launch.
+ * September 2026 launch. The list lives in `lib/publicPaths.ts` because the
+ * sitemap has to agree with it — see the note there.
  */
-const PUBLIC = ['/', '/signin', '/signup']
+const PUBLIC = PUBLIC_PATHS as readonly string[]
 
 /** Strip the locale so one list covers both languages. */
 function withoutLocale(pathname: string): string {

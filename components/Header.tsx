@@ -104,7 +104,9 @@ export default function Header({ user }: { user?: HeaderUser }) {
               what pushed the row past the viewport. */}
           <Link
             href="/subscribe"
-            className="inline-flex h-9 items-center gap-2 rounded-full border-2 border-zb-mint px-3 text-sm font-semibold text-zb-mint-deep no-underline transition-colors hover:bg-zb-mint-tint sm:px-4"
+            // `h-11`, not `h-9`: 36px is under the 44px mobile target standard,
+            // and on a phone this shrinks to an icon — so the box IS the target.
+            className="inline-flex h-11 items-center gap-2 rounded-full border-2 border-zb-mint px-3 text-sm font-semibold text-zb-mint-deep no-underline transition-colors hover:bg-zb-mint-tint sm:px-4"
           >
             <IconTrophy size={16} stroke={2} />
             <span className="hidden sm:inline">{t('premium')}</span>

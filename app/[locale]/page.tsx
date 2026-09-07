@@ -18,6 +18,7 @@
 import React from 'react'
 import { getTranslations } from 'next-intl/server'
 
+import OrganizationSchema from '@/components/seo/OrganizationSchema'
 import { listCourses } from '@/lib/courseCatalog'
 
 import { Link } from '@/i18n/navigation'
@@ -47,6 +48,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-dvh bg-zb-cream font-display text-zb-ink">
+      <OrganizationSchema description={t('sub')} />
       <LandingHeader />
 
       {/* ─── Hero ─── */}

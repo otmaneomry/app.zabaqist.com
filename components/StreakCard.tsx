@@ -167,7 +167,7 @@ export default function StreakCard() {
               />
             </span>
             <span
-              className={`font-mono text-[10px] uppercase ${
+              className={`font-mono text-[11px] uppercase ${
                 d.future ? 'text-zb-ink-3/50' : 'text-zb-ink-3'
               }`}
             >

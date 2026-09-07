@@ -1812,14 +1812,52 @@ section('Production readiness')
   const sm = await fetch(`${BASE}/sitemap.xml`)
   const smXml = await sm.text()
   ok(sm.ok && smXml.includes('<urlset'), 'sitemap.xml is served')
-  ok(
-    listCourses().every((c) => smXml.includes(`/courses/${c.slug}`)),
-    'every chapter is in the sitemap',
-  )
+  // The chapters used to be listed here. They are gated — Zabaqist is a closed
+  // beta — so a crawler asking for one got a 307 to `/signin`, which robots.txt
+  // disallows: fourteen of fifteen entries were URLs the sitemap asked Google
+  // to fetch and Google then excluded as "Page with redirect".
+  const gated = listCourses().filter((c) => smXml.includes(`/courses/${c.slug}`))
+  ok(gated.length === 0, 'the sitemap offers no page the app will refuse',
+    gated.map((c) => c.slug).join(', '))
+
+  // Whatever it does list has to answer a signed-out request itself.
+  const locs = [...smXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
+  ok(locs.length > 0, 'the sitemap is not empty')
+  const unreachable = []
+  for (const loc of locs) {
+    const path = new URL(loc).pathname || '/'
+    // No session cookie: this is what a crawler is.
+    const r = await fetch(`${BASE}${path}`, { redirect: 'manual' })
+    if (r.status !== 200) unreachable.push(`${path} -> ${r.status}`)
+  }
+  ok(unreachable.length === 0, 'and every URL in it answers a crawler with 200',
+    unreachable.join(', '))
+
   ok(
     /hreflang="ar"/.test(smXml) && /hreflang="fr"/.test(smXml),
     'and each entry pairs its two locales',
   )
+
+  // Structured data: the public surface had none, so every rich result was
+  // guessed from the prose. `Course` is deliberately absent — its pages are
+  // gated, and declaring them would be a mismatch rather than a rich result.
+  for (const [loc, label] of [['', 'French'], ['/ar', 'Arabic']]) {
+    const html = await (await get(`${BASE}${loc}/`)).text()
+    const m = /application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/.exec(html)
+    ok(!!m, `the ${label} landing page carries structured data`)
+    if (m) {
+      let parsed
+      try {
+        parsed = JSON.parse(m[1])
+      } catch {
+        /* reported below */
+      }
+      ok(parsed?.['@type'] === 'EducationalOrganization',
+        `and it parses as an organization (${label})`, parsed ? '' : 'invalid JSON')
+      ok(!JSON.stringify(parsed ?? {}).includes('"Course"'),
+        `and claims no Course whose page a crawler cannot fetch (${label})`)
+    }
+  }
 }
 
 section('Regressions')

@@ -64,7 +64,7 @@ export default function PlanPicker({
             >
               {t(p.id === 'annual' ? 'planAnnual' : 'planMonthly')}
               {p.id === 'annual' && (
-                <span className="rounded-full bg-zb-mint-soft px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-zb-mint-deep">
+                <span className="rounded-full bg-zb-mint-soft px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-zb-mint-deep">
                   {t('planPopular')}
                 </span>
               )}

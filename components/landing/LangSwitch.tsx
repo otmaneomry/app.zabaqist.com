@@ -33,7 +33,10 @@ export default function LangSwitch({
       href={pathname}
       locale={other}
       aria-label={t('label')}
-      className={`inline-flex h-8 items-center rounded-full border border-zb-line px-3 text-xs font-medium text-gray-600 no-underline transition-colors hover:border-zb-mint/40 hover:text-zb-ink ${className}`}
+      // `min-h-11`, not `h-8`: the visible pill stays small, but the row it sits
+      // in is a 44px target. At 32px this failed every mobile guideline while
+      // being the control a bilingual reader reaches for most.
+      className={`inline-flex min-h-11 items-center rounded-full border border-zb-line px-3 text-xs font-medium text-zb-ink-2 no-underline transition-colors hover:border-zb-mint/40 hover:text-zb-ink ${className}`}
     >
       {t('switch')}
     </Link>

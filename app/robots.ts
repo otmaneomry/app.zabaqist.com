@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next'
 
+import { siteUrl } from '@/lib/siteUrl'
+
 /**
  * Crawl rules.
  *
@@ -26,6 +28,8 @@ export default function robots(): MetadataRoute.Robots {
       '/api/',
     ],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://app.zabaqist.com'}/sitemap.xml`,
+    // `siteUrl()` refuses a localhost origin in a production build; this line
+    // used to publish whatever was in .env.local straight into robots.txt.
+    sitemap: `${siteUrl()}/sitemap.xml`,
   }
 }

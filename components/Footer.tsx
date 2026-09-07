@@ -11,6 +11,23 @@
  *
  * `pricing`, `careers`, `help` and `educators` are gone. Nothing was ever behind
  * them, and a link that leads nowhere costs more than a missing link.
+ *
+ * TWO THINGS WERE FIXED HERE FOR MOBILE, and both were measured at 390x844:
+ *
+ *  1. TAP TARGETS. Every link was a bare inline <a>: 20px tall, its whole height
+ *     coming from line-height, with 8px between it and the next one. **WCAG 2.2
+ *     SC 2.5.8 asks for 24x24 CSS px minimum**, so seven links on every page in
+ *     the app failed it outright — on a product whose audience is entirely on
+ *     phones. They are now 44px rows (`min-h-11`), the platform standard rather
+ *     than the floor. `space-y-2` went with it: the padding IS the spacing now,
+ *     and keeping both would have doubled the gaps.
+ *  2. THE BRAND. It was `bg-gray-800` / `text-white` / `hover:text-gray-300` —
+ *     generic Tailwind neutrals under an app that is mint, cream and gold
+ *     everywhere else, and directly under a marketing site whose footer is
+ *     `--zb-mint-deep` with cream text over a gold rule. A reader who follows
+ *     the link from zabaqist.com should not feel the brand drop out at the
+ *     bottom of the page. Cream on mint-deep measures 5.53:1 — the same pair
+ *     the marketing site already ships and has pixel-sampled.
  */
 
 import React from 'react';
@@ -19,6 +36,10 @@ import {useLocale, useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
 
 const SITE = 'https://zabaqist.com';
+
+/** One row, one 44px target. Used for both internal and external links. */
+const LINK_CLASS =
+    'inline-flex min-h-11 items-center text-sm text-zb-cream/90 no-underline transition-colors hover:text-zb-gold';
 
 export default function Footer() {
     const t = useTranslations('footer');
@@ -54,25 +75,25 @@ export default function Footer() {
     ];
 
     return (
-        <footer className="bg-gray-800 py-10 text-white">
-            <div className="container mx-auto max-w-7xl px-4">
-                <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+        <footer className="border-t-4 border-zb-gold bg-zb-mint-deep py-10 text-zb-cream">
+            <div className="container mx-auto max-w-7xl px-5 sm:px-6">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-3">
                     {columns.map((col) => (
                         <div key={col.title}>
-                            <h3 className="mb-4 text-lg font-semibold">{col.title}</h3>
-                            <ul className="space-y-2">
+                            <h3 className="mb-1 text-sm font-bold text-zb-gold">{col.title}</h3>
+                            <ul className="flex flex-col">
                                 {col.links.map((l) => (
-                                    <li key={l.href}>
+                                    <li key={l.href} className="flex">
                                         {col.external ? (
                                             <a
                                                 href={l.href}
                                                 rel="noopener noreferrer"
-                                                className="hover:text-gray-300"
+                                                className={LINK_CLASS}
                                             >
                                                 {l.label}
                                             </a>
                                         ) : (
-                                            <Link href={l.href} className="hover:text-gray-300">
+                                            <Link href={l.href} className={LINK_CLASS}>
                                                 {l.label}
                                             </Link>
                                         )}
@@ -82,8 +103,10 @@ export default function Footer() {
                         </div>
                     ))}
                 </div>
-                <div className="mt-8 border-t border-gray-700 pt-8 text-center">
-                    <p>{t('rights', {year: new Date().getFullYear()})}</p>
+                <div className="mt-8 border-t border-zb-cream/20 pt-6 text-center">
+                    <p className="text-sm text-zb-cream/80">
+                        {t('rights', {year: new Date().getFullYear()})}
+                    </p>
                 </div>
             </div>
         </footer>
