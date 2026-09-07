@@ -37,3 +37,6 @@ next-env.d.ts
 
 # stray backups
 *.backup
+
+# Loop-engineering run state (scripts/db-check.mjs)
+.loop/
