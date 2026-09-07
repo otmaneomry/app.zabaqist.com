@@ -19,8 +19,8 @@ const MainContent = () => {
                 <Grid.Col span={{base: 12, lg: 4}}>
                     <Stack gap="lg">
                         <section>
-                            <Title order={2} mb="md" style={{color: '#1f2937'}}>
-                                Welcome back!
+                            <Title order={2} mb="md" className="tracking-tight text-zb-ink">
+                                {t('welcome')}
                             </Title>
                             <Stack gap="md">
                                 <StreakCard/>
@@ -35,7 +35,7 @@ const MainContent = () => {
                     <ScrollArea h={{base: 'auto', lg: 'calc(100vh - 100px)'}}>
                         <Stack gap="xl" pr={{base: 0, lg: 'md'}}>
                             <section>
-                                <Title order={2} mb="md" style={{color: '#1f2937'}}>
+                                <Title order={2} mb="md" className="tracking-tight text-zb-ink">
                                     {t('jumpBackIn')}
                                 </Title>
                                 <Stack gap="md">

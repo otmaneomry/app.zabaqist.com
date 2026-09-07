@@ -154,12 +154,26 @@
     "recommended": "Recommandé pour vous"
   },
   "dashboard": {
-    "jumpBackIn": "Jump back in",
+    "jumpBackIn": "Reprends où tu en étais",
     "resume": "Reprendre le cours",
     "start": "Commencer le cours",
     "percentRead": "{pct}% du chapitre parcouru",
     "continueLearning": "Continuer l'apprentissage",
-    "seeMore": "Voir plus"
+    "seeMore": "Voir plus",
+    "streakTitle": "Ta régularité",
+    "streakDays": "{n, plural, =0 {jour} one {jour} other {jours}}",
+    "streakNone": "Ouvre une section aujourd’hui pour commencer une série.",
+    "streakKeep": "Reviens demain pour la tenir.",
+    "streakToday": "C’est fait pour aujourd’hui.",
+    "streakBest": "Meilleure série",
+    "streakActive": "Jours travaillés",
+    "workTitle": "Ton travail",
+    "workNone": "Rien encore. Ce compteur ne bouge que quand tu ouvres une section.",
+    "workXp": "points",
+    "workSections": "sections lues",
+    "workTime": "minutes de lecture",
+    "workPrivate": "Visible par toi seul. Aucun classement, aucune comparaison.",
+    "welcome": "Te revoilà"
   },
   "meta": {
     "title": "Maths 2ème Bac Maroc — le programme officiel en leçons que tu manipules | Zabaqist",

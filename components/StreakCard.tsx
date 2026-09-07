@@ -1,66 +1,171 @@
-import React from 'react';
-import {Card} from "@mantine/core";
+'use client'
 
-const StreakCard = () => {
-    return (
-        <Card padding="lg" radius="lg" withBorder>
-            <div style={{marginBottom: '1rem'}}>
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
-                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <h2 style={{fontSize: '2.25rem', fontWeight: 'bold', marginRight: '0.5rem'}}>0</h2>
+/**
+ * Regularity, as this device actually recorded it.
+ *
+ * Everything here used to be invented: a hardcoded `0`, a hardcoded `3` for
+ * longest streak, a hardcoded `33` for lessons completed, five English day
+ * initials starting on Sunday, and a collapse chevron with no handler behind
+ * it. A student who had read thirty sections saw the same numbers as one who
+ * had read none — which makes the whole card noise the moment anyone notices.
+ *
+ * Now: `currentStreak()`, `lastDays(7)` and `lifetime()` from lib/activity.ts,
+ * all computed from the same log the progress dashboard reads.
+ *
+ * The day marker is the khatim, not a lightning bolt. The bolt was Brilliant's
+ * icon; the khatim is ours, and this is a place it MEANS something — one mark
+ * per day, filled when the day was worked. That is the same rule as the list
+ * bullets in `.zb-star-list`: the mark appears where it carries meaning and
+ * nowhere it doesn't.
+ */
 
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             strokeWidth={1.5} stroke="currentColor" style={{width: '2rem', height: '2rem'}}>
-                            <path strokeLinecap="round" strokeLinejoin="round"
-                                  d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/>
-                        </svg>
-                    </div>
-                    <button style={{color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer'}}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="18 15 12 9 6 15"></polyline>
-                        </svg>
-                    </button>
-                </div>
-                <p style={{marginBottom: '1rem'}}>Solve <strong>3 problems</strong> to start a streak</p>
-                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '1rem'}}>
-                    {['Su', 'M', 'T', 'W', 'Th'].map((day, index) => (
-                        <div key={index} style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                            <div style={{
-                                width: '3rem',
-                                height: '3rem',
-                                backgroundColor: '#e5e7eb',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginBottom: '0.5rem'
-                            }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     strokeWidth={1.5} stroke="currentColor" style={{width: '1.5rem', height: '1.5rem'}}>
-                                    <path strokeLinecap="round" strokeLinejoin="round"
-                                          d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/>
-                                </svg>
-                            </div>
-                            <p style={{fontSize: '0.875rem'}}>{day}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-            <div style={{borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem'}}>
-                <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem'}}>
-                    <div>
-                        <p style={{fontWeight: 'bold'}}>3</p>
-                        <p>Longest streak</p>
-                    </div>
-                    <div>
-                        <p style={{fontWeight: 'bold'}}>33</p>
-                        <p>Lessons completed</p>
-                    </div>
-                </div>
-            </div>
-        </Card>
-    );
-};
+import React, { useCallback, useEffect, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 
-export default StreakCard;
+import { KHATIM } from '@/components/landing/Zellige'
+import {
+  ACTIVITY_EVENT,
+  currentStreak,
+  dayKey,
+  lastDays,
+  lifetime,
+  longestStreak,
+} from '@/lib/activity'
+
+/** The eight-point star as a polygon, sized to a box of `r * 2`. */
+function starPoints(r: number): string {
+  const inner = r * KHATIM
+  return Array.from({ length: 16 }, (_, i) => {
+    const rad = i % 2 === 0 ? r : inner
+    const a = (Math.PI / 8) * i - Math.PI / 2
+    return `${(r + rad * Math.cos(a)).toFixed(2)},${(r + rad * Math.sin(a)).toFixed(2)}`
+  }).join(' ')
+}
+
+function DayMark({ worked, today }: { worked: boolean; today: boolean }) {
+  return (
+    <svg viewBox="0 0 34 34" className="size-full" aria-hidden>
+      <polygon
+        points={starPoints(17)}
+        className={
+          worked
+            ? 'fill-zb-mint'
+            : 'fill-transparent stroke-zb-line [stroke-width:1.5]'
+        }
+      />
+      {/* Today is ringed rather than filled when unworked: it is still open,
+          not yet missed. Colouring it like a missed day would be a reproach
+          before the day is over. */}
+      {today && !worked && (
+        <polygon
+          points={starPoints(17)}
+          className="fill-transparent stroke-zb-gold [stroke-dasharray:3_3] [stroke-width:1.8]"
+        />
+      )}
+    </svg>
+  )
+}
+
+interface Snapshot {
+  streak: number
+  best: number
+  days: number
+  week: { key: string; date: Date; worked: boolean }[]
+}
+
+const EMPTY: Snapshot = { streak: 0, best: 0, days: 0, week: [] }
+
+export default function StreakCard() {
+  const t = useTranslations('dashboard')
+  const locale = useLocale()
+  // Starts empty and fills after mount: the log is on the device, so rendering
+  // it on the server would print one student's numbers into another's HTML.
+  const [s, setS] = useState<Snapshot>(EMPTY)
+
+  const read = useCallback(() => {
+    const life = lifetime()
+    setS({
+      streak: currentStreak(),
+      best: longestStreak(),
+      days: life.days,
+      week: lastDays(7),
+    })
+  }, [])
+
+  useEffect(() => {
+    read()
+    window.addEventListener(ACTIVITY_EVENT, read)
+    return () => window.removeEventListener(ACTIVITY_EVENT, read)
+  }, [read])
+
+  const todayKey = dayKey(new Date())
+  const workedToday = s.week.some((d) => d.key === todayKey && d.worked)
+
+  const message =
+    s.streak === 0
+      ? t('streakNone')
+      : workedToday
+        ? t('streakToday')
+        : t('streakKeep')
+
+  return (
+    <section
+      aria-label={t('streakTitle')}
+      className="rounded-2xl border border-zb-line bg-white p-5 shadow-[var(--zb-shadow-sm)]"
+    >
+      <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-zb-ink-3">
+        {t('streakTitle')}
+      </h2>
+
+      <p className="mt-3 flex items-baseline gap-2">
+        <span
+          dir="ltr"
+          className="font-display text-4xl font-bold leading-none tabular-nums text-zb-ink"
+        >
+          {s.streak}
+        </span>
+        <span className="text-sm font-medium text-zb-ink-2">
+          {t('streakDays', { n: s.streak })}
+        </span>
+      </p>
+
+      <p className="mt-2 text-sm leading-relaxed text-zb-ink-2">{message}</p>
+
+      {/* Seven marks, oldest first, in the reader's own week. `dir="ltr"` keeps
+          time running left-to-right on the Arabic route too: a calendar strip
+          is a chart, and charts do not mirror. */}
+      <ul dir="ltr" className="mt-5 flex items-end justify-between gap-1.5">
+        {s.week.map((d) => (
+          <li key={d.key} className="flex flex-1 flex-col items-center gap-1.5">
+            <span className="w-full max-w-8">
+              <DayMark worked={d.worked} today={d.key === todayKey} />
+            </span>
+            <span className="font-mono text-[10px] uppercase text-zb-ink-3">
+              {d.date.toLocaleDateString(locale, { weekday: 'narrow' })}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-zb-line pt-4">
+        {[
+          [s.best, t('streakBest')],
+          [s.days, t('streakActive')],
+        ].map(([value, label]) => (
+          <div key={String(label)}>
+            <dt className="sr-only">{label}</dt>
+            <dd>
+              <span
+                dir="ltr"
+                className="block text-lg font-bold tabular-nums text-zb-ink"
+              >
+                {value}
+              </span>
+              <span className="text-xs text-zb-ink-3">{label}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}

@@ -191,6 +191,71 @@ export function windowFor(
 }
 
 /** Totals across the whole recorded history. */
+/** A day counts as worked if anything at all was logged on it. */
+const worked = (d?: DayActivity) =>
+  !!d && (d.sections > 0 || d.checkpoints > 0 || d.seconds > 0)
+
+const shift = (d: Date, days: number) => {
+  const n = new Date(d)
+  n.setDate(n.getDate() + days)
+  return n
+}
+
+/**
+ * The last `n` days, oldest first, each marked worked or not.
+ *
+ * The student's own calendar days, like the rest of this file: their "today"
+ * is theirs, not UTC's.
+ */
+export function lastDays(n: number): { key: string; date: Date; worked: boolean }[] {
+  const log = readLog()
+  const today = new Date()
+  return Array.from({ length: n }, (_, i) => {
+    const date = shift(today, i - (n - 1))
+    const key = dayKey(date)
+    return { key, date, worked: worked(log[key]) }
+  })
+}
+
+/**
+ * Consecutive worked days, counting back from today.
+ *
+ * A day that has not finished does not break the streak: someone who worked
+ * yesterday and has not yet started this morning is on a streak, not off one.
+ * Counting from today alone would tell a student at 9am that they had lost
+ * something they still have all day to keep.
+ */
+export function currentStreak(): number {
+  const log = readLog()
+  const today = new Date()
+  // Start at today if it counts, otherwise at yesterday — anything older means
+  // a whole day was missed and the streak really is over.
+  let cursor = worked(log[dayKey(today)]) ? today : shift(today, -1)
+  let streak = 0
+  while (worked(log[dayKey(cursor)])) {
+    streak++
+    cursor = shift(cursor, -1)
+  }
+  return streak
+}
+
+/** The best run ever recorded on this device. */
+export function longestStreak(): number {
+  const keys = Object.keys(readLog()).filter((k) => worked(readLog()[k])).sort()
+  let best = 0
+  let run = 0
+  let previous: string | null = null
+  for (const key of keys) {
+    const expected = previous
+      ? dayKey(shift(new Date(`${previous}T12:00:00`), 1))
+      : null
+    run = expected === key ? run + 1 : 1
+    best = Math.max(best, run)
+    previous = key
+  }
+  return best
+}
+
 export function lifetime(): DayActivity & { days: number } {
   const log = readLog()
   const days = Object.keys(log).length

@@ -154,12 +154,26 @@
     "recommended": "مقترَح لك"
   },
   "dashboard": {
-    "jumpBackIn": "تابع من حيث توقفت",
+    "jumpBackIn": "تابع من حيث توقّفت",
     "resume": "تابع الدرس",
     "start": "ابدأ الدرس",
     "percentRead": "قطعت {pct}% من الفصل",
     "continueLearning": "واصل التعلّم",
-    "seeMore": "المزيد"
+    "seeMore": "المزيد",
+    "streakTitle": "انتظامك",
+    "streakDays": "{n, plural, zero {يوم} one {يوم} two {يومان} few {أيام} many {يومًا} other {يوم}}",
+    "streakNone": "افتح فقرة اليوم لتبدأ سلسلة.",
+    "streakKeep": "عُد غدًا للحفاظ عليها.",
+    "streakToday": "أنجزتَ نصيب اليوم.",
+    "streakBest": "أطول سلسلة",
+    "streakActive": "أيام العمل",
+    "workTitle": "حصيلتك",
+    "workNone": "لا شيء بعد. لا يتحرك هذا العدّاد إلا عندما تفتح فقرة.",
+    "workXp": "نقطة",
+    "workSections": "فقرة مقروءة",
+    "workTime": "دقيقة من القراءة",
+    "workPrivate": "مرئي لك وحدك. لا ترتيب ولا مقارنة.",
+    "welcome": "أهلًا من جديد"
   },
   "meta": {
     "title": "رياضيات الثانية باكالوريا المغرب — البرنامج الرسمي في دروس تُحرّكها بيدك | زباقيست",
