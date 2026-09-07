@@ -97,6 +97,15 @@ drop policy if exists "profil : écriture de soi" on public.profiles;
 create policy "profil : écriture de soi" on public.profiles
   for update using (auth.uid() = id) with check (auth.uid() = id);
 
+-- Une policy INSERT est nécessaire même si la ligne existe déjà : `upsert` côté
+-- PostgREST est un `insert ... on conflict do update`, et RLS évalue le droit
+-- d'insertion avant de savoir que ce sera une mise à jour. Sans elle, la
+-- synchronisation du profil échouait — sans message, la requête étant
+-- simplement refusée.
+drop policy if exists "profil : création de soi" on public.profiles;
+create policy "profil : création de soi" on public.profiles
+  for insert with check (auth.uid() = id);
+
 -- Création du profil au moment où Supabase crée le compte. Google range le nom
 -- et la photo dans raw_user_meta_data, sous deux orthographes selon la façon
 -- dont l'identité a été liée.
