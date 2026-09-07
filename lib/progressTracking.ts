@@ -87,91 +87,9 @@ export function markTabCompleted(courseId: string, tabId: string): void {
   saveCourseProgress(progress)
 }
 
-/**
- * Mark an exercise as attempted
- */
-export function markExerciseAttempted(courseId: string, exerciseNumber: number): void {
-  const progress = getCourseProgress(courseId) || {
-    courseId,
-    lastVisitedTab: 'exercices',
-    completedTabs: [],
-    exercisesAttempted: [],
-    exercisesCompleted: [],
-    homeworkStarted: false,
-    homeworkCompleted: false,
-    lastUpdated: new Date().toISOString(),
-    timeSpent: 0
-  }
 
-  if (!progress.exercisesAttempted.includes(exerciseNumber)) {
-    progress.exercisesAttempted.push(exerciseNumber)
-  }
 
-  saveCourseProgress(progress)
-}
 
-/**
- * Mark an exercise as completed
- */
-export function markExerciseCompleted(courseId: string, exerciseNumber: number): void {
-  const progress = getCourseProgress(courseId) || {
-    courseId,
-    lastVisitedTab: 'exercices',
-    completedTabs: [],
-    exercisesAttempted: [],
-    exercisesCompleted: [],
-    homeworkStarted: false,
-    homeworkCompleted: false,
-    lastUpdated: new Date().toISOString(),
-    timeSpent: 0
-  }
-
-  if (!progress.exercisesCompleted.includes(exerciseNumber)) {
-    progress.exercisesCompleted.push(exerciseNumber)
-  }
-
-  markExerciseAttempted(courseId, exerciseNumber)
-}
-
-/**
- * Mark homework as started
- */
-export function markHomeworkStarted(courseId: string): void {
-  const progress = getCourseProgress(courseId) || {
-    courseId,
-    lastVisitedTab: 'devoir',
-    completedTabs: [],
-    exercisesAttempted: [],
-    exercisesCompleted: [],
-    homeworkStarted: false,
-    homeworkCompleted: false,
-    lastUpdated: new Date().toISOString(),
-    timeSpent: 0
-  }
-
-  progress.homeworkStarted = true
-  saveCourseProgress(progress)
-}
-
-/**
- * Mark homework as completed
- */
-export function markHomeworkCompleted(courseId: string): void {
-  const progress = getCourseProgress(courseId) || {
-    courseId,
-    lastVisitedTab: 'devoir',
-    completedTabs: [],
-    exercisesAttempted: [],
-    exercisesCompleted: [],
-    homeworkStarted: false,
-    homeworkCompleted: false,
-    lastUpdated: new Date().toISOString(),
-    timeSpent: 0
-  }
-
-  progress.homeworkCompleted = true
-  markHomeworkStarted(courseId)
-}
 
 /**
  * Add time spent on course

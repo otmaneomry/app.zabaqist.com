@@ -17,6 +17,7 @@ import React from 'react'
 import { cookies } from 'next/headers'
 
 import Header from '@/components/Header'
+import SyncProvider from '@/components/SyncProvider'
 import { E2E_COOKIE, E2E_USER, isE2E } from '@/lib/e2e'
 import { createClient } from '@/lib/supabase/server'
 
@@ -46,6 +47,12 @@ export default async function WithHeaderLayout({
 
   return (
     <div className="min-h-screen bg-zb-cream">
+      {/* Only for a real session. A request through the e2e bypass has no
+          `auth.uid()`, so every RLS policy would refuse it and the sync would
+          retry forever against a database that is right to say no. */}
+      {account?.email && (
+        <SyncProvider userId={account.id} email={account.email} />
+      )}
       <Header user={user} />
       <main>{children}</main>
     </div>

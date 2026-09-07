@@ -124,6 +124,19 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Rattrapage : les comptes créés avant cette migration n'ont jamais déclenché
+-- le trigger et n'ont donc aucun profil. Sans cette ligne, la synchronisation
+-- écrirait dans le vide pour eux — silencieusement, ce qui est le pire cas.
+insert into public.profiles (id, email, full_name, avatar_url)
+select
+  u.id,
+  u.email,
+  coalesce(u.raw_user_meta_data ->> 'full_name', u.raw_user_meta_data ->> 'name'),
+  coalesce(u.raw_user_meta_data ->> 'avatar_url', u.raw_user_meta_data ->> 'picture')
+from auth.users u
+where u.email is not null
+on conflict (id) do nothing;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Progression par chapitre — lib/progressTracking.ts
 -- ─────────────────────────────────────────────────────────────────────────────

@@ -153,15 +153,52 @@ passage à Supabase Auth.
 Le profil est créé par un trigger sur `auth.users`, donc dès la première
 connexion, sans aller-retour depuis l'application.
 
-## Reste à faire
+## La synchronisation
 
-La progression, l'XP, la filière et les réponses du tunnel vivent encore dans
-`localStorage`, répartis sur cinq fichiers : `lib/courseProgress.ts`,
-`lib/activity.ts`, `lib/filiere.ts`, `lib/onboarding.ts`,
-`lib/progressTracking.ts`.
+`lib/sync.ts` + `components/SyncProvider.tsx`.
 
-**Un élève connecté sur son téléphone ne voit toujours rien de ce qu'il a fait
-sur son ordinateur.** Les tables existent maintenant et RLS les protège ; il
-reste à brancher ces cinq fichiers dessus — lire au montage, écrire au
-changement, et garder `localStorage` comme cache hors ligne plutôt que comme
-source de vérité.
+Les cinq magasins sous `lib/` écrivent toujours dans `localStorage`, exactement
+comme avant : rien au-dessus d'eux n'a changé, et l'application continue de
+fonctionner sans réseau. Ce que la synchronisation change, c'est le statut de
+`localStorage` — un **cache** de Postgres, et non plus la seule copie.
+
+- **À l'arrivée**, `pullAll()` lit les quatre tables et fusionne dans le cache.
+- **À chaque changement**, `pushAll()` renvoie tout, avec 1,5 s de regroupement.
+  Aucun écrivain n'a eu besoin d'être réécrit : ils annoncent déjà tous leurs
+  changements (`zabaqist:progress`, `zabaqist:filiere`, `zabaqist:activity`,
+  `zabaqist:onboarding`), et c'est à ces événements que le provider s'abonne.
+- **À la mise en arrière-plan** (`visibilitychange`, pas `beforeunload` : sur
+  mobile un onglet est souvent tué sans que ce dernier ne se déclenche jamais).
+
+### La règle de fusion : union et maximum, jamais « le dernier gagne »
+
+La progression ne fait que croître — une section lue reste lue, un checkpoint
+tenté reste tenté, les secondes s'accumulent. Prendre l'union des ensembles et
+le plus grand de chaque nombre **ne peut pas perdre de travail**, et n'exige
+aucun accord d'horloge entre un téléphone et un ordinateur.
+
+« Le dernier gagne » laisserait un onglet resté ouvert toute la nuit effacer une
+matinée de lecture — la seule panne qu'un élève ne pardonnerait pas et ne
+saurait jamais décrire précisément.
+
+Deux exceptions assumées :
+
+- **La filière distante n'est adoptée que si l'appareil n'en a aucune.** Un
+  élève qui vient d'en changer ici ne doit pas la voir annulée par une ligne
+  périmée.
+- **`hints` prend le maximum**, pour que la pénalité d'XP déjà payée sur un
+  appareil ne soit pas remboursée sur un autre.
+
+### Silencieux par choix
+
+Ni indicateur, ni « synchronisation… ». Les lectures viennent de
+`localStorage` et sont instantanées ; un élève qui vient de répondre à un
+checkpoint doit qu'on lui parle de sa réponse, pas d'un appel réseau. Un envoi
+qui échoue n'est pas signalé non plus : l'événement suivant le rejoue, et le
+travail est de toute façon en sûreté sur l'appareil.
+
+### Ce qui n'est pas synchronisé
+
+Une requête passée par le contournement e2e n'a pas d'`auth.uid()` : le
+provider n'est donc pas monté pour elle. Sans cela, la synchronisation
+réessaierait indéfiniment contre une base qui a raison de refuser.
