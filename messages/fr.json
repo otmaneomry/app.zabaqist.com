@@ -198,7 +198,9 @@
     "signInError": "La connexion a échoué. Réessaie.",
     "beta": "Gratuit pendant la bêta · lancement septembre 2026",
     "account": "Mon compte",
-    "notAllowed": "Ce compte n’est pas encore invité. Zabaqist est en bêta fermée jusqu’au lancement — écris-nous pour rejoindre la liste."
+    "notAllowed": "Ce compte n’est pas encore invité. Zabaqist est en bêta fermée jusqu’au lancement.",
+    "notAllowedCta": "Rejoindre la liste d’attente",
+    "notAllowedOther": "Ou essaie avec un autre compte Google"
   },
   "onboarding": {
     "back": "Retour",

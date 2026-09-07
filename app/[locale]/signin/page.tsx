@@ -22,6 +22,13 @@ import Logo from '@/components/landing/Logo'
 import GoogleButton from '@/components/auth/GoogleButton'
 import { createClient } from '@/lib/supabase/server'
 
+/**
+ * The marketing site's waitlist form, which already asks for filière, first
+ * name and a phone number — everything the beta needs to invite someone. There
+ * is no second form to build here.
+ */
+const WAITLIST = 'https://www.zabaqist.com/#waitlist'
+
 export default async function SignInPage({
   searchParams,
 }: {
@@ -36,6 +43,7 @@ export default async function SignInPage({
   if (user) redirect(next && /^\/(?!\/)/.test(next) ? next : '/home')
 
   const t = await getTranslations('auth')
+  const notAllowed = error === 'not-allowed'
   // The headline is authored with a line break so it falls the same way in both
   // languages instead of wherever the container happens to wrap.
   const title = t('signInTitle').split('\n')
@@ -68,13 +76,37 @@ export default async function SignInPage({
           >
             {/* An uninvited account is not a failure — say which it is, or the
                 reader retries the same address forever. */}
-            {error === 'not-allowed' ? t('notAllowed') : t('signInError')}
+            {notAllowed ? t('notAllowed') : t('signInError')}
           </p>
         )}
 
-        <div className="mt-8">
-          <GoogleButton next={next} label={t('google')} />
-        </div>
+        {/* Someone who is not on the list has done nothing wrong and should not
+            be left at a dead end. The waitlist is the next step for them, so it
+            becomes the primary action and Google drops to a quieter second —
+            still there, because the usual cause is signing in with the wrong
+            one of two Google accounts. */}
+        {notAllowed ? (
+          <div className="mt-8">
+            <a
+              href={WAITLIST}
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-zb-gold px-5 text-[15px] font-bold text-zb-on-accent no-underline shadow-[var(--zb-shadow-sm)] transition-all hover:shadow-[var(--zb-shadow-md)]"
+            >
+              {t('notAllowedCta')}
+              <span aria-hidden>→</span>
+            </a>
+
+            <p className="mt-6 text-center text-xs text-zb-ink-3">
+              {t('notAllowedOther')}
+            </p>
+            <div className="mt-3">
+              <GoogleButton next={next} label={t('google')} />
+            </div>
+          </div>
+        ) : (
+          <div className="mt-8">
+            <GoogleButton next={next} label={t('google')} />
+          </div>
+        )}
 
         <p className="mt-6 text-center text-xs leading-relaxed text-zb-ink-3">
           {t.rich('legal', {

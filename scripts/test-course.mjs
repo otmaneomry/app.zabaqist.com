@@ -1019,6 +1019,24 @@ section('Auth (Google)')
     'and no password field that leads nowhere',
   )
 
+  // An uninvited account is the commonest way to arrive here during the beta,
+  // and it must not be a dead end: the waitlist is that reader's next step.
+  await pg.goto(`${BASE}/signin?error=not-allowed`, { waitUntil: 'load' })
+  await pg.waitForSelector(HYDRATED)
+  const waitlist = pg.getByRole('link', {
+    name: new RegExp(`${messages.auth.notAllowedCta}|${messagesAr.auth.notAllowedCta}`),
+  })
+  ok(await waitlist.isVisible(), 'an uninvited account is offered the waitlist')
+  ok(
+    (await waitlist.getAttribute('href')) === 'https://www.zabaqist.com/#waitlist',
+    'which points at the marketing site\'s form, not a second one to build',
+    (await waitlist.getAttribute('href')) ?? 'missing',
+  )
+  ok(
+    await pg.getByRole('button', { name: new RegExp(messages.auth.google) }).isVisible(),
+    'and Google stays available, since the usual cause is the wrong account',
+  )
+
   // 3. The OAuth callback must be reachable without a session, and must NOT be
   //    locale-rewritten. next-intl ran before the gate and did not recognise
   //    `auth` as a locale, so it rewrote /auth/callback to /fr/auth/callback —
