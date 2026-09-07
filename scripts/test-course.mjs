@@ -832,9 +832,9 @@ section('Onboarding funnel')
   await pg.getByRole('radio').first().click()
   await cont().click()
   await pg.waitForTimeout(400)
-  await cont().click()
-  await pg.waitForTimeout(400)
-  await pg.getByRole('radio').nth(1).click()
+  // Leaving `programme` lands on the reveal: the daily-goal question that used
+  // to sit between them is out for now (see STEPS in lib/onboarding.ts), and
+  // `completedAt` moved here with it.
   await cont().click()
   await pg.waitForTimeout(600)
 

@@ -40,8 +40,10 @@ export const STEPS: Step[] = [
   { id: 'apercu', kind: 'give', segment: 1, fill: 50 },
   { id: 'filiere', kind: 'ask', segment: 1, fill: 75 },
   { id: 'option', kind: 'ask', segment: 1, fill: 100 },
-  { id: 'programme', kind: 'give', segment: 2, fill: 35 },
-  { id: 'objectif', kind: 'ask', segment: 2, fill: 80 },
+  { id: 'programme', kind: 'give', segment: 2, fill: 50 },
+  // `objectif` — the daily-goal question — is deliberately out for now.
+  // The type and DAILY_GOALS below stay: putting the step back is one line
+  // here plus its block in the funnel, and nothing else was built on it.
   { id: 'plan', kind: 'reveal', segment: 2, fill: 100 },
 ]
 
@@ -51,7 +53,7 @@ export const stepAt = (i: number): Step => STEPS[Math.min(Math.max(i, 0), STEPS.
 export type Motivation = 'bac' | 'rattraper' | 'avance' | 'parent'
 export const MOTIVATIONS: Motivation[] = ['bac', 'rattraper', 'avance', 'parent']
 
-/** Minutes a day. The retention answer, so it is asked last. */
+/** Minutes a day. Kept for when the question returns — see STEPS above. */
 export type DailyGoal = 10 | 20 | 30 | 60
 export const DAILY_GOALS: DailyGoal[] = [10, 20, 30, 60]
 

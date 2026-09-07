@@ -28,12 +28,10 @@ import Zellige from '@/components/landing/Zellige'
 import MathContent from '@/components/math/MathContent'
 import { useRouter as useLocaleRouter } from '@/i18n/navigation'
 import {
-  DAILY_GOALS,
   MOTIVATIONS,
   saveAnswers,
   STEPS,
   stepAt,
-  type DailyGoal,
   type Motivation,
 } from '@/lib/onboarding'
 import {
@@ -75,7 +73,6 @@ export default function DemarrerPage() {
   const [motivation, setMotivation] = useState<Motivation | null>(null)
   const [filiere, setFiliere] = useState<Filiere | null>(null)
   const [track, setTrack] = useState<Track | null>(null)
-  const [goal, setGoal] = useState<DailyGoal | null>(null)
 
   const go = useCallback(
     (i: number) => {
@@ -93,21 +90,21 @@ export default function DemarrerPage() {
       saveFiliere(track)
       saveAnswers({ track, filiere: filiere ?? undefined })
     }
-    if (step.id === 'objectif' && goal) saveGoal(goal)
+    // The funnel counts as finished on leaving the last question, which is now
+    // `programme`. This used to ride along with the daily goal; leaving it
+    // there when that step came out would have meant `completedAt` was never
+    // written and `hasOnboarded()` stayed false forever.
+    if (step.id === 'programme')
+      saveAnswers({ completedAt: new Date().toISOString() })
     go(index + 1)
-
-    function saveGoal(g: DailyGoal) {
-      saveAnswers({ dailyGoal: g, completedAt: new Date().toISOString() })
-    }
-  }, [step.id, motivation, track, filiere, goal, go, index])
+  }, [step.id, motivation, track, filiere, go, index])
 
   /** Continue is disabled until the current question has an answer. */
   const answered =
     step.kind !== 'ask' ||
     (step.id === 'motivation' && !!motivation) ||
     (step.id === 'filiere' && !!filiere) ||
-    (step.id === 'option' && !!track) ||
-    (step.id === 'objectif' && !!goal)
+    (step.id === 'option' && !!track)
 
   const motivationChoices: Choice[] = useMemo(
     () =>
@@ -141,16 +138,6 @@ export default function DemarrerPage() {
         label: a(`track-${tr}`),
       })),
     [a, filiere],
-  )
-
-  const goalChoices: Choice[] = useMemo(
-    () =>
-      DAILY_GOALS.map((g) => ({
-        id: String(g),
-        label: t(`objectif-${g}`),
-        hint: t(`objectif-hint-${g}`),
-      })),
-    [t],
   )
 
   // The plan reveal owns the whole screen — no progress bar, no Continue.
@@ -296,21 +283,6 @@ export default function DemarrerPage() {
           </div>
         )}
 
-        {step.id === 'objectif' && (
-          <>
-            <h1 className="text-3xl font-bold leading-tight">
-              {t('objectifTitle')}
-            </h1>
-            <p className="mt-3 leading-relaxed text-gray-600">
-              {t('objectifBody')}
-            </p>
-            <ChoiceGrid
-              choices={goalChoices}
-              value={goal ? String(goal) : null}
-              onChange={(id) => setGoal(Number(id) as DailyGoal)}
-            />
-          </>
-        )}
       </OnboardingShell>
 
       <ContinueButton
