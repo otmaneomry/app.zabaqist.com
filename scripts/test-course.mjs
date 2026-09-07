@@ -1281,6 +1281,77 @@ section('Programme complet (13 chapitres)')
     drift.map((c) => c.slug).join(', '),
   )
 
+  // The dashboard tiles read progress from localStorage, which the server does
+  // not have. Computing it during render made the server send
+  // `aria-valuenow="0"` while the browser's first render said 18, and React
+  // threw away the server markup for that whole tree. The zero state has to be
+  // what both sides render; the real figures arrive in an effect.
+  {
+    const ctx = await browser.newContext({ storageState: AUTH_STATE })
+    const hp = await ctx.newPage()
+    const bad = []
+    hp.on('pageerror', (e) => bad.push(String(e)))
+    hp.on('console', (m) => m.type() === 'error' && bad.push(m.text()))
+
+    await hp.goto(`${BASE}/home`, { waitUntil: 'networkidle' })
+    await hp.evaluate(() =>
+      localStorage.setItem(
+        'zabaqist:filiere',
+        JSON.stringify({ filiere: 'sm', track: '2bac-sm-a' }),
+      ),
+    )
+    // Progress has to be non-zero, or the zero state matches by accident.
+    const first = docs.get(all[0].slug).views[0].id
+    await hp.goto(`${BASE}/courses/${all[0].slug}?s=${first}`, { waitUntil: 'networkidle' })
+
+    bad.length = 0
+    await hp.goto(`${BASE}/home`, { waitUntil: 'networkidle' })
+    await hp.waitForTimeout(900)
+
+    const hydration = bad.filter((e) => /hydrat|did ?n.t match/i.test(e))
+    ok(hydration.length === 0, 'the dashboard hydrates without a mismatch', hydration[0] ?? '')
+    const bars = await hp
+      .locator('[role="progressbar"]')
+      .evaluateAll((els) => els.map((e) => e.getAttribute('aria-valuenow')))
+    ok(bars.length > 0, 'and still draws its progress bars', `${bars.length} bars`)
+    ok(bars.some((v) => v !== '0'), 'showing the progress this device recorded')
+    await ctx.close()
+  }
+
+  // The premium page was the last of the Brilliant scaffolding, and every claim
+  // on it was invented: a testimonial attributed to the Ministère de
+  // l'Éducation, "Plus de 10,000 avis 5 étoiles" for a closed beta with two
+  // invited addresses, and a chapter list that named chapters not in the
+  // programme. None of that is fixed by translating it.
+  {
+    const fr = JSON.parse(readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'))
+    const arM = JSON.parse(readFileSync(new URL('../messages/ar.json', import.meta.url), 'utf8'))
+    const html = await (await get(`${BASE}/subscribe`)).text()
+    const invented = [
+      "Ministère de l'Éducation",
+      '10,000 avis',
+      'Développements Limités',
+      'brilliant.org',
+    ].filter((x) => html.includes(x))
+    ok(invented.length === 0, 'the premium page claims nothing invented', invented.join(', '))
+
+    // Its chapter list is the catalogue's, so it cannot drift from the
+    // programme the way a typed-in list did.
+    const missing = all.filter((c) => !html.includes(c.title))
+    ok(missing.length === 0, 'and lists the real programme', missing.map((c) => c.slug).join(', '))
+
+    // There is no checkout anywhere in this repository, so the button must not
+    // imply one. It used to read "S'abonner maintenant" with no handler at all.
+    ok(
+      html.includes('zabaqist.com/#waitlist') && !/S'abonner maintenant/.test(html),
+      'and its call to action goes where something actually happens',
+    )
+
+    const ar = await (await get(`${BASE}/ar/subscribe`)).text()
+    ok(ar.includes(arM.premium.heroTitle), 'and the premium page speaks Arabic')
+    ok(!ar.includes(fr.premium.heroTitle), 'with no French left on the Arabic route')
+  }
+
   // `/quiz` is the index above the per-chapter self-assessments: every
   // capability the programme asks for, with the reader's own gaps first.
   {

@@ -130,6 +130,19 @@ for (const m of catalog.matchAll(/file: '([^']+)'/g))
   check(existsSync(path.join('content/course', m[1])), 'blocker', `md-${m[1]}`,
     `content/course/${m[1]} is in the catalogue but missing on disk`)
 
+// Brilliant was the visual reference for this product and its assets kept ending
+// up in the tree — a paywall video and two illustrations were still being served
+// from brilliant.org's own domain on /subscribe, which is both a competitor's
+// copyright and a third party watching our users load a page.
+// The narrower `images-thirdparty` check below only reads catalogue `image:`
+// fields, which is exactly how a paywall video and two illustrations kept being
+// served from brilliant.org on /subscribe without anything failing.
+// Matched as a URL, not as a word: the check is about assets being loaded from
+// their servers, and a comment recording that we removed some is not one.
+const borrowedSrc = src.filter((f) => /https?:\/\/(www\.)?brilliant\.org/.test(read(f)))
+check(borrowedSrc.length === 0, 'blocker', 'borrowed-assets',
+  `${borrowedSrc.length} file(s) reference brilliant.org`, borrowedSrc.slice(0, 4).join(', '))
+
 // A chapter slug written into a link is a link that breaks silently the day the
 // programme is reordered or that chapter is renamed — it 404s, or worse lands on
 // the "coming soon" fallback, and nothing fails until a student reports it. The

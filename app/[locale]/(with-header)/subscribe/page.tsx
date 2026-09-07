@@ -1,326 +1,167 @@
-'use client';
+/**
+ * What Premium will be, said honestly.
+ *
+ * The page this replaces was the last of the Brilliant scaffolding, and it was
+ * the most dangerous thing in the repository, because everything on it was
+ * presented as fact:
+ *
+ *  · a testimonial reading "Excellent" attributed to the Ministère de
+ *    l'Éducation — a real government body that has endorsed nothing;
+ *  · "Plus de 10,000 avis 5 étoiles", for a product in closed beta whose
+ *    allow-list holds two addresses;
+ *  · a second testimonial from "Parents & Étudiants", equally invented;
+ *  · a video and two illustrations hotlinked from brilliant.org's own servers;
+ *  · a chapter list that was not the programme — "Développements limités" is
+ *    not in it — under tabs (Géométrie, Statistiques) that filtered nothing;
+ *  · "S'abonner maintenant" on a button with no handler, next to prices, with
+ *    no payment integration anywhere in the codebase.
+ *
+ * None of that is fixed by translating it into Arabic, which is what the open
+ * i18n finding asked for. So: the invented social proof is gone, the borrowed
+ * assets are gone, the chapter list is read from the catalogue, and the button
+ * goes to the waitlist because the waitlist is what actually exists.
+ *
+ * The prices are the ones that were already here — they are the team's numbers,
+ * not mine to invent or to delete — but they are now labelled as the tariffs
+ * announced for launch, which is what they are while the beta is free.
+ */
 
-import CourseCover from '@/components/course/CourseCover';
-import React, {useState} from 'react';
-import Image from 'next/image';
-import {Button, Card} from "@mantine/core";
-import {IconCircleCheck, IconX} from '@tabler/icons-react';
+import React from 'react'
+import { getTranslations } from 'next-intl/server'
 
-type PlanType = 'annual' | 'monthly';
+import CourseCover from '@/components/course/CourseCover'
+import PlanPicker, { type Plan } from '@/components/premium/PlanPicker'
+import {
+  branchLabel,
+  courseTitle,
+  listByBranch,
+  type ContentLocale,
+} from '@/lib/courseCatalog'
+import { loadCourseDoc } from '@/lib/courseDoc'
 
-interface PricingCardProps {
-    selectedPlan: PlanType;
-    setSelectedPlan: React.Dispatch<React.SetStateAction<PlanType>>;
+/** The marketing site's form, the same one an uninvited account is sent to. */
+const WAITLIST = 'https://www.zabaqist.com/#waitlist'
+
+/**
+ * One place, so the toggle, the note and the per-month equivalent cannot
+ * disagree. Each plan states the period its price covers: with both labelled
+ * "/mois" the yearly plan read as 399 DH a month next to a monthly plan at 60.
+ */
+const PLANS: Plan[] = [
+  { id: 'annual', price: 399, was: 499, period: 'year' },
+  { id: 'monthly', price: 60, period: 'month' },
+]
+
+const FEATURES = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'] as const
+
+export async function generateMetadata() {
+  const t = await getTranslations('premium')
+  return { title: t('title'), description: t('metaDescription') }
 }
 
-const PricingCard: React.FC<PricingCardProps> = ({ selectedPlan, setSelectedPlan }) => (
-    <Card style={{maxWidth: '28rem', margin: '0 auto', backgroundColor: 'white'}}>
-        <div style={{padding: '1.5rem'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
-                <Button
-                    variant={selectedPlan === 'annual' ? 'filled' : 'outline'}
-                    onClick={() => setSelectedPlan('annual')}
-                    style={{
-                        width: '50%',
-                        marginRight: '0.5rem',
-                        backgroundColor: selectedPlan === 'annual' ? 'var(--zb-mint)' : undefined,
-                        color: selectedPlan === 'annual' ? 'white' : undefined,
-                    }}
-                >
-                    Annuel
-                    {selectedPlan === 'annual' && <span style={{marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: 'var(--zb-mint-deep)', padding: '0 0.25rem', borderRadius: '0.25rem'}}>POPULAIRE</span>}
-                </Button>
-                <Button
-                    variant={selectedPlan === 'monthly' ? 'filled' : 'outline'}
-                    onClick={() => setSelectedPlan('monthly')}
-                    style={{width: '50%', marginLeft: '0.5rem'}}
-                >
-                    Mensuel
-                </Button>
-            </div>
-            {selectedPlan === 'annual' && (
-                <div style={{textAlign: 'center', marginBottom: '1rem'}}>
-                    <p style={{fontSize: '0.875rem', textDecoration: 'line-through'}}>199 DH</p>
-                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>149 DH<span style={{fontSize: '0.875rem'}}>/mois*</span></p>
-                </div>
-            )}
-            {selectedPlan === 'monthly' && (
-                <div style={{textAlign: 'center', marginBottom: '1rem'}}>
-                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>299 DH<span style={{fontSize: '0.875rem'}}>/mois</span></p>
-                </div>
-            )}
-            <Button style={{width: '100%', backgroundColor: 'var(--zb-mint)', color: 'white'}} styles={{root: {':hover': {backgroundColor: 'var(--zb-mint-deep)'}}}}>S'abonner maintenant</Button>
-            <p style={{fontSize: '0.75rem', marginTop: '1rem', color: '#6b7280'}}>*Facturé en un seul paiement. Renouvellement annuel, annulation à tout moment. Vous pouvez désactiver le renouvellement automatique depuis vos paramètres.</p>
+export default async function SubscribePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations('premium')
+  const l = locale as ContentLocale
+
+  // The programme as written, not a list typed into this page. The old one
+  // named chapters that do not exist and omitted ones that do.
+  const groups = listByBranch()
+  const chapters = groups.reduce((n, g) => n + g.courses.length, 0)
+
+  // Every capability the self-assessments ask about, counted rather than
+  // claimed — the same figure the revision plan shows.
+  const docs = await Promise.all(
+    groups.flatMap((g) => g.courses).map((c) => loadCourseDoc(c.slug)),
+  )
+  const items = docs.reduce((n, d) => n + (d?.checklist.length ?? 0), 0)
+
+  return (
+    <main className="pb-20">
+      <section className="border-b border-zb-line bg-zb-cream-2">
+        <div className="mx-auto grid w-full max-w-5xl gap-10 px-5 py-14 sm:px-6 lg:grid-cols-[1fr_26rem] lg:items-start">
+          <div>
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-zb-gold-deep">
+              {t('eyebrow')}
+            </p>
+            <h1 className="mt-3 text-balance font-display text-[34px] font-bold leading-tight tracking-tight text-zb-ink sm:text-[42px]">
+              {t('heroTitle')}
+            </h1>
+            <p className="mt-4 max-w-[60ch] text-[17px] leading-relaxed text-zb-ink-2">
+              {t('heroBody', { chapters })}
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-display text-lg font-bold tracking-tight text-zb-ink">
+              {t('plansTitle')}
+            </h2>
+            <p className="mb-4 mt-1.5 text-sm leading-relaxed text-zb-ink-2">
+              {t('plansBody')}
+            </p>
+            <PlanPicker plans={PLANS} waitlist={WAITLIST} />
+          </div>
         </div>
-    </Card>
-);
+      </section>
 
-const ReviewSection = () => (
-    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem', margin: '3rem 0'}}>
-        <div style={{textAlign: 'center'}}>
-            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Excellent"`}</p>
-            <p style={{fontSize: '0.75rem'}}>Ministère de l'Éducation</p>
+      <section className="mx-auto w-full max-w-5xl px-5 py-14 sm:px-6">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-zb-ink">
+          {t('includedTitle')}
+        </h2>
+        {/* Each of these is something the app already does; nothing here is a
+            promise that no code backs. */}
+        <ul className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((f) => (
+            <li key={f}>
+              <h3 className="font-display text-base font-bold tracking-tight text-zb-ink">
+                {t(f)}
+              </h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-zb-ink-2">
+                {t(`${f}Body`, { chapters, items })}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="border-t border-zb-line bg-zb-cream-2">
+        <div className="mx-auto grid w-full max-w-5xl gap-10 px-5 py-14 sm:px-6 lg:grid-cols-[1fr_20rem] lg:items-start">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-zb-ink">
+              {t('programmeTitle')}
+            </h2>
+            <p className="mt-2 max-w-[62ch] leading-relaxed text-zb-ink-2">
+              {t('programmeBody')}
+            </p>
+
+            {groups.map(({ branch, courses }) => (
+              <div key={branch} className="mt-7">
+                <h3 className="flex items-center gap-3 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-zb-mint-deep">
+                  {branchLabel(branch, l)}
+                  <span className="h-px flex-1 bg-zb-line" />
+                  <span className="font-medium normal-case tracking-normal text-zb-ink-3">
+                    {t('branchCount', { n: courses.length })}
+                  </span>
+                </h3>
+                <ul className="mt-3 grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
+                  {courses.map((c) => (
+                    <li key={c.slug} className="text-[15px] text-zb-ink-2">
+                      {courseTitle(c, l)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Our own artwork. The page used to embed brilliant.org's. */}
+          <CourseCover seed="premium" tone="algebre" className="hidden lg:block" />
         </div>
-        <div style={{textAlign: 'center'}}>
-            <div style={{display: 'flex'}}>
-                {[...Array(5)].map((_, i) => (
-                    <span key={i} style={{color: 'var(--zb-mint)'}}>★</span>
-                ))}
-            </div>
-            <p style={{fontSize: '0.875rem'}}>Plus de 10,000 avis 5 étoiles</p>
-        </div>
-        <div style={{textAlign: 'center'}}>
-            <p style={{fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--zb-mint)'}}>Zabaqist</p>
-            <p style={{fontSize: '0.75rem'}}>Maroc</p>
-        </div>
-        <div style={{textAlign: 'center'}}>
-            <p style={{fontFamily: 'serif', fontStyle: 'italic'}}>{`"Innovant"`}</p>
-            <p style={{fontSize: '0.75rem'}}>Parents & Étudiants</p>
-        </div>
-    </div>
-);
-
-const LevelUpSection = () => (
-    <div style={{margin: '3rem 0'}}>
-        <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Passez au niveau supérieur avec Premium</h2>
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <ul style={{width: '33.333%', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-                <li>🚀 Apprentissage efficace</li>
-                <li>📚 Maîtrisez l'essentiel</li>
-                <li>🧠 Appliquez vos connaissances</li>
-                <li>📊 Suivez vos progrès</li>
-            </ul>
-            <div style={{width: '33.333%', display: 'flex', justifyContent: 'center'}}>
-                <section
-                    style={{position: 'relative', width: '100%', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'}}>
-                    <div
-                        style={{position: 'relative', width: '100%', height: '100%', maxWidth: '1200px', maxHeight: '675px'}}>
-                        <video
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            style={{position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain'}}
-                        >
-                            <source
-                                src="https://brilliant.org/videos/paywall/value-props/apply-your-learnings.mp4"
-                                type="video/mp4"/>
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                </section>
-            </div>
-            <div style={{width: '33.333%'}}>
-                <h3 style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>Apprentissage pratique et efficace</h3>
-                <p>Accès illimité aux thématiques interactives du Baccalauréat avec retours en temps réel et explications simples pour un apprentissage efficace.</p>
-            </div>
-        </div>
-    </div>
-);
-
-const CoursesSection = () => {
-    const [activeTab, setActiveTab] = useState('Analyse');
-    const tabs = ['Analyse', 'Algèbre', 'Géométrie', 'Probabilités', 'Statistiques'];
-    const courses = [
-        "Limites et Continuité", "Dérivées et Primitives", "Intégrales",
-        "Fonctions Logarithmiques", "Fonctions Exponentielles", "Suites Numériques",
-        "Équations Différentielles", "Développements Limités", "Calcul Intégral",
-        "Études de Fonctions"
-    ];
-
-    return (
-        <div style={{margin: '3rem 0'}}>
-            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Développez vos compétences en mathématiques</h2>
-            <div style={{display: 'flex', justifyContent: 'center', marginBottom: '1rem'}}>
-                {tabs.map(tab => (
-                    <Button
-                        key={tab}
-                        variant={activeTab === tab ? 'filled' : 'outline'}
-                        onClick={() => setActiveTab(tab)}
-                        style={{margin: '0 0.25rem'}}
-                    >
-                        {tab}
-                    </Button>
-                ))}
-            </div>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}}>
-                <div>
-                    <h3 style={{fontWeight: 'bold', marginBottom: '1rem'}}>Thématiques en {activeTab}</h3>
-                    <ul style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
-                        {courses.map((course, index) => (
-                            <li key={index} style={{display: 'flex', alignItems: 'center'}}>
-                                <span style={{marginRight: '0.5rem'}}>📚</span> {course}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    <Image src="/course-preview.png" alt="Course Preview" width={500} height={300}/>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const ComparisonSection = () => {
-    const features = [
-        {
-            name: "Thématiques guidées",
-            free: true,
-            premium: true,
-            description: "Algèbre, Analyse, Géométrie, Probabilités et plus"
-        },
-        {
-            name: "Exercices bonus de mathématiques",
-            free: true,
-            premium: true,
-            description: "Des centaines de défis supplémentaires"
-        },
-        {name: "Sans limites", free: false, premium: true, description: "Accès à toute notre bibliothèque de contenu"},
-        {
-            name: "Parcours d'apprentissage déverrouillés",
-            free: false,
-            premium: true,
-            description: "Parcours étape par étape pour développer vos compétences en mathématiques du Baccalauréat"
-        },
-    ];
-
-    return (
-        <div style={{margin: '3rem 0'}}>
-            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem'}}>Sans engagement, annulez à tout moment</h2>
-            <p style={{textAlign: 'center', marginBottom: '2rem'}}>Débloquez tout avec Premium</p>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem'}}>
-                <div></div>
-                <div style={{fontWeight: 'bold', textAlign: 'center'}}>Gratuit</div>
-                <div style={{fontWeight: 'bold', textAlign: 'center'}}>Premium</div>
-                {features.map((feature, index) => (
-                    <React.Fragment key={index}>
-                        <div>{feature.name}<p style={{fontSize: '0.875rem', color: '#6b7280'}}>{feature.description}</p></div>
-                        <div style={{textAlign: 'center'}}>{feature.free ? <IconCircleCheck style={{display: 'inline', color: 'var(--zb-mint)'}} /> :
-                            <IconX style={{display: 'inline', color: '#ef4444'}} />}</div>
-                        <div style={{textAlign: 'center'}}><IconCircleCheck style={{display: 'inline', color: 'var(--zb-mint)'}} /></div>
-                    </React.Fragment>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-const SuperchargeSection = () => (
-    <div style={{margin: '3rem 0', textAlign: 'center', display: 'flex', justifyContent: 'space-between'}}>
-        <div style={{width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-            <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem'}}>Boostez votre apprentissage</h2>
-            <ul style={{display: 'inline-block', textAlign: 'left', marginBottom: '2rem'}}>
-                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>📚</span> Toutes les thématiques du Baccalauréat Marocain en mathématiques
-                </li>
-                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>🚫</span> Pas d'achats intégrés ni de publicités
-                </li>
-                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>🆕</span> Nouveau contenu ajouté régulièrement
-                </li>
-                <li style={{display: 'flex', alignItems: 'center', marginBottom: '0.5rem'}}>
-                    <span style={{marginRight: '0.5rem'}}>📱</span> Un abonnement sur tous vos appareils
-                </li>
-            </ul>
-            <Button style={{backgroundColor: 'var(--zb-mint)', color: 'white'}} styles={{root: {':hover': {backgroundColor: 'var(--zb-mint-deep)'}}}}>S'abonner maintenant</Button>
-        </div>
-
-        <CourseCover seed="premium" tone="algebre" className="w-1/2" />
-    </div>
-);
-
-const GiftSection = () => (
-    <div style={{margin: '3rem 0'}}>
-        <h2 style={{fontSize: '2.25rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '2rem'}}>Partagez le cadeau de Premium</h2>
-        <div style={{display: 'flex', justifyContent: 'center', gap: '2rem'}}>
-            <Card style={{width: '50%'}}>
-                <div style={{padding: '1.5rem'}}>
-                    <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Image src={"https://brilliant.org/images/paywall/brandRefresh/gift-plan.svg"} alt={"Offrir un abonnement"}
-                               width={128} height={128}/>
-                        <div style={{paddingLeft: '0.5rem', paddingTop: '1rem', paddingBottom: '1rem'}}>
-                            <h3 style={{fontWeight: 'bold'}}>Offrir un abonnement</h3>
-                            <p style={{marginTop: '1rem'}}>Partagez votre passion pour les mathématiques — offrez un abonnement Zabaqist Premium.</p>
-                            <Button variant="outline"
-                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: 'var(--zb-mint)'}}
-                                    styles={{root: {':hover': {borderColor: 'var(--zb-mint-deep)', backgroundColor: '#e6faf8'}}}}>Offrir
-                                Premium</Button>
-                        </div>
-                    </div>
-                </div>
-            </Card>
-            <Card style={{width: '50%'}}>
-                <div style={{padding: '1.5rem'}}>
-                    <div style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Image src={"https://brilliant.org/images/paywall/brandRefresh/group-plan.svg"}
-                               alt={"Abonnement de groupe"}
-                               width={128} height={128}/>
-                        <div style={{paddingLeft: '0.5rem', paddingTop: '1rem', paddingBottom: '1rem'}}>
-                            <h3 style={{fontWeight: 'bold'}}>Abonnement de groupe</h3>
-                            <p style={{marginTop: '1rem'}}>Vous souhaitez partager Zabaqist Premium avec votre famille, classe ou équipe? Découvrez nos forfaits de groupe.</p>
-                            <Button variant="outline"
-                                    style={{marginTop: '2rem', width: '100%', borderWidth: '2px', borderRadius: '1rem', borderColor: 'var(--zb-mint)'}}
-                                    styles={{root: {':hover': {borderColor: 'var(--zb-mint-deep)', backgroundColor: '#e6faf8'}}}}>En savoir
-                                plus</Button>
-                        </div>
-                    </div>
-                </div>
-            </Card>
-        </div>
-    </div>
-);
-
-const SubscribePage = () => {
-    const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
-
-    return (
-        <div style={{minHeight: '100vh'}}>
-            <div style={{background: 'linear-gradient(to right, var(--zb-mint), var(--zb-mint-deep))', width: '100%'}}>
-                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem', color: 'white', textAlign: 'center'}}>
-                    <h1 style={{fontSize: '3rem', fontWeight: 'bold', marginTop: '2rem'}}>Déverrouillez l'expérience d'apprentissage complète</h1>
-                    <p style={{marginTop: '1rem'}}>Atteignez vos objectifs rapidement avec un accès illimité à toutes les thématiques du Bac</p>
-                    <p style={{margin: '2rem 0'}}>⚡ Offre spéciale pour étudiants marocains</p>
-                    <PricingCard selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan}/>
-                </div>
-            </div>
-            <div style={{backgroundColor: '#f3f4f6'}}>
-                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
-                    <ReviewSection/>
-                </div>
-            </div>
-            <div>
-                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
-                    <LevelUpSection/>
-                </div>
-            </div>
-
-            <div style={{backgroundColor: '#f3f4f6'}}>
-                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
-                    <CoursesSection/>
-                </div>
-            </div>
-
-            <div>
-                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
-                    <ComparisonSection/>
-                </div>
-            </div>
-
-            <div style={{backgroundColor: '#f3f4f6'}}>
-                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
-                    <SuperchargeSection/>
-                </div>
-            </div>
-
-            <div>
-                <div style={{maxWidth: '72rem', margin: '0 auto', padding: '2rem 1rem'}}>
-                    <GiftSection/>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default SubscribePage;
+      </section>
+    </main>
+  )
+}
