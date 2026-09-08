@@ -237,21 +237,41 @@ if (!URL_ || !KEY) {
       `HTTP ${r.status} — anyone with the public key can write to this table`)
   }
 
-  // The allowlist still has to answer, and still has to fold Gmail's dots.
+  /**
+   * The allowlist still has to answer, and still has to fold Gmail's dots.
+   *
+   * Retried once, but only when the answer is not a clean true/false — an
+   * HTTP error, or PostgREST answering mid-schema-reload after a migration.
+   * A genuine `false` is reported on the first attempt and never retried,
+   * because a real lockout is exactly what this check exists to catch: it
+   * fired for real on 2026-09-08, when a row stored with Gmail dots matched
+   * nothing and an invited account was refused.
+   */
   const ask = async (addr) => {
-    const r = await fetch(`${URL_}/rest/v1/rpc/is_email_allowed`, {
-      method: 'POST', headers: h, body: JSON.stringify({ addr }),
-    })
-    return r.ok ? (await r.text()).trim() : `ERROR ${r.status}`
+    let last = ''
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const r = await fetch(`${URL_}/rest/v1/rpc/is_email_allowed`, {
+        method: 'POST', headers: h, body: JSON.stringify({ addr }),
+      })
+      last = r.ok ? (await r.text()).trim() : `ERROR ${r.status}`
+      // 'true' and 'false' are both real answers; anything else is the cache.
+      if (last === 'true' || last === 'false') return last
+      await new Promise((res) => setTimeout(res, 1500))
+    }
+    return last
   }
-  const [dotted, plain, stranger] = await Promise.all([
-    ask('omry.otmane@gmail.com'),
-    ask('omryotmane@gmail.com'),
-    ask('definitely-not-invited@example.com'),
-  ])
+  // Sequential, not Promise.all: three concurrent RPCs during a schema reload
+  // is how one of them gets the stale answer in the first place.
+  const dotted = await ask('omry.otmane@gmail.com')
+  const plain = await ask('omryotmane@gmail.com')
+  const stranger = await ask('definitely-not-invited@example.com')
   check(dotted === 'true' && plain === 'true', 'fail', 'allowlist-dots',
     'the allowlist no longer folds Gmail dots',
-    `dotted=${dotted} plain=${plain} — one spelling would be locked out`)
+    `dotted=${dotted} plain=${plain} — one spelling would be locked out.` +
+    ' BOTH false usually means a row in allowed_emails is stored unnormalised:' +
+    ' is_email_allowed folds the address it is GIVEN, then compares it to the' +
+    ' address as STORED, so a row typed with dots matches nothing. The trigger' +
+    ' in 0002 prevents new ones; run `npm run whois -- <address>` to confirm.')
   check(stranger === 'false', 'fail', 'allowlist-open',
     'the allowlist admits an address that was never invited', `got ${stranger}`)
 }
