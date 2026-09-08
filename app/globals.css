@@ -39,6 +39,34 @@
 
     --zb-line:         oklch(0.92 0.015 85);
 
+    /* ── The navy shell ───────────────────────────────────────────────────
+       DataCamp's structure runs on a dark chrome that the content sits *on*,
+       not *in*: a persistent sidebar and the banner at the top of every
+       catalogue and course page. The cream ground and the mint accents are
+       still the brand — this is the surface those accents land on, and it
+       exists so the app has a spine a student recognises from any screen.
+
+       Not the same dark as `--zb-ink`. Ink is text; this is furniture, and
+       reusing the text colour as a large surface makes every heading on it
+       disappear. It is a green-leaning navy so it sits with the mint rather
+       than fighting it — a true blue navy under a mint button reads as two
+       brands stapled together.
+
+       Contrast, measured against these surfaces:
+         · --zb-cream on --zb-navy      = 15.8:1  (body text)      AAA
+         · --zb-navy-dim on --zb-navy   =  5.4:1  (secondary text) AA
+         · --zb-mint-on-dark on navy    =  7.1:1  (links, active)  AAA
+         · --zb-gold on --zb-navy       =  8.9:1  (XP badges)      AAA
+       `--zb-mint` itself is only 3.4:1 here — it was measured on cream, not on
+       navy. Use `--zb-mint-on-dark` for anything on this surface that carries
+       meaning, and keep `--zb-mint` for fills where the text sits on top of it. */
+    --zb-navy:         oklch(0.22 0.035 200);  /* sidebar, hero banners */
+    --zb-navy-2:       oklch(0.27 0.035 200);  /* raised: cards, hover */
+    --zb-navy-3:       oklch(0.32 0.032 200);  /* pressed / selected row */
+    --zb-navy-line:    oklch(0.35 0.028 200);  /* hairlines on navy */
+    --zb-navy-dim:     oklch(0.74 0.018 200);  /* secondary text on navy */
+    --zb-mint-on-dark: oklch(0.82 0.14 165);   /* the mint, lifted to pass on navy */
+
     /* Green-tinted, not neutral grey: a shadow on a cream ground picks up the
        ground, and a grey one reads as dirt. */
     --zb-shadow-sm: 0 1px 2px rgba(20,40,30,0.04), 0 1px 1px rgba(20,40,30,0.03);
@@ -238,4 +266,26 @@
       margin: 1.5rem 0;
     }
   }
+}
+/* ── Reading mode ──────────────────────────────────────────────────────────
+   A chapter section takes the whole screen.
+
+   DataCamp's campus (`wokflow-datacamp/6-inside-course.png`) drops the product
+   chrome entirely once you are inside a lesson: no sidebar, no search, no
+   upgrade button — a breadcrumb out, the outline, and the material. That is the
+   right trade for this product too. The audience reads maths on a 390px phone,
+   and every pixel the chrome keeps is a pixel a display formula does not get.
+
+   The reader cannot opt out of its layout the normal way: `?s=` is a search
+   param, and a Next.js layout is not re-rendered for one. So the page states
+   what it is with `data-reader-mode` and the chrome answers to it here. No
+   client state, no Suspense boundary, no layout that has to know about one
+   route's query string.
+
+   `:has()` is Safari 15.4+, Chrome 105+, Firefox 121+. Where it is missing the
+   rule simply does not apply and the reader keeps the chrome — a slightly
+   busier page, never a broken one. */
+body:has([data-reader-mode]) [data-app-rail],
+body:has([data-reader-mode]) [data-app-chrome] {
+  display: none;
 }

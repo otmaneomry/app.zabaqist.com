@@ -150,6 +150,12 @@ const browser = await chromium.launch(
   process.env.CI ? {} : { channel: 'chrome' },
 )
 
+/** Local calendar day, the same shape `dayKey` writes in lib/activity.ts. */
+const TODAY_KEY = (() => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+})()
+
 /**
  * Every context in this file gets a session.
  *
@@ -176,6 +182,14 @@ const AUTH_STATE = {
   // has never picked a filière into the funnel. That is the intended flow, so
   // the default session carries a choice and the tests that care about the
   // unanswered case clear it themselves.
+  //
+  // The same goes for the streak takeover. `components/course/StreakMoment.tsx`
+  // covers the whole screen the first time a student works on a given day, and
+  // reading a section is what triggers it — so partway through this suite it
+  // lands over the reader and swallows every click that follows. It is real
+  // behaviour with its own four checks in the Interaction section, and it is
+  // pre-dismissed here so the other ~170 checks stay about what they are about.
+  // The test that exercises it opts out with `SESSION_UNCELEBRATED`.
   origins: [
     {
       origin: BASE,
@@ -184,7 +198,21 @@ const AUTH_STATE = {
           name: 'zabaqist:filiere',
           value: JSON.stringify({ track: '2bac-pc', filiere: 'sx' }),
         },
+        { name: 'zabaqist:streak-seen', value: TODAY_KEY },
       ],
+    },
+  ],
+}
+
+/** The default session, minus the "already celebrated today" mark. */
+const SESSION_UNCELEBRATED = {
+  ...AUTH_STATE,
+  origins: [
+    {
+      origin: BASE,
+      localStorage: AUTH_STATE.origins[0].localStorage.filter(
+        (e) => e.name !== 'zabaqist:streak-seen',
+      ),
     },
   ],
 }
@@ -246,26 +274,115 @@ page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
  * 0 mismatches across every page; only synthetic clicks faster than hydration
  * produce one. So wait, rather than whitelist the error.
  */
+/** Part labels come from the document and may carry regex metacharacters. */
+const escapeRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/**
+ * Dismiss the streak celebration if it is up.
+ *
+ * `components/course/StreakMoment.tsx` takes the whole screen the first time a
+ * student works on a given day, and reading a section is what triggers it — so
+ * it lands over the reader partway through this suite and swallows every
+ * subsequent click. It is real behaviour and it has its own checks in the
+ * Learning loop section; here it just has to be got out of the way.
+ *
+ * It marks itself seen as soon as it opens, so this fires at most once per run.
+ */
+const dismissMoment = async (p) => {
+  const streak = p.getByRole('dialog', { name: messages.streak.title })
+  if (!(await streak.isVisible().catch(() => false))) return
+  await p.getByRole('button', { name: messages.streak.continue }).click()
+  await p.waitForTimeout(200)
+  const goal = p.getByRole('dialog', { name: messages.streak.goalTitle })
+  if (await goal.isVisible().catch(() => false)) {
+    await p.getByRole('button', { name: messages.streak.goalSkip }).click()
+    await p.waitForTimeout(200)
+  }
+}
+
 const settle = async (p) => {
   await p.waitForSelector(HYDRATED, { timeout: 30000 })
   // `client-side-classes` lands when the ROOT layout mounts; the page's own
-  // client components (the path, the sticky card, the progress card) hydrate
-  // just after. Clicking in that gap makes React regenerate the subtree and log
-  // a mismatch on a page that is otherwise fine.
+  // client components (the outline header, the progress card) hydrate just
+  // after. Clicking in that gap makes React regenerate the subtree and log a
+  // mismatch on a page that is otherwise fine.
   await p.waitForTimeout(450)
+  await dismissMoment(p)
 }
 const open = async (u) => {
   await page.goto(u, { waitUntil: 'load' })
   await settle(page)
 }
 
-// Tabs navigate to the tab's first section. Opened at a section, not at the
-// course root — the root is the path now, and the tabs live in the reader.
+// The streak celebration, before anything dismisses it silently.
+//
+// It fires on the first section read in a day and takes the whole screen — the
+// loudest thing in the product, deliberately, because showing up is what it is
+// for (DATACAMP_WORKFLOW.md §5). Checked here rather than trusted: a takeover
+// that failed to appear would be invisible, and one that failed to *close*
+// would lock the reader out of the chapter.
+{
+  const p = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    storageState: SESSION_UNCELEBRATED,
+  })
+  await p.goto(url(doc.views[0].id), { waitUntil: 'load' })
+  await p.waitForSelector(HYDRATED, { timeout: 30000 })
+  await p.waitForTimeout(700)
+  const streak = p.getByRole('dialog', { name: messages.streak.title })
+  ok(await streak.isVisible().catch(() => false), 'the streak moment fires on the day\'s first section')
+  await p.getByRole('button', { name: messages.streak.continue }).click()
+  await p.waitForTimeout(250)
+  ok(
+    await p.getByRole('dialog', { name: messages.streak.goalTitle }).isVisible().catch(() => false),
+    'the goal picker follows it when no goal is set',
+  )
+  await p.getByRole('button', { name: messages.streak.goalSkip }).click()
+  await p.waitForTimeout(250)
+  ok(
+    !(await p.getByRole('dialog').isVisible().catch(() => false)),
+    'declining the goal closes the takeover',
+  )
+  await p.reload({ waitUntil: 'load' })
+  await p.waitForSelector(HYDRATED, { timeout: 30000 })
+  await p.waitForTimeout(700)
+  ok(
+    !(await p.getByRole('dialog').isVisible().catch(() => false)),
+    'it fires once a day, not on every section',
+  )
+  await p.close()
+}
+
+// The chapter's parts are reachable from inside the reader.
+//
+// This used to click a `role="tab"` in a scrolling tab bar. That bar is gone:
+// the reader now carries one "Plan du chapitre" button and the whole outline
+// opens over the page (components/course/CampusHeader.tsx). The behaviour under
+// test is the same one — a part is one click away and lands on its first
+// section — so the check follows the control rather than being dropped.
 await open(url(doc.views[0].id))
 const secondTab = tabs[1]
-await page.getByRole('tab', { name: secondTab.label }).click()
-await page.waitForURL(`**/courses/${SLUG}?s=${secondTab.viewIds[0]}`, { timeout: 15000 })
-ok(true, `tab "${secondTab.label}" opens its first section`)
+await page.getByRole('button', { name: new RegExp(messages.course.outline) }).click()
+await page.getByRole('dialog').waitFor({ timeout: 15000 })
+ok(true, 'the outline opens over the reader')
+await page
+  .getByRole('dialog')
+  .getByRole('link', { name: new RegExp(escapeRe(secondTab.label.slice(0, 20))) })
+  .first()
+  .click()
+  .catch(async () => {
+    // Part labels are not links in the outline; its rows are the sections. Fall
+    // back to the part's own first section, which is what the tab bar opened.
+    await page.getByRole('dialog').getByRole('link').nth(1).click()
+  })
+await page.waitForURL(`**/courses/${SLUG}?s=**`, { timeout: 15000 })
+ok(true, 'a row in the outline navigates to its section')
+
+// And the stepper moves one section at a time, in both directions.
+await open(url(doc.views[1].id))
+await page.getByRole('link', { name: messages.course.prevSection }).click()
+await page.waitForURL(`**/courses/${SLUG}?s=${doc.views[0].id}`, { timeout: 15000 })
+ok(true, 'the outline stepper walks back one section')
 
 // A solution stays closed until asked for.
 const gated = doc.views.find((v) => /^> \*\*(Solution|Preuve|Démonstration)/im.test(v.body))
@@ -301,25 +418,35 @@ const saved = await page.evaluate(() => {
 ok(saved?.tried && saved.verdict === 'got' && saved.hints === 1, 'checkpoint survives a reload', JSON.stringify(saved))
 
 // XP: base 5, one hint -> 5 * 0.8 = 4.
+//
+// Read off the reader's own XP chip. It used to be the progress card's `✦ N XP`;
+// the card is chromeless inside the reader now and the campus header states the
+// figure instead — from `chapterTotals`, the same function the header's XpChip
+// and the chapter page's progress card use, so there is one definition of XP
+// and three places that show it.
 const expected = Math.round(withCp.xp * 0.8)
 ok(
-  (await page.locator('text=/✦ \\d+ XP/').first().innerText()).includes(String(expected)),
+  (await page.getByLabel(messages.course.dailyXp).first().innerText()).includes(
+    String(expected),
+  ),
   `XP applies the hint penalty (${withCp.xp} base, 1 hint -> ${expected})`,
 )
 
-// The phone header hides its text nav, so the hamburger has to work — hiding
-// the links without a drawer behind them would leave a phone with no way out.
+// Navigation lives in the rail now (components/shell/AppSidebar.tsx), and the
+// rail is not rendered below `lg` — so on a phone the hamburger is the only way
+// to it. Hiding the rail without a drawer behind it would leave a phone with no
+// way out of the page it is on.
 await open(`${BASE}/home`)
-// Scoped to <header>: the footer carries its own courses link. The label is
-// translated, so it comes from the catalogue rather than being typed here.
-const NAV_COURSES = messages.nav.courses
-const headerNav = page.locator('header').getByRole('link', { name: NAV_COURSES })
+// The label is translated, so it comes from the catalogue rather than being
+// typed here. Scoped to the rail: the footer carries its own courses link.
+const NAV_CHAPTERS = messages.nav.chapters
+const rail = page.locator(`nav[aria-label="${messages.nav.primary}"]`)
 ok(
-  !(await headerNav.isVisible().catch(() => false)),
-  '390px: the header text nav is hidden behind the hamburger',
+  !(await rail.isVisible().catch(() => false)),
+  '390px: the navigation rail is hidden behind the hamburger',
 )
 await page.getByRole('button', { name: /Ouvrir le menu/i }).click()
-await page.getByRole('dialog').getByRole('link', { name: NAV_COURSES }).click()
+await page.getByRole('dialog').getByRole('link', { name: NAV_CHAPTERS }).click()
 await page.waitForURL('**/courses', { timeout: 15000 })
 ok(true, '390px: the hamburger menu navigates')
 
@@ -329,8 +456,11 @@ const wide = await browser.newPage({ viewport: { width: 1280, height: 800 } })
 await wide.goto(`${BASE}/home`, { waitUntil: 'load' })
 await settle(wide)
 ok(
-  await wide.locator('header').getByRole('link', { name: NAV_COURSES }).isVisible(),
-  '1280px: the text nav is visible',
+  await wide
+    .locator(`nav[aria-label="${messages.nav.primary}"]`)
+    .getByRole('link', { name: NAV_CHAPTERS })
+    .isVisible(),
+  '1280px: the navigation rail is visible',
 )
 ok(
   !(await wide.getByRole('button', { name: /Ouvrir le menu/i }).isVisible().catch(() => false)),
@@ -512,7 +642,12 @@ section('Progress dashboard')
   await pg.goto(`${BASE}/progres`, { waitUntil: 'load' })
   await settle()
 
-  const stats = await pg.locator('p[dir="ltr"]').allInnerTexts()
+  // Scoped to the snapshot's own `dl`. The page grew a lifetime row that shares
+  // three of these four labels, and the rail grew a streak block — an unscoped
+  // `p[dir="ltr"]` sweep was picking those up first.
+  const snapshot = () =>
+    pg.locator(`dl[aria-label="${pr.snapshot}"] dd`).allInnerTexts()
+  const stats = await snapshot()
   ok(stats[0] === '3', 'the snapshot counts the sections read', stats.join(' | '))
 
   // Re-reading must not inflate the chart.
@@ -521,8 +656,9 @@ section('Progress dashboard')
   await pg.goto(`${BASE}/progres`, { waitUntil: 'load' })
   await settle()
   ok(
-    (await pg.locator('p[dir="ltr"]').first().innerText()) === '3',
+    (await snapshot())[0] === '3',
     'revisiting a section does not count twice',
+    (await snapshot()).join(' | '),
   )
 
   // The bucket contract: 7 daily / 4 weekly / 12 monthly.
@@ -673,10 +809,13 @@ section('Learning loop')
   await ctx.close()
 }
 
-section('Course path')
+section('Chapter outline')
 {
-  // The course landing is a journey with one node lit, not a document with a
-  // contents list on top. See BRILLIANT_WORKFLOW.md §3.
+  // The course landing is the chapter's own page: a dark banner that starts it,
+  // then the plan as an outline with per-part progress and per-section XP. It
+  // replaced the Brilliant serpentine (`components/course/CoursePath.tsx`); the
+  // behaviours below are the ones that were worth keeping from it, restated
+  // against the control that carries them now. See DATACAMP_WORKFLOW.md §3.
   const c = JSON.parse(
     readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'),
   ).course
@@ -695,62 +834,103 @@ section('Course path')
   await settle()
 
   ok(
-    (await pg.locator('ol li a').count()) === doc.views.length,
-    `the path has one node per section (${doc.views.length})`,
-  )
-  ok(
     (await pg.locator('.course-doc').count()) === 0,
-    'the landing view is the path, not the document',
+    'the landing view is the plan, not the document',
   )
   ok(
-    (await pg.locator('[aria-current="step"]').count()) === 1,
-    'exactly one node is current',
-  )
-  ok(
-    (await pg.locator(`text=${c.youAreHere}`).count()) === 1,
-    'the "you are here" pin appears once',
-  )
-  ok(
-    (await pg.locator('.sticky a').last().innerText()).trim() === c.pathStart,
-    'a fresh device is offered Start, not Continue',
+    (await pg.getByRole('link', { name: c.startChapter }).count()) === 1,
+    'the banner offers one button that starts the chapter',
   )
 
-  // Nothing is locked: an unreached section is still openable.
-  const last = pg.locator('ol li a').last()
+  // One part per `##`, each numbered and each with its own way in.
+  const parts = tabsOf(doc.views)
+  // One CTA per part. The open one says Commencer too on a fresh device, so
+  // this counts every part's button, not just the closed ones.
+  // `exact`, because Playwright matches an accessible name as a substring by
+  // default — and the banner's "Commencer le chapitre" contains "Commencer".
+  const partCta = (name) => pg.getByRole('link', { name, exact: true })
   ok(
-    (await last.getAttribute('href'))?.includes('?s='),
-    'unreached sections stay openable — desaturated, not locked',
+    (await partCta(c.partStart).count()) === parts.length,
+    `every part has a way in (${parts.length})`,
+    `found ${await partCta(c.partStart).count()}`,
   )
 
-  // Looking at the map must not count as reading.
+  // The outline opens the part the student is in — chapter 1 on a fresh device
+  // — so it is already expanded here and there is nothing to click. That is the
+  // behaviour under test: a plan that opens closed makes a returning student
+  // hunt for where they were.
+  const openPart = pg
+    .locator('ol > li')
+    .filter({ has: pg.getByRole('button', { name: c.hideSections }) })
+  ok((await openPart.count()) === 1, 'exactly one part is open, and it is the one in progress')
+
+  // Its sections are listed, each with what it is worth. The count is the
+  // part's own, so this fails if the outline ever silently truncates.
+  ok(
+    (await openPart.locator('ul li a').count()) === parts[0].viewIds.length,
+    'expanding a part lists exactly its sections',
+    `${await openPart.locator('ul li a').count()} of ${parts[0].viewIds.length}`,
+  )
+  ok(
+    (await openPart.locator('ul li a').first().innerText()).includes('XP'),
+    'and each section states what it is worth',
+  )
+
+  // Nothing is locked: every section is openable from the outline, in any
+  // order, whether or not the ones before it have been read.
+  ok(
+    ((await openPart.locator('ul li a').last().getAttribute('href')) ?? '').includes(
+      '?s=',
+    ),
+    'unreached sections stay openable — nothing is gated',
+  )
+
+  // Looking at the plan must not count as reading it.
   ok(
     !(await pg.evaluate(() =>
       localStorage.getItem('zabaqist_course_progress'),
     )),
-    'opening the path marks nothing as read',
+    'opening the plan marks nothing as read',
   )
 
-  // Read one section, come back: the node is stamped and the verb flips.
+  // Read one section, come back: the section is ticked and the part's verb flips.
   await pg.goto(`${path}?s=${doc.views[0].id}`, { waitUntil: 'load' })
   await settle()
   ok(
     (await pg.locator('.course-doc').count()) === 1,
-    'opening a node opens the reader',
+    'opening a section opens the reader',
   )
   await pg.goto(path, { waitUntil: 'load' })
   await settle()
+
+  // Part 1 is one section long, so reading it finished the part — and the
+  // outline now opens the NEXT unfinished part instead. Expand part 1 by hand
+  // to see the tick.
+  await pg
+    .locator('ol > li')
+    .first()
+    .getByRole('button', { name: c.showSections })
+    .click()
+  await pg.waitForTimeout(250)
   ok(
-    (await pg.locator('ol li a span:text-is("✓")').count()) === 1,
-    'the section just read is stamped done',
+    (await pg.getByLabel(c.sectionDone).count()) === 1,
+    'the section just read is ticked',
+    String(await pg.getByLabel(c.sectionDone).count()),
   )
+
+  // The CTA verb carries the state — the mechanic BRILLIANT_WORKFLOW.md §3
+  // singled out, and the one the source uses too. Never "Ouvrir". A finished
+  // part says Revoir; the six untouched ones still say Commencer.
   ok(
-    (await pg.locator('.sticky a').last().innerText()).trim() === c.pathContinue,
-    'and the CTA verb carries the state — Continue',
+    (await partCta(c.partReview).count()) === 1 &&
+      (await partCta(c.partStart).count()) === parts.length - 1,
+    'a finished part says Revoir, and only that one',
+    `${await partCta(c.partReview).count()} review / ${await partCta(c.partStart).count()} start`,
   )
 
   ok(
     pErrors.filter((e) => !/404|Failed to load resource/.test(e)).length === 0,
-    'no console errors on the path',
+    'no console errors on the chapter page',
     pErrors.filter((e) => !/404|Failed to load resource/.test(e)).slice(0, 2).join(' | '),
   )
   await ctx.close()
@@ -874,19 +1054,11 @@ section('Filière')
   // Scoped to the catalogue section by its own h2: `/courses` also carries the
   // browse-all grid, and the catalogue now nests course titles (h4) under a
   // branch heading (h3), so a bare `section h3` reads the branch names instead.
+  // The catalogue's cards. Its heading moved into the dark page banner as the
+  // page's `h1`, and the cards went from `h4` to `h3` with it — there is no
+  // longer a section heading between the two.
   const titles = async (pg) =>
-    (
-      await pg
-        .locator('section')
-        .filter({
-          has: pg.getByRole('heading', {
-            level: 2,
-            name: messages.catalog.title,
-          }),
-        })
-        .locator('li h4')
-        .allInnerTexts()
-    ).join(' | ')
+    (await pg.locator('main li h3').allInnerTexts()).join(' | ')
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } })
   const pg = await ctx.newPage()
   const fErrors = []
@@ -1127,9 +1299,15 @@ section('Auth (Google)')
 }
 
 section('Home page')
-// The dashboard opens on one dominant panel: the chapter to continue, its plan,
-// and a single button. It replaced a resume card, a premium banner claiming
-// "6x more likely", and six recommended chapters that did not exist.
+// The dashboard is DataCamp's `Learn → Dashboard`: greeting, one resume strip,
+// three doors for the work that is not reading, and the list of what else is in
+// flight (components/MainContent.tsx).
+//
+// The strip replaced the tall `ContinuePanel`, which re-printed the chapter's
+// whole plan — that list moved to the course page's outline, where it is acted
+// on. So the check that the plan is on THIS page is gone, and the two that
+// matter are kept and sharpened: the dashboard names one chapter, and its button
+// goes to the right place in it.
 const home = await browser.newPage({ viewport: { width: 1280, height: 1000 } })
 await home.goto(`${BASE}/home`, { waitUntil: 'load' })
 await home.waitForSelector(HYDRATED)
@@ -1142,9 +1320,10 @@ ok(
   'and starting opens the chapter path, not a section',
   await startCta.getAttribute('href'),
 )
+// The trio under the strip: méthode, exercices, devoir, each a real section.
 ok(
-  (await home.locator(`a[href^="/courses/${SLUG}?s="]`).count()) >= 5,
-  "the chapter's own plan is listed, each part linked",
+  (await home.locator(`a[href^="/courses/${SLUG}?s="]`).count()) >= 3,
+  'the three kinds of work each link into a section',
 )
 
 // After reading, the panel must resume at the next unread part.
@@ -1156,8 +1335,11 @@ await home.goto(`${BASE}/home`, { waitUntil: 'load' })
 await home.waitForSelector(HYDRATED)
 await home.waitForTimeout(500)
 
-const resume = home.getByRole('link', { name: /Reprendre/ })
-ok(await resume.isVisible(), 'after reading, the panel offers to resume')
+// The CTA verb carries the state — `Commencer` before, `Continuer` after.
+const resume = home
+  .getByRole('link', { name: messages.dashboard.resumeCta })
+  .first()
+ok(await resume.isVisible(), 'after reading, the strip offers to resume')
 ok(
   (await resume.getAttribute('href'))?.startsWith(`/courses/${SLUG}?s=`),
   'and resuming goes straight to a section',
@@ -1174,9 +1356,15 @@ ok(
   !/Hydrogen League|6x more likely|Matrices et D/.test(homeText),
   'no invented league, claim or chapter is left on the dashboard',
 )
+// The thirteen-tile grid left the dashboard for `/courses`, which has the
+// filters and the room to be read. What has to survive is that the catalogue is
+// still one click away from here.
 ok(
-  await home.getByRole('link', { name: new RegExp(doc.meta.title, 'i') }).first().isVisible(),
-  'the chapter is still reachable from the programme grid',
+  await home
+    .getByRole('link', { name: new RegExp(messages.nav.chapters, 'i') })
+    .first()
+    .isVisible(),
+  'the catalogue is one click from the dashboard',
 )
 await home.close()
 
@@ -1456,8 +1644,14 @@ section('Programme complet (13 chapitres)')
     // namespace to the client, so every string in it appears in the HTML
     // whether or not anything rendered it.
     const links = (html) => (html.match(new RegExp(`href="/quiz/${c.slug}"`, 'g')) ?? []).length
-    ok(links(first) === 1, 'the first section offers the self-assessment once, in the header', `got ${links(first)}`)
-    ok(links(last) === 2, 'and the last adds the end-of-chapter card', `got ${links(last)}`)
+    // The reader carries no quiz link at all now. Its header is DataCamp's
+    // campus bar — breadcrumb, outline, XP — and the self-assessment is offered
+    // where it is relevant: on the chapter page's banner, and in the card at the
+    // end of the chapter. Which is the same argument that moved this check here
+    // in the first place, applied one step further: an invitation to check what
+    // you know does not belong above a section you have not read.
+    ok(links(first) === 0, 'the reader does not offer the self-assessment mid-chapter', `got ${links(first)}`)
+    ok(links(last) === 1, 'the last section adds the end-of-chapter card', `got ${links(last)}`)
     // It must not promise a mark: nothing on the self-assessment is graded.
     ok(
       !/score|note\b|Quiz/i.test(fr.course.ctaBody + fr.course.ctaTitle + fr.course.ctaButton),
@@ -2046,18 +2240,38 @@ section('Arabic (/ar)')
     // navigation the document still carries the previous page's RSC payload in
     // inline scripts, so the raw HTML reports French that is not on screen.
     const shown = await pg.locator('body').innerText()
-    // The course landing is the path, whose job is ONE next action — so the
-    // quiz CTA is not on it. Assert the chrome that view actually renders.
+    // The chapter page is the banner plus the outline now, so assert the chrome
+    // that view actually renders: the progress card, the button that starts the
+    // chapter, and the outline's own controls.
     const missing = [
-      messagesAr.course.back,
       messagesAr.course.progressTitle,
-      messagesAr.course.youAreHere,
+      messagesAr.course.startChapter,
+      messagesAr.course.plan,
+      messagesAr.course.showSections,
     ].filter((v) => !shown.includes(v))
-    ok(missing.length === 0, 'the course chrome is in Arabic', missing.join(' | '))
+    ok(missing.length === 0, 'the chapter chrome is in Arabic', missing.join(' | '))
     ok(
       !shown.includes(messages.course.progressTitle) &&
-        !shown.includes(messages.course.back),
+        !shown.includes(messages.course.startChapter),
       'no French chrome is on screen on the Arabic route',
+    )
+
+    // And the reader's own bar, which is a different set of strings and is the
+    // one a student spends their time under.
+    await pg.goto(`${BASE}/ar/courses/${SLUG}?s=${doc.views[0].id}`, {
+      waitUntil: 'load',
+    })
+    await pg.waitForSelector(HYDRATED)
+    await pg.waitForTimeout(400)
+    const readerShown = await pg.locator('body').innerText()
+    const readerMissing = [
+      messagesAr.course.breadcrumbCourses,
+      messagesAr.course.outline,
+    ].filter((v) => !readerShown.includes(v))
+    ok(
+      readerMissing.length === 0,
+      'the reader chrome is in Arabic',
+      readerMissing.join(' | '),
     )
 
     // The document keeps its own direction: a French chapter inside the

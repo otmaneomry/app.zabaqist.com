@@ -25,11 +25,15 @@ import { useLocale, useTranslations } from 'next-intl'
 import { KHATIM } from '@/components/landing/Zellige'
 import {
   ACTIVITY_EVENT,
+  GOAL_CHOICES,
   currentStreak,
   dayKey,
   lifetime,
   longestStreak,
+  readGoal,
   thisWeek,
+  writeGoal,
+  type Goal,
   type WeekDay,
 } from '@/lib/activity'
 
@@ -92,12 +96,15 @@ interface Snapshot {
   best: number
   days: number
   week: WeekDay[]
+  /** The target the student set for themselves, if they set one. */
+  goal: Goal | null
 }
 
-const EMPTY: Snapshot = { streak: 0, best: 0, days: 0, week: [] }
+const EMPTY: Snapshot = { streak: 0, best: 0, days: 0, week: [], goal: null }
 
 export default function StreakCard() {
   const t = useTranslations('dashboard')
+  const tg = useTranslations('streak')
   const locale = useLocale()
   // Starts empty and fills after mount: the log is on the device, so rendering
   // it on the server would print one student's numbers into another's HTML.
@@ -110,6 +117,7 @@ export default function StreakCard() {
       best: longestStreak(),
       days: life.days,
       week: thisWeek(),
+      goal: readGoal(),
     })
   }, [])
 
@@ -196,6 +204,66 @@ export default function StreakCard() {
           </div>
         ))}
       </dl>
+
+      {/* The goal, and the way to set one.
+
+          `components/course/StreakMoment.tsx` asks for it once, at the moment a
+          streak starts, and lets the student decline. Declining has to lead
+          somewhere or it is not really a choice — so the offer lives on
+          permanently here, where a student comes to look at their own
+          regularity. Set, it becomes a progress line against their own number.
+
+          The bar is capped at the goal and never overflows it: a streak past the
+          target reads as 100% and the numerals say the rest. There is no
+          "exceeded by" state, because the goal was a commitment device, not a
+          score. */}
+      <div className="mt-4 border-t border-zb-line pt-4">
+        {s.goal === null ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-zb-ink-3">{tg('goalBody')}</span>
+            <span className="flex gap-1.5">
+              {GOAL_CHOICES.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => writeGoal(n)}
+                  className="inline-flex h-8 items-center rounded-full border border-zb-line px-3 text-xs font-semibold text-zb-ink-2 transition-colors hover:border-zb-mint hover:text-zb-mint-deep"
+                >
+                  {tg('goalDays', { n })}
+                </button>
+              ))}
+            </span>
+          </div>
+        ) : (
+          <>
+            <p className="flex items-baseline justify-between gap-3">
+              <span className="text-xs font-semibold text-zb-ink-2">
+                {tg('goalCurrent', { n: s.goal })}
+              </span>
+              <span
+                dir="ltr"
+                className="font-mono text-[11px] tabular-nums text-zb-ink-3"
+              >
+                {Math.min(s.streak, s.goal)}/{s.goal}
+              </span>
+            </p>
+            <div
+              className="mt-2 h-1.5 overflow-hidden rounded-full bg-zb-cream-3"
+              role="progressbar"
+              aria-valuenow={Math.min(s.streak, s.goal)}
+              aria-valuemin={0}
+              aria-valuemax={s.goal}
+            >
+              <div
+                className="h-full rounded-full bg-zb-gold transition-[width] duration-500 motion-reduce:transition-none"
+                style={{
+                  width: `${Math.min(100, (s.streak / s.goal) * 100)}%`,
+                }}
+              />
+            </div>
+          </>
+        )}
+      </div>
     </section>
   )
 }

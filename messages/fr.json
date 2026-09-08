@@ -19,7 +19,14 @@
     "progress": "Progression",
     "premium": "Passer au premium",
     "openMenu": "Ouvrir le menu",
-    "xpLabel": "{xp} points d’expérience gagnés"
+    "xpLabel": "{xp} points d’expérience gagnés",
+    "primary": "Navigation principale",
+    "overview": "Tableau de bord",
+    "activity": "Mon activité",
+    "learnSection": "Apprendre",
+    "chapters": "Chapitres",
+    "revision": "Plan de révision",
+    "streakLabel": "{n, plural, one {# jour d’affilée} other {# jours d’affilée}}"
   },
   "home": {
     "metaTitle": "Zabaqist · Apprends les maths en résolvant",
@@ -135,7 +142,22 @@
     "donePoints": "points gagnés",
     "doneSections": "sections parcourues",
     "doneCta": "Revenir au parcours",
-    "doneNext": "Chapitre suivant"
+    "doneNext": "Chapitre suivant",
+    "startChapter": "Commencer le chapitre",
+    "partCount": "{n, plural, one {# partie} other {# parties}}",
+    "sectionCount": "{n, plural, one {# section} other {# sections}}",
+    "showSections": "Voir les sections",
+    "hideSections": "Masquer les sections",
+    "partStart": "Commencer",
+    "partResume": "Continuer",
+    "partReview": "Revoir",
+    "sectionDone": "Section lue",
+    "outline": "Plan du chapitre",
+    "prevSection": "Section précédente",
+    "nextSection": "Section suivante",
+    "dailyXp": "XP du jour",
+    "breadcrumbCourses": "Cours",
+    "closeOutline": "Fermer le plan"
   },
   "catalog": {
     "title": "Chapitres disponibles",
@@ -148,8 +170,10 @@
     "soonExample": "Voir un chapitre complet",
     "soonQuiz": "Passer un quiz",
     "soonBack": "Retour aux cours",
-    "catalogAll": "Toutes les thématiques",
-    "catalogPopular": "Thématiques populaires"
+    "filterAll": "Tous",
+    "resultCount": "{n, plural, one {# chapitre} other {# chapitres}}",
+    "searchPlaceholder": "Rechercher un chapitre…",
+    "noResults": "Aucun chapitre ne correspond à « {q} »."
   },
   "dashboard": {
     "jumpBackIn": "Reprends où tu en étais",
@@ -179,7 +203,17 @@
     "continueReview": "Revoir le chapitre",
     "continuePct": "{pct}% du chapitre",
     "nextUp": "La suite de ton programme",
-    "allChapters": "Voir les {n} chapitres"
+    "allChapters": "Voir les {n} chapitres",
+    "welcomeNamed": "Te revoilà, {name}",
+    "resumeEyebrow": "Apprendre",
+    "resumeCta": "Continuer",
+    "startCta": "Commencer",
+    "resumeAt": "Tu reprends à : {tab}",
+    "sectionsLeft": "{n, plural, one {# section restante} other {# sections restantes}}",
+    "kindReview": "à revoir",
+    "pickUp": "Reprends où tu en étais",
+    "seeActivity": "Voir mon activité",
+    "discoverTitle": "Tu cherches autre chose ?"
   },
   "meta": {
     "title": "Maths 2ème Bac Maroc — le programme officiel en leçons que tu manipules | Zabaqist",
@@ -285,7 +319,12 @@
     "vsPrevDown": "{n} de moins que la période précédente",
     "vsPrevSame": "Comme la période précédente",
     "vsPrevNone": "Première période enregistrée",
-    "privacyNote": "Tout est calculé sur cet appareil. Aucun classement, aucune comparaison avec d'autres élèves."
+    "privacyNote": "Tout est calculé sur cet appareil. Aucun classement, aucune comparaison avec d'autres élèves.",
+    "inProgress": "En cours",
+    "completed": "Terminés",
+    "chaptersDone": "chapitres terminés",
+    "noneDone": "Aucun chapitre terminé pour l’instant. Ça viendra.",
+    "lifetime": "Depuis le début"
   },
   "footer": {
     "product": "Zabaqist",
@@ -380,5 +419,20 @@
     "branchCount": "{n} chapitres",
     "perYear": "/an",
     "annualEquivalent": "Soit environ {n} DH par mois."
+  },
+  "streak": {
+    "title": "Ta série est lancée",
+    "body": "{n, plural, one {# jour travaillé. Reviens demain pour la tenir.} other {# jours d’affilée. Reviens demain pour la tenir.}}",
+    "continue": "Continuer",
+    "goalTitle": "Fixe-toi un objectif",
+    "goalBody": "Choisis un nombre de jours à tenir. C’est ton objectif : personne d’autre ne le voit.",
+    "goalDays": "{n} jours",
+    "goalLabel-7": "Pour commencer",
+    "goalLabel-14": "Ambitieux",
+    "goalLabel-30": "Déterminé",
+    "goalSkip": "Pas maintenant",
+    "goalCommit": "Je m’y engage",
+    "goalCurrent": "Ton objectif : {n} jours",
+    "goalSet": "Fixer un objectif"
   }
 }

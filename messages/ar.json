@@ -19,7 +19,14 @@
     "progress": "تقدّمي",
     "premium": "الاشتراك في بريميوم",
     "openMenu": "فتح القائمة",
-    "xpLabel": "{xp} نقطة خبرة محصّلة"
+    "xpLabel": "{xp} نقطة خبرة محصّلة",
+    "primary": "التنقل الرئيسي",
+    "overview": "لوحة التحكم",
+    "activity": "نشاطي",
+    "learnSection": "التعلّم",
+    "chapters": "الدروس",
+    "revision": "خطة المراجعة",
+    "streakLabel": "{n, plural, zero {# يوم متتالٍ} one {يوم متتالٍ} two {يومان متتاليان} few {# أيام متتالية} many {# يوماً متتالياً} other {# يوم متتالٍ}}"
   },
   "home": {
     "metaTitle": "زباقيست · تعلّم الرياضيات بالحل",
@@ -135,7 +142,22 @@
     "donePoints": "نقطة مكتسبة",
     "doneSections": "فقرة مقروءة",
     "doneCta": "العودة إلى المسار",
-    "doneNext": "الفصل التالي"
+    "doneNext": "الفصل التالي",
+    "startChapter": "ابدأ الدرس",
+    "partCount": "{n, plural, zero {لا أجزاء} one {جزء واحد} two {جزءان} few {# أجزاء} many {# جزءاً} other {# جزء}}",
+    "sectionCount": "{n, plural, zero {لا أقسام} one {قسم واحد} two {قسمان} few {# أقسام} many {# قسماً} other {# قسم}}",
+    "showSections": "عرض الأقسام",
+    "hideSections": "إخفاء الأقسام",
+    "partStart": "ابدأ",
+    "partResume": "متابعة",
+    "partReview": "مراجعة",
+    "sectionDone": "قسم مقروء",
+    "outline": "خطة الدرس",
+    "prevSection": "القسم السابق",
+    "nextSection": "القسم التالي",
+    "dailyXp": "نقاط اليوم",
+    "breadcrumbCourses": "الدروس",
+    "closeOutline": "إغلاق الخطة"
   },
   "catalog": {
     "title": "الفصول المتاحة",
@@ -148,8 +170,10 @@
     "soonExample": "اطّلع على فصل كامل",
     "soonQuiz": "اجتز اختبارًا",
     "soonBack": "العودة إلى الدروس",
-    "catalogAll": "جميع المحاور",
-    "catalogPopular": "المحاور الأكثر طلبًا"
+    "filterAll": "الكل",
+    "resultCount": "{n, plural, zero {لا دروس} one {درس واحد} two {درسان} few {# دروس} many {# درساً} other {# درس}}",
+    "searchPlaceholder": "ابحث عن درس…",
+    "noResults": "لا يوجد درس يطابق «{q}»."
   },
   "dashboard": {
     "jumpBackIn": "تابع من حيث توقّفت",
@@ -179,7 +203,17 @@
     "continueReview": "مراجعة الفصل",
     "continuePct": "{pct}% من الفصل",
     "nextUp": "بقية برنامجك",
-    "allChapters": "عرض الفصول الـ{n}"
+    "allChapters": "عرض الفصول الـ{n}",
+    "welcomeNamed": "أهلاً بعودتك، {name}",
+    "resumeEyebrow": "تعلّم",
+    "resumeCta": "متابعة",
+    "startCta": "ابدأ",
+    "resumeAt": "تستأنف من: {tab}",
+    "sectionsLeft": "{n, plural, zero {لا أقسام متبقية} one {قسم واحد متبقٍ} two {قسمان متبقيان} few {# أقسام متبقية} many {# قسماً متبقياً} other {# قسم متبقٍ}}",
+    "kindReview": "للمراجعة",
+    "pickUp": "تابع من حيث توقفت",
+    "seeActivity": "عرض نشاطي",
+    "discoverTitle": "تبحث عن شيء آخر؟"
   },
   "meta": {
     "title": "رياضيات الثانية باكالوريا المغرب — البرنامج الرسمي في دروس تُحرّكها بيدك | زباقيست",
@@ -285,7 +319,12 @@
     "vsPrevDown": "أقلّ بـ {n} من الفترة السابقة",
     "vsPrevSame": "مثل الفترة السابقة",
     "vsPrevNone": "أول فترة مسجَّلة",
-    "privacyNote": "كل شيء يُحسب على هذا الجهاز. لا ترتيب، ولا مقارنة بتلاميذ آخرين."
+    "privacyNote": "كل شيء يُحسب على هذا الجهاز. لا ترتيب، ولا مقارنة بتلاميذ آخرين.",
+    "inProgress": "قيد التقدّم",
+    "completed": "مكتملة",
+    "chaptersDone": "دروس مكتملة",
+    "noneDone": "لا يوجد درس مكتمل بعد. سيأتي ذلك.",
+    "lifetime": "منذ البداية"
   },
   "footer": {
     "product": "زباقيست",
@@ -380,5 +419,20 @@
     "branchCount": "{n} فصول",
     "perYear": "/سنويًا",
     "annualEquivalent": "أي نحو {n} درهمًا في الشهر."
+  },
+  "streak": {
+    "title": "انطلقت سلسلتك",
+    "body": "{n, plural, zero {لا أيام بعد.} one {يوم واحد من العمل. عد غداً للحفاظ عليها.} two {يومان متتاليان. عد غداً للحفاظ عليها.} few {# أيام متتالية. عد غداً للحفاظ عليها.} many {# يوماً متتالياً. عد غداً للحفاظ عليها.} other {# يوم متتالٍ. عد غداً للحفاظ عليها.}}",
+    "continue": "متابعة",
+    "goalTitle": "حدّد هدفك",
+    "goalBody": "اختر عدد الأيام التي تريد الحفاظ عليها. هذا هدفك أنت: لا أحد غيرك يراه.",
+    "goalDays": "{n} يوماً",
+    "goalLabel-7": "للبداية",
+    "goalLabel-14": "طموح",
+    "goalLabel-30": "مثابر",
+    "goalSkip": "ليس الآن",
+    "goalCommit": "ألتزم بذلك",
+    "goalCurrent": "هدفك: {n} يوماً",
+    "goalSet": "حدّد هدفاً"
   }
 }

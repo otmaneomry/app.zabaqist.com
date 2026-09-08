@@ -77,6 +77,15 @@ const config = {
           "rose-soft": "var(--zb-rose-soft)",
           "rose-deep": "var(--zb-rose-deep)",
           line: "var(--zb-line)",
+          // The dark chrome the app is hung on — sidebar and page banners.
+          // See the note in app/globals.css: `mint-on-dark` is the mint
+          // lifted to pass AA on navy, and is not interchangeable with `mint`.
+          navy: "var(--zb-navy)",
+          "navy-2": "var(--zb-navy-2)",
+          "navy-3": "var(--zb-navy-3)",
+          "navy-line": "var(--zb-navy-line)",
+          "navy-dim": "var(--zb-navy-dim)",
+          "mint-on-dark": "var(--zb-mint-on-dark)",
         },
       },
       borderRadius: {

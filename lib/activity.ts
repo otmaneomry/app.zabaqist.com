@@ -287,3 +287,73 @@ export function lifetime(): DayActivity & { days: number } {
     { ...EMPTY, days },
   )
 }
+
+/* ------------------------------------------------------------------ */
+/* The streak goal                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A target the student sets for themselves.
+ *
+ * DataCamp asks for one the moment a streak starts (`wokflow-datacamp/5-set-goal.png`):
+ * 7, 14 or 30 days, labelled `Good Start` / `Ambitious` / `Devoted`. It is a
+ * commitment device — naming a number makes it more likely to be met — and it
+ * costs nothing to honour because it is the student's own number, compared to
+ * nobody. That is the one form of goal-setting this product can carry: see
+ * DATACAMP_WORKFLOW.md §6 on why the Leaderboard is not here.
+ *
+ * Their screen also claims *"You will be 3.4x more likely to complete a track"*.
+ * That figure is theirs, measured on their population, and repeating it here
+ * would be quoting someone else's study as our own result. The goal is offered
+ * without a statistic attached.
+ */
+export const GOAL_CHOICES = [7, 14, 30] as const
+export type Goal = (typeof GOAL_CHOICES)[number]
+
+const GOAL_KEY = 'zabaqist:streak-goal'
+/** The last day the streak celebration was shown, so it fires once a day. */
+const SEEN_KEY = 'zabaqist:streak-seen'
+
+export function readGoal(): Goal | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const n = Number(localStorage.getItem(GOAL_KEY))
+    return (GOAL_CHOICES as readonly number[]).includes(n) ? (n as Goal) : null
+  } catch {
+    return null
+  }
+}
+
+export function writeGoal(goal: Goal): void {
+  try {
+    localStorage.setItem(GOAL_KEY, String(goal))
+    window.dispatchEvent(new Event(ACTIVITY_EVENT))
+  } catch {
+    /* storage unavailable — the student simply is not asked again this session */
+  }
+}
+
+/**
+ * Whether today's streak has already been celebrated.
+ *
+ * Keyed by day rather than by a boolean: the moment is worth showing once each
+ * morning a student turns up, and never twice. A celebration that repeats on
+ * every section read is wallpaper — the same argument
+ * `components/course/ChapterComplete.tsx` makes about firing once per chapter.
+ */
+export const streakSeenToday = (): boolean => {
+  if (typeof window === 'undefined') return true
+  try {
+    return localStorage.getItem(SEEN_KEY) === dayKey(new Date())
+  } catch {
+    return true
+  }
+}
+
+export function markStreakSeen(): void {
+  try {
+    localStorage.setItem(SEEN_KEY, dayKey(new Date()))
+  } catch {
+    /* nothing to remember it with — it will simply not fire again this load */
+  }
+}

@@ -13,7 +13,6 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Group, Paper, Progress, Stack, Text } from '@mantine/core'
 import { IconClock } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 
@@ -35,6 +34,7 @@ export default function CourseProgressCard({
   viewIds,
   xpByView,
   markVisited = true,
+  chromeless = false,
 }: {
   slug: string
   activeId: string
@@ -48,6 +48,18 @@ export default function CourseProgressCard({
    * opened the first.
    */
   markVisited?: boolean
+  /**
+   * Keep the side effects, drop the card.
+   *
+   * The reader's `CampusHeader` already states the chapter's XP against its
+   * total, and the outline drawer states the per-part progress — so a second
+   * progress card directly under that bar prints the same two facts twice, in a
+   * different visual language, above the first line of the chapter. What is
+   * still needed on that page is everything this component does *invisibly*:
+   * marking the section read, accumulating time, and recording the chapter's
+   * shape so the dashboard and the catalogue can read it back.
+   */
+  chromeless?: boolean
 }) {
   const t = useTranslations('course')
   const [timeSpent, setTimeSpent] = useState('0m')
@@ -117,35 +129,63 @@ export default function CourseProgressCard({
     ? Math.min(100, Math.round((totals.sectionsDone / viewIds.length) * 100))
     : 0
 
+  if (chromeless) return null
+
   return (
-    <Paper shadow="sm" p="md" radius="md" withBorder>
-      <Stack gap="xs">
-        <Group justify="space-between">
-          <Text size="sm" fw={600} c="dimmed">
-            {t('progressTitle')}
-          </Text>
-          <Group gap="lg">
-            <Group gap="xs">
-              <IconClock size={16} />
-              <Text size="sm" c="dimmed">
-                {timeSpent}
-              </Text>
-            </Group>
-            {totals.xp > 0 && (
-              <Text size="sm" fw={600} c="dimmed" dir="ltr">
-                ✦ {totals.xp} XP
-              </Text>
-            )}
-            <Text size="sm" fw={700} c="mint">
-              {pct}%
-            </Text>
-          </Group>
-        </Group>
-        <Progress value={pct} color="mint" size="lg" radius="xl" />
-        <Text size="xs" c="dimmed">
-          {t('sectionsSeen', { done: totals.sectionsDone, total: viewIds.length })}
-        </Text>
-      </Stack>
-    </Paper>
+    <section className="rounded-xl border border-zb-line bg-white px-5 py-4 shadow-[var(--zb-shadow-sm)]">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-zb-ink-3">
+          {t('progressTitle')}
+        </h2>
+
+        <div className="flex items-center gap-4">
+          <span className="inline-flex items-center gap-1.5 text-sm text-zb-ink-2">
+            <IconClock size={15} />
+            <span dir="ltr" className="tabular-nums">
+              {timeSpent}
+            </span>
+          </span>
+
+          {/* No `✦`. The khatim is the brand's one mark and it means "item in a
+              list" (see `.zb-star-list` in app/globals.css); a decorative star
+              beside a number is the sprinkled-chrome use that rule refuses. */}
+          {totals.xp > 0 && (
+            <span
+              dir="ltr"
+              className="inline-flex h-6 items-center rounded-full bg-zb-gold/20 px-2.5 font-mono text-xs font-semibold tabular-nums text-zb-gold-deep"
+            >
+              {totals.xp} XP
+            </span>
+          )}
+
+          <span
+            dir="ltr"
+            className="text-sm font-bold tabular-nums text-zb-mint-deep"
+          >
+            {pct}%
+          </span>
+        </div>
+      </div>
+
+      <div
+        className="mt-3 h-2 overflow-hidden rounded-full bg-zb-cream-3"
+        role="progressbar"
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="h-full rounded-full bg-zb-mint transition-[width] duration-500 motion-reduce:transition-none"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+
+      <p className="mt-2 text-xs text-zb-ink-3">
+        {t('sectionsSeen', {
+          done: totals.sectionsDone,
+          total: viewIds.length,
+        })}
+      </p>
+    </section>
   )
 }

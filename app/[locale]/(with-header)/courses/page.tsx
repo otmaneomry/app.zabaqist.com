@@ -9,36 +9,24 @@ export const metadata = {
 }
 
 /**
- * ⚠️ `<CoursesPage />` USED TO RENDER UNDER THIS, AND IT WAS FICTION.
+ * The catalogue.
  *
- * It was the last of the Brilliant scaffolding on a signed-in route — its own
- * file called it "the two legacy grids" — and below the real catalogue a
- * student scrolled into:
+ * `CourseCatalog` owns the banner, the branch filters, the search and the grid —
+ * everything DataCamp puts on `Learn → Courses` — and every card in it comes from
+ * a markdown chapter that really opens.
  *
- *  · `LearningPaths`: six invented "Thématiques" (Algèbre, Analyse, Géométrie,
- *    Probabilités, …) and a card announcing "Mathématiques - Sciences Maths ·
- *    Programme complet du Baccalauréat Marocain" — a completeness claim, for a
- *    filière whose algebra half a Sciences Expérimentales reader is not even
- *    shown;
- *  · `BrowseAllCourses`: a search box wired to nothing, category chips that
- *    filtered nothing, and six more invented titles including "Géométrie dans
- *    l'Espace" and "Probabilités Continues" — neither of which is a chapter in
- *    `content/course/`.
- *
- * Both were hardcoded French, so the Arabic route served them in French; both
- * were inline styles with literal hex colours (`#4b5563`, `white`) against a
- * token system used everywhere else. `<CourseCatalog />` above already renders
- * the chapters that really open, from the markdown, filière-aware and bilingual
- * — so this was a fake catalogue sitting under the true one.
- *
- * The files are still in the tree (`CoursesPage.tsx`, `LearningPaths.tsx`,
- * `BrowseAllCourses.tsx`); only the render is gone, so restoring is one import.
- * They should be deleted once nothing else wants them.
+ * Three components used to render underneath it and all three were fiction:
+ * `LearningPaths` (six invented "Thématiques" and a completeness claim for a
+ * programme half of which Sciences Expérimentales students are never shown),
+ * `BrowseAllCourses` (a dead search box, chips that filtered nothing, and six
+ * chapter titles with no document behind them), and the `CoursesPage` wrapper
+ * that rendered the pair. Their render was removed earlier with a note saying to
+ * delete the files once nothing wanted them; the rewrite that gave this page a
+ * real filter row and a real search made that true, so they are gone.
  */
 export default function Courses() {
   return (
-    <div className="container mx-auto max-w-6xl p-6">
-      {/* Server-rendered from `content/course/`: the chapters that really open. */}
+    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <CourseCatalog />
     </div>
   )

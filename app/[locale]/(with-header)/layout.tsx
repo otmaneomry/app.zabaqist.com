@@ -17,6 +17,7 @@ import React from 'react'
 import { cookies } from 'next/headers'
 
 import Header from '@/components/Header'
+import AppSidebar from '@/components/shell/AppSidebar'
 import SyncProvider from '@/components/SyncProvider'
 import { E2E_COOKIE, E2E_USER, isE2E } from '@/lib/e2e'
 import { createClient } from '@/lib/supabase/server'
@@ -60,7 +61,15 @@ export default async function WithHeaderLayout({
         <SyncProvider userId={account.id} email={account.email} />
       )}
       <Header user={user} />
-      <main>{children}</main>
+      {/* Bar across the top, rail down the side, page in the corner they make.
+          `min-w-0` on the main column is load-bearing and not defensive: a flex
+          child defaults to `min-width:auto`, so one wide KaTeX display inside a
+          chapter would widen this column past the viewport and take the rail
+          off screen with it. */}
+      <div className="flex">
+        <AppSidebar />
+        <main className="min-w-0 flex-1">{children}</main>
+      </div>
     </div>
   )
 }

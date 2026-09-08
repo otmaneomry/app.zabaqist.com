@@ -13,6 +13,7 @@ import MainContent from '@/components/MainContent'
 import FiliereGate from '@/components/onboarding/FiliereGate'
 import type { ChapterShape } from '@/components/home/ContinuePanel'
 import { listCourses, loadCourseDoc, tabsOf } from '@/lib/courseDoc'
+import { createClient } from '@/lib/supabase/server'
 
 async function chapterShape(): Promise<ChapterShape> {
   const out: ChapterShape = {}
@@ -37,8 +38,38 @@ async function chapterShape(): Promise<ChapterShape> {
   return out
 }
 
+/**
+ * The name and face the dashboard greets the reader with.
+ *
+ * Read here as well as in the layout rather than threaded down through it: the
+ * layout hands its copy to the header, which needs an avatar, and the greeting
+ * needs a first name. Passing one shape through a shared layout to satisfy two
+ * unrelated consumers is what makes layouts grow props they do not use. Supabase
+ * serves this from the session cookie already in the request, so the second read
+ * costs no round trip.
+ *
+ * It must not take the page down when the service is unusable — an e2e-bypassed
+ * request reaches here with no Supabase at all, and a dashboard that fails to
+ * render because it could not draw an avatar is a worse outcome than "Te
+ * revoilà" with no name after it.
+ */
+async function greeting() {
+  try {
+    const supabase = await createClient()
+    const meta = (await supabase.auth.getUser()).data.user?.user_metadata ?? {}
+    return {
+      name: (meta.full_name ?? meta.name ?? null) as string | null,
+      // Google spells the avatar two ways depending on how the identity was
+      // linked; both appear in the wild on this project.
+      image: (meta.avatar_url ?? meta.picture ?? null) as string | null,
+    }
+  } catch {
+    return { name: null, image: null }
+  }
+}
+
 export default async function Home() {
-  const shape = await chapterShape()
+  const [shape, { name, image }] = await Promise.all([chapterShape(), greeting()])
 
   return (
     <main>
@@ -46,7 +77,7 @@ export default async function Home() {
           filière — that answer is in localStorage. So the funnel is entered
           from here, on the client, rather than from the sign-in redirect. */}
       <FiliereGate />
-      <MainContent shape={shape} />
+      <MainContent shape={shape} name={name} image={image} />
     </main>
   )
 }
