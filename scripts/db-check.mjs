@@ -113,9 +113,11 @@ for (const t of names) {
   )
 }
 
-// allowed_emails is deliberately policy-less: no policy means no access through
-// the browser key, which is what keeps the guest list private.
-const INTENTIONALLY_UNREADABLE = new Set(['allowed_emails'])
+// Policy-less on purpose: no policy means no access through the browser key.
+// `allowed_emails` is the guest list; `auth_events` is the journal, and it
+// holds the address of everyone who has tried to sign in. Both are written
+// through SECURITY DEFINER functions and read from the dashboard.
+const INTENTIONALLY_UNREADABLE = new Set(['allowed_emails', 'auth_events'])
 for (const t of names) {
   const hasPolicy = new RegExp(`create policy [^\\n]* on public\\.${t}`).test(sql)
   if (INTENTIONALLY_UNREADABLE.has(t)) {
@@ -223,6 +225,7 @@ if (!URL_ || !KEY) {
     checkpoints: { user_id: PROBE, course_slug: '__probe', view_id: 'v', idx: 0 },
     activity: { user_id: PROBE, day: '1970-01-01' },
     allowed_emails: { email: 'probe@example.invalid' },
+    auth_events: { event: '__probe' },
   }
   for (const [t, row] of Object.entries(probes)) {
     if (!tables[t]) continue

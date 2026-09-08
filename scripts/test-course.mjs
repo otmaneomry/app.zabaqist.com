@@ -1719,6 +1719,42 @@ section('Chrome')
   )
 }
 
+section('Auth diagnostics')
+{
+  const fr = JSON.parse(
+    readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'),
+  )
+  // A check that FAILED is not a refusal. The callback used to treat
+  // `checkError || !allowed` as one case, so an invited student whose lookup
+  // errored was told they were "not yet invited" and pointed at the waitlist
+  // they were already past.
+  // Read the rendered alert, not the page source: next-intl ships the whole
+  // `auth` namespace to the client, so every string in it is present in the
+  // HTML whether or not anything displayed it.
+  const alertText = (html) =>
+    (/bg-zb-rose-soft[^>]*>([\s\S]*?)<\/(?:p|div)>/.exec(html)?.[1] ?? '')
+      .replace(/<[^>]*>/g, '')
+      .trim()
+
+  const denied = await (await get(`${BASE}/signin?error=not-allowed`)).text()
+  const failed = await (await get(`${BASE}/signin?error=check-failed`)).text()
+
+  ok(alertText(denied) === fr.auth.notAllowed,
+    'a refusal says the account is not invited', alertText(denied).slice(0, 60))
+  ok(alertText(failed) === fr.auth.checkFailed,
+    'a failed check says it is not a refusal', alertText(failed).slice(0, 60))
+  ok(alertText(failed) !== fr.auth.notAllowed,
+    'and never claims the account was refused')
+
+  // The waitlist is the right next step for someone genuinely not invited, and
+  // the wrong one for someone whose lookup merely timed out. That link is
+  // rendered, not translated copy, so the raw HTML is the right place to look.
+  ok(
+    /href="[^"]*#waitlist"/.test(denied) && !/href="[^"]*#waitlist"/.test(failed),
+    'only a real refusal offers the waitlist',
+  )
+}
+
 section('Brand identity')
 {
   const pg = await browser.newPage({ viewport: { width: 1100, height: 900 } })

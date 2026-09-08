@@ -219,7 +219,8 @@
     "account": "Mon compte",
     "notAllowed": "Ce compte n’est pas encore invité. Zabaqist est en bêta fermée jusqu’au lancement.",
     "notAllowedCta": "Rejoindre la liste d’attente",
-    "notAllowedOther": "Ou essaie avec un autre compte Google"
+    "notAllowedOther": "Ou essaie avec un autre compte Google",
+    "checkFailed": "On n’a pas pu vérifier ton invitation. Ce n’est pas un refus : réessaie dans un instant."
   },
   "onboarding": {
     "back": "Retour",

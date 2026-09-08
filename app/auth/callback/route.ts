@@ -10,6 +10,11 @@
  * It is also where the closed beta is enforced. The allowlist lives in
  * Postgres (`public.allowed_emails`) rather than in the code, so adding a
  * tester is one row and not a deployment.
+ *
+ * Every outcome is written to `public.auth_events`. Until it was, an invited
+ * account that could not get in left no trace at all — not the address it
+ * tried, not the reason — so the only evidence was a screenshot of the refusal
+ * and a person saying "but I am on the list".
  */
 
 import { NextResponse, type NextRequest } from 'next/server'
@@ -45,16 +50,45 @@ export async function GET(request: NextRequest) {
   //
   // Gmail ignores dots, and Google returns the undotted form; the SQL function
   // normalises both sides, so `omry.otmane@` and `omryotmane@` are one account.
+  const email = data.user.email
+
+  /** Never let the journal break a sign-in that would otherwise work. */
+  const log = async (event: string, detail: Record<string, unknown> = {}) => {
+    try {
+      await supabase.rpc('log_auth_event', {
+        p_event: event,
+        p_email: email,
+        p_detail: detail,
+      })
+    } catch {
+      /* the log is diagnostic; losing a line is not worth failing a login */
+    }
+  }
+
   const { data: allowed, error: checkError } = await supabase.rpc(
     'is_email_allowed',
-    { addr: data.user.email },
+    { addr: email },
   )
 
-  if (checkError || !allowed) {
+  // A failed CHECK is not a refusal, and telling an invited student they are
+  // "not yet invited" because the database hiccuped is how you lose them. The
+  // two cases now say different things and are logged apart.
+  if (checkError) {
+    await log('signin_check_failed', {
+      code: checkError.code ?? null,
+      message: checkError.message ?? null,
+    })
+    await supabase.auth.signOut()
+    return NextResponse.redirect(`${origin}/signin?error=check-failed`)
+  }
+
+  if (!allowed) {
+    await log('signin_denied', { reason: 'not_on_allowlist' })
     // Do not leave a usable session behind for an address that is not invited.
     await supabase.auth.signOut()
     return NextResponse.redirect(`${origin}/signin?error=not-allowed`)
   }
 
+  await log('signin_ok')
   return NextResponse.redirect(`${origin}${to}`)
 }

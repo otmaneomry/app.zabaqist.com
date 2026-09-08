@@ -11,7 +11,8 @@
     "check": "tsc --noEmit && eslint .",
     "db:check": "node --no-warnings scripts/db-check.mjs",
     "prod:check": "node --no-warnings scripts/prod-check.mjs",
-    "loop": "npm run db:check && npm run prod:check"
+    "loop": "npm run db:check && npm run prod:check",
+    "whois": "node --no-warnings scripts/whois.mjs"
   },
   "dependencies": {
     "@mantine/core": "^9.6.0",

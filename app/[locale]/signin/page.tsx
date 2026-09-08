@@ -51,6 +51,10 @@ export default async function SignInPage({
 
   const t = await getTranslations('auth')
   const notAllowed = error === 'not-allowed'
+  // A check that FAILED is not a refusal. Telling an invited student they are
+  // "not yet invited" because the database hiccuped reads as a rejection and
+  // sends them to the waitlist they are already past.
+  const checkFailed = error === 'check-failed'
 
   // In development, a failed sign-in is far more often a misconfigured key
   // than a real outage, and "réessaie" invites retrying something that cannot
@@ -101,7 +105,11 @@ export default async function SignInPage({
           >
             {/* An uninvited account is not a failure — say which it is, or the
                 reader retries the same address forever. */}
-            {notAllowed ? t('notAllowed') : t('signInError')}
+            {notAllowed
+              ? t('notAllowed')
+              : checkFailed
+                ? t('checkFailed')
+                : t('signInError')}
           </p>
         )}
 
