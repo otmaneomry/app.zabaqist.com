@@ -284,6 +284,30 @@ Also not ported:
 
 ---
 
+## 6b. Screens still undecided
+
+Two of the nineteen reference captures have no counterpart here and no entry in
+§6 either — they were not ported and not argued against, which is the one gap
+this study had. Recording them so the next pass inherits a question rather than
+an oversight.
+
+**`14-notifications`** — a bell with a dropdown. Nothing in Zabaqist generates a
+notification today: there is no teacher, no cohort, no deadline, and progress is
+computed on the device. A bell would be chrome over an empty queue, which is the
+`Review 0` mistake in §6. It becomes a real question the day something can
+legitimately interrupt a student — a new chapter published, say.
+
+**`15-account-settings`** — a settings page. `components/auth/AccountMenu.tsx`
+currently offers sign-out and nothing else, yet two settings already exist and
+are reachable only sideways: the filière (changed at `/filiere`) and the
+language (the switch in the bar). A page that gathered those two would not be
+invented chrome — it would be a home for choices the student already has.
+
+This is the smaller and more defensible of the two, and the only one with real
+content behind it today.
+
+---
+
 ## 7. What this cost, in files
 
 Added: `shell/AppSidebar`, `shell/PageBanner`, `course/ChapterOutline`,
@@ -295,10 +319,18 @@ Deleted: `courses/CoursesPage.tsx`, `courses/LearningPaths.tsx`,
 `courses/BrowseAllCourses.tsx` — three files of invented catalogue that had been
 dead since an earlier pass, and which the new filter row and search superseded.
 
-Unreferenced, safe to delete when nobody wants them back: `course/CoursePath`,
+Deleted afterwards, once nothing imported them: `course/CoursePath`,
 `course/StickyNextCard`, `course/CourseTabs`, `course/SectionPicker`,
-`home/ContinuePanel` (still exports the `ChapterShape` type),
-`ContinueLearningSection`, `ComebackCard`, `CourseCard`.
+`home/ContinuePanel`, `ContinueLearningSection`, `ComebackCard`, `CourseCard` —
+728 lines. `ContinuePanel` had outlived its own component: three live files
+still imported its `ChapterShape` type, so a dead panel was being kept in the
+tree by two lines of `interface`. The type moved to `lib/chapterShape.ts`, where
+it belongs, and the panel went with the rest.
+
+Their copy went too — 49 message keys in both locales that nothing could reach,
+including the whole `objectif` family for an onboarding step `lib/onboarding.ts`
+takes out deliberately. Dead copy is worse than dead code: it gets translated,
+reviewed and believed.
 
 `npm run test:course` covers the new surfaces — the outline, the campus bar, the
-streak takeover, the rail at both widths — at 245 checks.
+streak takeover, the rail at both widths — at 244 checks.

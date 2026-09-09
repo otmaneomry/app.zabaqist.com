@@ -11,7 +11,7 @@ import React from 'react'
 
 import MainContent from '@/components/MainContent'
 import FiliereGate from '@/components/onboarding/FiliereGate'
-import type { ChapterShape } from '@/components/home/ContinuePanel'
+import type { ChapterShape } from '@/lib/chapterShape'
 import { listCourses, loadCourseDoc, tabsOf } from '@/lib/courseDoc'
 import { createClient } from '@/lib/supabase/server'
 

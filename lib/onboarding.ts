@@ -44,6 +44,9 @@ export const STEPS: Step[] = [
   // `objectif` — the daily-goal question — is deliberately out for now.
   // The type and DAILY_GOALS below stay: putting the step back is one line
   // here plus its block in the funnel, and nothing else was built on it.
+  // Its copy did NOT stay. Ten keys per locale sat in messages/ for a step
+  // nothing rendered, shipped to every browser; they were removed with the
+  // other 49 unreachable keys and are in git history when the step returns.
   { id: 'plan', kind: 'reveal', segment: 2, fill: 100 },
 ]
 

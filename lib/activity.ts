@@ -192,8 +192,33 @@ export function windowFor(
 
 /** Totals across the whole recorded history. */
 /** A day counts as worked if anything at all was logged on it. */
-const worked = (d?: DayActivity) =>
-  !!d && (d.sections > 0 || d.checkpoints > 0 || d.seconds > 0)
+/**
+ * A day counts when an attempt was committed to — nothing else.
+ *
+ * This used to be `sections > 0 || checkpoints > 0 || seconds > 0`, and the third
+ * term decided almost every day on its own: opening a chapter for five seconds
+ * filled the khatim, extended the streak, and fired `StreakMoment` — the only
+ * full-screen takeover in the product, the only screen that recolours the whole
+ * page. The loudest reward in the app was paid for turning up.
+ *
+ * ZABAQIST.md rules that out in one sentence: *« Un élève ne devrait pas être
+ * récompensé simplement parce qu'il a cliqué 100 fois. Il devrait progresser
+ * parce qu'il comprend et sait faire. »* And the section next to it is titled
+ * *« Apprendre n'est pas regarder »* — which is exactly what `seconds > 0`
+ * rewarded.
+ *
+ * `sections` goes too, for the same reason one rung up: opening a page is not
+ * work either. `logCheckpointTried()` fires when the reader commits an attempt,
+ * having written something and pressed the button — that is the smallest honest
+ * unit of "I worked today".
+ *
+ * Expect streaks to become rare and short at first. That is the intended
+ * outcome, not a regression: a streak that everyone keeps by accident measures
+ * nothing, and zabaqist.com now describes this rule to students in both
+ * languages (/mission/, /approche/, /demo/). If this line changes, those pages
+ * change in the same commit.
+ */
+const worked = (d?: DayActivity) => !!d && d.checkpoints > 0
 
 const shift = (d: Date, days: number) => {
   const n = new Date(d)

@@ -35,7 +35,7 @@ import { useTranslations } from 'next-intl'
 import { IconArrowRight } from '@tabler/icons-react'
 
 import { Link } from '@/i18n/navigation'
-import type { ChapterShape } from '@/components/home/ContinuePanel'
+import type { ChapterShape } from '@/lib/chapterShape'
 import DashboardGreeting from '@/components/home/DashboardGreeting'
 import KindTrio from '@/components/home/KindTrio'
 import PickUpList from '@/components/home/PickUpList'

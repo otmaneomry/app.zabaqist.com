@@ -7,8 +7,16 @@
  * skeleton: illustration → numeral → heading → stat row → dark pill CTA. Two
  * departures here (BRILLIANT_WORKFLOW.md §4, §6):
  *
- *  · **One takeover, not three.** The other two celebrate a streak, and this
- *    product deliberately has no streak to celebrate.
+ *  · **One takeover, not three.** Brilliant's other two celebrate a streak and a
+ *    map. This file used to say "this product deliberately has no streak to
+ *    celebrate", which was true when it was written and stopped being true when
+ *    the DataCamp pass added `StreakMoment` — two docstrings in the same tree
+ *    contradicting each other for a fortnight. There IS a streak now; it is
+ *    celebrated by `StreakMoment`, once a day, and marks days on which an
+ *    attempt was committed (see `worked()` in lib/activity.ts). This screen
+ *    stays separate from it: finishing a chapter and turning up are different
+ *    achievements and should not share a celebration.
+ *    The map screen is still not ported.
  *  · **No monetisation in the chain.** Brilliant puts a promo bar directly above
  *    the reward the reader just earned; that stays out of here.
  *

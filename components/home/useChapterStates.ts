@@ -20,7 +20,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type { ChapterShape, ChapterTab } from '@/components/home/ContinuePanel'
+import type { ChapterShape, ChapterTab } from '@/lib/chapterShape'
 import { listCourses, type CourseMeta } from '@/lib/courseCatalog'
 import { getCourseProgress } from '@/lib/progressTracking'
 import {
