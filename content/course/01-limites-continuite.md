@@ -219,9 +219,84 @@ B) Soit $f$ une fonction continue sur un segment $[a, b]$, et soit $\lambda$ un 
 
 On a donc montré que si $f$ est une fonction continue sur $[a, b]$, alors pour tout réel $\lambda$ compris entre $f(a)$ et $f(b)$, il existe au moins un réel $c$ dans $[a, b]$ tel que $f(c) = \lambda$. Ce résultat porte le nom de « théorème des valeurs intermédiaires ».
 
+#### Avant de démontrer : essaie de mettre le théorème en défaut
+
+Ci-dessous, $f(x) = x^3 + 2x + 1$ sur $[-1\,;1]$, avec $f(-1) = -2$ et $f(1) = 4$.
+La droite horizontale $y = k$ se déplace avec le curseur.
+
+**Fais une hypothèse avant de toucher au curseur :** existe-t-il une hauteur $k$
+entre $-2$ et $4$ pour laquelle la droite **ne coupe pas** la courbe ?
+
+Cherche-la. Prends le temps d'essayer plusieurs valeurs.
+
+```geogebra
+{
+  "coords": [-2, 2, -3, 5],
+  "commands": [
+    "f(x) = x^3 + 2x + 1",
+    "k = Slider(-2, 4, 0.1)",
+    "SetValue(k, 2.5)",
+    "d: y = k",
+    "A = (-1, -2)",
+    "B = (1, 4)",
+    "C = Intersect(f, d)"
+  ],
+  "style": {
+    "f": { "color": [44, 176, 161], "thickness": 4 },
+    "d": { "color": [232, 176, 74], "thickness": 3 }
+  },
+  "points": { "A": "a = −1", "B": "b = 1", "C": "c" }
+}
+```
+
+Tu n'en trouveras pas, et **c'est exactement ce que le théorème affirme**. La
+démonstration que tu viens de faire en A) et B) explique *pourquoi* : la courbe
+ne peut pas passer de l'autre côté de la droite sans la traverser, parce qu'elle
+n'a pas le droit de sauter.
+
+Le mot « continue » dans l'énoncé n'est donc pas une précaution d'écriture. C'est
+l'hypothèse qui interdit le saut — et l'activité suivante te montre ce qui se
+passe quand on l'enlève.
+
 3. Soit $h$ la fonction numérique définie par : $h(x) = x^4 - \frac{4}{x}$
 
 Montrer que l'équation $h(x) = x$ admet au moins une solution dans l'intervalle $[1, 2]$.
+
+#### Le contre-exemple : ce que devient le théorème sans la continuité
+
+Voici $g$, définie sur $[-1\,;2]$ par $g(x) = x^2 - 1$ si $x < 1$, et
+$g(x) = x^2 + 1$ si $x \geq 1$. Elle **saute** en $x = 1$ : elle vaut $0$ juste
+avant, et $2$ en ce point.
+
+$g(-1) = 0$ et $g(2) = 5$. **Hypothèse avant de manipuler :** la valeur $k = 1$
+est comprise entre les deux. Penses-tu qu'elle est atteinte ?
+
+```geogebra
+{
+  "coords": [-1.5, 2.5, -2, 6],
+  "commands": [
+    "g(x) = If(x < 1, x^2 - 1, x^2 + 1)",
+    "k = Slider(0, 5, 0.1)",
+    "SetValue(k, 1)",
+    "d: y = k",
+    "P = (-1, 0)",
+    "Q = (2, 5)"
+  ],
+  "style": {
+    "g": { "color": [44, 176, 161], "thickness": 4 },
+    "d": { "color": [199, 63, 46], "thickness": 3 }
+  },
+  "points": { "P": "g(−1) = 0", "Q": "g(2) = 5" }
+}
+```
+
+Déplace le curseur entre $0$ et $2$ : la droite passe **dans le trou**. Aucune
+valeur strictement entre $0$ et $2$ n'est atteinte, alors qu'elle est bien
+comprise entre $g(-1)$ et $g(2)$.
+
+> **À retenir.** Le théorème des valeurs intermédiaires n'est pas vrai « en
+> général » : il est vrai **parce que** la fonction est continue. Un seul point
+> de discontinuité suffit à le faire tomber.
 
 ### THÉORÈME DE LA FONCTION RÉCIPROQUE
 Soit $f$ la fonction numérique définie sur $\mathbb{R}$ par : $f(x) = \frac{x}{1 + |x|}$
@@ -231,6 +306,38 @@ Soit $f$ la fonction numérique définie sur $\mathbb{R}$ par : $f(x) = \frac{x}
 3. Montrer que pour tout $y \in ] - 1,1[$, il existe un unique réel $x \in \mathbb{R}$ tel que $f(x) = y$.
 
 Si on pose $x = f^{-1}(y)$ alors $f^{-1}$ est la fonction réciproque de $f$. De plus, $f^{-1}$ est définie de $]-1,1[$ dans $\mathbb{R}$.
+
+#### Observer la réciproque avant de la définir
+
+La fonction de l'exercice, $f(x) = \dfrac{x}{1 + |x|}$, est tracée en vert ; sa
+réciproque $f^{-1}$ en doré, et la droite $y = x$ en pointillés.
+
+**Regarde d'abord, formule ensuite :** quel lien géométrique unit les deux
+courbes ? Et que deviennent les asymptotes horizontales $y = -1$ et $y = 1$ de
+$f$ lorsqu'on passe à $f^{-1}$ ?
+
+```geogebra
+{
+  "coords": [-4, 4, -4, 4],
+  "commands": [
+    "f(x) = x / (1 + abs(x))",
+    "g(x) = x / (1 - abs(x))",
+    "h(x) = x"
+  ],
+  "style": {
+    "f": { "color": [44, 176, 161], "thickness": 4 },
+    "g": { "color": [232, 176, 74], "thickness": 4 },
+    "h": { "color": [150, 150, 150], "thickness": 2 }
+  }
+}
+```
+
+Les deux courbes sont **symétriques par rapport à la droite $y = x$**, et les
+asymptotes horizontales de $f$ deviennent les asymptotes verticales de $f^{-1}$ :
+échanger $x$ et $y$ échange aussi les directions asymptotiques.
+
+C'est la traduction graphique de l'équivalence que tu viens d'établir :
+$y = f(x) \Leftrightarrow x = f^{-1}(y)$.
 
 Toute fonction $f$ continue et strictement monotone sur un intervalle $I$ réalise une bijection de $I$ sur $f(I)$. Dans ce cas, $f$ admet une fonction réciproque $f^{-1}$ définie de $f(I)$ dans $I$.
 
