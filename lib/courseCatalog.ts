@@ -125,7 +125,7 @@ export const COURSE_CATALOG: CourseMeta[] = [
     level: LEVEL,
     levelAr: LEVEL_AR,
     semester: 1,
-    sections: 33,
+    sections: 34,
     exercises: 16,
     branch: 'analyse',
     n: 1,
