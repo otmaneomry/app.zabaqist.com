@@ -133,6 +133,75 @@ Deux détails qui comptent :
   stocke la forme pointée refuserait la connexion réelle.
   `public.normalize_email()` normalise les deux côtés.
 
+## Quand quelqu'un n'arrive pas à entrer
+
+Deux commandes, dans cet ordre.
+
+### `npm run whois -- <adresse>`
+
+Répond à une seule question : **la liste dit-elle oui ?** Elle interroge
+`is_email_allowed` comme le fait la connexion, avec la casse et les points de
+Gmail, donc sa réponse est celle que l'élève obtiendra.
+
+### `npm run events`
+
+Lit `public.auth_events`, le journal écrit à chaque tentative.
+
+```
+npm run events                  les 30 dernières lignes
+npm run events -- --denied      les refus seulement
+npm run events -- --who omry    une personne
+npm run events -- --event signin_ok
+npm run events -- --n 100
+```
+
+Un refus porte sa raison :
+
+| `event` | ce que ça veut dire |
+| --- | --- |
+| `signin_ok` | entré |
+| `signin_denied` | la liste a dit non — `detail.reason` le précise |
+| `signin_check_failed` | la vérification elle-même a échoué, code dans `detail` |
+
+La distinction est le tout : `signin_denied` est une décision,
+`signin_check_failed` est une panne, et les deux ressemblaient auparavant à
+« ça ne marche pas ».
+
+### Il faut la clé secrète
+
+Le journal est scellé côté navigateur : RLS est actif et il n'existe aucune
+politique `SELECT`, donc la clé publiable — celle qui part dans chaque page —
+ne voit qu'une liste vide. C'est voulu : la liste de qui a essayé de se
+connecter n'a rien à faire dans un navigateur. La lecture demande donc la clé
+secrète, dans `.env.local` (ignoré par git) :
+
+```
+SUPABASE_SECRET_KEY=<Project Settings → API Keys → secret>
+```
+
+Sans elle, `npm run events` explique où la trouver au lieu de planter.
+
+### Le journal ne sert pas qu'à l'authentification
+
+`event` est du texte libre. Tout ce qui mérite une ligne durable et
+append-only — une synchronisation qui échoue, une migration jouée — peut
+appeler `log_auth_event` et apparaîtra dans le même flux. Seul le nom de la
+table est spécifique à l'authentification.
+
+### Ce que le journal a déjà trouvé
+
+Le 8 septembre 2026, un compte pourtant invité s'est vu refuser l'entrée. La
+ligne `signin_denied` disait `reason: not_on_allowlist` — donc la liste avait
+bien répondu « non ». La cause : la ligne stockée dans `allowed_emails` ne
+l'était pas sous forme normalisée. `is_email_allowed` normalise l'adresse
+**qu'on lui donne**, puis la compare à l'adresse **telle qu'elle est
+stockée** : une ligne saisie avec des points ne correspond donc à rien.
+
+C'est exactement le cas que le déclencheur de `0002_auth_events.sql` empêche
+désormais, et que sa reprise a corrigé. Le symptôme au niveau du vérificateur
+est reconnaissable : `dotted=false plain=false` — **les deux** orthographes
+échouent, puisque seule l'entrée est normalisée.
+
 ## La base
 
 `supabase/migrations/0001_init.sql`, à coller dans **Supabase → SQL Editor**.

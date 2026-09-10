@@ -211,6 +211,21 @@ try {
 check(/localhost|127\.0\.0\.1/.test(read('lib/siteUrl.ts')), 'should', 'site-url-guard',
   'lib/siteUrl.ts does not reject a localhost origin in production')
 
+// The journal is only useful if someone can read it, and the reader is only
+// findable if it is written down. Both commands existed for a day with no
+// mention anywhere — the next person to hit a refused sign-in would have gone
+// to the Supabase dashboard, which is what they replace.
+{
+  const auth = read('AUTH.md')
+  const scripts = JSON.parse(read('package.json') || '{}').scripts ?? {}
+  const undocumented = ['whois', 'events'].filter(
+    (n) => scripts[n] && !auth.includes(`npm run ${n}`),
+  )
+  check(undocumented.length === 0, 'should', 'undocumented-tools',
+    `${undocumented.length} support command(s) are not documented in AUTH.md`,
+    undocumented.join(', '))
+}
+
 // Copy nobody renders. `exercise` and `homework` — 25 keys about checking an
 // answer and a teacher grading your work — outlived the feature they were
 // written for by months, and one of them promised a correction no code could
