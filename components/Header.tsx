@@ -113,7 +113,14 @@ export default function Header({ user }: { user?: HeaderUser }) {
             <span className="sr-only sm:hidden">{t('premium')}</span>
           </Link>
 
-          {user && <AccountMenu {...user} />}
+          {/* `user` is absent in two different situations, and only one of
+              them means signed out. `proxy.ts` has already refused anyone
+              without a session, so a reader who reaches this header IS signed
+              in — the layout simply could not read their profile, because
+              Supabase was unreachable for that request. Rendering nothing took
+              away the account menu, and with it the sign-out button, from
+              someone perfectly entitled to both. */}
+          <AccountMenu {...(user ?? {})} />
 
           <div className="md:hidden">
             <button

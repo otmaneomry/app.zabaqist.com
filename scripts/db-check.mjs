@@ -63,6 +63,10 @@ const env = Object.fromEntries(
 )
 const URL_ = env.NEXT_PUBLIC_SUPABASE_URL
 const KEY = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+// For the allowlist probe only. Every other live check deliberately uses the
+// PUBLISHABLE key, because "Postgres has to say no, not the app" is the property
+// being tested; the allowlist probe tests something else entirely.
+const SECRET = env.SUPABASE_SECRET_KEY
 
 const migrationsDir = path.join(ROOT, 'supabase', 'migrations')
 const sql = existsSync(migrationsDir)
@@ -276,11 +280,18 @@ if (!URL_ || !KEY) {
    * fired for real on 2026-09-08, when a row stored with Gmail dots matched
    * nothing and an invited account was refused.
    */
+  const rpcHeaders = SECRET
+    ? { apikey: SECRET, authorization: `Bearer ${SECRET}`, 'content-type': 'application/json' }
+    : h
   const ask = async (addr) => {
     let last = ''
     for (let attempt = 0; attempt < 2; attempt++) {
+      // The SECRET key, not the publishable one. This probe is not testing
+      // RLS — it is asking whether the allowlist still folds Gmail's dots —
+      // and 0005 revoked `anon` from the function, because a yes/no anyone can
+      // ask repeatedly is the guest list.
       const r = await fetch(`${URL_}/rest/v1/rpc/is_email_allowed`, {
-        method: 'POST', headers: h, body: JSON.stringify({ addr }),
+        method: 'POST', headers: rpcHeaders, body: JSON.stringify({ addr }),
       })
       last = r.ok ? (await r.text()).trim() : `ERROR ${r.status}`
       // 'true' and 'false' are both real answers; anything else is the cache.
@@ -297,7 +308,11 @@ if (!URL_ || !KEY) {
   check(dotted === 'true' && plain === 'true', 'fail', 'allowlist-dots',
     'the allowlist no longer folds Gmail dots',
     `dotted=${dotted} plain=${plain} — one spelling would be locked out.` +
-    ' BOTH false usually means a row in allowed_emails is stored unnormalised:' +
+    ' ONE of the two false means the folding itself broke.' +
+    ' BOTH false has two causes and this check cannot tell them apart:' +
+    ' either this address is no longer on the list at all (someone edited' +
+    ' or removed the row — check it first, it is the likelier one), or a row' +
+    ' is stored unnormalised, because' +
     ' is_email_allowed folds the address it is GIVEN, then compares it to the' +
     ' address as STORED, so a row typed with dots matches nothing. The trigger' +
     ' in 0002 prevents new ones; run `npm run whois -- <address>` to confirm.')

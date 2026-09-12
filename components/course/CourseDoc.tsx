@@ -122,6 +122,7 @@ export default function CourseDoc({
   // Stable per-checkpoint key: position within this view. Stable across reloads
   // because the document is static.
   let checkpointIdx = 0
+  let revealIdx = 0
 
   const components: Components = {
     h2: ({ children }) => (
@@ -215,8 +216,16 @@ export default function CourseDoc({
       const kind = CALLOUTS.find((c) => c.match.test(label))
 
       if (kind?.behaviour === 'reveal') {
+        // Keyed by view AND by position. Without it React reconciles the
+        // solution of one section onto the solution of the next, and an
+        // already-opened `open` state travels with it: the reader arrives at a
+        // new exercise with the answer showing. Same defect the checkpoints
+        // had, in the component next door.
         return (
-          <Reveal kind={kind.label === 'preuve' ? 'preuve' : 'solution'}>
+          <Reveal
+            key={`${viewId}:reveal:${revealIdx++}`}
+            kind={kind.label === 'preuve' ? 'preuve' : 'solution'}
+          >
             {children}
           </Reveal>
         )

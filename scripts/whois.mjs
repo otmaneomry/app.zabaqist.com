@@ -7,8 +7,12 @@
  * form the address can take. Until this existed the only way to answer was to
  * ask the person to try again and watch.
  *
- * It uses the publishable key, so it can call `is_email_allowed` — which is
- * SECURITY DEFINER and answers a yes/no — but it cannot read `allowed_emails`
+ * It uses the SECRET key. It used to use the publishable one, which worked
+ * because `is_email_allowed` was granted to `anon` — and that grant was the
+ * problem: a closed question anyone can ask as often as they like is an open
+ * list. 0005 revoked it. This is a support tool run from a terminal by the
+ * operator, so it has the secret key anyway; it still cannot read
+ * `allowed_emails`
  * or `auth_events`. That is deliberate: those hold every invited address, and
  * this key ships to every browser. To READ the journal, use the dashboard or a
  * service key.
@@ -28,9 +32,10 @@ const env = Object.fromEntries(
 )
 
 const url = env.NEXT_PUBLIC_SUPABASE_URL
-const key = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+const key = env.SUPABASE_SECRET_KEY
 if (!url || !key) {
-  console.error('NEXT_PUBLIC_SUPABASE_URL / _PUBLISHABLE_KEY missing from .env.local')
+  console.error('NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SECRET_KEY missing from .env.local')
+  console.error('SUPABASE_SECRET_KEY: Supabase dashboard → Project Settings → API keys')
   process.exit(1)
 }
 
