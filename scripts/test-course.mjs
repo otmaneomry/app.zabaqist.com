@@ -1163,9 +1163,13 @@ ok(
   'and resuming goes straight to a section',
   await resume.getAttribute('href'),
 )
+// `\d+%` accepted `0%` — which IS the placeholder this check is named after.
+// A section has just been read above, so the figure has to have moved.
+const pct = await home.locator('text=/%/').first().innerText()
 ok(
-  /\d+%/.test(await home.locator('text=/%/').first().innerText()),
+  /[1-9]\d*%/.test(pct),
   'it shows real progress, not a placeholder',
+  pct,
 )
 
 // Nothing fabricated survives on this page.

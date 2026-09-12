@@ -16,7 +16,7 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
-import { pullAll, pushAll, SYNC_EVENTS } from '@/lib/sync'
+import { claimDevice, pullAll, pushAll, SYNC_EVENTS } from '@/lib/sync'
 
 /** Long enough to coalesce a burst of writes, short enough to survive a tab close. */
 const DEBOUNCE_MS = 1500
@@ -45,6 +45,14 @@ export default function SyncProvider({
     let cancelled = false
 
     ;(async () => {
+      // BEFORE anything is read or merged. If this device was last used by a
+      // different account, its work is not this reader's — and `pullAll` would
+      // union the two together and `pushAll` would file the result under this
+      // account, which is not a thing that can be undone.
+      const wasSomeoneElses = claimDevice(userId)
+      if (wasSomeoneElses && !cancelled)
+        for (const e of SYNC_EVENTS) window.dispatchEvent(new Event(e))
+
       let complete = false
       try {
         const result = await pullAll(userId)

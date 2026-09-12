@@ -48,6 +48,8 @@ const ONBOARDING_KEY = 'zabaqist:onboarding'
 const PROGRESS_EVENT = 'zabaqist:progress'
 /** When this device last completed a pull. Used to date-order drafts. */
 const PULLED_AT_KEY = 'zabaqist:pulled-at'
+/** Which account the work in localStorage belongs to. */
+const OWNER_KEY = 'zabaqist:owner'
 
 /** Every event a store fires when it changes something worth keeping. */
 export const SYNC_EVENTS = [
@@ -56,6 +58,59 @@ export const SYNC_EVENTS = [
   ACTIVITY_KEY,
   ONBOARDING_EVENT,
 ] as const
+
+/* ------------------------------------------------------------------ */
+/* Whose device is this?                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Forget every trace of the account this device was last used for.
+ *
+ * Everything under `zabaqist:` and the one legacy `zabaqist_` key: progress,
+ * checkpoints, activity, filière, the funnel's answers, the chapter shapes and
+ * the celebration markers.
+ */
+export function resetLocalState(): void {
+  try {
+    const doomed: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (k && k !== OWNER_KEY && /^zabaqist[:_]/.test(k)) doomed.push(k)
+    }
+    for (const k of doomed) localStorage.removeItem(k)
+  } catch {
+    /* storage unavailable — there is nothing to forget */
+  }
+}
+
+/**
+ * Claim this device for `userId`, and say whether it had to be taken off
+ * somebody else first.
+ *
+ * `signin/actions.ts` asks Google for `prompt: 'select_account'` with the
+ * comment "Students share machines." It was right, and nothing acted on it:
+ * not one storage key is namespaced by account and sign-out clears only
+ * cookies. So the next student to sign in on a school computer mounted
+ * `SyncProvider` over the last one's work, `pullAll` UNIONED their own rows
+ * into it — union and maximum, which cannot drop anything — and `pushAll`
+ * wrote the result up. One student's chapters, checkpoints and XP, filed under
+ * another student's account, permanently.
+ *
+ * A device with NO recorded owner is not the same thing. That is a visitor who
+ * used the funnel or read a chapter before signing up, and carrying that work
+ * into their new account is the intended behaviour.
+ */
+export function claimDevice(userId: string): boolean {
+  try {
+    const previous = localStorage.getItem(OWNER_KEY)
+    const takenFromSomeoneElse = previous !== null && previous !== userId
+    if (takenFromSomeoneElse) resetLocalState()
+    if (previous !== userId) localStorage.setItem(OWNER_KEY, userId)
+    return takenFromSomeoneElse
+  } catch {
+    return false
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /* localStorage helpers                                                */
