@@ -773,9 +773,9 @@ La tangente $T$ traverse la courbe $\mathcal{C}_f$ en $M_0(3, 2)$.
 > **Proposition 14.**
 Soit $f$ une fonction deux fois dérivable sur un intervalle $I$.
 
-- Pour que la courbe $\mathcal{C}_f$ de $f$ soit convexe sur $I$, il faut et il suffit que: $(\forall x \in I)$, $f^*(x) \geq 0$
-- Pour que la courbe $\mathcal{C}_f$ de $f$ soit concave sur $I$, il faut et il suffit que: $(\forall x \in I)$, $f^*(x) \leq 0$
-- Pour que le point $ M_0(x_0, f(x_0)) $ soit un point d'inflexion de la courbe $ \mathcal{C}_f $, il faut et il suffit que la dérivée seconde $ f^* $ s'annule en $ x_0 $ et change de signe de part et d'autre de $ x_0 $.
+- Pour que la courbe $\mathcal{C}_f$ de $f$ soit convexe sur $I$, il faut et il suffit que: $(\forall x \in I)$, $f''(x) \geq 0$
+- Pour que la courbe $\mathcal{C}_f$ de $f$ soit concave sur $I$, il faut et il suffit que: $(\forall x \in I)$, $f''(x) \leq 0$
+- Pour que le point $ M_0(x_0, f(x_0)) $ soit un point d'inflexion de la courbe $ \mathcal{C}_f $, il faut et il suffit que la dérivée seconde $ f'' $ s'annule en $ x_0 $ et change de signe de part et d'autre de $ x_0 $.
 
 > **Applications.**
 Pour chacun des cas suivants, étudier la concavité de la courbe $\mathcal{C}_f$ et déterminer ses points d'inflexion (sous réserve d'existence) :
@@ -1650,7 +1650,7 @@ Montrer que : $(\exists c \in I) ; f'(c) = 0$
 **Exercice 42.**
 Soit $f$ une fonction continue sur $[a, b]$ et deux fois dérivable sur $]a, b[$ tel que :
 
-$$f(a) = f(b) = 0 \text{ et } f^*(x) \neq 0 \text{ pour tout } x \in ]a, b[$$
+$$f(a) = f(b) = 0 \text{ et } f''(x) \neq 0 \text{ pour tout } x \in ]a, b[$$
 
 Montrer par l'absurde que : $(\forall x \in ]a, b[)$ $f(x) \neq 0$
 

@@ -211,19 +211,19 @@ $y' + 4y - 7 = 0$ ; $y' = -9y + 2$ ; $3y' + 5y = 8$ ; $y'' = -2y' + 3$
 
 ### 2. Équations différentielles du second ordre
 #### 2.1. L'ÉQUATION DIFFÉRENTIELLE $y'' + ay' + by = 0$ ($(a; b) \in \mathbb{R}^2$)
-Soit $(a, b) \in \mathbb{R}^2$. L'équation $y^* + ay' + by = 0$ où l'inconnue est une fonction numérique $y$, deux fois dérivable sur $\mathbb{R}$ (ou sur un intervalle de $\mathbb{R}$) est appelée équation différentielle du second ordre.
+Soit $(a, b) \in \mathbb{R}^2$. L'équation $y'' + ay' + by = 0$ où l'inconnue est une fonction numérique $y$, deux fois dérivable sur $\mathbb{R}$ (ou sur un intervalle de $\mathbb{R}$) est appelée équation différentielle du second ordre.
 Cas Particuliers :
 
 - Cas où \( a = b = 0 \): Dans ce cas, l'équation différentielle ci-dessus devient sous la forme \( y^{*} = 0 \) et ceci est équivaut à: \( y = ax + \beta \) avec \( (\alpha; \beta) \in \mathbb{R}^2 \).
 - Cas où \( b = 0 \): Dans ce cas, l'équation différentielle ci-dessus devient sous la forme
 
-$y^* + ay' = 0$ ou aussi $(y' + ay)' = 0$, et ceci est équivalent à : $(\exists \beta \in \mathbb{R})$ ; $y' + ay = \beta$
+$y'' + ay' = 0$ ou aussi $(y' + ay)' = 0$, et ceci est équivalent à : $(\exists \beta \in \mathbb{R})$ ; $y' + ay = \beta$
 
 D'après la proposition 2 du paragraphe précédent, on obtient : $y = ae^{-ax} + \frac{\beta}{a}$ où $a \in \mathbb{R}$.
 On admet les résultats cités dans la proposition suivante :
 
 > **Proposition 3.**
-Soit $a$ et $b$ deux réels quelconques. On considère l'équation différentielle : $(E)$ : $y^* + ay' + by = 0$
+Soit $a$ et $b$ deux réels quelconques. On considère l'équation différentielle : $(E)$ : $y'' + ay' + by = 0$
 
 L'équation caractéristique de $(E)$ est $r^2 + ar + b = 0$. Son discriminant est : $\Delta = a^2 - 4b$
 
@@ -260,26 +260,26 @@ $$y = \left(\alpha \cos(x\sqrt{-m}) + \beta \sin(x\sqrt{-m})\right)e^x \text{ av
 > **Applications.**
 1. Résoudre les équations différentielles suivantes :
 
-$$y^* + y' - 2y = 0 \quad ; \quad 4y^* - 4y' + y = 0 \quad ; \quad y^* - y' + y = 0 \quad ; \quad y^* = -2y' + 3$$
+$$y'' + y' - 2y = 0 \quad ; \quad 4y'' - 4y' + y = 0 \quad ; \quad y'' - y' + y = 0 \quad ; \quad y'' = -2y' + 3$$
 
-2. Discuter selon les valeurs du réel $m$ l'ensemble de solutions de l'équation : $(E_m)$ : $y^* - 2my' + my = 0$
+2. Discuter selon les valeurs du réel $m$ l'ensemble de solutions de l'équation : $(E_m)$ : $y'' - 2my' + my = 0$
 
-3. Soit $(E)$ l'équation différentielle : $4y^* + 5y' + y = 2e^{-2x}(7x - 11)$
+3. Soit $(E)$ l'équation différentielle : $4y'' + 5y' + y = 2e^{-2x}(7x - 11)$
 
 a) Vérifier que la fonction $g$ définie par $g(x) = 2xe^{-2x}$ est une solution particulière de $(E)$ puis trouver la solution générale de $(E)$.
 
 b) Déterminer la solution $f$ de $(E)$ dont la courbe passe par le point $A(0, -1)$ et admet en ce point une tangente parallèle à l'axe des abscisses.
 
 > **Remarques.**
-• Pour tout $(x_0; y_0; z_0) \in \mathbb{R}^1$ il existe une unique solution de l'équation $(E)$ : $y^* + ay' + by = 0$ vérifiant les conditions initiales : $y(x_0) = y_0$ et $y'(x_0) = z_0$
+• Pour tout $(x_0; y_0; z_0) \in \mathbb{R}^1$ il existe une unique solution de l'équation $(E)$ : $y'' + ay' + by = 0$ vérifiant les conditions initiales : $y(x_0) = y_0$ et $y'(x_0) = z_0$
 
-• L'équation $y^* + \omega^2 y = 0$ est un cas particulier de l'équation différentielle $(E)$ : $y^* + ay' + by = 0$ :
+• L'équation $y'' + \omega^2 y = 0$ est un cas particulier de l'équation différentielle $(E)$ : $y'' + ay' + by = 0$ :
 
-• La solution générale de l'équation différentielle $y^* + \omega^2 y = 0$ est :
+• La solution générale de l'équation différentielle $y'' + \omega^2 y = 0$ est :
 
 $$y = \alpha \cos(\omega x) + \beta \sin(\omega x) \quad \text{où} \quad (\alpha; \beta) \in \mathbb{R}^2$$
 
-• La solution générale de l'équation différentielle $y^* - \omega^2 y = 0$ est :
+• La solution générale de l'équation différentielle $y'' - \omega^2 y = 0$ est :
 
 $$y = \alpha e^{\omega x} + \beta e^{-\omega x} \quad \text{où} \quad (\alpha; \beta) \in \mathbb{R}^2$$
 
@@ -291,7 +291,7 @@ $$y = \alpha e^{\omega x} + \beta e^{-\omega x} \quad \text{où} \quad (\alpha; 
 
 - La courbe $\mathcal{C}_f$ de $f$ admet au point $A(x_0, y_0)$ une tangente de pente $y_1$ : $y_0 = f(x_0)$ et $y_1 = f'(x_0)$
 
-• Dans les sciences physiques, on rencontre souvent les équations différentielles $ay^* + by' + cy = 0$ sous la forme (A titre d'exemple) : $a \frac{d^2x}{dt^2} + b \frac{dx}{dt} + cx = 0$ ou sous la forme : $a\ddot{x} + b\dot{x} + cx = 0$
+• Dans les sciences physiques, on rencontre souvent les équations différentielles $ay'' + by' + cy = 0$ sous la forme (A titre d'exemple) : $a \frac{d^2x}{dt^2} + b \frac{dx}{dt} + cx = 0$ ou sous la forme : $a\ddot{x} + b\dot{x} + cx = 0$
 
 ## Méthodes
 
@@ -378,7 +378,7 @@ On considère les conditions initiales suivantes : $y(0) = 0,05m$ et $y'(0) = 0$
 
 On fait l'hypothèse de l'absence d'amortissement du déplacement. On obtient l'équation différentielle
 
-suivante : $y^*(t) + 100y(t) = 0$
+suivante : $y''(t) + 100y(t) = 0$
 
 Résoudre cette équation puis déterminer l'expression du déplacement $y(t)$ de l'élément.
 
@@ -386,7 +386,7 @@ Résoudre cette équation puis déterminer l'expression du déplacement $y(t)$ d
 
 On fait l'hypothèse d'un faible amortissement du déplacement. On obtient l'équation différentielle
 
-suivante : $y^*(t) + \sqrt{39} y'(t) + 100y(t) = 0$
+suivante : $y''(t) + \sqrt{39} y'(t) + 100y(t) = 0$
 
 Résoudre cette équation puis déterminer l'expression du déplacement $y(t)$ de l'élément.
 
@@ -394,14 +394,14 @@ Résoudre cette équation puis déterminer l'expression du déplacement $y(t)$ d
 
 On fait l'hypothèse d'un faible amortissement du déplacement. On obtient l'équation différentielle
 
-suivante : $y^*(t) + 20 y'(t) + 100y(t) = 0$
+suivante : $y''(t) + 20 y'(t) + 100y(t) = 0$
 
 Résoudre cette équation puis déterminer l'expression du déplacement $y(t)$ de l'élément.
 
 > **Solution.**
 1) Hypothèse d'absence d'amortissement :
 
-La solution générale de l'équation $y^* + 100y = 0$ est : $y(t) = \alpha \cos(10t) + \beta \sin(10t)$
+La solution générale de l'équation $y'' + 100y = 0$ est : $y(t) = \alpha \cos(10t) + \beta \sin(10t)$
 
 Les conditions initiales $y(0) = 0,05$ et $y'(0) = 0$ donnent $\alpha = 0,05$ et $\beta = 0$
 
@@ -409,7 +409,7 @@ On en déduit la solution du système étudié : $y(t) = 0,05 \cos(10t)$
 
 2) Hypothèse d'amortissement faible :
 
-L'équation caractéristique de l'équation $y^*(t) + \sqrt{39} y'(t) + 100y(t) = 0$ est $r^2 + \sqrt{39} r + 100 = 0$.
+L'équation caractéristique de l'équation $y''(t) + \sqrt{39} y'(t) + 100y(t) = 0$ est $r^2 + \sqrt{39} r + 100 = 0$.
 
 Elle a deux racines complexes conjuguées qui sont : $r_1 = -\frac{\sqrt{39}}{2} + \frac{19}{2}i$ et $r_2 = -\frac{\sqrt{39}}{2} - \frac{19}{2}i$
 
@@ -421,7 +421,7 @@ $\alpha = 0,05$ et $\beta = 0,05 \times \frac{\sqrt{39}}{19}$. Il s'ensuit alors
 
 3) Hypothèse d'amortissement classique :
 
-L'équation caractéristique de l'équation $y^*(t) + 20 y'(t) + 100 y(t) = 0$ est $r^2 + 20r + 100 = 0$. Elle a une
+L'équation caractéristique de l'équation $y''(t) + 20 y'(t) + 100 y(t) = 0$ est $r^2 + 20r + 100 = 0$. Elle a une
 
 seule racine qui est $r = -10$. On en déduit la solution de l'équation différentielle : $y(t) = (\alpha t + \beta) e^{-10t}$
 
@@ -528,7 +528,7 @@ b) $e^{\prime}_e$ admet une tangente horizontale en $A$.
 
 On considère l'équation différentielle :
 
-$$(E) : y^2 - 2y = e^{2x}$$
+$$(E) : y' - 2y = e^{2x}$$
 
 1) Montrer que la fonction \( u: x \mapsto xe^{2x} \) est une solution de l'equation \( (E) \).
 2) Resoudre I'equation differentielle: \(\left(E_{n}\right):y^{\prime} - 2y = 0\)
@@ -538,7 +538,7 @@ $$(E) : y^2 - 2y = e^{2x}$$
 
 On considère l'équation différentielle :
 
-$$(E) : 2y^2 + 3y = 6x^2 - 7x + 2$$
+$$(E) : 2y' + 3y = 6x^2 - 7x + 2$$
 
 1) Montrer que I'equation \((E)\) admet une solution \(u\) de la forme: \(u: x \mapsto ax^2 + bx + c\)
 2) Resoudre I'equation differentielle: \(\left(E_{n}\right): 2y^{\prime} + 3y = 0\)
@@ -547,7 +547,7 @@ $$(E) : 2y^2 + 3y = 6x^2 - 7x + 2$$
 
 On considère l'équation différentielle :
 
-$$(E) : y^2 - 2y = \frac{2}{1 + e^{-2x}}$$
+$$(E) : y' - 2y = \frac{2}{1 + e^{-2x}}$$
 
 Soit $g$ une fonction définie et dérivable sur $\mathbb{R}$ et $f$ la fonction définie sur $\mathbb{R}$ par : $f(x) = e^{2x} \cdot g(x)$
 
@@ -675,7 +675,7 @@ et : $$h(x) = f(x) - f(-x) - 2x$$
 b) Montrer que $g$ est solution de l'équation diffé-
 
 #### Exercice 21
-rentielle $y^* = y$ et que $h$ est solution de l'équation différentielle $y^* = -y$.
+rentielle $y'' = y$ et que $h$ est solution de l'équation différentielle $y'' = -y$.
 
 2) Écrire $f(x)$ en fonction de $g(x)$ et $h(x)$ puis donner l'expression de $f(x)$ en fonction de $x$.
 
@@ -685,9 +685,9 @@ Déterminer toutes les fonctions $f$ deux fois dérivables sur $\mathbb{R}$ tell
 #### Exercice 23
 On considère l'équation différentielle :
 
-$$(E) : y^* - y' - 2y = (-6x - 4)e^{-4}$$
+$$(E) : y'' - y' - 2y = (-6x - 4)e^{-4}$$
 
-1) Résoudre l'équation: \((E_0): y^* - y' - 2y = 0\)
+1) Résoudre l'équation: \((E_0): y'' - y' - 2y = 0\)
 2) Démontré que la fonction \( u \) définie sur \( \mathbb{R} \) par \( u(x) = (x^2 + 2x)e^{-4} \) est une solution de \( (E) \).
 3) Soit \( f \) une fonction définie et dérivable sur \( \mathbb{R} \). Montré que la fonction \( f \) est une solution de \( (E) \) si, et seulement si, la fonction \( (f - u) \) est solution de l'équation différentielle \( (E_0) \).
 4) En déduire l'ensemble des solutions de \((E)\).
@@ -713,7 +713,7 @@ L'objet de ce problème est l'étude de la décharge d'un condensateur de capaci
 
 décharge $q$ du condensateur est une fonction du temps qui vérifie :
 
-$$Lq^*(t) + Rq'(t) + \frac{1}{C}q(t) = 0$$
+$$Lq''(t) + Rq'(t) + \frac{1}{C}q(t) = 0$$
 
 1) On donne \( L = 10H \), \( C = 0,2F \) et \( R = 22,5\Omega \). Détérminer la solution \( q \) de l'équation différentielle telle que \( q(0) = 1 \) et \( q'(0) = \frac{13}{4} \).
 2) Soit \( g \) la fonction définie sur \( \mathbb{R}^* \) par:
@@ -731,16 +731,16 @@ c) Etudier le signe de \( g'(t) \) puis dresser le tableau de variations de la f
 
 Dévoirs 1
 1) Résoudre les équations différentielles suivantes :
-$$3y^2 - 4y = 5$$ ; $$3y^2 - 5y^2 = 0$$ ; $$3y^2 + y = 0$$
-$$y^2 - \sqrt{10}y^2 + \frac{5}{2}y = 0$$ ; $$3y^2 - 7y^2 + 4y = 0$$
-$$(1 - \sqrt{2})y^2 + y^2 - (1 + \sqrt{2})y = 0$$
+$$3y' - 4y = 5$$ ; $$3y'' - 5y' = 0$$ ; $$3y' + y = 0$$
+$$y'' - \sqrt{10}y' + \frac{5}{2}y = 0$$ ; $$3y'' - 7y' + 4y = 0$$
+$$(1 - \sqrt{2})y'' + y' - (1 + \sqrt{2})y = 0$$
 
 2) Résoudre les équations différentielles suivantes puis déterminer la solution vérifiant les conditions initiales données :
-$$(E_1) : y^2 - 8y^2 + 16y = 0$$ et $$y(0) = 1$$ et $$y'(0) = 0$$
-$$(E_2) : y^2 + y = 0$$ et $$y(0) = 0$$ et $$y'(0) = \frac{\pi}{2}$$
+$$(E_1) : y'' - 8y' + 16y = 0$$ et $$y(0) = 1$$ et $$y'(0) = 0$$
+$$(E_2) : y'' + y = 0$$ et $$y(0) = 0$$ et $$y'(0) = \frac{\pi}{2}$$
 
 3) On considère les équations différentielles suivantes :
-$$(E) : y^2 + y = \cos^2 x$$ et $$(E_0) : y^2 + y = 0$$
+$$(E) : y'' + y = \cos^2 x$$ et $$(E_0) : y'' + y = 0$$
 
 a) Vérifier que pour tout $$x \in \mathbb{R}$$ :
 $$\cos^2 x = \frac{1}{8}\cos(4x) + \frac{1}{2}\cos(2x) + \frac{3}{8}$$
@@ -760,8 +760,8 @@ Soit $$f$$ une fonction définie et dérivable sur $$\mathbb{R}^*$$, telle que :
 $$(\forall x \in \mathbb{R}^*) f'(x) = f\left(\frac{1}{x}\right)$$ (*)
 
 1) Soit $$g$$ la fonction définie sur $$\mathbb{R}$$ par : $$g(x) = f(e^x)$$
-a) Montrer que : $$(\forall x \in \mathbb{R}^*) x^2 f^*(x) + f(x) = 0$$
-b) En déduire que la fonction $$g$$ est solution de l'équation différentielle : $$y^2 - y^2 + y = 0$$
+a) Montrer que : $$(\forall x \in \mathbb{R}^*) x^2 f''(x) + f(x) = 0$$
+b) En déduire que la fonction $$g$$ est solution de l'équation différentielle : $$y'' - y' + y = 0$$
 2) Déterminer toutes les fonctions $$f$$ vérifiant (*).
 
 #### Devoir 3
@@ -779,7 +779,7 @@ $$f(1) = \frac{1}{e}$$ et $$f(0) = 1$$
 
 #### Devoir 4
 1) Résoudre l'équation :
-$$(E) : y^2 - 2y^2 + 5y = 0$$
+$$(E) : y'' - 2y' + 5y = 0$$
 
 2) a) Déterminer la solution $$f$$ de l'équation $$(E)$$ qui vérifie les conditions :
 $$f(0) = f'(0) = 1$$
@@ -789,7 +789,7 @@ $$\int_0^x e^x \cos(2x) dx = \frac{e^x - 1}{5}$$
 
 3) Soit $$\theta \in \mathbb{R}$$. Résoudre et discuter selon les valeurs de $$\theta$$ l'équation différentielle suivante :
 
-$$y^2 - (2\sin\theta)y^2 + y = 0$$
+$$y'' - (2\sin\theta)y' + y = 0$$
 
 Soit $n \in \mathbb{N}^*$, on considère la fonction numérique $f$ définie sur $\mathbb{R}^*$, par :
 

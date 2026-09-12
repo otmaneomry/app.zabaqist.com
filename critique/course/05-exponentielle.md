@@ -1085,7 +1085,7 @@ et soit $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(O,
 3) Etudier la position relative de la courbe \(\mathcal{C}\) et de la droite \((\Delta)\) d'équation \(y = 1\)
 4) a) Montrer que pour tout \( x \in \mathbb{R} \):
 
-$$f^*(x) = \frac{e^x(e^x - 1)}{(e^{2x} - 2e^x + 2)^{\frac{1}{2}}}((e^x - 1)^2 - 5)$$
+$$f''(x) = \frac{e^x(e^x - 1)}{(e^{2x} - 2e^x + 2)^{\frac{1}{2}}}((e^x - 1)^2 - 5)$$
 
 b) Étudier la concavité de la courbe $\mathcal{C}$ en déterminant ses points d'inflexion.
 

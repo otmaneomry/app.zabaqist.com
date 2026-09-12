@@ -62,7 +62,7 @@ D) Ensemble des solutions d'une équation différentielle :
 
 On note $\mathcal{D}^2(\mathbb{R})$ l'ensemble des fonctions deux fois dérivables sur $\mathbb{R}$. On considère l'ensemble :
 
-$$E = \left\{ f \in \mathcal{D}^2(\mathbb{R}) \mid f^* - 2f' + f = 0 \right\}$$
+$$E = \left\{ f \in \mathcal{D}^2(\mathbb{R}) \mid f'' - 2f' + f = 0 \right\}$$
 
 1. Montrer que les fonctions suivantes: $ g_0: x \mapsto e^x $; $ g_1: x \mapsto xe^x $; $ g: x \mapsto (ax + b)e^x $ (ou $ a, b \in \mathbb{R} $) appartiennent à l'ensemble $ E $.
 2. On considère la fonction $ h: x \mapsto f(x).e^{-x} $ ou $ f \in E $.
