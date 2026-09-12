@@ -1508,8 +1508,6 @@ $$\sqrt[3]{3+x} - \sqrt[3]{3-x} = \sqrt[4]{9-x^2} \text{ ; } 2x\sqrt{x} - 3x\sqr
 
 $$\lim_{x \to 0} \frac{\sqrt[3]{x^2}-1}{\sqrt[3]{x}-1} \text{ ; } \lim_{x \to +\infty} \frac{\sqrt[4]{x}-\sqrt[4]{x+1}}{\sqrt[4]{x}-\sqrt[4]{x+1}} \text{ ; } \lim_{x \to +\infty} \left(\sqrt[3]{x^3+x^2}-x\right) \text{ ; } \lim_{x \to 0^+} \frac{1}{x}\left(\operatorname{Arc}\tan\frac{1}{x}-\frac{\pi}{2}\right)$$
 
-TECHNIQUES ET STUDIES
-
 > **Solution.**
 1) Résolution des équations :
 

@@ -1742,8 +1742,6 @@ points d'inflexion :
 5) $ f(x) = -\cos^2 x - 2\sin x $; 6) $ f(x) = \frac{\sin^2 x}{\cos(2x)} $
 7) $ f(x) = x - \operatorname{Arc} \tan x $; 8) $ f(x) = (x - 1)^{\frac{2}{3}} $
 
-DÉTERMINER
-
 #### AXE DE SYMÉTRIE - CENTRE DE SYMÉTRIE
 **Exercice 54.**
 Dans chacun des cas suivants, montrer que la droite (Δ) est un axe de symétrie de la courbe $\mathcal{C}_f$ de $f$ :
@@ -2207,8 +2205,6 @@ Montrer que $(u_\alpha(x))_{\alpha \in \mathbb{N}}$ est majorée par $\frac{3\sq
 5) Pour tout $x \in \mathbb{R}^*$ on pose : $C(x) = \lim_{\alpha \to \infty} u_\alpha(x)$
 
 a) Montrer que pour tout $(x, x_0) \in (\mathbb{R}^*)^2$ :
-
-CARACTÈRES
 
 $$\left| u _ { n } ( x ) - u _ { n } \left( x _ { 0 } \right) \right| \leq \frac { 3 \sqrt { 3 } } { 4 } \left| x - x _ { 0 } \right| \sum _ { p = 0 } ^ { \infty } \frac { 1 } { 2 ^ { p } }$$
 

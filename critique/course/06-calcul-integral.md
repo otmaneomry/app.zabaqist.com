@@ -134,8 +134,6 @@ A) Soit $f$ une fonction continue sur un intervalle $I$ et soit $a \in I$.
 1. Vérifier que \(\varphi(a) = 0\).
 2. Montrer que \(\varphi\) est une primitive de la fonction \(f\) sur \(I\). On obtient alors le résultat suivant:
 
-ARTICLES PRÉSENTATIFS
-
 La fonction $x \mapsto \int_{0}^{1} f(t) dt$ est la primitive de la fonction $f$ sur $I$ qui s'annule en $a$.
 
 B) Montrer que la fonction $g$ définie par $g(x) = \int_{0}^{1} \frac{1}{\ln t} dt$ est dérivable sur $[e^2, +\infty[$ puis déterminer $g'(x)$.
@@ -751,8 +749,6 @@ solide est (en unités de volume) : $v(S) = \int_a^b S(t) dt$
 Soit $v(t)$ le volume de l'ensemble des points appartenant à $(S)$ et qui sont compris entre les plans d'équations $z = a$ et $z = t$. Et soit $t_0 \in [a, b]$ et $h \in \mathbb{R}^+$, tel que $t_0 + h \in [a; b]$.
 
 le volume de l'ensemble des points de $(S)$ et qui sont compris entre les plans d'équations $z = t_0$ et $z = t_0 + h$ est $v(t_0 + h) - v(t_0)$. Ce volume est encadré par les volumes des cylindres de hauteur $h$ et d'aires de bases
-
-SUMMARIARES FORMATIONS
 
 respectives $S(t_0)$ et $S(t_0 + h)$.
 
@@ -1473,14 +1469,12 @@ Calculer l'aire du domaine délimité par les courbes des fonctions $f$ et $g$ d
 
 $$f(x) = \frac{x + 1}{x \ln x} \text{ et } g(x) = \frac{1}{\ln x}$$
 
-LE PRÉSENTATIVE
 Le plan est rapporté à un repère orthonormé $$(O, \vec{i}, \vec{j})$$
 tel que $$\frac{1}{2} \pi \ge 2\pi$$. Soit $$\mathcal{C}$$ la courbe représentative de
 la restriction de la fonction $$x \mapsto \tan x$$ sur $$\left[-\frac{x}{4}, \frac{x}{4}\right]$$.
 Calculer le volume du solide engendré par la rotation
 de la courbe $$\mathcal{C}$$ autour de l'axe des abscisses.
 
-LE PRÉSENTATE
 Le plan est rapporté à un repère orthonormé $$(O, \vec{i}, \vec{j})$$.
 Soit $$\mathcal{C}$$ la courbe représentative de la restriction de la
 fonction $$\cos \pi \, \text{sur } I = [2\pi, 3\pi]$$.

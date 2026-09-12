@@ -617,8 +617,6 @@ On admet que les résultats sur les limites des fonctions restent valables pour 
 |  lim $v_n$ | $\ell'$ | $\ell' > 0$ | $\ell' < 0$ | $+\infty$ | $-\infty$ | $+\infty$ | $0$  |
 |  lim $(u_n \times v_n)$ | $\ell\ell'$ | $+\infty$ | $-\infty$ | $-\infty$ | $+\infty$ | $+\infty$ | Forme indéterminée  |
 
-CONVERSION DES CONDITIONS
-
 ➤ Limite d'une inverse :
 
 |  $$\lim u_n$$ | $$\ell \neq 0$$ | $$+\infty$$ ou $$+\infty$$ | 0  |
@@ -686,8 +684,6 @@ Si elle est non majorée alors : $(\forall A > 0) (\exists N \in \mathbb{N})$ ; 
 Par définition de la limite d'une suite tendant vers $+\infty$, on en déduit que $\lim u_n = +\infty$.
 - Si $(u_n)_{n \ge n}$ est une suite décroissante non minorée alors $(-u_n)_{n \ge n}$ est une suite croissante non majorée.
 Comme $\lim (-u_n) = +\infty$ alors $\lim u_n = -\infty$. Ce qui achève la démonstration.
-
-CONVERGENCES AND PARAMETERS
 
 ### 3. Critères de convergence
 #### 3.1. EXISTENCE DE LA LIMITE PAR ENCADREMENT

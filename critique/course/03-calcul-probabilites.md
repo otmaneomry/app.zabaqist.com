@@ -515,7 +515,7 @@ d'une boule rouge et d'une boule verte. Par suite : $$G = C \cap D$$.
 d) Les événements B et C sont incompatibles car ils ne peuvent pas être réalisés en même temps. On a
 alors $$B \cap C = \emptyset$$. Par contre, les événements D et C sont compatibles.
 
-TABLEAU RÉCAPUTILATIF
+TABLEAU RÉCAPITULATIF
 
 |  Langage ensembliste | Langage probabiliste | Notation  |
 | --- | --- | --- |

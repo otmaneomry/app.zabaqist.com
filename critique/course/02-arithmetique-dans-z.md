@@ -1443,8 +1443,7 @@ En suivant la même démarche, on obtient : $$37 = \overline{100101}_{(2)}$$
 
 $$\overline{101}_{(2)} ; \overline{1101110}_{(2)} ; \overline{10011011}_{(2)} ; \overline{110010110}_{(2)} ; \overline{101110011}_{(2)}$$
 
-#### 4.2. COMPARAISON DE DEUX NOMBRES PRÉSENTÉS
-DANS LE MÊME SYSTÈME DE NUMÉRATION
+#### 4.2. COMPARAISON DE DEUX NOMBRES PRÉSENTÉS DANS LE MÊME SYSTÈME DE NUMÉRATION
 
 > **Théorème 19.**
 Soit x et y deux entiers naturels représentés dans le même système de numération par :
@@ -1466,8 +1465,7 @@ Par exemple :
 
 $$2278 = 1 \times 12^3 + 3 \times 12^2 + 9 \times 12^1 + \alpha \times 12^0 = \overline{139\alpha}_{(12)} \quad \text{et} \quad \overline{71\alpha9}_{(12)} > \overline{9\beta2}_{(12)}$$
 
-#### 4.3. ADDITION ET MULTIPLICATION DE DEUX NOMBRES
-PRÉSENTÉS DANS LE MÊME SYSTÈME DE NUMÉRATION
+#### 4.3. ADDITION ET MULTIPLICATION DE DEUX NOMBRES PRÉSENTÉS DANS LE MÊME SYSTÈME DE NUMÉRATION
 
 • On considère les deux nombres suivants : $x = \overline{5312}_{(6)}$ et $y = \overline{214}_{(6)}$
 

@@ -17,9 +17,11 @@ npm run loop         db:check + prod:check          must say "no blockers"
 npm run test:course  ~236 browser checks            must be "all checks passed"
 ```
 
-CI runs exactly these, in the order `check → db:check → prod:check → build →
-test:course`, so a green local run is a green pipeline. `test:course` needs a
-built app on `:3111`:
+CI runs these in the order `check → db:check → prod:check → build →
+test:course`, so a green local run is a green pipeline. The converse does not
+hold: `db:check` carries `continue-on-error: true` in `.github/workflows/ci.yml`,
+so it reports without gating — a red one locally still ships. Read it, do not
+wait for CI to stop you. `test:course` needs a built app on `:3111`:
 
 ```
 npm run build && E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111
@@ -62,8 +64,14 @@ root layout, so it has no i18n provider and carries inline bilingual copy.
 ## Auth and the allowlist
 
 Supabase Auth with Google, gated by `public.allowed_emails`. The gate is
-`proxy.ts` (Next 16's renamed middleware); `PUBLIC_PATHS` in `lib/publicPaths.ts`
-is the single list it and the sitemap both read.
+`proxy.ts` (Next 16's renamed middleware), which reads `PUBLIC_PATHS` from
+`lib/publicPaths.ts`.
+
+**That file exports two lists and they are not the same.** `PUBLIC_PATHS`
+(`/`, `/signin`, `/signup`) is what the proxy lets through unauthenticated;
+`INDEXABLE_PATHS` (`/` alone) is what `app/sitemap.ts` publishes. A page can be
+reachable without a session and still be deliberately absent from the sitemap —
+that is the closed beta. Adding a public route means deciding about both.
 
 `is_email_allowed` normalises the address it is **given**, then compares it to
 the address as **stored** — so a row typed with Gmail dots matches nothing and

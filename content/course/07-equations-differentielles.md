@@ -433,8 +433,6 @@ Il s'ensuit alors : $y(t) = 0,05(10t + 1)e^{-10t}$
 
 ### Exercices d'application
 
-SURGEON GENERAL
-
 L'ÉQUATION DIFFÉRENTIELLE $y' = ay$
 
 #### Exercice 01
@@ -730,8 +728,6 @@ c) Etudier le signe de \( g'(t) \) puis dresser le tableau de variations de la f
 4) Utiliser la courbe \(\mathcal{C}\) pour déterminer une valeur approchée à 0,2 seconde pres de l'instant où la charge du condensateur est devenue inférieure à 0,2 coulomb.
 
 ## Problèmes de synthèse
-
-STÉRÉCIÈSSES PROHIBITÉS
 
 Dévoirs 1
 1) Résoudre les équations différentielles suivantes :

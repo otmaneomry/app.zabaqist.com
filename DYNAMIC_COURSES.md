@@ -1,12 +1,18 @@
 # Cours dynamiques (markdown)
 
-Un cours n'est plus une page React écrite à la main. C'est un **document markdown**
-sous `content/course/`, rendu tel quel.
+Un cours n'est plus une page React écrite à la main. C'est un **document markdown**,
+rendu presque tel quel — trois normalisations passent dessus, décrites plus bas.
 
-## Ajouter un chapitre — 2 étapes
+## Ajouter un chapitre — 3 étapes
 
-1. Copier le `.md` dans `content/course/`
-2. Ajouter une ligne dans `COURSE_CATALOG` (`lib/courseCatalog.ts`) :
+**`critique/course/` est la source, `content/course/` est la copie servie.** Les
+deux sont versionnées et `test:course` les compare. Écrire dans la copie sans
+écrire dans la source, c'est perdre son travail à la prochaine synchronisation —
+c'est déjà arrivé, au prix de trois sections GeoGebra rédigées.
+
+1. Déposer le `.md` dans `critique/course/`
+2. En copier l'exact contenu dans `content/course/`
+3. Ajouter une ligne dans `COURSE_CATALOG` (`lib/courseCatalog.ts`) :
 
 ```ts
 {
@@ -63,11 +69,13 @@ onglets défilants, contenu en carte, appel au quiz. L'origine des onglets —
 **ce sont les `##` du chapitre**, pas une liste tapée à la main :
 
 ```
-## Activités préparatoires   →  onglet « Activités »   (7 sections)
-## Cours                     →  onglet « Cours »       (5 sections)
-## Méthodes                  →  onglet « Méthodes »    (6 sections)
-## Exercices                 →  onglet « Exercices »  (11 sections)
-## Devoirs et synthèse       →  onglet « Devoir »      (2 sections)
+(intro, avant le premier ##)  →  onglet « Introduction »  (1 section)
+## Activités préparatoires    →  onglet « Activités »     (8 sections)
+## Cours                      →  onglet « Cours »         (5 sections)
+## Méthodes                   →  onglet « Méthodes »      (6 sections)
+## Exercices                  →  onglet « Exercices »    (11 sections)
+## Devoirs et synthèse        →  onglet « Devoir »        (2 sections)
+## Résumé                     →  onglet « Résumé »        (1 section)
 ```
 
 Deux niveaux de navigation, tous deux dans l'URL (`?s=<sectionId>`) — l'onglet
@@ -79,12 +87,12 @@ ouvert est déduit de la section lue, donc un lien profond reste valable :
 ## Tests
 
 ```bash
-npm run build && npm start -- -p 3111
-npm run test:course              # 156 vérifications
+npm run build && E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111
+npm run test:course              # 236 vérifications
 ```
 
 `scripts/test-course.mjs` pilote l'application réelle dans un navigateur réel :
-découpage du document, rendu des 33 sections, absence de défilement horizontal
+découpage du document, rendu des 34 sections, absence de défilement horizontal
 à 390/768/1440 px, onglets, solution repliée, indices, persistance des
 checkpoints, XP, en-tête mobile (nav repliée dans le tiroir), page d'accueil
 publique (liens, problème interactif, parcours), reprise depuis le tableau de
@@ -172,25 +180,28 @@ Adapté de Brilliant — voir `BRILLIANT_WORKFLOW.md` §4. Une erreur ne coûte
 
 | Règle | Où |
 | --- | --- |
-| **Ambre, jamais rouge** — l'ambre dit « pas encore », le rouge dirait « échoué » | `ExerciseWithSolution`, `MultipleChoiceQuestion` |
+| **Ambre, jamais rouge** — l'ambre dit « pas encore », le rouge dirait « échoué » | `Checkpoint`, `SelfCheck` |
 | Le mot « Incorrect » n'apparaît nulle part — « Encore un essai. » | idem |
-| **Reprise illimitée** : plus de plafond à 3 tentatives, plus de solution imposée | `ExerciseWithSolution` |
+| **Reprise illimitée** : plus de plafond à 3 tentatives, plus de solution imposée | `Checkpoint` |
 | La réponse n'est jamais révélée ; l'aide est proposée, pas poussée | idem |
 | **Rien n'est repris** : ni XP, ni progression | `Checkpoint` |
-| Réussite amplifiée, échec atténué (contraste des marqueurs) | `Checkpoint`, `MultipleChoiceQuestion` |
+| Réussite amplifiée, échec atténué (contraste des marqueurs) | `Checkpoint`, `SelfCheck` |
 | « Réessayer » est l'action principale après un manque | `Checkpoint` |
 
-**Ce qui a été supprimé :** `ExerciseWithSolution` bloquait la saisie après trois
-tentatives et affichait la solution d'autorité. C'est exactement la mécanique de
-punition que le guide pédagogique interdit (*تجنب كل أشكال التثبيط*) — le
-compteur d'essais reste, mais comme un constat, pas comme un budget.
+**Ce qui a été supprimé :** l'ancien `ExerciseWithSolution` bloquait la saisie
+après trois tentatives et affichait la solution d'autorité. C'est exactement la
+mécanique de punition que le guide pédagogique interdit (*تجنب كل أشكال
+التثبيط*) — le compteur d'essais reste, mais comme un constat, pas comme un
+budget. Le composant lui-même n'existe plus ; son nom ne survit que dans des
+commentaires de `scripts/test-course.mjs`.
 
 **La célébration** (`ChapterComplete`) est une prise de plein écran, sans chrome,
 qui se déclenche **une seule fois** à la fin du chapitre. Elle verse le total que
-la carte du cours annonce (« … · 400 points ») : **les points paient
-l'achèvement**, pas la justesse — noter la célébration sur les checkpoints
-tentés donnerait 6 points à quelqu'un qui a lu les 33 sections, ce qui se lit
-comme un reproche.
+la carte du cours annonce — calculé depuis les vues, pas écrit en dur : 405 points
+pour Limites et continuité, ses 34 vues additionnées via `XP_BY_KIND`. **Les
+points paient l'achèvement**, pas la justesse — noter la célébration sur les
+checkpoints tentés donnerait 6 points à quelqu'un qui a lu les 34 sections, ce
+qui se lit comme un reproche.
 
 Deux écarts avec la source : **une seule prise et non trois** (les deux autres
 fêtent une série quotidienne, que ce produit n'a pas), et **aucune
@@ -354,9 +365,10 @@ Points à connaître :
   ponctuation et ses indices passent du mauvais côté (x₀ devient ₀x).
 - L'interface est traduite ; **le contenu du chapitre ne l'est pas** — c'est le
   markdown du pédagogue, et le traduire est un travail de contenu, pas de code.
-- `ExerciseWithSolution`, `MultipleChoiceQuestion`, `QuizPlayer` et
-  `DevoirAssignment` sont antérieurs à next-intl : leurs 26 chaînes visibles
-  sont désormais dans `exercise`, `quiz` et `homework`.
+- Les composants d'exercice étaient antérieurs à next-intl et codaient leur
+  français en dur. Leurs chaînes visibles vivent désormais dans `exercise`,
+  `quiz` et `homework` ; le rendu passe aujourd'hui par `Checkpoint` (markdown)
+  et `SelfCheck` (quiz).
 
 ### Pied de page
 
@@ -375,17 +387,19 @@ problème interactif (lim sin x / x), parcours en stations, trois piliers, pied
 de page. Deux choses ne sont pas des copies :
 
 - les liens visent les routes de cette application — `/courses`,
-  `/courses/<slug>`, `/quiz/1`, `/home` — donc tout l'existant continue de
-  fonctionner ;
+  `/courses/<slug>`, `/quiz/<slug>`, `/home` — donc tout l'existant continue de
+  fonctionner. Le quiz est adressé par slug de chapitre, jamais par numéro ;
+  l'en-tête public pointe sur `/quiz` sans slug ;
 - les états des stations sont réels : ils viennent de la progression stockée sur
   l'appareil, donc « En cours » désigne le chapitre réellement lu et
   « Continuer » reprend à la section exacte.
 
-Palette : la page utilise le vert « Mint Tea » (`--zb-mint`) et le crème de la
-maquette d'origine. Les pages de cours gardent leur teal `#2CB0A1` — les deux
-jeux de jetons coexistent dans `tailwind.config.ts` (`zb-mint*` / `zb-teal*`).
-L'ancienne page reste au chaud dans
-`components/frontend/BrilliantLandingPage.tsx`.
+Palette : **un seul vert dans toute l'application**, « Mint Tea »
+(`--zb-mint`), avec le crème de la maquette d'origine. Le teal `#2CB0A1` des
+anciennes pages de cours a disparu, et avec lui les jetons `zb-teal*` : il n'en
+reste rien dans `tailwind.config.ts`. Ce n'est pas une préférence, c'est une
+règle tenue par le test — `scripts/test-course.mjs` échoue si `zb-teal`,
+`zb-saffron`, `zb-gold-warm` ou `#2CB0A1` reparaît dans le HTML servi.
 
 ## Accueil connecté (`/home`)
 
@@ -395,9 +409,9 @@ propose de commencer le chapitre 1. Les chapitres apparaissent aussi en tête de
 « Continuer l'apprentissage », avec leur vraie progression — les autres
 vignettes restent des espaces réservés.
 
-Le décompte des sections vient du serveur, que l'accueil n'interroge pas : la
-page de cours l'enregistre (`rememberSectionCount`) à la première ouverture, et
-les cartes le relisent.
+Le décompte des sections ne transite plus par l'appareil : il est dénormalisé
+dans `COURSE_CATALOG` (`sections`), que le client lit directement, et
+`test:course` le recalcule depuis le markdown pour qu'il ne puisse pas mentir.
 
 ## Ce que le pipeline fait du markdown
 
@@ -428,9 +442,11 @@ toucher au contenu :
 Un chapitre entier fait ~15 Mo de KaTeX rendu : inutilisable sur téléphone. Il est
 donc découpé par `##`, les sections courtes consécutives sont fusionnées, et les
 sections lourdes (> 200 formules) sont recoupées par `###`. Chaque page est un
-extrait **verbatim** du document — `?s=<sectionId>` choisit laquelle.
+extrait **contigu** du document — verbatim à ceci près que les trois
+normalisations ci-dessus sont déjà passées — et `?s=<sectionId>` choisit
+laquelle.
 
-Résultat pour ce chapitre : 33 sections, 175–200 Ko gzippés pour les plus
+Résultat pour ce chapitre : 34 sections, 175–200 Ko gzippés pour les plus
 lourdes, 13 Ko pour l'introduction.
 
 ## Conventions du markdown
@@ -441,10 +457,14 @@ lourdes, 13 Ko pour l'introduction.
 | `> **Théorème.** / **Proposition.** / **Corollaire.**` | encadré doré |
 | `> **Exemple.** / **Remarque.**` | encadré gris |
 | `> **Solution.** / **Preuve.**` | replié derrière « Afficher » |
-| `> **Application.** …` | checkpoint : brouillon, 3 indices, auto-évaluation |
+| `> **Application.** …` | checkpoint : brouillon, indices, auto-évaluation |
 
 Le type de section (`Cours`, `Méthodes`, `Exercices`, `Devoirs`, `Résumé`) est déduit
 du titre `##` et fixe les XP — voir `XP_BY_KIND`.
+
+Un checkpoint offre **trois indices là où le pédagogue a écrit une solution à
+montrer, deux sinon** (`hasSolution ? 3 : 2`, `components/course/Checkpoint.tsx`) :
+le dernier niveau ne peut pas pointer vers un texte qui n'existe pas.
 
 ## Figures GeoGebra dans le markdown
 
@@ -477,9 +497,13 @@ maintenant `content/course/04-fonctions-logarithmiques.md`, servi par le même
 pipeline que les autres, à la même URL. Les six onglets survivent, la figure
 GeoGebra aussi.
 
-Ce que la migration a coûté : `ExerciseWithSolution` validait les réponses en
-LaTeX (`lib/mathValidation.ts`), les checkpoints markdown non — ils reposent sur
-l'auto-évaluation. C'est cohérent avec le principe déjà en place (*rien n'est
-corrigé automatiquement*), mais c'est une capacité en moins, et
-`ExerciseWithSolution`, `DevoirAssignment` et `mathValidation` ne sont plus
-référencés par aucune route.
+Ce que la migration a coûté : l'ancien `ExerciseWithSolution` validait les
+réponses en LaTeX (`lib/mathValidation.ts`), les checkpoints markdown non — ils
+reposent sur l'auto-évaluation. C'est cohérent avec le principe déjà en place
+(*rien n'est corrigé automatiquement*), mais c'est une capacité en moins.
+
+Ces composants ont depuis été **supprimés**, pas seulement déréférencés :
+`ExerciseWithSolution`, `MultipleChoiceQuestion`, `QuizPlayer`,
+`DevoirAssignment`, `mathValidation` et `BrilliantLandingPage` n'existent plus
+dans l'arbre. Leurs noms ne subsistent que dans des commentaires — chercher le
+fichier est une perte de temps.
