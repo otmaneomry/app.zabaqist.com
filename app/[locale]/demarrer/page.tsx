@@ -14,7 +14,7 @@
  * half-finished funnel is resumable.
  */
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
@@ -29,6 +29,7 @@ import MathContent from '@/components/math/MathContent'
 import { useRouter as useLocaleRouter } from '@/i18n/navigation'
 import {
   MOTIVATIONS,
+  readAnswers,
   saveAnswers,
   STEPS,
   stepAt,
@@ -73,6 +74,23 @@ export default function DemarrerPage() {
   const [motivation, setMotivation] = useState<Motivation | null>(null)
   const [filiere, setFiliere] = useState<Filiere | null>(null)
   const [track, setTrack] = useState<Track | null>(null)
+  const [restored, setRestored] = useState(false)
+
+  // Every answer is written as it is given, which is what lets a student close
+  // the tab at step 5 without losing the first four — but nothing read them
+  // back, so reopening `?e=4` showed an empty question with Continue disabled,
+  // and the plan reveal offered Sciences Exp to someone who had chosen SM.
+  //
+  // In an effect and not in the initialiser: `localStorage` does not exist on
+  // the server, and reading it during render makes React throw away the markup
+  // the server just sent.
+  useEffect(() => {
+    const saved = readAnswers()
+    if (saved.motivation) setMotivation(saved.motivation)
+    if (saved.filiere) setFiliere(saved.filiere)
+    if (saved.track) setTrack(saved.track)
+    setRestored(true)
+  }, [])
 
   const go = useCallback(
     (i: number) => {
@@ -142,6 +160,8 @@ export default function DemarrerPage() {
 
   // The plan reveal owns the whole screen — no progress bar, no Continue.
   if (step.kind === 'reveal') {
+    // One frame of nothing rather than a frame of the wrong programme.
+    if (!restored) return null
     return (
       <PlanReveal
         filiere={filiere ?? 'sx'}

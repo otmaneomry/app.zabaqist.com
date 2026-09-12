@@ -47,7 +47,15 @@ export const STEPS: Step[] = [
   { id: 'plan', kind: 'reveal', segment: 2, fill: 100 },
 ]
 
-export const stepAt = (i: number): Step => STEPS[Math.min(Math.max(i, 0), STEPS.length - 1)]!
+/**
+ * The step at `i`, clamped.
+ *
+ * `Math.trunc` is not decoration: the index comes from `?e=`, and `?e=1.5`
+ * clamped to 1.5, indexed STEPS with a float, and handed the page `undefined`
+ * to read `.kind` from.
+ */
+export const stepAt = (i: number): Step =>
+  STEPS[Math.min(Math.max(Math.trunc(i) || 0, 0), STEPS.length - 1)]!
 
 /** Why the student is here. Shapes tone later; never gates content. */
 export type Motivation = 'bac' | 'rattraper' | 'avance' | 'parent'

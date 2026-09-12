@@ -38,7 +38,12 @@ type Log = Record<string, DayActivity>
 function readLog(): Log {
   if (typeof window === 'undefined') return {}
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '{}') as Log
+    // `JSON.parse` is happy with "null", "3" and "[]". Only an object can be
+    // indexed by day, and every caller does exactly that.
+    const parsed: unknown = JSON.parse(localStorage.getItem(KEY) ?? '{}')
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Log)
+      : {}
   } catch {
     return {}
   }

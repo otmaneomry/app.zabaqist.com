@@ -48,12 +48,17 @@ const src = [...walk('app'), ...walk('components'), ...walk('lib'), ...walk('i18
 /* ── Secrets ──────────────────────────────────────────────────────────── */
 
 const gitignore = read('.gitignore')
-check(/^\.env\*?\.local|^\.env\*/m.test(gitignore), 'blocker', 'env-ignored',
+// Anchored at BOTH ends. `^\.env\*?\.local` also matched the line
+// `.env.local.example`, so a repo that ignored only the example file — and
+// tracked the real one — passed a blocker check.
+check(/^\.env(\*|\*?\.local\*?)\s*$/m.test(gitignore), 'blocker', 'env-ignored',
   '.env.local is not gitignored')
 
 let tracked = ''
 try { tracked = execSync('git ls-files', { encoding: 'utf8' }) } catch {}
-check(!/^\.env(\.|$)/m.test(tracked), 'blocker', 'env-committed',
+// Any directory, not just the repository root: `config/.env.production` is
+// every bit as committed as `.env.production`.
+check(!/(^|\/)\.env(\.|$)/m.test(tracked), 'blocker', 'env-committed',
   'an .env file is committed to git')
 
 // A literal key in source, as opposed to a process.env read.

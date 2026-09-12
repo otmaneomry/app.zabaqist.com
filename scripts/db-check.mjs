@@ -104,11 +104,23 @@ const names = Object.keys(tables)
 check(names.length > 0, 'fail', 'sql-parsed', 'no CREATE TABLE found in supabase/migrations/')
 
 for (const t of names) {
+  // The LAST word wins. Migrations are concatenated in order, so a later
+  // `DISABLE ROW LEVEL SECURITY` is what the database ends up with — and a test
+  // that only asked whether ENABLE appears anywhere would report green on a
+  // table whose protection had since been switched off.
+  const toggles = [
+    ...sql.matchAll(
+      new RegExp(`alter table public\\.${t} (enable|disable) row level security`, 'g'),
+    ),
+  ]
+  const last = toggles.at(-1)?.[1]
   check(
-    new RegExp(`alter table public\\.${t} enable row level security`).test(sql),
+    last === 'enable',
     'fail',
     `rls-${t}`,
-    `${t}: RLS is not enabled`,
+    last === 'disable'
+      ? `${t}: RLS is enabled and then DISABLED again`
+      : `${t}: RLS is not enabled`,
     'without it the publishable key reads the whole table',
   )
 }
@@ -210,9 +222,18 @@ if (!URL_ || !KEY) {
 
     // Anonymous read must return nothing. Rows coming back means RLS is off or
     // a policy is wider than intended.
-    if (r.status === 200 && body.trim() !== '[]')
-      fail(`leak-${t}`, `${t}: returns rows to an anonymous caller`,
-        `RLS is not protecting it — ${body.slice(0, 60)}`)
+    if (r.status === 200) {
+      if (body.trim() !== '[]')
+        fail(`leak-${t}`, `${t}: returns rows to an anonymous caller`,
+          `RLS is not protecting it — ${body.slice(0, 60)}`)
+    } else {
+      // Anything else proved nothing. A 401, 403 or 500 is not a table that
+      // was verified — it is a table that was not reached, and counting it as
+      // a pass is how this check would report green on a project it never
+      // successfully queried.
+      fail(`unread-${t}`, `${t}: could not be read to verify it`,
+        `HTTP ${r.status} — ${body.slice(0, 60)}`)
+    }
   }
 
   // A write must be refused on every table. This is the property the whole
@@ -232,9 +253,17 @@ if (!URL_ || !KEY) {
     const r = await fetch(`${URL_}/rest/v1/${t}`, {
       method: 'POST', headers: h, body: JSON.stringify(row),
     })
-    check(r.status >= 400, 'fail', `write-${t}`,
-      `${t}: accepted an ANONYMOUS WRITE`,
-      `HTTP ${r.status} — anyone with the public key can write to this table`)
+    const body = await r.text()
+    // Postgres refusing on POLICY grounds is `42501`, "new row violates
+    // row-level security policy", served as 401. Accepting any status >= 400
+    // meant the probe's own foreign key could answer for RLS: a 409 from the
+    // zero UUID looked exactly like a refusal, so this check would pass with
+    // RLS switched off entirely.
+    const byPolicy = /42501|row-level security/i.test(body) ||
+      r.status === 401 || r.status === 403
+    check(byPolicy, 'fail', `write-${t}`,
+      `${t}: an ANONYMOUS WRITE was not refused by RLS`,
+      `HTTP ${r.status} — expected a 42501 policy refusal, got ${body.slice(0, 60)}`)
   }
 
   /**

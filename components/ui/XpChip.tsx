@@ -33,8 +33,13 @@ export default function XpChip({ className = '' }: { className?: string }) {
 
   useEffect(() => {
     refresh()
+    // `storage` carries the change from another tab; the custom event does not.
     window.addEventListener('zabaqist:progress', refresh)
-    return () => window.removeEventListener('zabaqist:progress', refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener('zabaqist:progress', refresh)
+      window.removeEventListener('storage', refresh)
+    }
   }, [refresh])
 
   if (xp <= 0) return null

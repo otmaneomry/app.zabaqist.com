@@ -57,6 +57,11 @@ const sb = createClient(url, key)
 console.log(`\nChecking ${addr}\n`)
 
 let anyAllowed = false
+// Did the list answer AT ALL? An error is not a "no", and this script exists to
+// be run when a student says they cannot get in — telling an operator to insert
+// a row that is already there, because the connection failed, sends them to fix
+// the one thing that was never broken.
+let anyAnswered = false
 for (const form of forms(addr)) {
   const { data, error } = await sb.rpc('is_email_allowed', { addr: form })
   if (error) {
@@ -64,6 +69,7 @@ for (const form of forms(addr)) {
     console.log(`           ${error.code ?? ''} ${error.message}`)
     continue
   }
+  anyAnswered = true
   if (data) anyAllowed = true
   console.log(`  ${data ? 'ALLOWED ' : 'refused '} ${form}`)
 }
@@ -74,6 +80,14 @@ if (anyAllowed) {
   console.log('  came from somewhere else — read public.auth_events for the')
   console.log('  attempt: signin_denied means the list said no, and')
   console.log('  signin_check_failed means the check itself errored.')
+} else if (!anyAnswered) {
+  console.log('  NO ANSWER. Every call above errored, so the list was never')
+  console.log('  consulted — this is not a refusal, and the address may well')
+  console.log('  already be there. Fix the connection first: check')
+  console.log('  NEXT_PUBLIC_SUPABASE_URL and the key in .env.local, then')
+  console.log('  re-run. Do not add a row on the strength of this output.')
+  console.log()
+  process.exit(1)
 } else {
   console.log('  Not on the list in any form. Add it with:')
   console.log(`    insert into public.allowed_emails (email, note)`)

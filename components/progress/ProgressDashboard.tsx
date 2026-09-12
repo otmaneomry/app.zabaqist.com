@@ -73,7 +73,13 @@ export default function ProgressDashboard() {
       listCourses(filiere)
         .map((c) => {
           const shape = readCourseShape(c.slug)
-          const done = getCourseProgress(c.slug)?.completedTabs.length ?? 0
+          const seen = getCourseProgress(c.slug)?.completedTabs ?? []
+          // Only sections this chapter still has. A chapter that gains, loses
+          // or renames one leaves the old id behind on the device, and counting
+          // it unfiltered is how a card reads "2 of 1".
+          const done = shape
+            ? seen.filter((id) => id in shape).length
+            : seen.length
           return {
             slug: c.slug,
             title: courseTitle(c, contentLocale),
@@ -88,13 +94,13 @@ export default function ProgressDashboard() {
   // localStorage does not exist during SSR, so the first read lands after mount.
   useEffect(() => {
     refresh()
-    for (const e of [ACTIVITY_EVENT, 'zabaqist:progress', FILIERE_EVENT]) {
-      window.addEventListener(e, refresh)
-    }
+    // `storage` too: the three custom events are dispatched on the window that
+    // fired them, so a dashboard left open in one tab never noticed the reading
+    // done in another. `storage` is the only one the browser sends across tabs.
+    const EVENTS = [ACTIVITY_EVENT, 'zabaqist:progress', FILIERE_EVENT, 'storage']
+    for (const e of EVENTS) window.addEventListener(e, refresh)
     return () => {
-      for (const e of [ACTIVITY_EVENT, 'zabaqist:progress', FILIERE_EVENT]) {
-        window.removeEventListener(e, refresh)
-      }
+      for (const e of EVENTS) window.removeEventListener(e, refresh)
     }
   }, [refresh])
 
