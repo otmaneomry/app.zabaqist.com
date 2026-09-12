@@ -1598,7 +1598,7 @@ b) Montrer que la famille $(u; v)$ est libre dans $\mathcal{D}$.
 
 3) Soit $f$ une fonction deux fois dérivables sur $\mathbb{R}^*$. Montrer que si $f \in \mathcal{D}$, alors :
 
-$$(\forall x \in \mathbb{R}^*) \ f''(x) = f''(x)$$
+$$(\forall x \in \mathbb{R}^*) \ x\left(f''(x) - f'(x)\right) = f'(x) - f(x)$$
 
 4) Montrer que $\mathcal{D}$ est l'ensemble des fonctions $f$ telles : $(\exists (a; b) \in \mathbb{R}^2)$ $f(x) = ae^x + bx + b$
 

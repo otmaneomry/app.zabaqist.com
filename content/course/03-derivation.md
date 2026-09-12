@@ -481,16 +481,16 @@ $$\left(\sqrt[n]{x}\right)' = \left(\frac{1}{x^n}\right)' = \frac{1}{n} x^{\frac
 $$\left(\sqrt[n]{u(x)}\right)' = \frac{1}{n} u'(x)(u(x))^{\frac{1}{n}-1} = \frac{u'(x)}{n \left(\sqrt[n]{u(x)}\right)^{n-1}}$$
 
 > **Preuve.**
-On sait que la fonction $x \mapsto \sqrt[x]{x}$ est la fonction réciproque de la fonction $f$ définie sur $\mathbb{R}^*$ par $f(x) = x^*$. Puisque $f$ est dérivable sur $\mathbb{R}^*$, et sa dérivée $f' : x \mapsto nx^{n-1}$ ne s'annule pas sur $\mathbb{R}^*$, alors sa fonction réciproque $f^{-1}$ est dérivable sur $f(\mathbb{R}^*) = \mathbb{R}^*$. On a pour tout $x \in \mathbb{R}^*$ :
+On sait que la fonction $x \mapsto \sqrt[n]{x}$ est la fonction réciproque de la fonction $f$ définie sur $\mathbb{R}^*$ par $f(x) = x^n$. Puisque $f$ est dérivable sur $\mathbb{R}^*$, et sa dérivée $f' : x \mapsto nx^{n-1}$ ne s'annule pas sur $\mathbb{R}^*$, alors sa fonction réciproque $f^{-1}$ est dérivable sur $f(\mathbb{R}^*) = \mathbb{R}^*$. On a pour tout $x \in \mathbb{R}^*$ :
 
-$$\left(\sqrt[x]{x}\right)' = \left(f^{-1}\right)'(x) = \frac{1}{f'\left(f^{-1}(x)\right)} = \frac{1}{n\left(\sqrt[x]{x}\right)^{n-1}}$$
+$$\left(\sqrt[n]{x}\right)' = \left(f^{-1}\right)'(x) = \frac{1}{f'\left(f^{-1}(x)\right)} = \frac{1}{n\left(\sqrt[n]{x}\right)^{n-1}}$$
 
-Si $u$ est une fonction dérivable et strictement positive sur un intervalle $I$ de $\mathbb{R}$ alors la fonction $x \mapsto \sqrt[u]{u(x)}$ est dérivable sur $I$ en tant que composée de deux fonctions dérivables. De plus, pour tout $x \in I$ :
+Si $u$ est une fonction dérivable et strictement positive sur un intervalle $I$ de $\mathbb{R}$ alors la fonction $x \mapsto \sqrt[n]{u(x)}$ est dérivable sur $I$ en tant que composée de deux fonctions dérivables. De plus, pour tout $x \in I$ :
 
-$$\left(\sqrt[u(x)]\right)' = f'(u(x)) \times u'(x) = \frac{1}{n}(u(x))^{\frac{1}{n}-1} u'(x) = \frac{u'(x)}{n\left(\sqrt[u]{u(x)}\right)^{n-1}}$$
+$$\left(\sqrt[n]{u(x)}\right)' = f'(u(x)) \times u'(x) = \frac{1}{n}(u(x))^{\frac{1}{n}-1} u'(x) = \frac{u'(x)}{n\left(\sqrt[n]{u(x)}\right)^{n-1}}$$
 
 > **Exemples.**
-1) La fonction $ x \mapsto \sqrt{x} $ est dérivable sur $ \mathbb{R}^* $, et on a pour tout $ x \in \mathbb{R}^* $: $ \left(\sqrt{x}\right)' = \frac{1}{3} x^{-\frac{2}{3}} = \frac{1}{3\sqrt{x^2}} $.
+1) La fonction $ x \mapsto \sqrt[3]{x} $ est dérivable sur $ \mathbb{R}^* $, et on a pour tout $ x \in \mathbb{R}^* $: $ \left(\sqrt[3]{x}\right)' = \frac{1}{3} x^{-\frac{2}{3}} = \frac{1}{3\sqrt[3]{x^2}} $.
 2) On considere la fonction $ f $ définie par: $ f(x) = \sqrt[3]{8x - 5} $
 
 La fonction $u : x \mapsto 8x - 5$ est dérivable et strictement positive sur l'intervalle $\left]\frac{5}{8}; +\infty\right[$. Par conséquent
@@ -507,10 +507,10 @@ $$f(x) = \sqrt[3]{3 + \cos^2 x} \quad ; \quad g(x) = x\sqrt[3]{x^2 - x} \quad ; 
 > **Proposition 9.**
 Soit $r$ un nombre rationnel non nul.
 
-La fonction $x\mapsto x^{\prime}$ est derivable sur $\mathbb{R}^*$ et sa derivee est la fonction $x\mapsto r\cdot x^{r - 1}$
-- Si u est une fonction dérivable et strictement positive sur un intervalle I de R alors la fonction $ x \mapsto (u(x))^{\prime} $ est dérivable sur I et sa fonction dérivée est donnée par:
+La fonction $x\mapsto x^{r}$ est derivable sur $\mathbb{R}^*$ et sa derivee est la fonction $x\mapsto r\cdot x^{r - 1}$
+- Si u est une fonction dérivable et strictement positive sur un intervalle I de R alors la fonction $ x \mapsto (u(x))^{r} $ est dérivable sur I et sa fonction dérivée est donnée par:
 
-$$\left(\left(u(x)\right)'\right)' = r\cdot u'(x)\cdot\left(u(x)\right)'^{-1}$$
+$$\left(\left(u(x)\right)^{r}\right)' = r\cdot u'(x)\cdot\left(u(x)\right)^{r-1}$$
 
 > **Exemple.**
 On considère la fonction $f$ définie sur $\mathbb{R}$ par : $f(x) = (x^2 - x + 5)^{\frac{7}{8}}$

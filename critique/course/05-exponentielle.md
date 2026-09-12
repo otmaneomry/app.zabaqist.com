@@ -380,11 +380,11 @@ On a pour tout $$x \in \mathbb{R}^*$$ :
 #### FORMALISANCE FONDAMENTALES
 
 > **Proposition 10.**
-Soit $a$ un réel strictement positif et différent de $l$. Alors :
+Soit $a$ un réel strictement positif et différent de $1$. Alors :
 
-\(\left(\forall x\in \mathbb{R}\right)\left(\forall y\in \mathbb{R}_{+}^{*}\right)\quad y = a^{*}\Leftrightarrow x = \frac{\lny}{\ln a}\)
-\(\left(\forall x\in \mathbb{R}\right)\log_a\left(a^*\right) = x\) et \(\left(\forall x\in \mathbb{R}_{+}^{*}\right)a^{\log_{a}(x)} = x\)
-Pour tout \((x,y)\in \mathbb{R}^2\) .. \(a^{x + y} = a^x\times a^x\) et \(a^{x - y} = \frac{a^x}{a^x}\)
+\(\left(\forall x\in \mathbb{R}\right)\left(\forall y\in \mathbb{R}_{+}^{*}\right)\quad y = a^{x}\Leftrightarrow x = \frac{\ln y}{\ln a}\)
+\(\left(\forall x\in \mathbb{R}\right)\log_a\left(a^x\right) = x\) et \(\left(\forall x\in \mathbb{R}_{+}^{*}\right)a^{\log_{a}(x)} = x\)
+Pour tout \((x,y)\in \mathbb{R}^2\) .. \(a^{x + y} = a^x\times a^y\) et \(a^{x - y} = \frac{a^x}{a^y}\)
 
 > **Remarque.**
 Dans ce paragraphe, on a supposé que $a > 0$ et $a \neq 1$, et après avoir prolongé l'écriture $\exp_a$ sous la forme d'une puissance de $a$, on a obtenu : $(\forall x \in \mathbb{R}) a^x = e^{x \ln a}$
@@ -407,13 +407,13 @@ Par suite, l'ensemble des solutions de cette équation est : $S = \left\{ \frac{
 
 2) Soit $a$ un réel de l'intervalle $]1; +\infty[$, et soit $x$ et $y$ deux réels strictement positifs.
 
-Simplifions les expressions suivantes : $\alpha = a^{\frac{\log(\log a)}{\log a}}$ et $\beta = \log_a \left( \log_a a^{a^*} \right)$ et $\lambda = \frac{x^{\log_a(x)}}{y^{\log_a(x)}}$
+Simplifions les expressions suivantes : $\alpha = a^{\frac{\log(\log a)}{\log a}}$ et $\beta = \log_a \left( \log_a a^{a^a} \right)$ et $\lambda = \frac{x^{\log_a(y)}}{y^{\log_a(x)}}$
 
 Pour $\alpha$ : $\alpha = a^{\frac{\log(\log a)}{\log a}} = a^{\log_a(\log a)} = \log a$
 
-Pour $\beta$ : $\beta = \log_a \left( \log_a a^{a^*} \right) = \log_a \left( a^a \right) = a \log_a (a) = a$
+Pour $\beta$ : $\beta = \log_a \left( \log_a a^{a^a} \right) = \log_a \left( a^a \right) = a \log_a (a) = a$
 
-Pour $\lambda$ : $\lambda = \frac{x^{\log_a(x)}}{y^{\log_a(x)}} = \frac{e^{\frac{\ln(x) \ln(x)}{\ln(a)}}}{e^{\frac{\ln(x) \ln(x)}{\ln(a)}}} = 1$
+Pour $\lambda$ : $\lambda = \frac{x^{\log_a(y)}}{y^{\log_a(x)}} = \frac{e^{\frac{\ln(x) \ln(y)}{\ln(a)}}}{e^{\frac{\ln(y) \ln(x)}{\ln(a)}}} = 1$
 
 2) Résolvons dans $\mathbb{R}$ l'inéquation : $3^{2s} \geq 5^{1-s}$
 Cette inéquation est équivalente à $2x \ln 3 \geq (1-x) \ln 5$, c'est-à-dire que $(2 \ln 3 + \ln 5)x \geq \ln 5$. Par suite,
