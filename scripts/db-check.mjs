@@ -300,13 +300,45 @@ if (!URL_ || !KEY) {
     }
     return last
   }
-  // Sequential, not Promise.all: three concurrent RPCs during a schema reload
-  // is how one of them gets the stale answer in the first place.
-  const dotted = await ask('omry.otmane@gmail.com')
-  const plain = await ask('omryotmane@gmail.com')
-  const stranger = await ask('definitely-not-invited@example.com')
-  check(dotted === 'true' && plain === 'true', 'fail', 'allowlist-dots',
-    'the allowlist no longer folds Gmail dots',
+  /**
+   * The address to probe comes FROM the list.
+   *
+   * It used to be the literal `omry.otmane@gmail.com` seeded by 0001. That
+   * stopped being a row on 2026-09-12 and this check went red for a reason
+   * that had nothing to do with folding — it was asserting something about
+   * data that no longer existed, which is the one thing a verifier must never
+   * do. Taking a real Gmail row and dotting it tests the same property and
+   * cannot go stale.
+   */
+  let plainAddr = null
+  if (SECRET) {
+    try {
+      const r = await fetch(`${URL_}/rest/v1/allowed_emails?select=email`, { headers: rpcHeaders })
+      if (r.ok) {
+        const rows = JSON.parse(await r.text())
+        plainAddr = rows
+          .map((x) => x.email)
+          .find((e) => /@gmail\.com$/.test(e) && e.split('@')[0].length > 1)
+      }
+    } catch { /* falls through to the skip below */ }
+  }
+
+  if (!plainAddr) {
+    warn('allowlist-fixture',
+      'no @gmail.com row to probe — the dot-folding check needs one, and' +
+      ' SUPABASE_SECRET_KEY in .env.local to read it')
+  } else {
+    const [user, domain] = plainAddr.split('@')
+    // A dot anywhere in the local part must fold to the same address.
+    const dottedAddr = `${user.slice(0, 1)}.${user.slice(1)}@${domain}`
+
+    // Sequential, not Promise.all: three concurrent RPCs during a schema reload
+    // is how one of them gets the stale answer in the first place.
+    const dotted = await ask(dottedAddr)
+    const plain = await ask(plainAddr)
+    const stranger = await ask('definitely-not-invited@example.com')
+    check(dotted === 'true' && plain === 'true', 'fail', 'allowlist-dots',
+      `the allowlist no longer folds Gmail dots (probed ${plainAddr})`,
     `dotted=${dotted} plain=${plain} — one spelling would be locked out.` +
     ' ONE of the two false means the folding itself broke.' +
     ' BOTH false has two causes and this check cannot tell them apart:' +
@@ -316,8 +348,9 @@ if (!URL_ || !KEY) {
     ' is_email_allowed folds the address it is GIVEN, then compares it to the' +
     ' address as STORED, so a row typed with dots matches nothing. The trigger' +
     ' in 0002 prevents new ones; run `npm run whois -- <address>` to confirm.')
-  check(stranger === 'false', 'fail', 'allowlist-open',
-    'the allowlist admits an address that was never invited', `got ${stranger}`)
+    check(stranger === 'false', 'fail', 'allowlist-open',
+      'the allowlist admits an address that was never invited', `got ${stranger}`)
+  }
 }
 
 /* ------------------------------------------------------------------ */

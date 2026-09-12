@@ -88,7 +88,15 @@ export default function DemarrerPage() {
     const saved = readAnswers()
     if (saved.motivation) setMotivation(saved.motivation)
     if (saved.filiere) setFiliere(saved.filiere)
-    if (saved.track) setTrack(saved.track)
+    // Only a track that belongs to that filière. Choosing SM, going back and
+    // switching to SX leaves the SM track on disk until the option step is
+    // reached again — restoring the pair unchecked re-enables Continue with a
+    // track from the filière the reader has just left.
+    if (
+      saved.track &&
+      (!saved.filiere || FILIERE_TRACKS[saved.filiere]?.includes(saved.track))
+    )
+      setTrack(saved.track)
     setRestored(true)
   }, [])
 

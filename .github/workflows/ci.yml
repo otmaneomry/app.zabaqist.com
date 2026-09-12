@@ -37,8 +37,12 @@ jobs:
 
       # Structure, without the network: the live half skips itself when there
       # are no real credentials, and says so.
+      # No `continue-on-error`. It meant a migration that left RLS disabled, or
+      # an anonymous write the database accepted, reported red here and green
+      # overall — and the pipeline went on to build and deploy it. Without live
+      # credentials db:check skips the live half and passes on structure alone,
+      # so this does not turn a missing secret into a red build.
       - run: npm run db:check
-        continue-on-error: true
 
       - run: npm run prod:check
 

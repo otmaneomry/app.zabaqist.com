@@ -42,6 +42,17 @@ function validate(): { ok: true } | { ok: false; why: string } {
         '(Supabase → Project Settings → API Keys)',
     }
   if (!isAscii(URL_)) return { ok: false, why: 'NEXT_PUBLIC_SUPABASE_URL contains a non-ASCII character' }
+  // A SECRET key in the publishable slot. `client.ts` puts this value in every
+  // browser bundle, and a secret key bypasses RLS: the whole design rests on
+  // the key that ships being one Postgres will argue with.
+  if (/^sb_secret_/.test(KEY) || /^eyJ/.test(KEY))
+    return {
+      ok: false,
+      why:
+        'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY looks like a SECRET or legacy ' +
+        'service key — it would be published to every visitor and it bypasses ' +
+        'RLS. Use the publishable key (sb_publishable_…).',
+    }
   // The shortest real publishable key is far longer than any placeholder.
   if (KEY.length < 40)
     return {

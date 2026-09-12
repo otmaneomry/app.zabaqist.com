@@ -91,11 +91,14 @@ export default function ContinuePanel({ shape }: { shape: ChapterShape }) {
 
   useEffect(() => {
     refresh()
-    for (const e of [FILIERE_EVENT, 'zabaqist:progress'])
-      window.addEventListener(e, refresh)
+    // `storage` alongside the two custom events: those are dispatched on the
+    // window that fired them, so reading a section in another tab left this
+    // panel showing the old chapter and percentage. `storage` is the only one
+    // the browser delivers across tabs.
+    const EVENTS = [FILIERE_EVENT, 'zabaqist:progress', 'storage']
+    for (const e of EVENTS) window.addEventListener(e, refresh)
     return () => {
-      for (const e of [FILIERE_EVENT, 'zabaqist:progress'])
-        window.removeEventListener(e, refresh)
+      for (const e of EVENTS) window.removeEventListener(e, refresh)
     }
   }, [refresh])
 

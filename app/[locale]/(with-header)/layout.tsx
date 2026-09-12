@@ -54,7 +54,11 @@ export default async function WithHeaderLayout({
       // callback makes. A database hiccup must not throw out an invited
       // student mid-session.
       if (!error && allowed === false) {
-        await supabase.auth.signOut()
+        // NOT `signOut()` here. A server component cannot write cookies —
+        // `lib/supabase/server.ts` swallows the attempt by design — so the
+        // session survived, `/signin` saw a valid user, sent them back, and
+        // this refused them again: a redirect loop. `/auth/signout` is a route
+        // handler, which can end it for real.
         account = null
         refused = true
       }
@@ -65,7 +69,7 @@ export default async function WithHeaderLayout({
 
   // Outside the try: `redirect` works by throwing, and catching it here would
   // swallow the redirect and render the page to someone just turned away.
-  if (refused) redirect('/signin?error=not-allowed')
+  if (refused) redirect('/auth/signout?reason=not-allowed')
 
   // Google's profile fields arrive under user_metadata, with two spellings of
   // the avatar depending on how the identity was linked.
