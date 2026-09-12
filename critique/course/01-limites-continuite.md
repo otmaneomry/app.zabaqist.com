@@ -321,7 +321,7 @@ $f$ lorsqu'on passe à $f^{-1}$ ?
   "coords": [-4, 4, -4, 4],
   "commands": [
     "f(x) = x / (1 + abs(x))",
-    "g(x) = x / (1 - abs(x))",
+    "g(x) = If(abs(x) < 1, x / (1 - abs(x)))",
     "h(x) = x"
   ],
   "style": {
@@ -343,9 +343,7 @@ Toute fonction $f$ continue et strictement monotone sur un intervalle $I$ réali
 
 On a alors : $(\forall x \in I) (\forall y \in f(I)) : y = f(x) \Leftrightarrow x = f^{-1}(y)$
 
-et : $(\forall x \in I) f^{-1} \text{ of } (x) = x$ ; $(\forall y \in f(I)) \text{ for } f^{-1}(y) = y$
-
-COMPRÉES NÉCHÉÂTRE
+et : $(\forall x \in I)\ (f^{-1} \circ f)(x) = x$ ; $(\forall y \in f(I))\ (f \circ f^{-1})(y) = y$
 
 ## Cours
 ### 1. Limite d'une fonction en un point
