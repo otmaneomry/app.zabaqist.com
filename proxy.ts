@@ -128,6 +128,16 @@ export const config = {
    * Everything except API routes, the OAuth callback, Next internals, and
    * anything with a file extension (favicon, images, robots.txt).
    *
+   * The second pattern exists because the first one is not enough. Excluding
+   * every path containing a dot is what lets `/og.png` through without a
+   * session — but `[courseId]` matches a dot too, so `/fr/courses/x.txt`
+   * skipped the gate and answered a signed-out visitor with 200 and the whole
+   * course shell, while `/fr/courses/limites-et-continuite` correctly
+   * redirected. Static assets are served from `public/` at the root and never
+   * carry a locale prefix, so running the proxy on everything under one is
+   * safe and closes the hole. Keep the locales here in step with
+   * `i18n/routing.ts`: a matcher has to be a literal, so it cannot read them.
+   *
    * `auth` has to be excluded, not merely allow-listed in PUBLIC. next-intl
    * runs before the gate and does not recognise `auth` as a locale, so it
    * rewrote `/auth/callback` to `/fr/auth/callback` — a path with no route
@@ -136,5 +146,5 @@ export const config = {
    * has no interface to translate and no session to check, since exchanging
    * the code is what creates one.
    */
-  matcher: '/((?!api|auth|_next|_vercel|.*\\..*).*)',
+  matcher: ['/((?!api|auth|_next|_vercel|.*\\..*).*)', '/(fr|ar)/:path*'],
 }

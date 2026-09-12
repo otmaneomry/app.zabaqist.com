@@ -45,19 +45,24 @@ export default function SyncProvider({
     let cancelled = false
 
     ;(async () => {
+      let complete = false
       try {
-        const changed = await pullAll(userId)
+        const result = await pullAll(userId)
         if (cancelled) return
+        complete = result.complete
         // Tell the interface to re-read: cards, the dashboard and the header
         // all listen already.
-        if (changed)
+        if (result.changed)
           for (const e of SYNC_EVENTS) window.dispatchEvent(new Event(e))
       } catch {
         /* offline, or RLS said no — the device copy still works */
       } finally {
         pulling.current = false
-        // Send whatever this device had before it knew about the account.
-        if (!cancelled) void pushAll(userId, email)
+        // Send whatever this device had before it knew about the account — but
+        // only if the pull actually finished. Pushing after a partial pull
+        // hands the server this device's unmerged copy and deletes the rows the
+        // pull failed to read.
+        if (!cancelled && complete) void pushAll(userId, email)
       }
     })()
 

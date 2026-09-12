@@ -34,12 +34,15 @@ export default function CourseProgressCard({
   activeId,
   viewIds,
   xpByView,
+  cpsByView,
   markVisited = true,
 }: {
   slug: string
   activeId: string
   viewIds: string[]
   xpByView: Record<string, number>
+  /** Checkpoints per view, so a view's XP is shared rather than paid per one. */
+  cpsByView?: Record<string, number>
   /**
    * Whether being on this page counts as having READ `activeId`.
    *
@@ -61,7 +64,7 @@ export default function CourseProgressCard({
 
   const refresh = useCallback(() => {
     const seen = getCourseProgress(slug)?.completedTabs ?? []
-    setTotals(chapterTotals(slug, idsKey.split(','), xpByView, seen))
+    setTotals(chapterTotals(slug, idsKey.split(','), xpByView, seen, cpsByView))
     setTimeSpent(getFormattedTimeSpent(slug))
     // xpByView is rebuilt each render but keyed by idsKey.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,7 +76,7 @@ export default function CourseProgressCard({
     if (markVisited) markTabCompleted(slug, activeId)
     // Only this page knows the chapter's sections and what each is worth;
     // the home and landing pages read it back from here.
-    rememberCourseShape(slug, xpByView)
+    rememberCourseShape(slug, xpByView, cpsByView)
     refresh()
   }, [slug, activeId, idsKey, markVisited, refresh])
 

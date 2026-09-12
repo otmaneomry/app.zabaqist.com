@@ -11,6 +11,7 @@ import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { E2E_COOKIE } from '@/lib/e2e'
+import { safeInternalPath } from '@/lib/safePath'
 import { routing } from '@/i18n/routing'
 import { createClient } from '@/lib/supabase/server'
 
@@ -21,7 +22,7 @@ import { createClient } from '@/lib/supabase/server'
  * unchecked value is an open redirect reached through a real sign-in page.
  */
 export async function signInWithGoogle(next?: string) {
-  const safe = next && /^\/(?!\/)/.test(next) ? next : '/home'
+  const safe = safeInternalPath(next)
 
   let supabase
   try {

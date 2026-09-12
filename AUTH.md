@@ -243,8 +243,15 @@ fonctionner sans réseau. Ce que la synchronisation change, c'est le statut de
 
 La progression ne fait que croître — une section lue reste lue, un checkpoint
 tenté reste tenté, les secondes s'accumulent. Prendre l'union des ensembles et
-le plus grand de chaque nombre **ne peut pas perdre de travail**, et n'exige
-aucun accord d'horloge entre un téléphone et un ordinateur.
+le plus grand de chaque nombre **ne peut pas perdre une section ni un
+checkpoint**, et n'exige aucun accord d'horloge entre un téléphone et un
+ordinateur.
+
+La limite est assumée : les compteurs cumulatifs (secondes lues, tallies
+quotidiens) s'additionnent, et le maximum de deux totaux n'est pas leur somme.
+Deux appareils partis de 100 s et ayant lu 20 s et 30 s hors ligne se
+rejoignent à 130 et non à 150. Ce qui est en jeu est une statistique de
+lecture, pas le travail de l'élève.
 
 « Le dernier gagne » laisserait un onglet resté ouvert toute la nuit effacer une
 matinée de lecture — la seule panne qu'un élève ne pardonnerait pas et ne

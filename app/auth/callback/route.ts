@@ -19,6 +19,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server'
 
+import { safeInternalPath } from '@/lib/safePath'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next')
   // An internal path or nothing: an unchecked value here is an open redirect,
   // and it would be reached through a genuine Zabaqist sign-in.
-  const to = next && /^\/(?!\/)/.test(next) ? next : '/home'
+  const to = safeInternalPath(next)
 
   if (!code) return NextResponse.redirect(`${origin}/signin?error=1`)
 

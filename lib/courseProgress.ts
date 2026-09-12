@@ -99,6 +99,7 @@ export function chapterTotals(
   viewIds: string[],
   xpByView: Record<string, number>,
   visited: string[],
+  cpsByView?: Record<string, number>,
 ): ChapterTotals {
   const known = new Set(viewIds)
   let xp = 0
@@ -115,7 +116,13 @@ export function chapterTotals(
         const state = readCheckpoint(key)
         if (!state.tried) continue
         attempted += 1
-        xp += xpFor(xpByView[viewId] ?? 0, state.hints)
+        // A view's XP is what the view is worth, not what each of its
+        // checkpoints is worth. Crediting the whole view per checkpoint paid 48
+        // for a ten-XP view with four of them, and the chapter card advertises
+        // the sum of the view XP.
+        const n = cpsByView?.[viewId]
+        const share = n && n > 1 ? (xpByView[viewId] ?? 0) / n : xpByView[viewId] ?? 0
+        xp += xpFor(share, state.hints)
       }
     } catch {
       /* storage unavailable — report the zero state, which is honest */
@@ -158,6 +165,7 @@ const readShapes = (): Shapes => {
 export function rememberCourseShape(
   slug: string,
   xpByView: Record<string, number>,
+  cpsByView?: Record<string, number>,
 ): void {
   if (typeof window === 'undefined') return
   try {
@@ -165,11 +173,55 @@ export function rememberCourseShape(
     const ids = Object.keys(xpByView)
     // Cheap equality: same count and same total is the same chapter.
     const prev = all[slug]
-    if (prev && Object.keys(prev).length === ids.length) return
+    if (prev && Object.keys(prev).length === ids.length) {
+      if (cpsByView) rememberCheckpointCounts(slug, cpsByView)
+      return
+    }
     all[slug] = xpByView
     localStorage.setItem(SHAPE_KEY, JSON.stringify(all))
+    if (cpsByView) rememberCheckpointCounts(slug, cpsByView)
   } catch {
     /* storage unavailable — the cards just show no percentage */
+  }
+}
+
+/**
+ * How many checkpoints each view holds.
+ *
+ * Kept beside the shape rather than inside it: the shape is what the dashboard
+ * already has stored on thousands of devices, and widening its value from a
+ * number to an object would make every one of those unreadable.
+ */
+const CPS_KEY = 'zabaqist:course-checkpoints'
+
+function rememberCheckpointCounts(
+  slug: string,
+  cpsByView: Record<string, number>,
+): void {
+  try {
+    const all = JSON.parse(localStorage.getItem(CPS_KEY) ?? '{}') as Record<
+      string,
+      Record<string, number>
+    >
+    all[slug] = cpsByView
+    localStorage.setItem(CPS_KEY, JSON.stringify(all))
+  } catch {
+    /* the totals simply fall back to one checkpoint per view */
+  }
+}
+
+export function readCheckpointCounts(
+  slug: string,
+): Record<string, number> | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const all = JSON.parse(localStorage.getItem(CPS_KEY) ?? '{}') as Record<
+      string,
+      Record<string, number>
+    >
+    return all[slug] ?? null
+  } catch {
+    return null
   }
 }
 
@@ -192,7 +244,13 @@ export function totalXp(slugs: string[]): number {
     const shape = readCourseShape(slug)
     if (!shape) continue
     const visited = getCourseProgress(slug)?.completedTabs ?? []
-    sum += chapterTotals(slug, Object.keys(shape), shape, visited).xp
+    sum += chapterTotals(
+      slug,
+      Object.keys(shape),
+      shape,
+      visited,
+      readCheckpointCounts(slug) ?? undefined,
+    ).xp
   }
   return sum
 }

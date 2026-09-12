@@ -20,12 +20,10 @@ import { useTranslations } from 'next-intl'
 import FilierePicker from '@/components/filiere/FilierePicker'
 import Logo from '@/components/landing/Logo'
 import { useRouter } from '@/i18n/navigation'
+import { safeInternalPath } from '@/lib/safePath'
 
 /** An in-app destination, or `/home`. Anything else is refused. */
-function safeNext(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/home'
-  return raw
-}
+const safeNext = (raw: string | null) => safeInternalPath(raw)
 
 export default function FilierePage() {
   const t = useTranslations('auth')

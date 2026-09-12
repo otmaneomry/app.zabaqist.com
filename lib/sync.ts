@@ -15,9 +15,15 @@
  * Union and maximum, never last-write-wins.
  *
  * Learning progress only ever grows: a section read stays read, a checkpoint
- * attempted stays attempted, seconds spent accumulate. So merging by taking the
- * union of the sets and the larger of each number cannot lose work, and needs
- * no clock agreement between a phone and a laptop. Last-write-wins would let a
+ * attempted stays attempted. Merging by taking the union of the sets and the
+ * larger of each number cannot lose a section or a checkpoint, and needs no
+ * clock agreement between a phone and a laptop.
+ *
+ * It DOES undercount the cumulative counters: seconds and the daily tallies are
+ * additive, and the maximum of two totals is not their sum. Two devices that
+ * both start at 100 and read 20 and 30 offline meet at 130, not 150. Counting
+ * exactly would need a per-device delta; what is at stake is a reading
+ * statistic rather than the student's work. Last-write-wins would let a
  * stale tab left open overnight quietly erase a morning's reading — the one
  * failure a student would never forgive and never be able to report precisely.
  */
@@ -40,6 +46,8 @@ const ACTIVITY_KEY = 'zabaqist:activity'
 const FILIERE_KEY = 'zabaqist:filiere'
 const ONBOARDING_KEY = 'zabaqist:onboarding'
 const PROGRESS_EVENT = 'zabaqist:progress'
+/** When this device last completed a pull. Used to date-order drafts. */
+const PULLED_AT_KEY = 'zabaqist:pulled-at'
 
 /** Every event a store fires when it changes something worth keeping. */
 export const SYNC_EVENTS = [
@@ -62,11 +70,17 @@ function readJSON<T>(key: string, fallback: T): T {
   }
 }
 
-function writeJSON(key: string, value: unknown): void {
+/** True when the value actually landed. Quota and private mode both throw. */
+function writeJSON(key: string, value: unknown): boolean {
   try {
     localStorage.setItem(key, JSON.stringify(value))
+    return true
   } catch {
-    /* quota or private mode — the server copy is still authoritative */
+    // The caller has to know. This used to be swallowed, and `pullAll` then
+    // reported success — after which `pushAll` read the UNMERGED local value
+    // and wrote it over the server's, deleting whatever the pull had just
+    // fetched. A write that did not happen cannot be followed by a push.
+    return false
   }
 }
 
@@ -109,13 +123,40 @@ const cpKey = (c: string, v: string, i: number) => `${CP_PREFIX}${c}:${v}:${i}`
 /* Pull — the server's copy, merged into this device                   */
 /* ------------------------------------------------------------------ */
 
+/** What a pull managed to do. */
+export interface PullResult {
+  /** Something on this device changed, so the interface should re-read. */
+  changed: boolean
+  /**
+   * Every read AND every write succeeded. When false this device is not
+   * current, and pushing would overwrite the server with a stale copy.
+   */
+  complete: boolean
+}
+
+/** Which of two drafts to keep. Local wins ties: it is what the reader sees. */
+function pickDraft(local: string, remote: string | null, remoteAt?: string | null): string {
+  if (!remote) return local
+  if (!local) return remote
+  // A device that has not pulled since `remoteAt` cannot have a newer draft.
+  const seen = localStorage.getItem(PULLED_AT_KEY)
+  if (remoteAt && seen && remoteAt > seen) return remote
+  return local
+}
+
 /**
- * Read everything back and merge it in. Returns true when anything changed, so
- * the caller knows whether to tell the interface to re-read.
+ * Read everything back and merge it in.
  */
-export async function pullAll(userId: string): Promise<boolean> {
+export async function pullAll(userId: string): Promise<PullResult> {
   const supabase = createClient()
   let changed = false
+  let complete = true
+
+  /** A failed merge — network or storage — means this device is not current. */
+  const kept = (ok: boolean) => {
+    if (!ok) complete = false
+    return ok
+  }
 
   const [profile, progress, checkpoints, activity] = await Promise.all([
     supabase.from('profiles').select('filiere, track, onboarding').eq('id', userId).maybeSingle(),
@@ -124,14 +165,20 @@ export async function pullAll(userId: string): Promise<boolean> {
     supabase.from('activity').select('*').eq('user_id', userId),
   ])
 
+  // A select that FAILED looks exactly like one that found nothing: both leave
+  // `.data` empty. Merging nothing and then pushing would hand the server this
+  // device's stale copy as the truth, so a failed read has to be recorded.
+  for (const r of [profile, progress, checkpoints, activity])
+    if (r.error) complete = false
+
   // ── Filière and the funnel's answers.
   if (profile.data) {
     const { filiere, track, onboarding } = profile.data
     // Only adopt the remote choice when this device has none: a student who
     // just switched filière here should not have it undone by a stale row.
     if (filiere && track && !localStorage.getItem(FILIERE_KEY)) {
-      writeJSON(FILIERE_KEY, { filiere, track } satisfies FiliereChoice)
-      changed = true
+      if (kept(writeJSON(FILIERE_KEY, { filiere, track } satisfies FiliereChoice)))
+        changed = true
     }
     const remote = (onboarding ?? {}) as Answers
     if (Object.keys(remote).length) {
@@ -139,8 +186,7 @@ export async function pullAll(userId: string): Promise<boolean> {
       // The funnel is answered once; keep whichever copy finished it.
       const merged: Answers = { ...remote, ...local }
       if (JSON.stringify(merged) !== JSON.stringify(local)) {
-        writeJSON(ONBOARDING_KEY, merged)
-        changed = true
+        if (kept(writeJSON(ONBOARDING_KEY, merged))) changed = true
       }
     }
   }
@@ -163,7 +209,7 @@ export async function pullAll(userId: string): Promise<boolean> {
       }
       changed = true
     }
-    writeJSON(PROGRESS_KEY, map)
+    kept(writeJSON(PROGRESS_KEY, map))
   }
 
   // ── Checkpoints: the more advanced attempt wins, and it is never "less
@@ -173,14 +219,16 @@ export async function pullAll(userId: string): Promise<boolean> {
     const key = cpKey(row.course_slug, row.view_id, row.idx)
     const local = readJSON<CheckpointState>(key, EMPTY_CHECKPOINT)
     const merged: CheckpointState = {
-      draft: local.draft || row.draft || '',
+      // The NEWER draft, not merely a non-empty local one. `local || row` let a
+      // tab left open for a week overwrite a correction made on the phone this
+      // morning — the stale-tab failure the merge rule exists to prevent.
+      draft: pickDraft(local.draft, row.draft, row.updated_at),
       tried: local.tried || row.tried,
       verdict: local.verdict ?? row.verdict ?? null,
       hints: Math.max(local.hints, row.hints ?? 0),
     }
     if (JSON.stringify(merged) !== JSON.stringify(local)) {
-      writeJSON(key, merged)
-      changed = true
+      if (kept(writeJSON(key, merged))) changed = true
     }
   }
 
@@ -196,10 +244,14 @@ export async function pullAll(userId: string): Promise<boolean> {
       }
       changed = true
     }
-    writeJSON(ACTIVITY_KEY, log)
+    kept(writeJSON(ACTIVITY_KEY, log))
   }
 
-  return changed
+  // What the server was known to hold at this moment, so a later merge can tell
+  // "this device has not seen that row yet" from "this device has a newer one".
+  if (complete) writeJSON(PULLED_AT_KEY, new Date().toISOString())
+
+  return { changed, complete }
 }
 
 /* ------------------------------------------------------------------ */
@@ -214,7 +266,22 @@ export async function pullAll(userId: string): Promise<boolean> {
  * five stores that currently need none. Upserts are idempotent, so a push that
  * fails is simply retried by the next event.
  */
-export async function pushAll(userId: string, email: string): Promise<void> {
+let inFlight: Promise<void> = Promise.resolve()
+
+/**
+ * Queue a push behind any push already running.
+ *
+ * Three callers fire this — the debounce, the end of the initial pull, and the
+ * tab being hidden — and only the first went through a timer. Two could be in
+ * the air at once, and the one that started with the OLDER snapshot could land
+ * second and put the server back.
+ */
+export function pushAll(userId: string, email: string): Promise<void> {
+  inFlight = inFlight.catch(() => {}).then(() => pushNow(userId, email))
+  return inFlight
+}
+
+async function pushNow(userId: string, email: string): Promise<void> {
   const supabase = createClient()
 
   const filiere = readJSON<FiliereChoice | null>(FILIERE_KEY, null)

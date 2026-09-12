@@ -20,6 +20,7 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import Logo from '@/components/landing/Logo'
 import GoogleButton from '@/components/auth/GoogleButton'
+import { safeInternalPath } from '@/lib/safePath'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseConfigError } from '@/lib/supabase/config'
 
@@ -47,7 +48,7 @@ export default async function SignInPage({
     /* signed out, and the button below will say so when clicked */
   }
   // Already signed in: this page has nothing to offer.
-  if (user) redirect(next && /^\/(?!\/)/.test(next) ? next : '/home')
+  if (user) redirect(safeInternalPath(next))
 
   const t = await getTranslations('auth')
   const notAllowed = error === 'not-allowed'

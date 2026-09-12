@@ -42,7 +42,15 @@ export default function Checkpoint({
   const t = useTranslations('course')
   // One state object, not four: hydrating from localStorage would otherwise
   // fire four setStates in a single effect and cascade renders.
-  const [state, setState] = useState<CheckpointState>(EMPTY_CHECKPOINT)
+  // `key` is which storageKey `state` was read from. Without it, moving to
+  // another checkpoint let the persistence effect below write the PREVIOUS
+  // answer under the new key — and since that effect skips empty state, it
+  // never corrected itself: an unvisited checkpoint kept a stranger's draft,
+  // verdict and hints for good.
+  const [state, setState] = useState<CheckpointState & { key: string | null }>({
+    ...EMPTY_CHECKPOINT,
+    key: null,
+  })
   const { draft, tried, verdict, hints } = state
 
   const patch = (p: Partial<CheckpointState>) =>
@@ -50,13 +58,15 @@ export default function Checkpoint({
 
   // localStorage does not exist during SSR, so hydrating can only happen here.
   useEffect(() => {
-    setState(readCheckpoint(storageKey))
+    setState({ ...readCheckpoint(storageKey), key: storageKey })
   }, [storageKey])
 
   useEffect(() => {
+    // Still holding the previous checkpoint's answer, or not yet hydrated.
+    if (state.key !== storageKey) return
     if (!tried && !draft && !verdict && !hints) return
     writeCheckpoint(storageKey, { draft, tried, verdict, hints })
-  }, [storageKey, draft, tried, verdict, hints])
+  }, [storageKey, state.key, draft, tried, verdict, hints])
 
   // Level 3 only exists where the pedagogue wrote a solution to point at.
   const maxHints = hasSolution ? 3 : 2

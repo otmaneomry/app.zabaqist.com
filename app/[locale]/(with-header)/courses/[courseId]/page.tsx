@@ -43,6 +43,7 @@ import SectionPicker from '@/components/course/SectionPicker'
 import ViewHeader from '@/components/course/ViewHeader'
 import LinkButton from '@/components/ui/LinkButton'
 import {
+  checkpointXp,
   courseBySlug,
   courseDescription,
   courseLevel,
@@ -99,7 +100,14 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
   }))
 
   const viewIds = doc.views.map((v) => v.id)
+  // Two different numbers, and conflating them was the bug. `xpByView` is what
+  // each section is WORTH — the chapter card advertises their sum and the
+  // celebration pays it. `cpsByView` is how many checkpoints share that worth,
+  // so a view with four of them does not pay four times over.
   const xpByView = Object.fromEntries(doc.views.map((v) => [v.id, v.xp]))
+  const cpsByView = Object.fromEntries(
+    doc.views.map((v) => [v.id, v.checkpoints]),
+  )
   const totalXp = doc.views.reduce((sum, v) => sum + v.xp, 0)
 
   const t = await getTranslations('course')
@@ -195,6 +203,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
           activeId={view.id}
           viewIds={viewIds}
           xpByView={xpByView}
+          cpsByView={cpsByView}
         />
 
         {/* Course header */}
@@ -272,7 +281,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
                 body={view.body}
                 courseId={courseId}
                 viewId={view.id}
-                baseXp={view.xp}
+                baseXp={checkpointXp(view)}
                 tools={view.tools}
                 dir={doc.meta.contentDir}
               />

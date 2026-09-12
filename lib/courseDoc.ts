@@ -144,7 +144,11 @@ export function slugifyHeading(text: string, seen?: Map<string, number>) {
  * maths, or carrying two `$$…$$` pairs, stays inline on purpose.
  */
 export function normalizeDisplayMath(md: string): string {
-  const whole = /^[ \t]*\$\$((?:(?!\$\$)[\s\S])+?)\$\$[ \t]*$/
+  // The optional `> ` is the whole point of the first group. Sixteen of the
+  // logarithm chapter's boxed identities are authored inside a blockquote, and
+  // a pattern anchored without it left every one of them as a remark-math
+  // `inlineMath` node — ln(ab) = ln a + ln b, set in running text.
+  const whole = /^([ \t]*(?:> ?)*)\$\$((?:(?!\$\$)[\s\S])+?)\$\$[ \t]*$/
   let inFence = false
   return md
     .split('\n')
@@ -152,7 +156,11 @@ export function normalizeDisplayMath(md: string): string {
       if (line.startsWith('```')) inFence = !inFence
       if (inFence) return line
       const m = whole.exec(line)
-      return m?.[1] ? `$$\n${m[1].trim()}\n$$` : line
+      if (!m?.[2]) return line
+      // Carry the prefix onto all three lines: `> $$` / `> body` / `> $$` is
+      // one blockquote holding one display formula, which is what was meant.
+      const quote = m[1]
+      return `${quote}$$\n${quote}${m[2].trim()}\n${quote}$$`
     })
     .join('\n')
 }
@@ -395,6 +403,18 @@ export function tabsOf(views: View[]): CourseTab[] {
 }
 
 /** Full breadcrumb for a section: the `##` it came from, then its headings. */
+/**
+ * A view's XP, split between the checkpoints that can earn it.
+ *
+ * `chapterTotals` credited the WHOLE view to every checkpoint in it, and
+ * `xpFor` adds 20% for solving without a hint: the four checkpoints in the
+ * logarithm chapter's ten-XP exercises view paid 48. The chapter card
+ * advertises the sum of the view XP, and the completion celebration pays that
+ * sum, so a running total above it makes the two disagree.
+ */
+export const checkpointXp = (view: Pick<View, 'xp' | 'checkpoints'>): number =>
+  view.checkpoints > 1 ? view.xp / view.checkpoints : view.xp
+
 export const viewLabel = (view: Pick<View, 'parent' | 'titles'>): string =>
   [view.parent, ...view.titles].filter(Boolean).join(' · ') || 'Section'
 

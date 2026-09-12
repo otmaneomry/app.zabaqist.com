@@ -47,6 +47,14 @@ For each finding:
 Check the claim against this repo's own conventions too. A finding that argues against a
 deliberate pattern here is a rejection, not a defect.
 
+**Where Codex is strong, and where it is not.** Measured on a full-codebase review of this repo:
+it was right about every claim it made on the auth boundary, the sync layer, the SQL and the
+markdown pipeline — including a live gate bypass and an open redirect. It was wrong about both
+claims it made on React and Next.js framework behaviour, each time asserting that a build would
+fail when that build had already passed. So weight a React or Next finding lower than the rest,
+and settle it by running the thing — `npm run check`, `npm run build`, `npm run test:course` —
+rather than by reasoning about the framework.
+
 ## 3. Report
 
 Most severe first, capped at five. For each surviving finding:
