@@ -104,6 +104,10 @@ export default function DemarrerPage() {
   // abandons at step 5 should not lose the four answers before it.
   const commitAndGo = useCallback(() => {
     if (step.id === 'motivation' && motivation) saveAnswers({ motivation })
+    // Its own step, not only the option step after it. The filière was written
+    // once `track` existed, so a reader who chose SM and then closed the tab
+    // had chosen nothing at all as far as the next visit was concerned.
+    if (step.id === 'filiere' && filiere) saveAnswers({ filiere })
     if (step.id === 'option' && track) {
       saveFiliere(track)
       saveAnswers({ track, filiere: filiere ?? undefined })

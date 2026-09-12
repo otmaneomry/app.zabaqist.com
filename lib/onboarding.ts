@@ -81,7 +81,14 @@ export const ONBOARDING_EVENT = 'zabaqist:onboarding'
 export function readAnswers(): Answers {
   if (typeof window === 'undefined') return {}
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '{}') as Answers
+    const raw: unknown = JSON.parse(localStorage.getItem(KEY) ?? '{}')
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
+    // Anything can be written to `localStorage`, and `/demarrer` is a public
+    // page: a stored `filiere` of "invalid" used to reach `chaptersOf` and
+    // return undefined to a caller about to index it.
+    const a = raw as Answers
+    if (a.filiere && a.filiere !== 'sm' && a.filiere !== 'sx') delete a.filiere
+    return a
   } catch {
     return {}
   }

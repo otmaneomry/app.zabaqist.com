@@ -90,17 +90,6 @@ export const CHAPTERS_SX: ChapterMeta[] = [
   },
   {
     n: 2,
-    slug: 'derivation-etude-fonctions',
-    title: 'Dérivation et étude des fonctions',
-    titleAr: 'الاشتقاق ودراسة الدوال',
-    semester: 1,
-    priority: 'coeur',
-    objective:
-      'Étudier complètement une fonction et tracer sa courbe, du domaine aux asymptotes.',
-    objectiveAr: 'دراسة دالة دراسة كاملة ورسم منحناها، من المجال إلى المقاربات.',
-  },
-  {
-    n: 3,
     slug: 'suites-numeriques',
     title: 'Suites numériques',
     titleAr: 'المتتاليات العددية',
@@ -109,6 +98,22 @@ export const CHAPTERS_SX: ChapterMeta[] = [
     objective:
       "Étudier des grandeurs définies pas à pas et leur comportement à l'infini.",
     objectiveAr: 'دراسة مقادير مُعرَّفة خطوة بخطوة، وسلوكها بجوار ما لا نهاية.',
+  },
+  {
+    // Suites before Dérivation: the dérivation chapter lists "Suites numériques
+    // et raisonnement par récurrence" in its own `## Prérequis`. `listCourses`
+    // was corrected when the source content arrived; this list was not, so a
+    // Sciences Exp student saw Dérivation as chapter 2 in the programme and
+    // Suites as chapter 2 in the catalogue.
+    n: 3,
+    slug: 'derivation-etude-fonctions',
+    title: 'Dérivation et étude des fonctions',
+    titleAr: 'الاشتقاق ودراسة الدوال',
+    semester: 1,
+    priority: 'coeur',
+    objective:
+      'Étudier complètement une fonction et tracer sa courbe, du domaine aux asymptotes.',
+    objectiveAr: 'دراسة دالة دراسة كاملة ورسم منحناها، من المجال إلى المقاربات.',
   },
   {
     n: 4,
@@ -144,8 +149,16 @@ export const CHAPTERS_SX: ChapterMeta[] = [
     objectiveAr: 'الدالة العكسية لـ ln، حاضرة في كل نمذجة (فيزياء، بيولوجيا).',
   },
   {
+    // `nombres-complexes-sx`, and deliberately not `nombres-complexes`: the
+    // written document is the SM version, marked `['sm']` in the catalogue
+    // because Sciences Exp studies a lighter chapter of its own. Reusing the
+    // SM slug meant the catalogue hid the chapter while the programme linked
+    // straight to it, and an SVT student clicking chapter 7 was handed 34
+    // sections of the Sciences Maths syllabus. With a slug of its own it falls
+    // back to "cours en développement", like the three other SX chapters that
+    // have not been written yet — which is the truth.
     n: 7,
-    slug: 'nombres-complexes',
+    slug: 'nombres-complexes-sx',
     title: 'Nombres complexes',
     titleAr: 'الأعداد العقدية',
     semester: 2,
@@ -338,7 +351,16 @@ export const PROGRAMMES: Record<Filiere, ChapterMeta[]> = {
   sm: CHAPTERS_SM,
 }
 
-export const chaptersOf = (f: Filiere): ChapterMeta[] => PROGRAMMES[f]
+/**
+ * Total by construction.
+ *
+ * `PROGRAMMES[f]` for anything that is not a filière is `undefined`, and every
+ * caller goes straight on to `.map` or `.findIndex`. The argument reaches here
+ * from `localStorage`, which is to say from a value anyone can set, and
+ * `/demarrer` is a public page.
+ */
+export const chaptersOf = (f: Filiere): ChapterMeta[] =>
+  PROGRAMMES[f] ?? PROGRAMMES.sx
 
 export const chaptersOfSemester = (f: Filiere, s: Semester) =>
   chaptersOf(f).filter((c) => c.semester === s)

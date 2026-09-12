@@ -29,6 +29,11 @@ export function siteUrl(): string {
     return FALLBACK
   }
 
+  // `new URL` is happy with `mailto:` and `javascript:`; their `origin` is the
+  // string "null", which would be concatenated into every canonical tag and
+  // then thrown at `new URL()` by the layout's metadataBase.
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return FALLBACK
+
   if (isLocal(url.origin) && process.env.NODE_ENV === 'production') return FALLBACK
 
   // Trailing slashes double up when paths are appended.

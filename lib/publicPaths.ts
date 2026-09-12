@@ -12,8 +12,23 @@
  * is not to open them. It is to stop claiming they are open.
  */
 
-/** Paths reachable without a session, WITHOUT a locale prefix. */
-export const PUBLIC_PATHS = ['/', '/signin', '/signup'] as const
+/**
+ * Paths reachable without a session, WITHOUT a locale prefix.
+ *
+ * `/demarrer` is here because the funnel's entire premise is that it runs
+ * before there is an account — "sans chrome, sans sortie, et sans jamais
+ * demander de compte". It was gated anyway, so the landing page's own primary
+ * call to action answered a visitor with a redirect to a sign-in for a beta
+ * they cannot join.
+ *
+ * It exposes nothing new: `PlanReveal` renders `chaptersOf(filiere)`, the same
+ * chapter titles `components/landing/ChapterPath.tsx` already shows on `/`.
+ * The chapters themselves stay gated, so finishing the funnel still lands on
+ * `/signin` — which is the conversion the funnel exists to earn, and `next=`
+ * carries the reader back. `app/robots.ts` already disallows it, so opening it
+ * to a visitor does not offer it to a crawler.
+ */
+export const PUBLIC_PATHS = ['/', '/signin', '/signup', '/demarrer'] as const
 
 /**
  * The subset worth indexing.
