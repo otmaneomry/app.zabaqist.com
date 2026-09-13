@@ -189,14 +189,15 @@ export interface PullResult {
   complete: boolean
 }
 
-/** Which of two drafts to keep. Local wins ties: it is what the reader sees. */
-function pickDraft(local: string, remote: string | null, remoteAt?: string | null): string {
-  if (!remote) return local
-  if (!local) return remote
-  // A device that has not pulled since `remoteAt` cannot have a newer draft.
-  const seen = localStorage.getItem(PULLED_AT_KEY)
-  if (remoteAt && seen && remoteAt > seen) return remote
-  return local
+/** True when the server's row was written after this device last pulled. */
+function remoteIsNewer(remoteAt?: string | null): boolean {
+  if (!remoteAt) return false
+  try {
+    const seen = localStorage.getItem(PULLED_AT_KEY)
+    return !!seen && remoteAt > seen
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -273,13 +274,16 @@ export async function pullAll(userId: string): Promise<PullResult> {
   for (const row of checkpoints.data ?? []) {
     const key = cpKey(row.course_slug, row.view_id, row.idx)
     const local = readJSON<CheckpointState>(key, EMPTY_CHECKPOINT)
+    // `tried`, `verdict` and `draft` are the CURRENT attempt, not a total.
+    // "Réessayer" clears all three on purpose — reprise illimitée — so folding
+    // them with `local || row` resurrected the failed attempt the moment an
+    // older row came back from another device. The date decides instead.
+    const fresher = remoteIsNewer(row.updated_at)
     const merged: CheckpointState = {
-      // The NEWER draft, not merely a non-empty local one. `local || row` let a
-      // tab left open for a week overwrite a correction made on the phone this
-      // morning — the stale-tab failure the merge rule exists to prevent.
-      draft: pickDraft(local.draft, row.draft, row.updated_at),
-      tried: local.tried || row.tried,
-      verdict: local.verdict ?? row.verdict ?? null,
+      draft: fresher ? (row.draft ?? '') : local.draft || row.draft || '',
+      tried: fresher ? !!row.tried : local.tried || row.tried,
+      verdict: fresher ? (row.verdict ?? null) : (local.verdict ?? row.verdict ?? null),
+      // The one that only grows: the XP penalty already paid.
       hints: Math.max(local.hints, row.hints ?? 0),
     }
     if (JSON.stringify(merged) !== JSON.stringify(local)) {
