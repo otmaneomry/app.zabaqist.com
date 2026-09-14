@@ -12,6 +12,7 @@
  */
 
 import React from 'react'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
@@ -19,6 +20,27 @@ import SelfCheck from '@/components/quiz/SelfCheck'
 import { Link } from '@/i18n/navigation'
 import { courseTitle, listCourses, type ContentLocale } from '@/lib/courseCatalog'
 import { loadCourseDoc } from '@/lib/courseDoc'
+import { alternatesFor } from '@/lib/publicPaths'
+
+/**
+ * The canonical names THIS self-assessment, not the homepage.
+ *
+ * `quizId` is spelled here exactly as the reader asked for it, numeric aliases
+ * included: `/quiz/1` and `/quiz/limites-et-continuite` render the same page,
+ * so the one a crawler was given is the one it is told to keep. Resolving the
+ * alias to the slug would have two URLs each claiming to be canonical for the
+ * other's content.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ quizId: string; locale: string }>
+}): Promise<Metadata> {
+  const { quizId, locale } = await params
+  return {
+    alternates: alternatesFor(`/quiz/${quizId}`, locale === 'ar' ? 'ar' : 'fr'),
+  }
+}
 
 export default async function QuizPage({
   params,

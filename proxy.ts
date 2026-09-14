@@ -111,8 +111,20 @@ export default async function proxy(req: NextRequest) {
 
   // Send them to sign in, remembering where they were headed so the round trip
   // through Google lands on the page they actually asked for.
+  //
+  // In the reader's OWN language. `/signin` unprefixed is the French page, so
+  // an Arabic reader turned away from `/ar/progres` landed in French whenever
+  // the NEXT_LOCALE cookie was absent — a shared link, a stripped jar, a first
+  // visit. The locale is already in the path they asked for; keep it.
+  const locale = routing.locales.find(
+    (l) =>
+      req.nextUrl.pathname === `/${l}` ||
+      req.nextUrl.pathname.startsWith(`/${l}/`),
+  )
   const url = req.nextUrl.clone()
-  url.pathname = '/signin'
+  url.pathname = locale && locale !== routing.defaultLocale
+    ? `/${locale}/signin`
+    : '/signin'
   url.search = ''
   url.searchParams.set('next', req.nextUrl.pathname)
   const redirect = NextResponse.redirect(url)

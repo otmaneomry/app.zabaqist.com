@@ -1,11 +1,38 @@
 import React from 'react'
+import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 
 import CourseCatalog from '@/components/course/CourseCatalog'
+import { alternatesFor } from '@/lib/publicPaths'
+import type { ContentLocale } from '@/lib/courseCatalog'
 
-export const metadata = {
-  title: 'Cours · Zabaqist',
-  description:
-    'Chapitres de mathématiques du programme du Baccalauréat Marocain.',
+/**
+ * The catalogue, described in the language it is served in.
+ *
+ * This was a hardcoded French `export const metadata`, so `/ar/courses` — a
+ * page whose body, chapter titles and chrome are all Arabic — announced itself
+ * to a crawler and to anyone sharing the link as "Cours · Zabaqist". A static
+ * object cannot read the locale; `generateMetadata` can, and the strings it
+ * needs are the ones `CourseCatalog` already renders as its own heading.
+ *
+ * `alternates` is set for the same reason the chapters set theirs: the root
+ * layout's belongs to the root page, and Next merges metadata shallowly, so
+ * inheriting it made this page claim the homepage as its canonical URL.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const l: ContentLocale = locale === 'ar' ? 'ar' : 'fr'
+  const t = await getTranslations({ locale: l, namespace: 'catalog' })
+
+  return {
+    title: `${t('title')} · Zabaqist`,
+    description: t('sub'),
+    alternates: alternatesFor('/courses', l),
+  }
 }
 
 /**

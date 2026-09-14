@@ -11,10 +11,11 @@
  *     welcome → ask → GIVE → ask → ask → GIVE → ask → reveal
  *
  * The step lives in the URL (`?e=`) so the browser's back button works and a
- * half-finished funnel is resumable.
+ * half-finished funnel is resumable — which is why the funnel itself sits
+ * behind a Suspense boundary. See `DemarrerPage` at the foot of the file.
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
@@ -58,17 +59,16 @@ const FILIERE_EXAMPLE: Record<Filiere, string> = {
   sx: '\\lim_{x \\to 0} \\dfrac{\\sin x}{x} = 1',
 }
 
-export default function DemarrerPage() {
+/** The step `?e=` names, clamped to one that exists. 0 when it names nothing. */
+const stepIndex = (raw: string | null) =>
+  Math.min(Math.max(Number(raw ?? 0) || 0, 0), STEPS.length - 1)
+
+function Funnel({ index }: { index: number }) {
   const t = useTranslations('onboarding')
   const a = useTranslations('auth')
   const router = useRouter()
   const localeRouter = useLocaleRouter()
-  const params = useSearchParams()
 
-  const index = Math.min(
-    Math.max(Number(params.get('e') ?? 0) || 0, 0),
-    STEPS.length - 1,
-  )
   const step = stepAt(index)
 
   const [motivation, setMotivation] = useState<Motivation | null>(null)
@@ -323,5 +323,38 @@ export default function DemarrerPage() {
         onClick={commitAndGo}
       />
     </>
+  )
+}
+
+/** The funnel at the step the URL names. */
+function FunnelAtUrlStep() {
+  const params = useSearchParams()
+  return <Funnel index={stepIndex(params.get('e'))} />
+}
+
+/**
+ * `useSearchParams` needs a Suspense boundary above it, and there was not one
+ * anywhere in the app.
+ *
+ * In a production build a static page that calls `useSearchParams` from a
+ * Client Component must be wrapped in one or the build FAILS — see the
+ * "Prerendering" section of node_modules/next/dist/docs/01-app/
+ * 03-api-reference/04-functions/use-search-params.md ("During production
+ * builds, a static page that calls `useSearchParams` from a Client Component
+ * must be wrapped in a `Suspense` boundary"). Nothing in this app prerenders
+ * today, which is the only reason the build has been passing; the day one route
+ * goes static this was a build break waiting on a public path — `/demarrer` is
+ * the landing page's primary call to action.
+ *
+ * The fallback is the step the funnel shows before it has read anything: the
+ * welcome screen, index 0. Not a spinner and not nothing — a reader arriving at
+ * `/demarrer` with no `?e=` is at step 0, so the prerendered HTML is already
+ * the right screen and the hydrated one only differs for someone resuming.
+ */
+export default function DemarrerPage() {
+  return (
+    <Suspense fallback={<Funnel index={0} />}>
+      <FunnelAtUrlStep />
+    </Suspense>
   )
 }

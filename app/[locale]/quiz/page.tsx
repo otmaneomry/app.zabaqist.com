@@ -16,13 +16,25 @@ import React from 'react'
 import { getTranslations } from 'next-intl/server'
 
 import BackLink from '@/components/quiz/BackLink'
+import { alternatesFor } from '@/lib/publicPaths'
 import RevisionPlan, { type ChapterCheck } from '@/components/quiz/RevisionPlan'
 import { listCourses } from '@/lib/courseCatalog'
 import { loadCourseDoc } from '@/lib/courseDoc'
 
-export async function generateMetadata() {
-  const t = await getTranslations('revision')
-  return { title: t('title'), description: t('metaDescription') }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const l = locale === 'ar' ? 'ar' : 'fr'
+  const t = await getTranslations({ locale: l, namespace: 'revision' })
+
+  return {
+    title: t('title'),
+    description: t('metaDescription'),
+    alternates: alternatesFor('/quiz', l),
+  }
 }
 
 export default async function RevisionPage() {

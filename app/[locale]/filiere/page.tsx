@@ -12,7 +12,7 @@
  * a URL, so it cannot be used to bounce someone off-site.
  */
 
-import React from 'react'
+import React, { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Card, Container, Stack, Text, Title } from '@mantine/core'
 import { useTranslations } from 'next-intl'
@@ -22,13 +22,24 @@ import Logo from '@/components/landing/Logo'
 import { useRouter } from '@/i18n/navigation'
 import { safeInternalPath } from '@/lib/safePath'
 
+/** Where the picker goes when `?next=` says nothing usable. */
+const DEFAULT_NEXT = '/home'
+
 /** An in-app destination, or `/home`. Anything else is refused. */
-const safeNext = (raw: string | null) => safeInternalPath(raw)
+const safeNext = (raw: string | null) => safeInternalPath(raw, DEFAULT_NEXT)
+
+function Picker({ next }: { next: string }) {
+  const router = useRouter()
+  return <FilierePicker onDone={() => router.push(next)} />
+}
+
+function PickerAtUrlDestination() {
+  const next = safeNext(useSearchParams().get('next'))
+  return <Picker next={next} />
+}
 
 export default function FilierePage() {
   const t = useTranslations('auth')
-  const router = useRouter()
-  const next = safeNext(useSearchParams().get('next'))
 
   return (
     <main className="min-h-dvh bg-zb-cream font-display text-zb-ink">
@@ -42,7 +53,22 @@ export default function FilierePage() {
             <Text size="sm" c="dimmed" mb="lg">
               {t('pickSub')}
             </Text>
-            <FilierePicker onDone={() => router.push(next)} />
+            {/* `useSearchParams` needs a Suspense boundary above it or a
+                production build of a static page FAILS — see the "Prerendering"
+                section of node_modules/next/dist/docs/01-app/03-api-reference/
+                04-functions/use-search-params.md. Nothing in this app
+                prerenders today, which is the only reason the build has been
+                passing; the boundary is what stops that from being a build
+                break the day a route goes static.
+
+                Only the picker is inside it, because only the picker needs the
+                URL. The heading and the card render on the server either way,
+                and the fallback is the same picker wired to the same `/home`
+                the component itself falls back to — the zero state, not a
+                spinner, so nothing moves when the URL arrives. */}
+            <Suspense fallback={<Picker next={DEFAULT_NEXT} />}>
+              <PickerAtUrlDestination />
+            </Suspense>
           </Card>
         </Stack>
       </Container>

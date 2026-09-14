@@ -57,9 +57,16 @@ export default async function WithHeaderLayout({
       // The callback is the door: refusing there costs an invited student one
       // retry, and they are told why. This runs on every page of a session
       // already open, so refusing here would throw a student out mid-chapter
-      // because a lookup timed out. Since 0004 the guest list is enforced
-      // before an account can even be created, so what survives a failed check
-      // here is an account that already existed — not a new way in.
+      // because a lookup timed out.
+      //
+      // An earlier draft justified that by saying 0004 already refuses the
+      // account itself, so nothing new gets in through a failed check here.
+      // That is only true once someone has switched the hook on: 0004's own
+      // header says «Tant qu'il n'y est pas, cette fonction existe et ne
+      // s'exécute jamais», and nothing in the repo can tell you which it is.
+      // The honest reason to fail open is the one above — the cost of being
+      // wrong here is a student thrown out of a chapter they are in the middle
+      // of, and the cost of being wrong at the door is one retry.
       if (!error && allowed === false) {
         // NOT `signOut()` here. A server component cannot write cookies —
         // `lib/supabase/server.ts` swallows the attempt by design — so the

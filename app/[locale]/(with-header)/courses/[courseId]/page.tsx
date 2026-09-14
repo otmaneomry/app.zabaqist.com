@@ -18,6 +18,7 @@
  */
 
 import React from 'react'
+import type { Metadata } from 'next'
 import {Link} from '@/i18n/navigation'
 import { notFound } from 'next/navigation'
 import {
@@ -47,30 +48,68 @@ import {
   courseBySlug,
   courseDescription,
   courseLevel,
+  courseTitle,
   listCourses,
   loadCourseDoc,
   tabsOf,
   viewLabel,
   type ContentLocale,
 } from '@/lib/courseDoc'
+import { alternatesFor } from '@/lib/publicPaths'
 import CourseFallback from './CourseFallback'
 
 interface PageProps {
-  params: Promise<{ courseId: string }>
+  params: Promise<{ courseId: string; locale: string }>
   searchParams: Promise<{ s?: string }>
 }
+
+/** The route is `app/[locale]/…`, so `locale` is always one of these two. */
+const contentLocale = (locale: string): ContentLocale =>
+  locale === 'ar' ? 'ar' : 'fr'
 
 /** Prerender the markdown courses; other slugs still render on demand. */
 export function generateStaticParams() {
   return listCourses().map((c) => ({ courseId: c.slug }))
 }
 
-export async function generateMetadata({ params }: Pick<PageProps, 'params'>) {
-  const { courseId } = await params
+/**
+ * The chapter, described in the language the page is written in.
+ *
+ * `meta.title` and `meta.description` are the FRENCH fields — the catalogue
+ * keeps `titleAr`/`descriptionAr` beside them — and this returned them whatever
+ * the locale was. So `/ar/courses/limites-et-continuite` served
+ * `<title>Limites et continuité · Zabaqist</title>` on a document whose body is
+ * Arabic and whose `<html lang="ar-MA">`: the one line of the page a search
+ * result actually shows was in the wrong language, and so was the description
+ * under it. `courseTitle()`/`courseDescription()` are the same accessors the
+ * page body already uses for the hero.
+ *
+ * `alternates` is here because the root layout's is the ROOT's: metadata merges
+ * shallowly (see the "Merging" section of node_modules/next/dist/docs/01-app/
+ * 03-api-reference/04-functions/generate-metadata.md), so without this every
+ * chapter told a crawler its canonical URL was the homepage — thirteen pages
+ * asking to be consolidated into one, on the deploy that opens them.
+ */
+export async function generateMetadata({
+  params,
+}: Pick<PageProps, 'params'>): Promise<Metadata> {
+  const { courseId, locale } = await params
+  const l = contentLocale(locale)
   const meta = courseBySlug(courseId)
-  return meta
-    ? { title: `${meta.title} · Zabaqist`, description: meta.description }
-    : { title: 'Cours · Zabaqist' }
+  const alternates = alternatesFor(`/courses/${courseId}`, l)
+
+  // No catalogue entry: the slug still renders `CourseFallback`, so the page is
+  // real and needs a title. `nav.courses` is the word the chrome already uses.
+  if (!meta) {
+    const t = await getTranslations({ locale: l, namespace: 'nav' })
+    return { title: `${t('courses')} · Zabaqist`, alternates }
+  }
+
+  return {
+    title: `${courseTitle(meta, l)} · Zabaqist`,
+    description: courseDescription(meta, l),
+    alternates,
+  }
 }
 
 export default async function CoursePage({ params, searchParams }: PageProps) {

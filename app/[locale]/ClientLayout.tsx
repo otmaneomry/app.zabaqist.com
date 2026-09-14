@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Footer from '@/components/Footer';
 import { usePathname } from '@/i18n/navigation';
-import { MantineProvider, createTheme } from '@mantine/core';
+import { DirectionProvider, MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 
 const theme = createTheme({
@@ -48,9 +48,11 @@ const theme = createTheme({
 
 export default function ClientLayout({
                                          children,
+                                         dir,
                                          interVariable
                                      }: {
     children: React.ReactNode;
+    dir: 'ltr' | 'rtl';
     interVariable: string;
 }) {
     const [mounted, setMounted] = useState(false);
@@ -73,12 +75,26 @@ export default function ClientLayout({
             suppressHydrationWarning
             className={`min-h-screen bg-background font-sans antialiased flex flex-col ${interVariable} ${mounted ? 'client-side-classes' : ''}`}
         >
-        <MantineProvider theme={theme}>
-            <div className="flex-grow">
-                {children}
-            </div>
-            {showFooter && <Footer />}
-        </MantineProvider>
+        {/* `dir` on <html> is what flips the CSS; this is what tells Mantine.
+            Its components do not read the attribute — they read a React
+            context, and `DirectionProvider` is the only thing that fills it.
+            Without one the context keeps its literal default of `{dir: 'ltr'}`
+            (see node_modules/@mantine/core/esm/core/DirectionProvider/
+            DirectionProvider.mjs), so on `/ar` the header's Drawer slid in
+            from the left edge of an RTL page and the course tabs' ScrollArea
+            drew its thumb at the mirror image of where the content was.
+
+            `initialDirection` and not detection alone: detection happens in an
+            effect, which is after the server has already rendered — passing the
+            locale's direction in is what makes the first paint right. */}
+        <DirectionProvider initialDirection={dir}>
+            <MantineProvider theme={theme}>
+                <div className="flex-grow">
+                    {children}
+                </div>
+                {showFooter && <Footer />}
+            </MantineProvider>
+        </DirectionProvider>
         </body>
     );
 }

@@ -7,6 +7,7 @@ import "../globals.css";
 import ClientLayout from './ClientLayout';
 
 import {dir, htmlLang, routing} from "@/i18n/routing";
+import {ALLOW_INDEXING, localeHref, MARKETING_SITE} from "@/lib/publicPaths";
 import {siteUrl} from "@/lib/siteUrl";
 import type {Locale} from "@/i18n/routing";
 
@@ -42,20 +43,48 @@ const jetbrainsMono = JetBrains_Mono({
     display: 'swap',
 })
 
+/**
+ * The root page's own canonical and hreflang pair.
+ *
+ * It is the one page that keeps a canonical while the beta is closed, and
+ * `alternatesFor()` deliberately does not: `/` is the page that duplicates the
+ * marketing landing page, so handing `zabaqist.com` the credit for it IS the
+ * deferral. Every other route has no counterpart over there to point at.
+ */
+function rootAlternates(l: Locale): NonNullable<Metadata['alternates']> {
+  const languages: NonNullable<NonNullable<Metadata['alternates']>['languages']> = {};
+  for (const x of routing.locales) languages[x] = localeHref(x, '/');
+  languages['x-default'] = localeHref(routing.defaultLocale, '/');
+  return {canonical: localeHref(l, '/'), languages};
+}
+
 // Copy mirrors zabaqist.com so the marketing site and the app describe one
 // product rather than two. Per-locale strings live in messages/{fr,ar}.json
 // under `meta`.
 //
-// Indexing does NOT mirror it, and that is the point. Three signals used to
-// disagree: the canonical pointed at zabaqist.com ("do not index me"), the
-// sitemap listed app.zabaqist.com URLs ("index these"), and robots said
-// `index, follow`. Google resolves that by guessing.
+// Indexing does NOT mirror it, and that is the point. Signals used to disagree:
+// the canonical pointed at zabaqist.com ("do not index me"), the sitemap listed
+// app.zabaqist.com URLs ("index these"), and robots said `index, follow`.
+// Google resolves that by guessing.
 //
 // While the beta is closed, the app has exactly one page a crawler can fetch —
 // this one — and it duplicates the marketing landing page. So the app defers:
 // canonical points home to zabaqist.com and the app itself is noindex, which
 // keeps every ranking signal on the one domain that has public content.
-// `NEXT_PUBLIC_ALLOW_INDEXING=1` flips it at launch, when the chapters open.
+// `NEXT_PUBLIC_ALLOW_INDEXING=1` flips it at launch, when the chapters open —
+// and it now moves `app/sitemap.ts` and the JSON-LD in
+// `components/seo/OrganizationSchema.tsx` with it. All of them read the one
+// declaration in `lib/publicPaths.ts` so there is nothing left to flip by hand.
+//
+// ⚠️ `alternates` below belongs to THE ROOT PAGE ONLY, and every page under
+// this layout has to say so for itself. Next merges metadata shallowly from the
+// root segment down, so a page that sets no `alternates` inherits this whole
+// object — see the "Merging" and "Inheriting fields" sections of
+// node_modules/next/dist/docs/01-app/03-api-reference/04-functions/generate-metadata.md.
+// That is how thirteen chapters, the dashboard and the paywall each came to
+// carry `<link rel="canonical" href="…/">` and an hreflang pair naming the
+// marketing homepage as their French translation. Use `alternatesFor()` from
+// `lib/publicPaths.ts`; it is the same helper the sitemap builds its URLs with.
 export async function generateMetadata({
   params,
 }: {
@@ -64,10 +93,7 @@ export async function generateMetadata({
   const {locale} = await params;
   const l = hasLocale(routing.locales, locale) ? (locale as Locale) : routing.defaultLocale;
   const t = await getTranslations({locale: l, namespace: 'meta'});
-  // Where the public, indexable version of this content lives.
-  const marketing = "https://zabaqist.com";
-  const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === '1';
-  const site = allowIndexing ? siteUrl() : marketing;
+  const site = ALLOW_INDEXING ? siteUrl() : MARKETING_SITE;
 
   return {
     metadataBase: new URL(site),
@@ -78,11 +104,8 @@ export async function generateMetadata({
     // `follow` stays on either way: a crawler that reaches the app should still
     // walk its links, it just should not list the app's pages as their own
     // results while zabaqist.com carries the same copy.
-    robots: {index: allowIndexing, follow: true},
-    alternates: {
-      canonical: l === 'fr' ? '/' : '/ar',
-      languages: {fr: '/', ar: '/ar', 'x-default': '/'},
-    },
+    robots: {index: ALLOW_INDEXING, follow: true},
+    alternates: rootAlternates(l),
     icons: {
       icon: [{url: ICON_SVG, type: "image/svg+xml"}],
       apple: [{url: APPLE_ICON_SVG}],
@@ -137,7 +160,13 @@ export default async function RootLayout({
       <html lang={htmlLang[l]} dir={dir[l]} suppressHydrationWarning>
       <head/>
       <NextIntlClientProvider>
-        <ClientLayout interVariable={`${inter.variable} ${rubik.variable} ${jetbrainsMono.variable}`}>
+        {/* `dir` is passed down as well as set on <html>: Mantine keeps its own
+            copy of the direction in React context and reads the attribute only
+            after mount, so without it the server renders the Arabic route's
+            Mantine components left-to-right. See ClientLayout. */}
+        <ClientLayout
+            dir={dir[l]}
+            interVariable={`${inter.variable} ${rubik.variable} ${jetbrainsMono.variable}`}>
             {children}
         </ClientLayout>
       </NextIntlClientProvider>

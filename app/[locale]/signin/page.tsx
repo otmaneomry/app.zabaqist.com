@@ -14,12 +14,14 @@
  */
 
 import React from 'react'
-import { redirect } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
+import type { Metadata } from 'next'
+import { getLocale, getTranslations } from 'next-intl/server'
 
-import { Link } from '@/i18n/navigation'
+import { Link, redirect } from '@/i18n/navigation'
+import { routing, type Locale } from '@/i18n/routing'
 import Logo from '@/components/landing/Logo'
 import GoogleButton from '@/components/auth/GoogleButton'
+import { alternatesFor } from '@/lib/publicPaths'
 import { safeInternalPath } from '@/lib/safePath'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseConfigError } from '@/lib/supabase/config'
@@ -31,12 +33,50 @@ import { supabaseConfigError } from '@/lib/supabase/config'
  */
 const WAITLIST = 'https://www.zabaqist.com/#waitlist'
 
+/**
+ * `next=` as a path with no language in it.
+ *
+ * `proxy.ts` sets it to the full pathname, so an Arabic reader turned away from
+ * `/ar/progres` arrives here with `next=/ar/progres` — already prefixed — while
+ * the fallback is the bare `/home`. Handing either straight to a locale-aware
+ * redirect would produce `/ar/ar/progres` or drop the reader into French.
+ * Stripping first means one shape goes in and the redirect puts back the prefix
+ * the reader is actually reading in. (`proxy.ts` has the same function under
+ * the name `withoutLocale`; it runs at the edge and cannot import from here.)
+ */
+const unprefixed = (p: string): string => {
+  for (const l of routing.locales) {
+    if (p === `/${l}`) return '/'
+    if (p.startsWith(`/${l}/`)) return p.slice(l.length + 1)
+  }
+  return p
+}
+
+/**
+ * Sign-in names itself, rather than inheriting the root layout's canonical.
+ *
+ * Metadata merges shallowly from the root segment down, so with no `alternates`
+ * of its own this page told a crawler its canonical URL was the homepage. It is
+ * disallowed in `robots.txt` in both languages and will stay that way, so what
+ * it claims here should be itself or nothing — never another page.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const l: Locale = locale === 'ar' ? 'ar' : 'fr'
+  return { alternates: alternatesFor('/signin', l) }
+}
+
 export default async function SignInPage({
   searchParams,
 }: {
   searchParams: Promise<{ next?: string; error?: string }>
 }) {
   const { next, error } = await searchParams
+  const locale = await getLocale()
   // This page is public and must render even when Supabase is unconfigured or
   // unreachable — it is where a reader is sent when anything else fails, so it
   // is the one page that cannot itself depend on the service being up.
@@ -47,8 +87,10 @@ export default async function SignInPage({
   } catch {
     /* signed out, and the button below will say so when clicked */
   }
-  // Already signed in: this page has nothing to offer.
-  if (user) redirect(safeInternalPath(next))
+  // Already signed in: this page has nothing to offer. The locale-aware
+  // redirect, or an Arabic reader is sent to the French copy of wherever they
+  // were going.
+  if (user) redirect({ href: unprefixed(safeInternalPath(next)), locale })
 
   const t = await getTranslations('auth')
   const notAllowed = error === 'not-allowed'

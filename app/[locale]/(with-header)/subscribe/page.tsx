@@ -30,6 +30,7 @@ import React from 'react'
 import { getTranslations } from 'next-intl/server'
 
 import CourseCover from '@/components/course/CourseCover'
+import { alternatesFor } from '@/lib/publicPaths'
 import PlanPicker, { type Plan } from '@/components/premium/PlanPicker'
 import {
   branchLabel,
@@ -54,9 +55,22 @@ const PLANS: Plan[] = [
 
 const FEATURES = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'] as const
 
-export async function generateMetadata() {
-  const t = await getTranslations('premium')
-  return { title: t('title'), description: t('metaDescription') }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const l = locale === 'ar' ? 'ar' : 'fr'
+  const t = await getTranslations({ locale: l, namespace: 'premium' })
+
+  return {
+    title: t('title'),
+    description: t('metaDescription'),
+    // Without this the paywall claimed the homepage as its canonical URL —
+    // see the note on the chapters, where the same inheritance was costlier.
+    alternates: alternatesFor('/subscribe', l),
+  }
 }
 
 export default async function SubscribePage({

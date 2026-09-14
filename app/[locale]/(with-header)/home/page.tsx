@@ -8,11 +8,32 @@
  */
 
 import React from 'react'
+import type { Metadata } from 'next'
 
 import MainContent from '@/components/MainContent'
 import FiliereGate from '@/components/onboarding/FiliereGate'
 import type { ChapterShape } from '@/components/home/ContinuePanel'
 import { listCourses, loadCourseDoc, tabsOf } from '@/lib/courseDoc'
+import { alternatesFor } from '@/lib/publicPaths'
+
+/**
+ * Only `alternates`, so the title and description still come from the root
+ * layout — metadata merges shallowly, and this page has nothing better to say
+ * about itself than the product's own name.
+ *
+ * What it must NOT inherit is the root's `alternates`, which names the root.
+ * Every page that skipped this was telling a crawler its canonical URL was the
+ * homepage. This one is disallowed in robots.txt in both locales, so no crawler
+ * reads it today — the line is here so that stays true of the next page too.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  return { alternates: alternatesFor('/home', locale === 'ar' ? 'ar' : 'fr') }
+}
 
 async function chapterShape(): Promise<ChapterShape> {
   const out: ChapterShape = {}
