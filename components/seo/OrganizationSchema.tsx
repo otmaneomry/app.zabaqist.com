@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { ALLOW_INDEXING, MARKETING_SITE } from '@/lib/publicPaths'
 import { siteUrl } from '@/lib/siteUrl'
 
 /**
@@ -7,6 +8,15 @@ import { siteUrl } from '@/lib/siteUrl'
  *
  * The public surface had no structured data at all, so every rich result was
  * built by guessing from the prose.
+ *
+ * It names the same origin the canonical does, and that took a fix: this used
+ * `siteUrl()` unconditionally, so while the beta was closed the landing page
+ * served `"url":"https://app.zabaqist.com"` inside a document whose
+ * `<link rel="canonical">` handed everything to `zabaqist.com`. Structured data
+ * that disagrees with the canonical is a fourth vote in a contradiction Google
+ * settles by guessing — and the whole point of the flag is that there is only
+ * one vote. `image` follows the origin for the same reason: an OG card served
+ * from the app for an entity said to live on the marketing site.
  *
  * What this deliberately does NOT emit is `Course`. Google's Course markup
  * describes a page it can fetch, and every chapter here answers a crawler with
@@ -22,7 +32,7 @@ export default function OrganizationSchema({
 }: {
   description: string
 }) {
-  const site = siteUrl()
+  const site = ALLOW_INDEXING ? siteUrl() : MARKETING_SITE
 
   const schema = {
     '@context': 'https://schema.org',

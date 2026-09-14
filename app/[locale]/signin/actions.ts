@@ -91,5 +91,16 @@ export async function signOutAction() {
     locale && locale !== routing.defaultLocale && routing.locales.includes(locale as never)
       ? `/${locale}`
       : '/'
-  redirect(home)
+
+  // By way of `/auth/signout`, which is where the rest of signing out happens.
+  //
+  // A server action can end a session and it can redirect, and neither of those
+  // touches `localStorage` — which is where every chapter read, every
+  // checkpoint and the whole funnel actually live. Until this hop existed,
+  // signing out on a shared machine left all of it in place for the next
+  // person: `/` lit the previous student's chapters as done and `/demarrer`,
+  // which needs no session, restored their filière and their answers. That
+  // route answers with a page whose script clears the device before landing
+  // here, so the two halves of a session end together.
+  redirect(`/auth/signout?next=${encodeURIComponent(home)}`)
 }

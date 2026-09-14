@@ -58,30 +58,92 @@ export function xpFor(base: number, hintsUsed: number): number {
   return Math.round(base * factor)
 }
 
-export function readCheckpoint(key: string): CheckpointState {
-  if (typeof window === 'undefined') return EMPTY_CHECKPOINT
+/** What is actually stored for `key`, or null when nothing ever was. */
+function storedCheckpoint(key: string): Partial<CheckpointState> | null {
+  if (typeof window === 'undefined') return null
   try {
     const raw = localStorage.getItem(key)
-    if (!raw) return EMPTY_CHECKPOINT
-    const saved = JSON.parse(raw) as Partial<CheckpointState>
-    return {
-      draft: saved.draft ?? '',
-      tried: saved.tried ?? false,
-      verdict: saved.verdict ?? null,
-      hints: saved.hints ?? 0,
-    }
+    if (!raw) return null
+    return JSON.parse(raw) as Partial<CheckpointState>
   } catch {
-    return EMPTY_CHECKPOINT
+    return null
+  }
+}
+
+/** The attempt itself — everything except the date that says when it moved. */
+function sameAttempt(a: Partial<CheckpointState>, b: CheckpointState): boolean {
+  return (
+    (a.draft ?? '') === b.draft &&
+    (a.tried ?? false) === b.tried &&
+    (a.verdict ?? null) === b.verdict &&
+    (a.hints ?? 0) === b.hints
+  )
+}
+
+/**
+ * Whether this device has ever written anything for `key`.
+ *
+ * Not the same question as "is the state empty", and the difference is the
+ * whole point. A student who presses « Réessayer » on their only attempt ends
+ * up with an empty state that MUST be stored — clearing is a decision, and it
+ * has to reach their other devices. A checkpoint the reader merely scrolled
+ * past is also empty and must not be stored at all, or every chapter opened
+ * would file a row per checkpoint. The caller cannot tell the two apart from
+ * the state; it can from this.
+ */
+export const checkpointExists = (key: string): boolean =>
+  storedCheckpoint(key) !== null
+
+export function readCheckpoint(key: string): CheckpointState {
+  if (typeof window === 'undefined') return EMPTY_CHECKPOINT
+  const saved = storedCheckpoint(key)
+  if (!saved) return EMPTY_CHECKPOINT
+  return {
+    draft: saved.draft ?? '',
+    tried: saved.tried ?? false,
+    verdict: saved.verdict ?? null,
+    hints: saved.hints ?? 0,
+    // Dropping `at` here was enough to make the whole date rule meaningless.
+    // Every reader of a checkpoint goes through this function, so a stamp it
+    // does not return is a stamp the push does not have — and `lib/sync.ts`
+    // then fell back to the moment of upload, which is exactly the lie
+    // migration 0006 cannot survive.
+    ...(saved.at ? { at: saved.at } : {}),
   }
 }
 
 export function writeCheckpoint(key: string, state: CheckpointState): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(
-      key,
-      JSON.stringify({ ...state, at: new Date().toISOString() }),
-    )
+    const stored = storedCheckpoint(key)
+
+    // The clock is read only when the ATTEMPT moved.
+    //
+    // Stamping `at` on every write meant that merely OPENING a section re-dated
+    // every checkpoint on it: mounting hydrates each one from storage and the
+    // next effect writes the same value straight back, and with an
+    // unconditional `new Date()` that round trip announced a change that never
+    // happened. A device that only displayed the chapter then won the merge
+    // against the device where « Réessayer » was actually pressed, and the
+    // abandoned attempt came back. An unchanged attempt keeps the date it
+    // already had; an attempt this device has never seen before is dated now,
+    // because that is when it appeared here.
+    const unchanged = stored !== null && sameAttempt(stored, state)
+    const at = unchanged ? (stored.at ?? state.at) : new Date().toISOString()
+    const next: CheckpointState = {
+      draft: state.draft,
+      tried: state.tried,
+      verdict: state.verdict,
+      hints: state.hints,
+      ...(at ? { at } : {}),
+    }
+
+    // Nothing to say: not the attempt, not even its date. Writing anyway made
+    // every mounted checkpoint announce a change, which `SyncProvider` turned
+    // into a push per chapter merely opened.
+    if (unchanged && (stored.at ?? null) === (next.at ?? null)) return
+
+    localStorage.setItem(key, JSON.stringify(next))
     // A plain `storage` event does not fire in the tab that wrote it, so the
     // progress bar on the same page needs an explicit nudge.
     window.dispatchEvent(new Event('zabaqist:progress'))

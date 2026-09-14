@@ -38,6 +38,7 @@ import {
 } from '@/lib/filiere'
 import { ONBOARDING_EVENT, type Answers } from '@/lib/onboarding'
 import { EMPTY_CHECKPOINT, type CheckpointState } from '@/lib/courseProgress'
+import { SELFCHECK_KEY } from '@/lib/selfCheck'
 import type { CourseProgress } from '@/lib/progressTracking'
 
 const CP_PREFIX = 'zabaqist:cp:'
@@ -48,8 +49,30 @@ const ONBOARDING_KEY = 'zabaqist:onboarding'
 const PROGRESS_EVENT = 'zabaqist:progress'
 /** When this device last completed a pull. Used to date-order drafts. */
 const PULLED_AT_KEY = 'zabaqist:pulled-at'
+/**
+ * When the filière was last chosen ON THIS DEVICE.
+ *
+ * `zabaqist:filiere` carries no date of its own and `lib/filiere.ts` is written
+ * by the picker, which knows nothing about syncing. `SyncProvider` stamps this
+ * when the picker announces a change; `pullAll` is the only reader. See the
+ * filière block there for why a pull that can never change its mind is a
+ * deadlock rather than a precaution.
+ */
+const FILIERE_AT_KEY = 'zabaqist:filiere-at'
 /** Which account the work in localStorage belongs to. */
-const OWNER_KEY = 'zabaqist:owner'
+export const OWNER_KEY = 'zabaqist:owner'
+/** `components/course/ChapterComplete.tsx` — one marker per chapter celebrated. */
+const CELEBRATED_PREFIX = 'zabaqist:celebrated:'
+/** Where a dispossessed student's device-local work waits for them. */
+const ARCHIVE_PREFIX = 'zabaqist:device-local:'
+/**
+ * The shape of every key this app owns.
+ *
+ * Exported because `app/auth/signout/route.ts` has to clear exactly this set
+ * from a page that cannot import this module, and two regexes that are supposed
+ * to agree drift the moment one of them is edited alone.
+ */
+export const DEVICE_KEY_PATTERN = '^zabaqist[:_]'
 
 /** Every event a store fires when it changes something worth keeping. */
 export const SYNC_EVENTS = [
@@ -69,19 +92,69 @@ export const SYNC_EVENTS = [
  * Everything under `zabaqist:` and the one legacy `zabaqist_` key: progress,
  * checkpoints, activity, filière, the funnel's answers, the chapter shapes and
  * the celebration markers.
+ *
+ * Two exceptions, both because the only caller is `claimDevice`.
+ *
+ * `zabaqist:owner`, which that function overwrites in the same breath. It does
+ * NOT survive signing out, and that distinction is the whole of the rule: an
+ * owner that is never removed is an owner that outlives the student, and this
+ * key used to be removed by nothing at all. The last student's uuid stayed on
+ * the machine for good, so the next genuine visitor — who answered the entire
+ * funnel while signed OUT — had that work wiped the instant they signed up,
+ * because `claimDevice` saw a previous owner who was not them. Work done while
+ * nobody was signed in should follow whoever then signs up; work belonging to
+ * an identified student must not. Only sign-out can tell the two apart, and now
+ * it does: see `app/auth/signout/route.ts`, which clears this whole set, owner
+ * and archives included.
+ *
+ * And the archives, which belong to students who are not party to this claim.
+ * On a machine three or four students share, a wipe that took them too would
+ * mean each arrival destroyed everyone else's — the feature would work for
+ * exactly the previous student and nobody before them.
  */
 export function resetLocalState(): void {
+  const ours = new RegExp(DEVICE_KEY_PATTERN)
   try {
     const doomed: string[] = []
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
-      if (k && k !== OWNER_KEY && /^zabaqist[:_]/.test(k)) doomed.push(k)
+      if (!k || k === OWNER_KEY || !ours.test(k)) continue
+      if (k.startsWith(ARCHIVE_PREFIX)) continue
+      doomed.push(k)
     }
     for (const k of doomed) localStorage.removeItem(k)
   } catch {
     /* storage unavailable — there is nothing to forget */
   }
 }
+
+/**
+ * What this device holds that the server cannot give back.
+ *
+ * Two stores, and both on purpose: `lib/selfCheck.ts` — the `## Auto-évaluation`
+ * verdicts, this product's only assessment — and the per-chapter celebration
+ * markers. Neither has a table, and neither is asking for one; see the header of
+ * `lib/selfCheck.ts` for why a self-assessment that becomes a row starts
+ * becoming a mark. The consequence is that a wipe is permanent for them, so the
+ * claim below moves them aside rather than deleting them.
+ */
+function deviceLocalEntries(): Record<string, string> {
+  const out: Record<string, string> = {}
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (!k) continue
+      if (k !== SELFCHECK_KEY && !k.startsWith(CELEBRATED_PREFIX)) continue
+      const v = localStorage.getItem(k)
+      if (v !== null) out[k] = v
+    }
+  } catch {
+    /* storage unavailable — there is nothing to set aside */
+  }
+  return out
+}
+
+const archiveKey = (owner: string) => `${ARCHIVE_PREFIX}${owner}`
 
 /**
  * Claim this device for `userId`, and say whether it had to be taken off
@@ -98,18 +171,97 @@ export function resetLocalState(): void {
  *
  * A device with NO recorded owner is not the same thing. That is a visitor who
  * used the funnel or read a chapter before signing up, and carrying that work
- * into their new account is the intended behaviour.
+ * into their new account is the intended behaviour — a sentence that was only
+ * true on a device nobody had ever signed in on, until `/auth/signout` started
+ * removing the owner along with the work.
+ *
+ * The wipe is right for everything the server can hand back. It is not right
+ * for the two stores that have nowhere to be handed back FROM, so those are
+ * archived under the outgoing student's uuid and restored when that student
+ * signs back in on this machine. Archiving rather than simply sparing them:
+ * sparing them would show one student their neighbour's self-assessment, which
+ * is the very leak this function exists to prevent.
  */
 export function claimDevice(userId: string): boolean {
   try {
     const previous = localStorage.getItem(OWNER_KEY)
     const takenFromSomeoneElse = previous !== null && previous !== userId
-    if (takenFromSomeoneElse) resetLocalState()
+    if (takenFromSomeoneElse) {
+      // Set aside, wipe, hand back. `resetLocalState` spares the archives, so
+      // the order below only has to get the LIVE keys out of the way first.
+      const theirs = deviceLocalEntries()
+      resetLocalState()
+      if (Object.keys(theirs).length) writeJSON(archiveKey(previous), theirs)
+      const mine = readJSON<Record<string, string>>(archiveKey(userId), {})
+      for (const [k, v] of Object.entries(mine)) {
+        try {
+          localStorage.setItem(k, v)
+        } catch {
+          /* quota or private mode — the verdicts stay in the archive */
+        }
+      }
+    }
     if (previous !== userId) localStorage.setItem(OWNER_KEY, userId)
     return takenFromSomeoneElse
   } catch {
     return false
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* The seal                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Set when this tab has been dispossessed, and never unset.
+ *
+ * `OWNER_KEY` was consulted in exactly two places — the claim, and the guard in
+ * `pushNow` — and in no write path at all. On a shared school PC that left a
+ * hole with no lock on it: A reads in tab 1 and leaves it open, B signs in in
+ * tab 2, the claim wipes the stores and hands them to B, and then A keeps
+ * clicking. Every click repopulates a store B now owns, tab 2's own perfectly
+ * legitimate push sends the result, and migration 0006's union-and-greatest
+ * makes A's chapters part of B's account for good.
+ *
+ * The lock is here rather than in the five stores because the stores cannot see
+ * the claim: it happens in another tab, and the only thing that crosses a tab
+ * boundary is the `storage` event. `SyncProvider` listens for it, seals this
+ * module so nothing further is pulled or pushed, and reloads the tab — which is
+ * what actually stops the writing, since the page that was writing is gone.
+ * Anything short of that leaves a live React tree holding one student's work
+ * and writing it into another student's storage.
+ */
+let sealed = false
+
+/** This tab no longer owns the device. Nothing may be pulled or pushed again. */
+export function sealDevice(): void {
+  sealed = true
+}
+
+export const deviceIsSealed = (): boolean => sealed
+
+/** Whose work is in localStorage right now, or null on a fresh device. */
+export function deviceOwner(): string | null {
+  return readString(OWNER_KEY)
+}
+
+/** True while this device is unclaimed, or claimed by `userId`. */
+function ownedBy(userId: string): boolean {
+  if (sealed) return false
+  const owner = deviceOwner()
+  return owner === null || owner === userId
+}
+
+/**
+ * Remember that the filière was chosen on THIS device, just now.
+ *
+ * Called by `SyncProvider` when `lib/filiere.ts` announces a change, and only
+ * when that change did not come from a pull.
+ */
+export function noteFiliereChange(): void {
+  // Best effort: a device that cannot store the stamp simply lets the server
+  // win the next time it pulls, which is the safe half of the rule.
+  writeStamp(FILIERE_AT_KEY, new Date().toISOString())
 }
 
 /* ------------------------------------------------------------------ */
@@ -122,6 +274,43 @@ function readJSON<T>(key: string, fallback: T): T {
     return raw ? (JSON.parse(raw) as T) : fallback
   } catch {
     return fallback
+  }
+}
+
+/** A raw stored string, or null — including when storage itself is refused. */
+function readString(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * A stored ISO date, read back as it was written.
+ *
+ * `PULLED_AT_KEY` used to go through `writeJSON`, which wraps a string in
+ * quotes — so what came back was `"2026-09-14T…"`, a value no date parser
+ * accepts and no ISO string ever compares equal to. The old text comparison in
+ * `remoteIsNewer` did not notice, because every digit sorts above `"`: it
+ * answered "the remote is newer" for every row, every time, and the merge that
+ * was supposed to be decided by date was decided by nothing. Dates are stored
+ * raw now; the unwrapping below is for the devices that already have the old
+ * spelling, and costs one pull.
+ */
+function readStamp(key: string): string | null {
+  const raw = readString(key)
+  if (raw === null) return null
+  return raw.startsWith('"') && raw.endsWith('"') ? raw.slice(1, -1) : raw
+}
+
+/** True when the value actually landed — same contract as `writeJSON`. */
+function writeStamp(key: string, iso: string): boolean {
+  try {
+    localStorage.setItem(key, iso)
+    return true
+  } catch {
+    return false
   }
 }
 
@@ -189,21 +378,48 @@ export interface PullResult {
   complete: boolean
 }
 
-/** True when the server's row was written after this device last pulled. */
+/**
+ * An ISO date as a number of milliseconds, or null when there is nothing usable.
+ *
+ * Explicit rather than `new Date(x).getTime()`: an unparseable value yields NaN,
+ * every comparison against NaN is false, and a silent false here reads exactly
+ * like "the remote is older" — a wrong answer dressed as a decision.
+ */
+function instant(value?: string | null): number | null {
+  if (!value) return null
+  const ms = Date.parse(value)
+  return Number.isFinite(ms) ? ms : null
+}
+
+/**
+ * True when the server's row was written after this device last pulled.
+ *
+ * Parsed, not compared as text. PostgREST answers
+ * `2026-09-14T10:00:00.123456+00:00` and `toISOString()` produces
+ * `2026-09-14T10:00:00.123Z`; inside the same second `+` and the extra digits
+ * both sort BELOW `Z`, so a string comparison reported a remote row that was
+ * genuinely newer as older. This is the sole tie-breaker for the « Réessayer »
+ * rule — getting it backwards keeps a draft the student had just abandoned.
+ */
 function remoteIsNewer(remoteAt?: string | null): boolean {
-  if (!remoteAt) return false
-  try {
-    const seen = localStorage.getItem(PULLED_AT_KEY)
-    return !!seen && remoteAt > seen
-  } catch {
-    return false
-  }
+  const remote = instant(remoteAt)
+  if (remote === null) return false
+  const seen = instant(readStamp(PULLED_AT_KEY))
+  if (seen === null) return false
+  return remote > seen
 }
 
 /**
  * Read everything back and merge it in.
  */
 export async function pullAll(userId: string): Promise<PullResult> {
+  // This device may already be somebody else's. Merging the server's rows for
+  // `userId` into another student's storage is the first half of the accident
+  // `claimDevice` exists to prevent; `pushNow` guarded against the second half
+  // and nothing guarded against this one. `complete: false` so the caller does
+  // not then push what it did not manage to read.
+  if (!ownedBy(userId)) return { changed: false, complete: false }
+
   const supabase = createClient()
   let changed = false
   let complete = true
@@ -215,11 +431,20 @@ export async function pullAll(userId: string): Promise<PullResult> {
   }
 
   const [profile, progress, checkpoints, activity] = await Promise.all([
-    supabase.from('profiles').select('filiere, track, onboarding').eq('id', userId).maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('filiere, track, onboarding, updated_at')
+      .eq('id', userId)
+      .maybeSingle(),
     supabase.from('course_progress').select('*').eq('user_id', userId),
     supabase.from('checkpoints').select('*').eq('user_id', userId),
     supabase.from('activity').select('*').eq('user_id', userId),
   ])
+
+  // Four network round trips is plenty of time for a second tab to sign a
+  // DIFFERENT student in, wipe this storage and claim it for them. Everything
+  // below is synchronous, so one re-check here covers every write that follows.
+  if (!ownedBy(userId)) return { changed: false, complete: false }
 
   // A select that FAILED looks exactly like one that found nothing: both leave
   // `.data` empty. Merging nothing and then pushing would hand the server this
@@ -229,12 +454,40 @@ export async function pullAll(userId: string): Promise<PullResult> {
 
   // ── Filière and the funnel's answers.
   if (profile.data) {
-    const { filiere, track, onboarding } = profile.data
-    // Only adopt the remote choice when this device has none: a student who
-    // just switched filière here should not have it undone by a stale row.
-    if (filiere && track && !localStorage.getItem(FILIERE_KEY)) {
-      if (kept(writeJSON(FILIERE_KEY, { filiere, track } satisfies FiliereChoice)))
-        changed = true
+    const { filiere, track, onboarding, updated_at: profileAt } = profile.data
+
+    // The profile row is the one place a student's filière exists for all their
+    // devices, so a pull has to be able to change this device's mind.
+    //
+    // Adopting the remote choice ONLY when the device had none read as caution
+    // and was a deadlock: 0006's trigger keeps whichever non-null value arrived
+    // last, so two devices that disagreed never agreed. The phone kept serving
+    // the Sciences Exp syllabus, the laptop kept serving SM, and each push
+    // flipped `profiles.filiere` again — indefinitely, with the student seeing
+    // two different programmes depending on what they picked up.
+    //
+    // The rule is: the server wins unless this device chose more recently.
+    // `FILIERE_AT_KEY` is what makes "more recently" answerable at all. A device
+    // that has a filière but no stamp cannot prove it chose anything — it
+    // stored that value before this rule existed — so the server wins there
+    // too. The cost is at most one re-pick; the alternative is the deadlock.
+    const stored = readJSON<FiliereChoice | null>(FILIERE_KEY, null)
+    if (filiere && track) {
+      const chosenHere = instant(readStamp(FILIERE_AT_KEY))
+      const serverAt = instant(profileAt)
+      const serverWins =
+        stored === null ||
+        chosenHere === null ||
+        (serverAt !== null && serverAt > chosenHere)
+      if (serverWins && (stored?.filiere !== filiere || stored?.track !== track)) {
+        if (kept(writeJSON(FILIERE_KEY, { filiere, track } satisfies FiliereChoice))) {
+          // Dated by the server, not by the clock of the device adopting it:
+          // otherwise this pull would look like a local choice and the next one
+          // would refuse to adopt anything.
+          writeStamp(FILIERE_AT_KEY, profileAt ?? new Date().toISOString())
+          changed = true
+        }
+      }
     }
     const remote = (onboarding ?? {}) as Answers
     if (Object.keys(remote).length) {
@@ -279,15 +532,32 @@ export async function pullAll(userId: string): Promise<PullResult> {
     // them with `local || row` resurrected the failed attempt the moment an
     // older row came back from another device. The date decides instead.
     const fresher = remoteIsNewer(row.updated_at)
+    // The stamp travels with the attempt it describes — the winning side's.
+    // Building `merged` without it broke two things at once: the next push had
+    // no date to send and fell back to the moment of upload, and the object
+    // could never equal `local`, which DID carry one. So the comparison below
+    // was true for every checkpoint on every pull, every one was rewritten, and
+    // `SyncProvider` was told the interface had changed on every single mount.
+    const at = fresher ? (row.updated_at ?? local.at) : local.at
     const merged: CheckpointState = {
       draft: fresher ? (row.draft ?? '') : local.draft || row.draft || '',
       tried: fresher ? !!row.tried : local.tried || row.tried,
       verdict: fresher ? (row.verdict ?? null) : (local.verdict ?? row.verdict ?? null),
       // The one that only grows: the XP penalty already paid.
       hints: Math.max(local.hints, row.hints ?? 0),
+      ...(at ? { at } : {}),
     }
-    if (JSON.stringify(merged) !== JSON.stringify(local)) {
-      if (kept(writeJSON(key, merged))) changed = true
+    // Field by field, and the attempt apart from its date. A stamp that moved
+    // on its own is worth storing — it is what the next merge reads — but it is
+    // not worth telling the interface to re-read, because nothing it displays
+    // has changed.
+    const attemptMoved =
+      merged.draft !== (local.draft ?? '') ||
+      merged.tried !== (local.tried ?? false) ||
+      merged.verdict !== (local.verdict ?? null) ||
+      merged.hints !== (local.hints ?? 0)
+    if (attemptMoved || (merged.at ?? null) !== (local.at ?? null)) {
+      if (kept(writeJSON(key, merged)) && attemptMoved) changed = true
     }
   }
 
@@ -308,7 +578,7 @@ export async function pullAll(userId: string): Promise<PullResult> {
 
   // What the server was known to hold at this moment, so a later merge can tell
   // "this device has not seen that row yet" from "this device has a newer one".
-  if (complete) writeJSON(PULLED_AT_KEY, new Date().toISOString())
+  if (complete) writeStamp(PULLED_AT_KEY, new Date().toISOString())
 
   return { changed, complete }
 }
@@ -336,6 +606,11 @@ let inFlight: Promise<void> = Promise.resolve()
  * second and put the server back.
  */
 export function pushAll(userId: string, email: string): Promise<void> {
+  // Sealed means another account has taken this device while this tab was still
+  // open. Whatever is in storage now is theirs, and the snapshot below would
+  // read it.
+  if (sealed) return Promise.resolve()
+
   // Read the stores NOW, not when the queue reaches us.
   //
   // `pushNow` used to read them at the moment it ran, which is fine until two
@@ -345,7 +620,7 @@ export function pushAll(userId: string, email: string): Promise<void> {
   // work and filed it under A. Capturing here makes the snapshot belong to the
   // account that asked for it.
   const snapshot = {
-    owner: readOwner(),
+    owner: deviceOwner(),
     filiere: readJSON<FiliereChoice | null>(FILIERE_KEY, null),
     onboarding: readJSON<Answers>(ONBOARDING_KEY, {}),
     progress: readJSON<Record<string, CourseProgress>>(PROGRESS_KEY, {}),
@@ -365,14 +640,18 @@ type Snapshot = {
   checkpoints: ReturnType<typeof localCheckpoints>
 }
 
-/** Whose work is in localStorage right now, or null on a fresh device. */
-function readOwner(): string | null {
-  try {
-    return localStorage.getItem(OWNER_KEY)
-  } catch {
-    return null
-  }
-}
+/**
+ * The date for an attempt whose date is not known.
+ *
+ * Only pre-`at` checkpoints reach this: everything written since carries the
+ * moment it actually changed. The honest thing to send for "I do not know when
+ * this changed" is the oldest instant there is, not the current one — an
+ * unknown date must never be allowed to beat a known one. 0006 then keeps the
+ * server's `tried`, `verdict` and `draft`, and the union in `pullAll` still
+ * carries the undated attempt to the student's other devices, so nothing is
+ * lost by refusing to invent a time.
+ */
+const UNDATED = new Date(0).toISOString()
 
 async function pushNow(
   userId: string,
@@ -382,6 +661,7 @@ async function pushNow(
   // The device changed hands between the queue and here. The snapshot is one
   // student's work and `userId` is another's; sending it would be the very
   // thing `claimDevice` exists to prevent.
+  if (sealed) return
   if (snap.owner !== null && snap.owner !== userId) return
 
   const supabase = createClient()
@@ -428,8 +708,10 @@ async function pushNow(
     // When the ATTEMPT changed, not when it was uploaded. Stamping `now` on
     // every checkpoint made migration 0006's date rule meaningless: a tab open
     // since before "Réessayer" would reconnect, have its stale draft dated to
-    // this instant, and win the merge it should have lost.
-    updated_at: c.state.at ?? now,
+    // this instant, and win the merge it should have lost. Falling back to
+    // `now` for a checkpoint that carries no stamp is the same lie in smaller
+    // print, so it falls back to `UNDATED` instead — see there.
+    updated_at: c.state.at ?? UNDATED,
   }))
   if (cpRows.length) jobs.push(supabase.from('checkpoints').upsert(cpRows))
 

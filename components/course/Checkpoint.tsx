@@ -9,11 +9,12 @@
  * timer and no failure state, on purpose.
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IconBulb } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 import { logCheckpointTried } from '@/lib/activity'
 import {
+  checkpointExists,
   EMPTY_CHECKPOINT,
   readCheckpoint,
   writeCheckpoint,
@@ -56,17 +57,51 @@ export default function Checkpoint({
   const patch = (p: Partial<CheckpointState>) =>
     setState((s) => ({ ...s, ...p }))
 
+  // Which key this device has already stored something for. Not the same thing
+  // as "the state is non-empty" — see the persistence effect below.
+  const stored = useRef<string | null>(null)
+
   // localStorage does not exist during SSR, so hydrating can only happen here.
   useEffect(() => {
+    stored.current = checkpointExists(storageKey) ? storageKey : null
     setState({ ...readCheckpoint(storageKey), key: storageKey })
   }, [storageKey])
 
   useEffect(() => {
     // Still holding the previous checkpoint's answer, or not yet hydrated.
     if (state.key !== storageKey) return
-    if (!tried && !draft && !verdict && !hints) return
-    writeCheckpoint(storageKey, { draft, tried, verdict, hints })
-  }, [storageKey, state.key, draft, tried, verdict, hints])
+
+    // An empty state means one of two opposite things, and the early-out here
+    // used to treat them as one.
+    //
+    // Nobody has ever touched this checkpoint — then writing would file an empty
+    // row for every checkpoint in every chapter a reader merely scrolls past.
+    //
+    // Or the student has just pressed « Réessayer » — then the emptiness IS the
+    // work, and refusing to write it was a broken promise printed on the page.
+    // Retry clears `tried`, `verdict` and `draft` and leaves `hints`, so with no
+    // hint opened all four were falsy, nothing was stored, and localStorage kept
+    // the abandoned attempt and its verdict. Reload, or leave the chapter and
+    // come back, and the attempt the student had explicitly given up on was
+    // back on screen — under a line that says nothing is lost. The server kept
+    // it too, so the other devices got it back as well.
+    //
+    // Having written once is what separates the two.
+    const empty = !tried && !draft && !verdict && !hints
+    if (empty && stored.current !== storageKey) return
+
+    writeCheckpoint(storageKey, {
+      draft,
+      tried,
+      verdict,
+      hints,
+      // Carried through so a hydration round trip that changes nothing leaves
+      // the attempt's date alone; `writeCheckpoint` reads the clock only when
+      // the attempt itself moved.
+      ...(state.at ? { at: state.at } : {}),
+    })
+    stored.current = storageKey
+  }, [storageKey, state.key, state.at, draft, tried, verdict, hints])
 
   // Level 3 only exists where the pedagogue wrote a solution to point at.
   const maxHints = hasSolution ? 3 : 2

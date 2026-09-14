@@ -18,7 +18,21 @@ import type { Verdict } from '@/lib/courseProgress'
 
 export type { Verdict }
 
-const KEY = 'zabaqist:selfcheck'
+/**
+ * Where the verdicts live, and the only place they live.
+ *
+ * There is no `selfcheck` table and this file does not ask for one. Giving the
+ * auto-évaluation a row would be the first step towards treating it as a mark
+ * — synced, counted, eventually compared — and it is not a mark: it is the
+ * reader saying where they stand, to themselves. The cost of that decision is
+ * that these answers are device-local and cannot be restored from the server,
+ * so the one place that used to destroy them — `claimDevice` in `lib/sync.ts`,
+ * which wipes everything matching `zabaqist:` when a device changes hands —
+ * now sets them aside under the name of the student they belong to instead.
+ * Hence the export: the key is part of that contract, not an implementation
+ * detail.
+ */
+export const SELFCHECK_KEY = 'zabaqist:selfcheck'
 export const SELFCHECK_EVENT = 'zabaqist:selfcheck'
 
 /** slug → item index → verdict. */
@@ -26,7 +40,7 @@ type Store = Record<string, Record<string, Verdict>>
 
 function read(): Store {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '{}') as Store
+    return JSON.parse(localStorage.getItem(SELFCHECK_KEY) ?? '{}') as Store
   } catch {
     return {}
   }
@@ -42,7 +56,7 @@ export function writeSelfCheck(slug: string, index: number, verdict: Verdict) {
   try {
     const all = read()
     all[slug] = { ...(all[slug] ?? {}), [index]: verdict }
-    localStorage.setItem(KEY, JSON.stringify(all))
+    localStorage.setItem(SELFCHECK_KEY, JSON.stringify(all))
     window.dispatchEvent(new Event(SELFCHECK_EVENT))
   } catch {
     /* storage unavailable — the answer is lost, the page still works */
@@ -54,7 +68,7 @@ export function clearSelfCheck(slug: string) {
   try {
     const all = read()
     delete all[slug]
-    localStorage.setItem(KEY, JSON.stringify(all))
+    localStorage.setItem(SELFCHECK_KEY, JSON.stringify(all))
     window.dispatchEvent(new Event(SELFCHECK_EVENT))
   } catch {
     /* nothing to clear */
