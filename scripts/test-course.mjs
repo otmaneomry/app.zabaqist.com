@@ -43,8 +43,8 @@ const E2E_SECRET = process.env.E2E_AUTH_SECRET
  * Past the gate, without a real Google account.
  *
  * Supabase OAuth leaves the origin and shows a consent screen, so it cannot be
- * scripted; signing in for real would also make 178 local checks depend on a
- * remote service being reachable. `proxy.ts` therefore honours a `zb-e2e`
+ * scripted; signing in for real would also make every check in this file depend
+ * on a remote service being reachable. `proxy.ts` therefore honours a `zb-e2e`
  * cookie carrying E2E_AUTH_SECRET — see the note there for why that is safe.
  *
  * It grants passage through the gate and nothing else: there is no Supabase
@@ -71,11 +71,84 @@ const SLUG = process.argv[3] ?? 'limites-et-continuite'
 const url = (s) => `${BASE}/courses/${SLUG}${s ? `?s=${s}` : ''}`
 
 let failures = 0
+let checks = 0
 const ok = (pass, label, detail = '') => {
+  checks++
   if (!pass) failures++
   console.log(`  ${pass ? '✓' : '✗'} ${label}${detail ? `  ${detail}` : ''}`)
 }
 const section = (t) => console.log(`\n${t}`)
+
+/**
+ * Fetch as a signed-in reader, and do NOT follow the gate's redirect.
+ *
+ * Both halves matter. A bare `fetch` of a gated path is answered by `proxy.ts`
+ * with a 307 to `/signin`, fetch follows it, and `/signin` answers 200 — so
+ * `fetch('/totally-made-up-gated-route')` came back `ok: true`. Three checks
+ * were built on that: the hero and nav targets, `/ar/progres`, and "both
+ * locales serve every route". None of them could fail, for any route, ever.
+ *
+ * `redirect: 'manual'` is the second half: with the cookie a gated route
+ * answers 200 directly, so a 3xx now means the gate turned us away and a 404
+ * means the route is not there — both of which are the failure being looked
+ * for rather than something to follow.
+ */
+const COOKIE = sessionCookieHeader()
+const get = (u, o = {}) =>
+  fetch(u, { redirect: 'manual', ...o, headers: { cookie: COOKIE, ...(o.headers ?? {}) } })
+
+/**
+ * A hydration mismatch, seen from a PRODUCTION build.
+ *
+ * This suite runs against `npm run build && npm start`, and React 19.2 strips
+ * its error text out of the production bundle: "Hydration failed because…"
+ * appears zero times in `react-dom`'s production build and zero times in
+ * `.next/static/chunks`. What it actually logs is
+ *
+ *   Error: Minified React error #418; visit https://react.dev/errors/418…
+ *
+ * so a filter for `/hydrat|did ?n.t match/i` matched nothing and could not
+ * fire — and it is the ONLY guard on "never read device state during render",
+ * the trap CLAUDE.md names. 418 is a text mismatch, 423 a recoverable error
+ * during hydration, 425 a text-content difference; the dev spellings stay for
+ * anyone running this against `next dev`.
+ */
+const isHydrationError = (text) =>
+  /minified react error #?\s*(418|423|425)\b|react\.dev\/errors\/(418|423|425)\b|hydrat|did ?n.t match/i.test(
+    String(text),
+  )
+
+/**
+ * Wait for a navigation and report it as ONE check.
+ *
+ * `await page.waitForURL(...)` followed by `ok(true, 'it navigated')` prints a
+ * ✓ for something never evaluated, and when the navigation does not happen the
+ * throw is an unhandled rejection: the run dies mid-file, every later check
+ * goes with it, and `✗ N check(s) failed` is never printed at all. A failure
+ * has to be one red line among many.
+ */
+const arrived = async (p, pattern, label, detail = '') => {
+  try {
+    await p.waitForURL(pattern, { timeout: 15000 })
+    ok(true, label, detail)
+  } catch {
+    ok(false, label, `never got there — still at ${p.url().replace(BASE, '')}`)
+  }
+}
+
+/**
+ * How many elements match, and whether the one that matches is on screen.
+ *
+ * `!(await x.isVisible().catch(() => false))` is true when the element is
+ * hidden AND when it is not in the page at all — so three "must be hidden"
+ * assertions passed on a header that had failed to render. Worse, the `.catch`
+ * swallowed Playwright's strict-mode violation, which is what a DUPLICATE
+ * looks like: two dialogs read as "fires once".
+ */
+const visibility = async (locator) => {
+  const n = await locator.count()
+  return { n, visible: n === 1 && (await locator.first().isVisible()) }
+}
 
 /* ---------------------------------------------------------------- */
 /* 1. The loader: does the document parse into sane sections?        */
@@ -119,12 +192,9 @@ ok(
 
 section('Server render')
 // These fetch the HTML directly rather than through a browser, so they need the
-// session cookie explicitly. Without it every request follows the gate's
-// redirect to /signin and returns a perfectly valid 200 with no maths on it —
-// the assertions below would fail while looking like a rendering bug.
-const COOKIE = sessionCookieHeader()
-const get = (u) => fetch(u, { headers: { cookie: COOKIE } })
-
+// session cookie explicitly — `get()` at the top of this file carries it.
+// Without it every request follows the gate's redirect to /signin and returns a
+// perfectly valid 200 with no maths on it.
 let broken = []
 for (const v of doc.views) {
   const res = await get(url(v.id))
@@ -138,7 +208,29 @@ const heavy = doc.views.reduce((a, b) => (b.body.length > a.body.length ? b : a)
 const html = await (await get(url(heavy.id))).text()
 ok(/class="katex/.test(html), 'KaTeX rendered server-side (no client math runtime)')
 ok(/katex-display/.test(html), 'block formulas are display math, not inline')
-ok(!html.includes(heavy.body.slice(0, 80)), 'raw markdown is not shipped to the client')
+/**
+ * Raw markdown must not reach the browser — in either spelling.
+ *
+ * The needle was a literal 80-character slice of the chapter, which contains a
+ * real newline. The regression that ships markdown to the client ships it
+ * through an RSC prop, where it is JSON-encoded and that newline is the two
+ * characters `\` and `n`. The needle could not match that form, so the check
+ * could only ever catch markdown pasted into the HTML verbatim — which is not
+ * how it would arrive.
+ */
+{
+  const needle = heavy.body.slice(0, 80)
+  const asProp = JSON.stringify(needle).slice(1, -1)
+  const found = [
+    ['verbatim', needle],
+    ['JSON-escaped in an RSC payload', asProp],
+  ].filter(([, n]) => html.includes(n))
+  ok(
+    found.length === 0,
+    'raw markdown is not shipped to the client',
+    found.map(([how]) => how).join(', '),
+  )
+}
 
 /* ---------------------------------------------------------------- */
 /* 3. The browser: layout, gates, persistence                        */
@@ -264,8 +356,11 @@ const open = async (u) => {
 await open(url(doc.views[0].id))
 const secondTab = tabs[1]
 await page.getByRole('tab', { name: secondTab.label }).click()
-await page.waitForURL(`**/courses/${SLUG}?s=${secondTab.viewIds[0]}`, { timeout: 15000 })
-ok(true, `tab "${secondTab.label}" opens its first section`)
+await arrived(
+  page,
+  `**/courses/${SLUG}?s=${secondTab.viewIds[0]}`,
+  `tab "${secondTab.label}" opens its first section`,
+)
 
 // A solution stays closed until asked for.
 const gated = doc.views.find((v) => /^> \*\*(Solution|Preuve|Démonstration)/im.test(v.body))
@@ -314,28 +409,38 @@ await open(`${BASE}/home`)
 // translated, so it comes from the catalogue rather than being typed here.
 const NAV_COURSES = messages.nav.courses
 const headerNav = page.locator('header').getByRole('link', { name: NAV_COURSES })
-ok(
-  !(await headerNav.isVisible().catch(() => false)),
-  '390px: the header text nav is hidden behind the hamburger',
-)
+// Asserted WITH its replacement. On its own, "the text nav is not visible" is
+// satisfied by a header that failed to render at all — `.catch(() => false)`
+// answered false for "hidden", for "absent", and for "two of them", which is
+// three different states reported as one pass.
+{
+  const nav = await visibility(headerNav)
+  const burger = await visibility(page.getByRole('button', { name: /Ouvrir le menu/i }))
+  ok(
+    !nav.visible && burger.n === 1 && burger.visible,
+    '390px: the text nav gives way to a hamburger that is really there',
+    `nav ×${nav.n} visible=${nav.visible} · hamburger ×${burger.n} visible=${burger.visible}`,
+  )
+}
 await page.getByRole('button', { name: /Ouvrir le menu/i }).click()
 await page.getByRole('dialog').getByRole('link', { name: NAV_COURSES }).click()
-await page.waitForURL('**/courses', { timeout: 15000 })
-ok(true, '390px: the hamburger menu navigates')
+await arrived(page, '**/courses', '390px: the hamburger menu navigates')
 
 // Mantine's own display rule outranks Tailwind's `hidden` at equal
 // specificity, so this pairing is worth pinning down.
 const wide = await browser.newPage({ viewport: { width: 1280, height: 800 } })
 await wide.goto(`${BASE}/home`, { waitUntil: 'load' })
 await settle(wide)
-ok(
-  await wide.locator('header').getByRole('link', { name: NAV_COURSES }).isVisible(),
-  '1280px: the text nav is visible',
-)
-ok(
-  !(await wide.getByRole('button', { name: /Ouvrir le menu/i }).isVisible().catch(() => false)),
-  '1280px: the hamburger is hidden',
-)
+{
+  const nav = await visibility(wide.locator('header').getByRole('link', { name: NAV_COURSES }))
+  const burger = await visibility(wide.getByRole('button', { name: /Ouvrir le menu/i }))
+  ok(nav.n === 1 && nav.visible, '1280px: the text nav is visible', `×${nav.n}`)
+  ok(
+    !burger.visible && nav.n === 1 && nav.visible,
+    '1280px: the hamburger gives way to the text nav, which is really there',
+    `hamburger ×${burger.n} visible=${burger.visible}`,
+  )
+}
 await wide.close()
 
 ok(errors.length === 0, 'no console errors', errors.slice(0, 3).join(' | '))
@@ -424,13 +529,33 @@ section('Landing page')
   for (const [name, [got, want]] of Object.entries(links)) {
     ok(got === want, `"${name}" → ${want}`, got === want ? '' : `got ${got}`)
   }
-  for (const [, [href]] of Object.entries(links)) {
-    const res = await fetch(`${BASE}${href}`)
-    if (!res.ok) failures++, console.log(`  ✗ ${href} returned ${res.status}`)
+  // Every one of these is behind the gate except `/` and `/demarrer`, so a bare
+  // `fetch` was answered with a 307 to `/signin`, followed it, and reported the
+  // sign-in page's 200 as the target's. `/totally-made-up-gated-route` came
+  // back ok. And the verdict was `ok(true, …)` — a ✓ printed for a loop whose
+  // result nothing looked at.
+  const dead = []
+  for (const [name, [href]] of Object.entries(links)) {
+    const res = await get(`${BASE}${href}`)
+    if (res.status !== 200) dead.push(`${name} → ${href} HTTP ${res.status}`)
   }
-  ok(true, 'every hero and nav target returns 200')
+  ok(dead.length === 0, 'every hero and nav target returns 200', dead.join(', '))
 
-  // The interactive problem is the page's own claim about how it teaches.
+  /**
+   * The interactive problem is the page's own claim about how it teaches.
+   *
+   * DELIBERATE EXCEPTION to "no auto-graded mathematics", and the only one. The
+   * two assertions below check that the landing preview DOES tell the reader
+   * which answer is right — which is the opposite of what `/quiz/<slug>` and
+   * the checkpoints are allowed to do, and it is not an oversight. It is one
+   * hand-authored illustration of how the product teaches, written by the
+   * pedagogue (`preview.correct` / `preview.wrong`); it is not a chapter,
+   * nothing about it is stored, counted or compared, and no answer is
+   * generated. `scripts/prod-check.mjs` excludes `components/landing/` from its
+   * structural grading check for this reason and no other.
+   *
+   * So: do not "fix" these two by making them assert the absence of feedback.
+   */
   await lp.getByRole('button', { name: messages.preview.label0 }).click()
   await lp.waitForTimeout(200)
   ok(
@@ -557,9 +682,11 @@ section('Progress dashboard')
     'no ranking, league or leaderboard anywhere on the page',
   )
 
-  // Arabic route serves the same page.
-  const arRes = await fetch(`${BASE}/ar/progres`)
-  ok(arRes.ok, 'the dashboard serves on the Arabic route too')
+  // Arabic route serves the same page. Cookie-carrying and not redirect-
+  // following: `/ar/progres` is gated, so a bare fetch reported the sign-in
+  // page's 200 and would have said `ok` for a route that does not exist.
+  const arRes = await get(`${BASE}/ar/progres`)
+  ok(arRes.status === 200, 'the dashboard serves on the Arabic route too', `HTTP ${arRes.status}`)
 
   ok(
     dErrors.filter((e) => !/404|Failed to load resource/.test(e)).length === 0,
@@ -646,24 +773,35 @@ section('Learning loop')
 
   await pg.goto(`${BASE}/courses/${SLUG}`, { waitUntil: 'load' })
   await settle()
-  ok(await pg.getByRole('dialog').isVisible(), 'finishing the chapter is celebrated')
+  // Counted, not asked. Two dialogs is a real regression and `isVisible()` on a
+  // locator that matches two throws a strict-mode violation — which the paired
+  // check below swallowed with `.catch(() => false)` and read as "fires once".
+  {
+    const dlg = await visibility(pg.getByRole('dialog'))
+    ok(dlg.n === 1 && dlg.visible, 'finishing the chapter is celebrated', `×${dlg.n}`)
+  }
+  // `.first()`, now that the count above has established there is exactly one.
+  // `innerText()` on a locator matching two throws a strict-mode violation, and
+  // an uncaught throw here ends the whole run — every later check goes with it
+  // and the failure count is never printed. See `arrived` at the top.
+  const dialogText = await pg.getByRole('dialog').first().innerText()
   const total = doc.views.reduce((n, v) => n + v.xp, 0)
   ok(
-    (await pg.getByRole('dialog').innerText()).includes(String(total)),
+    dialogText.includes(String(total)),
     'the celebration pays the total the course card advertises',
     String(total),
   )
   ok(
-    !/premium|essai gratuit|abonn/i.test(await pg.getByRole('dialog').innerText()),
+    !/premium|essai gratuit|abonn/i.test(dialogText),
     'no monetisation in the celebration',
   )
-  await pg.getByRole('button', { name: new RegExp(c.doneCta) }).click()
+  await pg.getByRole('button', { name: new RegExp(c.doneCta) }).first().click()
   await pg.goto(`${BASE}/courses/${SLUG}`, { waitUntil: 'load' })
   await settle()
-  ok(
-    !(await pg.getByRole('dialog').isVisible().catch(() => false)),
-    'it fires once, not on every visit',
-  )
+  {
+    const again = await pg.getByRole('dialog').count()
+    ok(again === 0, 'it fires once, not on every visit', `${again} dialog(s) on the second visit`)
+  }
 
   ok(
     lErrors.filter((e) => !/404|Failed to load resource/.test(e)).length === 0,
@@ -911,8 +1049,7 @@ section('Filière')
   await pg.getByRole('button', { name: messages.auth['filiere-sm'] }).click()
   await pg.getByRole('button', { name: messages.auth['track-2bac-sm-a'] }).click()
   await pg.getByRole('button', { name: new RegExp(messages.auth.confirm) }).click()
-  await pg.waitForURL('**/home', { timeout: 15000 })
-  ok(true, 'choosing a filière lands on the dashboard')
+  await arrived(pg, '**/home', 'choosing a filière lands on the dashboard')
 
   await pg.goto(`${BASE}/courses`, { waitUntil: 'load' })
   await settle()
@@ -948,7 +1085,7 @@ section('Filière')
   await pg.getByRole('button', { name: messages.auth['filiere-sx'] }).click()
   await pg.getByRole('button', { name: messages.auth['track-2bac-svt'], exact: true }).click()
   await pg.getByRole('button', { name: new RegExp(messages.auth.confirm) }).click()
-  await pg.waitForURL('**/home', { timeout: 15000 })
+  await arrived(pg, '**/home', 'switching filière lands on the dashboard too')
   await pg.goto(`${BASE}/courses`, { waitUntil: 'load' })
   await settle()
   ok(
@@ -960,7 +1097,7 @@ section('Filière')
   await pg.goto(`${BASE}/filiere?next=https://example.com`, { waitUntil: 'load' })
   await settle()
   await pg.getByRole('button', { name: new RegExp(messages.auth.confirm) }).click()
-  await pg.waitForURL('**/home', { timeout: 15000 })
+  await arrived(pg, '**/home', 'an off-site `next` still lands on the dashboard')
   ok(
     new URL(pg.url()).origin === BASE,
     'an off-site `next` is refused',
@@ -1072,8 +1209,7 @@ section('Auth (Google)')
   //    until that is answered.
   await signInAs(ctx)
   await pg.goto(`${BASE}/home`, { waitUntil: 'load' })
-  await pg.waitForURL('**/demarrer**', { timeout: 15000 })
-  ok(true, 'signing in with no filière opens the funnel')
+  await arrived(pg, '**/demarrer**', 'signing in with no filière opens the funnel')
 
   // 6. Answered once, it is not asked again.
   await pg.evaluate(() => {
@@ -1106,7 +1242,7 @@ section('Auth (Google)')
   // cookies from the test. The action drops the e2e bypass alongside the
   // Supabase session precisely so this can be exercised for real.
   await pg.getByRole('menuitem', { name: either('signOut') }).click()
-  await pg.waitForURL(/\/(ar)?$/, { timeout: 15000 })
+  await arrived(pg, /\/(ar)?$/, 'signing out returns to a public page')
   ok(
     at() === '/',
     'signing out lands back on the landing page',
@@ -1312,8 +1448,15 @@ section('Programme complet (13 chapitres)')
     await hp.goto(`${BASE}/home`, { waitUntil: 'networkidle' })
     await hp.waitForTimeout(900)
 
-    const hydration = bad.filter((e) => /hydrat|did ?n.t match/i.test(e))
-    ok(hydration.length === 0, 'the dashboard hydrates without a mismatch', hydration[0] ?? '')
+    // `isHydrationError` — see the top of this file. The filter used to be
+    // `/hydrat|did ?n.t match/i`, which is the DEVELOPMENT text; this suite runs
+    // a production build, where React 19.2 emits "Minified React error #418"
+    // instead. Verified against this very build: an injected text mismatch logs
+    // `Error: Minified React error #418; visit https://react.dev/errors/418…`,
+    // which the old filter matched zero times.
+    const hydration = bad.filter(isHydrationError)
+    ok(hydration.length === 0, 'the dashboard hydrates without a mismatch',
+      hydration[0]?.slice(0, 120) ?? '')
     const bars = await hp
       .locator('[role="progressbar"]')
       .evaluateAll((els) => els.map((e) => e.getAttribute('aria-valuenow')))
@@ -1351,9 +1494,19 @@ section('Programme complet (13 chapitres)')
       'and its call to action goes where something actually happens',
     )
 
-    const ar = await (await get(`${BASE}/ar/subscribe`)).text()
-    ok(ar.includes(arM.premium.heroTitle), 'and the premium page speaks Arabic')
-    ok(!ar.includes(fr.premium.heroTitle), 'with no French left on the Arabic route')
+    // Rendered, not grepped. Every string of `ar.json` is in the HTML of every
+    // page — `/ar/quiz/does-not-exist` returns 404 and still contains
+    // `ar.premium.heroTitle` — so `html.includes(...)` proved nothing about
+    // this page at all.
+    const sp = await browser.newPage({ viewport: { width: 1100, height: 1000 } })
+    await sp.goto(`${BASE}/ar/subscribe`, { waitUntil: 'load' })
+    await sp.waitForSelector(HYDRATED, { timeout: 30000 })
+    await sp.waitForTimeout(250)
+    const arHero = await visibility(sp.getByRole('heading', { name: arM.premium.heroTitle }))
+    ok(arHero.visible, 'and the premium page speaks Arabic', `×${arHero.n}`)
+    const onScreen = await sp.locator('body').innerText()
+    ok(!onScreen.includes(fr.premium.heroTitle), 'with no French left on the Arabic route')
+    await sp.close()
   }
 
   // `/quiz` is the index above the per-chapter self-assessments: every
@@ -1435,33 +1588,51 @@ section('Programme complet (13 chapitres)')
   // course page were hardcoded to `/quiz/1` — "the first chapter of the
   // catalogue" — so every chapter but Limites sent the reader to the wrong
   // self-assessment, and Limites only looked right by coincidence.
+  /**
+   * The loop iterated the links FOUND on the page. Delete the feature and there
+   * are no links, so there are no iterations, so `wrong` is empty and the check
+   * passes — the strongest possible regression reads as a ✓. "Every quiz link
+   * names this chapter" is only half the property; the other half is that there
+   * is one.
+   *
+   * Its companion counted links on `all[0]` alone, so chapters 2 to 13 were
+   * uncovered by it entirely. Both halves are folded into this one pass, over
+   * every chapter's FIRST and LAST section.
+   */
   {
+    const links = (html) =>
+      [...html.matchAll(/href="([^"]*\/quiz\/[^"]+)"/g)].map((m) => m[1]).filter((h) => !/\/quiz\/$/.test(h))
     const wrong = []
-    for (const c of all) {
-      const html = await (await get(`${BASE}/courses/${c.slug}?s=${docs.get(c.slug).views[0].id}`)).text()
-      if (/href="[^"]*\/quiz\/1"/.test(html)) wrong.push(c.slug)
-      // Any quiz link on the page must name this chapter.
-      for (const m of html.matchAll(/href="([^"]*\/quiz\/[^"]+)"/g))
-        if (!m[1].endsWith(`/quiz/${c.slug}`)) wrong.push(`${c.slug} -> ${m[1]}`)
-    }
-    ok(wrong.length === 0, 'every chapter links to its own self-assessment', wrong.slice(0, 3).join(', '))
-  }
-
-  // The end-of-chapter invitation is for the end of the chapter. It used to
-  // render under every section, so the intro offered to check what the reader
-  // knew before they had read a word of it.
-  {
-    const c = all[0]
-    const views = docs.get(c.slug).views
+    const absent = []
+    const header = []
+    const endCard = []
     const fr = JSON.parse(readFileSync(new URL('../messages/fr.json', import.meta.url), 'utf8'))
-    const first = await (await get(`${BASE}/courses/${c.slug}?s=${views[0].id}`)).text()
-    const last = await (await get(`${BASE}/courses/${c.slug}?s=${views[views.length - 1].id}`)).text()
-    // Count rendered links, not copy: next-intl ships the whole `course`
-    // namespace to the client, so every string in it appears in the HTML
-    // whether or not anything rendered it.
-    const links = (html) => (html.match(new RegExp(`href="/quiz/${c.slug}"`, 'g')) ?? []).length
-    ok(links(first) === 1, 'the first section offers the self-assessment once, in the header', `got ${links(first)}`)
-    ok(links(last) === 2, 'and the last adds the end-of-chapter card', `got ${links(last)}`)
+    for (const c of all) {
+      const views = docs.get(c.slug).views
+      const first = await (await get(`${BASE}/courses/${c.slug}?s=${views[0].id}`)).text()
+      const last = await (await get(`${BASE}/courses/${c.slug}?s=${views[views.length - 1].id}`)).text()
+      for (const [html, where] of [[first, 'first'], [last, 'last']]) {
+        const hrefs = links(html)
+        if (hrefs.length === 0) absent.push(`${c.slug}/${where}`)
+        for (const h of hrefs)
+          if (!h.endsWith(`/quiz/${c.slug}`)) wrong.push(`${c.slug}/${where} -> ${h}`)
+      }
+      // Counted per chapter, not just for the first one: the end-of-chapter
+      // invitation used to render under EVERY section, so the intro offered to
+      // check what the reader knew before they had read a word.
+      const mine = (html) => (html.match(new RegExp(`href="/quiz/${c.slug}"`, 'g')) ?? []).length
+      if (mine(first) !== 1) header.push(`${c.slug}:${mine(first)}`)
+      if (mine(last) !== 2) endCard.push(`${c.slug}:${mine(last)}`)
+    }
+    ok(absent.length === 0, 'every chapter offers its self-assessment at all',
+      `${absent.length} page(s) carry no quiz link: ${absent.slice(0, 3).join(', ')}`)
+    ok(wrong.length === 0, 'every chapter links to its own self-assessment', wrong.slice(0, 3).join(', '))
+    ok(header.length === 0,
+      'the first section offers the self-assessment once, in the header',
+      header.slice(0, 3).join(', '))
+    ok(endCard.length === 0,
+      'and the last adds the end-of-chapter card',
+      endCard.slice(0, 3).join(', '))
     // It must not promise a mark: nothing on the self-assessment is graded.
     ok(
       !/score|note\b|Quiz/i.test(fr.course.ctaBody + fr.course.ctaTitle + fr.course.ctaButton),
@@ -1487,26 +1658,53 @@ section('Programme complet (13 chapitres)')
       .join(', '),
   )
 
-  // `critique/course/` is where the chapters are authored and `content/course/`
-  // is what the app reads. Both are committed, so a chapter edited in one and
-  // not the other drifts silently — the site would keep serving the stale copy.
+  /**
+   * `critique/course/` is where the chapters are authored and `content/course/`
+   * is what the app reads. Both are committed, so a chapter edited in one and
+   * not the other drifts silently — the site would keep serving the stale copy.
+   *
+   * The comparison ran one way only: it iterated `critique/`, so a file that
+   * exists ONLY in `content/` was never compared to anything. That is correct
+   * for exactly one file and silent for any other — and "anything you put in
+   * content/" is not an exception, it is a hole. So the exception is named.
+   *
+   * `04-fonctions-logarithmiques.md` was migrated from a 684-line JSX page and
+   * has no authored original; see CLAUDE.md. If it ever gains one, the first
+   * loop starts comparing it and this list should lose it.
+   */
+  const MIGRATED_ONLY = ['04-fonctions-logarithmiques.md']
   const authoredDir = new URL('../critique/course/', import.meta.url)
   const servedDir = new URL('../content/course/', import.meta.url)
-  const stale = readdirSync(authoredDir)
-    .filter((f) => f.endsWith('.md'))
-    .filter((f) => {
-      let served
-      try {
-        served = readFileSync(new URL(f, servedDir), 'utf8')
-      } catch {
-        return true // authored but never copied across
-      }
-      return served !== readFileSync(new URL(f, authoredDir), 'utf8')
-    })
+  const mdIn = (dir) => readdirSync(dir).filter((f) => f.endsWith('.md'))
+  const authoredMd = mdIn(authoredDir)
+  const servedMd = mdIn(servedDir)
+  const stale = authoredMd.filter((f) => {
+    let served
+    try {
+      served = readFileSync(new URL(f, servedDir), 'utf8')
+    } catch {
+      return true // authored but never copied across
+    }
+    return served !== readFileSync(new URL(f, authoredDir), 'utf8')
+  })
   ok(
     stale.length === 0,
     'content/course/ is in sync with critique/course/',
     stale.join(', '),
+  )
+  const unauthored = servedMd.filter(
+    (f) => !authoredMd.includes(f) && !MIGRATED_ONLY.includes(f),
+  )
+  ok(
+    unauthored.length === 0,
+    'and carries no chapter critique/course/ has never seen',
+    `${unauthored.join(', ')} — edit the source, not the served copy: the next sync deletes work done here`,
+  )
+  const goneExceptions = MIGRATED_ONLY.filter((f) => !servedMd.includes(f))
+  ok(
+    goneExceptions.length === 0,
+    'and the one documented exception is still the one',
+    goneExceptions.join(', '),
   )
 
   // The plan a student is shown must be the plan they can open.
@@ -1693,34 +1891,56 @@ section('Chrome')
   const ar = JSON.parse(
     readFileSync(new URL('../messages/ar.json', import.meta.url), 'utf8'),
   )
-  // The quiz is a chapter's own `## Auto-évaluation` now, so it is bilingual
-  // for the same reason the chapters are.
-  const quizHtml = await (await get(`${BASE}/ar/quiz/1`)).text()
-  ok(
-    quizHtml.includes(ar.selfcheck.title) && quizHtml.includes(ar.selfcheck.got),
-    'the self-assessment speaks Arabic',
-  )
-  ok(
-    !/Je sais faire|Pas encore/.test(quizHtml),
-    'and no French is left in it on the Arabic route',
-  )
   /**
-   * The chapters are authored in French and served on the Arabic route too, so
-   * each item is Latin text inside an RTL page. Without an explicit direction
-   * the bidi algorithm moves the full stop to the left of the sentence — the
-   * rendered line read `.complexe et savoir passer de l'une à l'autre`. The
-   * items carry the chapter's `contentDir`, the same field `CourseDoc` reads.
+   * The quiz is a chapter's own `## Auto-évaluation` now, so it is bilingual
+   * for the same reason the chapters are.
+   *
+   * Asserted on RENDERED ELEMENTS, and that is the whole point of this block.
+   * `<NextIntlClientProvider>` gets no `messages` prop, so the ENTIRE locale
+   * bundle is serialised into every page: `/ar/quiz/does-not-exist` answers
+   * HTTP 404 and its HTML still contains `ar.selfcheck.title` and
+   * `ar.selfcheck.got`. `html.includes(<a message string>)` therefore cannot
+   * fail — not for a missing component, not for a missing page.
    */
-  ok(
-    (quizHtml.match(/<span dir="ltr"/g) ?? []).length >= 3,
-    'and its French items keep their own writing direction',
-  )
-  // The interface stays in the reader's language: `contentDir` must not leak
-  // onto the chrome, or the whole page would flip back to LTR.
-  ok(
-    !new RegExp(`dir="ltr"[^>]*>\\s*${ar.selfcheck.title}`).test(quizHtml),
-    'while the interface around them stays Arabic',
-  )
+  const qp = await browser.newPage({ viewport: { width: 1000, height: 1100 } })
+  await qp.goto(`${BASE}/ar/quiz/1`, { waitUntil: 'load' })
+  await qp.waitForSelector(HYDRATED, { timeout: 30000 })
+  await qp.waitForTimeout(300)
+  {
+    const title = await visibility(qp.getByRole('heading', { level: 1, name: ar.selfcheck.title }))
+    const got = await qp.getByRole('button', { name: ar.selfcheck.got }).count()
+    ok(title.visible && got >= 1, 'the self-assessment speaks Arabic',
+      `title ×${title.n} visible=${title.visible} · "${ar.selfcheck.got}" ×${got}`)
+  }
+  {
+    // `body`, not `main`: a page that failed to render has no `main`, and
+    // `innerText()` on a missing locator throws rather than returning ''.
+    const onScreen = await qp.locator('body').innerText()
+    ok(
+      !/Je sais faire|Pas encore/.test(onScreen),
+      'and no French is left in it on the Arabic route',
+    )
+    /**
+     * The chapters are authored in French and served on the Arabic route too,
+     * so each item is Latin text inside an RTL page. Without an explicit
+     * direction the bidi algorithm moves the full stop to the left of the
+     * sentence — the rendered line read `.complexe et savoir passer de l'une à
+     * l'autre`. The items carry the chapter's `contentDir`, the same field
+     * `CourseDoc` reads.
+     */
+    const ltrItems = await qp.locator('ol > li [dir="ltr"]').count()
+    ok(ltrItems >= 3, 'and its French items keep their own writing direction', `×${ltrItems}`)
+    // The interface stays in the reader's language: `contentDir` must not leak
+    // onto the chrome, or the whole page would flip back to LTR. Read the
+    // COMPUTED direction of the rendered heading, not a regex over the source.
+    const h1 = qp.getByRole('heading', { level: 1 })
+    const dir =
+      (await h1.count()) > 0
+        ? await h1.first().evaluate((el) => getComputedStyle(el).direction)
+        : 'no heading'
+    ok(dir === 'rtl', 'while the interface around them stays Arabic', dir)
+  }
+  await qp.close()
 }
 
 section('Auth diagnostics')
@@ -1832,6 +2052,89 @@ section('Brand identity')
   await pg.close()
 }
 
+section('What this product refuses')
+{
+  /**
+   * No ranking, league or leaderboard. Anywhere.
+   *
+   * This was asserted on `/progres` and nowhere else, plus a three-literal
+   * blocklist on `/home` — so `/`, `/courses`, `/quiz`, the reader, `/subscribe`
+   * and the whole Arabic side were never looked at. The regex was French-only
+   * (`rang\b` does not match "ranking"), and it read `innerText`, which returns
+   * text AS RENDERED and therefore skips anything `display: none` — a ranking
+   * panel hidden behind a feature flag would not have been seen.
+   *
+   * So: every page, both languages, every text node whether or not it is
+   * painted, plus the accessible names a screen reader would announce.
+   *
+   * `<script>` is excluded deliberately, and it is not a loophole — it is the
+   * opposite. next-intl serialises the entire locale bundle into every page, so
+   * reading script contents would find every string in `fr.json` on every route
+   * and the check would fire for the copy that says this product does NOT rank.
+   * The catalogues are checked directly, as text, by `scripts/prod-check.mjs`.
+   */
+  const RANKING =
+    /(classements?|ligues?|league|leaderboards?|rankings?|\brangs?\b|palmar[eè]s|podium|top ?\d+|تصنيف|ترتيب|لوحة الصدارة|صدارة)/gi
+  const DENIAL =
+    /(sans|aucunes?|aucun|jamais|ni|pas|no|never|without|بدون|بلا|لا|دون|غير)(\s+(de|des|du|d['’]|la|le|les|such|any|a|of))?[\s'’"«»:,،-]*$/i
+
+  /** Everything a reader could be told, painted or not. */
+  const readableText = (pg) =>
+    pg.evaluate(() => {
+      const SKIP = new Set(['SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT'])
+      let out = ''
+      const walk = (el) => {
+        for (const n of el.childNodes) {
+          if (n.nodeType === 3) out += `${n.nodeValue} `
+          else if (n.nodeType === 1 && !SKIP.has(n.tagName)) {
+            for (const a of ['aria-label', 'alt', 'title'])
+              if (n.hasAttribute(a)) out += `${n.getAttribute(a)} `
+            walk(n)
+          }
+        }
+      }
+      walk(document.body)
+      return out
+    })
+
+  const slugs = listCourses().map((c) => c.slug)
+  const routes = [
+    '/', '/home', '/courses', '/progres', '/quiz', '/subscribe', '/demarrer', '/filiere',
+    `/courses/${SLUG}`, `/courses/${SLUG}?s=${doc.views[0].id}`, `/quiz/${SLUG}`,
+    `/courses/${slugs[slugs.length - 1]}`,
+    '/ar', '/ar/home', '/ar/progres', '/ar/quiz', '/ar/subscribe', `/ar/courses/${SLUG}`,
+  ]
+
+  const rp = await browser.newPage({ viewport: { width: 1280, height: 1000 } })
+  const ranked = []
+  const unreachable = []
+  for (const r of routes) {
+    const res = await rp.goto(`${BASE}${r}`, { waitUntil: 'load' })
+    if (!res || res.status() !== 200) {
+      unreachable.push(`${r} → ${res?.status()}`)
+      continue
+    }
+    await rp.waitForSelector(HYDRATED, { timeout: 30000 })
+    await rp.waitForTimeout(150)
+    const text = await readableText(rp)
+    for (const m of text.matchAll(RANKING)) {
+      const before = text.slice(Math.max(0, m.index - 28), m.index)
+      if (!DENIAL.test(before)) ranked.push(`${r}: “…${before.trim().slice(-22)}${m[0]}…”`)
+    }
+  }
+  await rp.close()
+  ok(
+    unreachable.length === 0,
+    `all ${routes.length} pages answered, so they were all actually read`,
+    unreachable.join(', '),
+  )
+  ok(
+    ranked.length === 0,
+    'no ranking, league or leaderboard on any page, in either language',
+    ranked.slice(0, 3).join(' | '),
+  )
+}
+
 section('Production readiness')
 {
   // Things that must not reach a real deployment.
@@ -1859,21 +2162,79 @@ section('Production readiness')
    * me"), the sitemap listed app.zabaqist.com URLs ("index these"), and the
    * robots meta said `index, follow`. Google resolves that by guessing.
    *
-   * `NEXT_PUBLIC_ALLOW_INDEXING=1` is the switch. Unset — the closed beta, and
-   * how this suite runs — the app defers to the marketing site entirely.
+   * `NEXT_PUBLIC_ALLOW_INDEXING=1` is the switch, and the half of this section
+   * behind it had NEVER RUN. The flag was set nowhere — not in `ci.yml`'s env,
+   * not in the `test:course` script, not by any developer — so four assertions
+   * about the exact transition CLAUDE.md warns about had executed zero times
+   * since they were written.
+   *
+   * Worse, `indexing` was read from THIS PROCESS's environment while the app
+   * bakes `NEXT_PUBLIC_*` into the bundle at BUILD time. Setting the variable
+   * at test time would not have flipped the app; it would have flipped the
+   * expectations and produced a red run for the wrong reason.
+   *
+   * So the state is read off the APP, from the one signal that is always
+   * present, and the environment is used only to check that the build under
+   * test is the build this run meant to test. CI builds and runs both ways.
    */
-  const indexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === '1'
   const homeHtml = await (await get(`${BASE}/`)).text()
   const robotsMeta = /<meta name="robots" content="([^"]+)"/.exec(homeHtml)?.[1] ?? ''
   const canonical = /<link rel="canonical" href="([^"]+)"/.exec(homeHtml)?.[1] ?? ''
 
-  if (indexing) {
-    ok(/Sitemap:/.test(robotsTxt), 'robots.txt offers a sitemap when indexing is on')
+  const built = robotsMeta.startsWith('index')
+    ? 'on'
+    : robotsMeta.startsWith('noindex')
+      ? 'off'
+      : 'unknown'
+  ok(built !== 'unknown', 'the app states an indexing posture at all',
+    robotsMeta || 'no robots meta on /')
+  const asked = process.env.NEXT_PUBLIC_ALLOW_INDEXING
+  if (asked !== undefined) {
     ok(
-      ['/demarrer', '/progres', '/signin'].every((p) =>
-        robotsTxt.includes(`Disallow: ${p}`),
-      ),
-      'the funnel, the private dashboard and auth are excluded from crawling',
+      built === (asked === '1' ? 'on' : 'off'),
+      `the build under test was made with NEXT_PUBLIC_ALLOW_INDEXING=${asked}`,
+      `the app says indexing is ${built} — the flag is baked by \`next build\`,` +
+        ' so setting it at test time changes nothing but these expectations',
+    )
+  }
+
+  const sm = await fetch(`${BASE}/sitemap.xml`, { redirect: 'manual' })
+  const smXml = await sm.text()
+
+  /**
+   * The sixth signal, and the one that lives below the HTML.
+   *
+   * next-intl publishes `Link: <…>; rel="alternate"; hreflang="…"` RESPONSE
+   * HEADERS from the proxy, on every route, in both languages. Google honours
+   * those exactly as it honours the tags in the head — so while the beta was
+   * saying `noindex`, no sitemap, canonical at zabaqist.com, the same responses
+   * were telling a crawler where the app's Arabic pages live. Nothing that
+   * reads page source can see that, which is why it survived four other checks.
+   */
+  const altLinks = async (path) => {
+    const r = await get(`${BASE}${path}`)
+    return (r.headers.get('link') ?? '').includes('rel="alternate"')
+  }
+
+  if (built === 'on') {
+    ok(/Sitemap:/.test(robotsTxt), 'robots.txt offers a sitemap when indexing is on')
+    // Parsed as rules, not as a substring of the file. robots.txt matching is
+    // literal PREFIX, and `localePrefix: 'as-needed'` puts the whole Arabic app
+    // under `/ar` — so `Disallow: /home` does not cover `/ar/home`, and the
+    // Arabic half of the private app was crawlable while the French half was
+    // not. Both spellings have to be covered.
+    const disallowed = robotsTxt
+      .split('\n')
+      .map((l) => /^\s*Disallow:\s*(\S*)\s*$/i.exec(l)?.[1])
+      .filter((x) => x)
+    const uncovered = [
+      '/home', '/progres', '/demarrer', '/signin',
+      '/ar/home', '/ar/progres', '/ar/demarrer', '/ar/signin',
+    ].filter((p) => !disallowed.some((d) => p.startsWith(d)))
+    ok(
+      uncovered.length === 0,
+      'the funnel, the private dashboard and auth are excluded from crawling, in BOTH languages',
+      uncovered.join(', '),
     )
     ok(robotsMeta.startsWith('index'), 'and the robots meta agrees')
     ok(
@@ -1881,53 +2242,110 @@ section('Production readiness')
       'and the canonical claims the app itself',
       canonical,
     )
+
+    /**
+     * A chapter has to name ITSELF.
+     *
+     * `generateMetadata` merges SHALLOWLY from the root layout down, so a page
+     * that sets no `alternates` inherits the root's whole object — thirteen
+     * chapters all emitting `<link rel="canonical" href=".../">`. Google
+     * consolidates a set like that into the one URL they name and indexes none
+     * of them. This is the check that could only ever have run on the launch
+     * branch, which is the branch that had never run.
+     */
+    const drift = []
+    for (const c of listCourses()) {
+      const h = await (await get(`${BASE}/courses/${c.slug}`)).text()
+      const can = /<link rel="canonical" href="([^"]+)"/.exec(h)?.[1] ?? ''
+      if (!can.endsWith(`/courses/${c.slug}`)) drift.push(`${c.slug} → ${can || 'none'}`)
+    }
+    ok(
+      drift.length === 0,
+      "and every chapter's canonical names that chapter, not the homepage",
+      drift.slice(0, 3).join(', '),
+    )
+
+    ok(sm.status === 200 && smXml.includes('<urlset'), 'sitemap.xml is served', `HTTP ${sm.status}`)
+    // The chapters used to be listed here. They are gated — Zabaqist is a
+    // closed beta — so a crawler asking for one got a 307 to `/signin`, which
+    // robots.txt disallows: fourteen of fifteen entries were URLs the sitemap
+    // asked Google to fetch and Google then excluded as "Page with redirect".
+    const gated = listCourses().filter((c) => smXml.includes(`/courses/${c.slug}`))
+    ok(gated.length === 0, 'the sitemap offers no page the app will refuse',
+      gated.map((c) => c.slug).join(', '))
+
+    // Whatever it does list has to answer a signed-out request itself.
+    const locs = [...smXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
+    ok(locs.length > 0, 'the sitemap is not empty')
+    const unreachable = []
+    for (const loc of locs) {
+      const path = new URL(loc).pathname || '/'
+      // No session cookie: this is what a crawler is.
+      const r = await fetch(`${BASE}${path}`, { redirect: 'manual' })
+      if (r.status !== 200) unreachable.push(`${path} -> ${r.status}`)
+    }
+    ok(unreachable.length === 0, 'and every URL in it answers a crawler with 200',
+      unreachable.join(', '))
+
+    ok(
+      /hreflang="ar"/.test(smXml) && /hreflang="fr"/.test(smXml),
+      'and each entry pairs its two locales',
+    )
+    const noHeader = []
+    for (const path of ['/', '/ar']) if (!(await altLinks(path))) noHeader.push(path)
+    ok(
+      noHeader.length === 0,
+      'and the Link: rel="alternate" response headers pair them too',
+      noHeader.join(', '),
+    )
   } else {
     ok(/Disallow: \/\s*$/m.test(robotsTxt), 'the closed beta disallows crawling outright')
     ok(!/Sitemap:/.test(robotsTxt), 'and offers no sitemap to crawl')
+    // Not advertising one is not the same as not having one: crawlers probe
+    // `/sitemap.xml` by convention whether or not robots.txt names it, so the
+    // route has to answer for itself. An empty `<urlset>` would be a valid
+    // document saying "these are all my URLs: none", which Search Console keeps
+    // and re-fetches; 404 is the truth and agrees with robots.txt's silence.
+    ok(sm.status === 404, 'and /sitemap.xml is not there to be found either',
+      `HTTP ${sm.status}`)
     ok(robotsMeta.startsWith('noindex'), 'the robots meta says noindex')
     // `follow` stays on: a crawler that arrives should still walk the links.
     ok(/follow/.test(robotsMeta), 'while still allowing links to be followed')
     ok(
       canonical === 'https://zabaqist.com',
       'and the canonical defers to the site that has public content',
-      canonical,
+      canonical || 'none',
+    )
+    // No page may claim the app while no page may be indexed. A chapter that
+    // named itself here would be asking to be indexed on a deploy that has just
+    // said noindex — the contradiction this whole flag exists to prevent.
+    const claiming = []
+    for (const c of listCourses().slice(0, 3)) {
+      const h = await (await get(`${BASE}/courses/${c.slug}`)).text()
+      const can = /<link rel="canonical" href="([^"]+)"/.exec(h)?.[1] ?? ''
+      if (can.includes('app.zabaqist.com')) claiming.push(`${c.slug} → ${can}`)
+    }
+    ok(claiming.length === 0,
+      'and no gated chapter claims itself as a canonical URL while the beta is closed',
+      claiming.join(', '))
+    const leaking = []
+    for (const path of ['/', '/ar', '/home', `/courses/${SLUG}`])
+      if (await altLinks(path)) leaking.push(path)
+    ok(
+      leaking.length === 0,
+      'and no response advertises an alternate URL of the app in its headers',
+      `${leaking.join(', ')} — next-intl\'s alternateLinks is a sixth indexing signal` +
+        ' and has to move with the other five',
     )
   }
-
-  const sm = await fetch(`${BASE}/sitemap.xml`)
-  const smXml = await sm.text()
-  ok(sm.ok && smXml.includes('<urlset'), 'sitemap.xml is served')
-  // The chapters used to be listed here. They are gated — Zabaqist is a closed
-  // beta — so a crawler asking for one got a 307 to `/signin`, which robots.txt
-  // disallows: fourteen of fifteen entries were URLs the sitemap asked Google
-  // to fetch and Google then excluded as "Page with redirect".
-  const gated = listCourses().filter((c) => smXml.includes(`/courses/${c.slug}`))
-  ok(gated.length === 0, 'the sitemap offers no page the app will refuse',
-    gated.map((c) => c.slug).join(', '))
-
-  // Whatever it does list has to answer a signed-out request itself.
-  const locs = [...smXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
-  ok(locs.length > 0, 'the sitemap is not empty')
-  const unreachable = []
-  for (const loc of locs) {
-    const path = new URL(loc).pathname || '/'
-    // No session cookie: this is what a crawler is.
-    const r = await fetch(`${BASE}${path}`, { redirect: 'manual' })
-    if (r.status !== 200) unreachable.push(`${path} -> ${r.status}`)
-  }
-  ok(unreachable.length === 0, 'and every URL in it answers a crawler with 200',
-    unreachable.join(', '))
-
-  ok(
-    /hreflang="ar"/.test(smXml) && /hreflang="fr"/.test(smXml),
-    'and each entry pairs its two locales',
-  )
 
   // Structured data: the public surface had none, so every rich result was
   // guessed from the prose. `Course` is deliberately absent — its pages are
   // gated, and declaring them would be a mismatch rather than a rich result.
   for (const [loc, label] of [['', 'French'], ['/ar', 'Arabic']]) {
-    const html = await (await get(`${BASE}${loc}/`)).text()
+    // `${loc}/` would be `/ar/`, which the app 308s to `/ar` — and `get()` does
+    // not follow redirects, deliberately. Name the URL the app actually serves.
+    const html = await (await get(`${BASE}${loc || '/'}`)).text()
     const m = /application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/.exec(html)
     ok(!!m, `the ${label} landing page carries structured data`)
     if (m) {
@@ -1954,20 +2372,63 @@ ok(
   migrated.ok && migratedHtml.includes('Chapitre 5'),
   'the migrated course keeps its URL and is served from markdown',
 )
-ok(
-  migratedHtml.includes(messages.course.youAreHere),
-  'and gets the path treatment like every other chapter',
-)
-// Derived, not hardcoded: a chapter that has no markdown yet. Naming one
-// meant the check broke the day that chapter got written.
-const authored = new Set(listCourses().map((c) => c.slug))
-const pending = CHAPTERS_SX.map((c) => c.slug).find((slug) => !authored.has(slug))
-const unknown = await fetch(`${BASE}/courses/${pending}`)
-ok(
-  unknown.ok && (await unknown.text()).includes('Cours en développement'),
-  'a slug with no document still falls back to "coming soon"',
-  pending,
-)
+// The "you are here" pin, RENDERED once — not `html.includes(the string)`,
+// which is true on every page in the app because next-intl ships the whole
+// `course` namespace into all of them.
+{
+  const mp = await browser.newPage({ viewport: { width: 1100, height: 1000 } })
+  await mp.goto(`${BASE}/courses/fonctions-logarithmiques`, { waitUntil: 'load' })
+  await mp.waitForSelector(HYDRATED, { timeout: 30000 })
+  await mp.waitForTimeout(300)
+  const pin = await mp.getByText(messages.course.youAreHere, { exact: true }).count()
+  const nodes = await mp.locator('ol li a').count()
+  ok(
+    pin === 1 && nodes > 1,
+    'and gets the path treatment like every other chapter',
+    `“you are here” ×${pin} · ${nodes} station(s)`,
+  )
+  await mp.close()
+}
+/**
+ * Derived, not hardcoded: a chapter that has no markdown yet. Naming one meant
+ * the check broke the day that chapter got written.
+ *
+ * It asserted two things and proved neither. The bare `fetch` never reached the
+ * page — `/courses/<slug>` is gated, so it followed the 307 and read `/signin`
+ * — and the needle, `'Cours en développement'`, is `catalog.soonTitle`, which
+ * next-intl serialises into the client bundle of EVERY route in the app. The
+ * string was in the sign-in page's HTML. The check was green on two mistakes
+ * that cancelled out.
+ */
+{
+  const authored = new Set(listCourses().map((c) => c.slug))
+  const pending = CHAPTERS_SX.map((c) => c.slug).find((slug) => !authored.has(slug))
+  const fb = await browser.newPage({ viewport: { width: 1000, height: 900 } })
+  const res = await fb.goto(`${BASE}/courses/${pending}`, { waitUntil: 'load' })
+  await fb.waitForSelector(HYDRATED, { timeout: 30000 })
+  ok(
+    res.status() === 200 && new URL(fb.url()).pathname.endsWith(`/courses/${pending}`),
+    'a slug with no document is served rather than redirected',
+    `HTTP ${res.status()} at ${fb.url().replace(BASE, '')}`,
+  )
+  // The RENDERED heading, not the string: see the note above.
+  const soon = await visibility(
+    fb.getByRole('heading', { name: messages.catalog.soonTitle }),
+  )
+  ok(soon.visible, 'a slug with no document still falls back to "coming soon"', `${pending} — ×${soon.n}`)
+  // `getAttribute` on a locator that matches nothing does not return null — it
+  // WAITS for the element and then throws, and an uncaught throw here ends the
+  // run. Count first. (Found by the injection that proved the check above: with
+  // the fallback gone, the check went red and then the suite died.)
+  const quizCta = fb.getByRole('link', { name: messages.catalog.soonQuiz })
+  const quizHref = (await quizCta.count()) === 1 ? await quizCta.getAttribute('href') : null
+  ok(
+    quizHref === `/quiz/${pending}`,
+    'and the fallback offers that chapter\'s own self-assessment',
+    quizHref ?? 'no such link on the page',
+  )
+  await fb.close()
+}
 const catalog = await get(`${BASE}/courses`)
 ok(
   (await catalog.text()).includes(`/courses/${SLUG}`),
@@ -1988,11 +2449,14 @@ section('Arabic (/ar)')
     [`/courses/${SLUG}`, `/ar/courses/${SLUG}`],
     ['/home', '/ar/home'],
   ]
+  // Four of these eight are gated. Without the cookie every one of them was a
+  // 307 to `/signin` that fetch followed and reported as 200, which is why this
+  // loop passed for routes that do not exist at all.
   const bad = []
   for (const [fr, ar] of pairs) {
     for (const u of [fr, ar]) {
-      const r = await fetch(`${BASE}${u}`)
-      if (!r.ok) bad.push(`${u} → ${r.status}`)
+      const r = await get(`${BASE}${u}`)
+      if (r.status !== 200) bad.push(`${u} → ${r.status}`)
     }
   }
   ok(bad.length === 0, 'both locales serve every route', bad.join(', '))
@@ -2038,8 +2502,7 @@ section('Arabic (/ar)')
     // The switcher carries an aria-label, which IS its accessible name — the
     // visible "العربية" / "Français" text does not name it.
     await pg.getByRole('link', { name: messages.lang.label }).first().click()
-    await pg.waitForURL(`**/ar/courses/${SLUG}`, { timeout: 15000 })
-    ok(true, 'the switcher stays on the same page')
+    await arrived(pg, `**/ar/courses/${SLUG}`, 'the switcher stays on the same page')
     await pg.waitForSelector(HYDRATED)
     await pg.waitForTimeout(400)
 
@@ -2079,8 +2542,7 @@ section('Arabic (/ar)')
     )
 
     await pg.getByRole('link', { name: messagesAr.lang.label }).first().click()
-    await pg.waitForURL(`**/courses/${SLUG}`, { timeout: 15000 })
-    ok(true, 'switching back returns to the French URL')
+    await arrived(pg, `**/courses/${SLUG}`, 'switching back returns to the French URL')
     await ctx.close()
   }
 
@@ -2103,5 +2565,11 @@ section('Arabic (/ar)')
 }
 
 await browser.close()
-console.log(`\n${failures === 0 ? '✓ all checks passed' : `✗ ${failures} check(s) failed`}`)
+// The count is printed, never quoted. Three different numbers for this suite
+// were written down as fact in three files — 189 in ci.yml, 189 in
+// prod-check.mjs, ~236 in CLAUDE.md — and all three were stale, because a
+// number in prose does not move when a check is added.
+console.log(
+  `\n${failures === 0 ? `✓ all ${checks} checks passed` : `✗ ${failures} of ${checks} check(s) failed`}`,
+)
 process.exit(failures === 0 ? 0 : 1)

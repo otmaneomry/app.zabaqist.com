@@ -14,14 +14,34 @@ RLS) · Tailwind 3.4 alongside Mantine 9 · TypeScript 6.
 ```
 npm run check        tsc --noEmit && eslint .      must be 0 errors
 npm run loop         db:check + prod:check          must say "no blockers"
-npm run test:course  ~236 browser checks            must be "all checks passed"
+npm run test:course  the browser suite              must be "all checks passed"
 ```
 
+Each of the three prints its own total — `N of M checks ran` for the verifiers,
+`all N checks passed` for the browser suite. **Do not write a count down
+anywhere.** Three were written down as fact and all three were stale: `ci.yml`
+and `prod-check.mjs` said 189, this file said ~236.
+
+`npm run loop` runs both halves and fails if either does. It used to be
+`db:check && prod:check`, so a red database check hid every production blocker
+from the reader of the line above.
+
 CI runs these in the order `check → db:check → prod:check → build →
-test:course`, so a green local run is a green pipeline. The converse does not
-hold: `db:check` carries `continue-on-error: true` in `.github/workflows/ci.yml`,
-so it reports without gating — a red one locally still ships. Read it, do not
-wait for CI to stop you. `test:course` needs a built app on `:3111`:
+test:course`, twice — once with `NEXT_PUBLIC_ALLOW_INDEXING=0` and once with
+`1`, because the flag is baked at build time and the launch half of the
+indexing checks cannot be exercised any other way.
+
+**A green CI run is weaker than a green local one, in exactly one place.** CI
+has no Supabase credentials (`NEXT_PUBLIC_SUPABASE_URL` is `https://ci.invalid`
+on purpose), so `db:check` cannot reach the project: it skips its RLS probes,
+its anonymous-write probes, the allowlist and the signup hook — roughly half of
+what it declares. It says so now, by name and by count, instead of reporting
+"42 checks" and a clean bill of health. Run it locally with `.env.local` in
+place before you believe anything about the database. (There is no
+`continue-on-error` in `.github/workflows/ci.yml`; it was removed in 022835a and
+`prod:check` now asserts it stays removed.)
+
+`test:course` needs a built app on `:3111`:
 
 ```
 npm run build && E2E_AUTH_SECRET=e2e-local-only npm start -- -p 3111
@@ -38,9 +58,11 @@ still catches the real fault by injecting one.
 **`critique/course/` is the source; `content/course/` is the copy the app
 serves.** Both are committed. Editing the served copy and not the source means
 the next sync deletes your work — this broke CI once, with three authored
-GeoGebra sections at stake. `test:course` compares them. (`04-fonctions-
-logarithmiques.md` exists only in `content/`: it was migrated from JSX and has
-no authored original. The check iterates `critique/`, so this is fine.)
+GeoGebra sections at stake. `test:course` compares them **both ways** now.
+`04-fonctions-logarithmiques.md` exists only in `content/` because it was
+migrated from JSX and has no authored original; that is an allowlist of exactly
+one in the check, not "anything you put in `content/`", which is what iterating
+`critique/` alone silently meant.
 
 **The catalogue denormalises `sections` and `exercises`** from the markdown and
 shows them to students. Edit a chapter, update its row in `lib/courseCatalog.ts`
@@ -68,10 +90,14 @@ Supabase Auth with Google, gated by `public.allowed_emails`. The gate is
 `lib/publicPaths.ts`.
 
 **That file exports two lists and they are not the same.** `PUBLIC_PATHS`
-(`/`, `/signin`, `/signup`) is what the proxy lets through unauthenticated;
-`INDEXABLE_PATHS` (`/` alone) is what `app/sitemap.ts` publishes. A page can be
-reachable without a session and still be deliberately absent from the sitemap —
-that is the closed beta. Adding a public route means deciding about both.
+(`/`, `/signin`, `/signup`, `/demarrer`) is what the proxy lets through
+unauthenticated; `INDEXABLE_PATHS` (`/` alone) is what `app/sitemap.ts`
+publishes and what `app/robots.ts` subtracts from the route tree to build its
+disallow list. A page can be reachable without a session and still be
+deliberately absent from the sitemap — that is the closed beta, and `/demarrer`
+is the case in point: the funnel's premise is that it runs before there is an
+account, so it is public, and `robots.ts` disallows it. Adding a public route
+means deciding about both.
 
 `is_email_allowed` normalises the address it is **given**, then compares it to
 the address as **stored** — so a row typed with Gmail dots matches nothing and
@@ -91,25 +117,58 @@ Full detail in `AUTH.md`.
 
 ## Indexing
 
-The app defers to the marketing site while the beta is closed: `noindex`, no
-sitemap offered, canonical pointing at `zabaqist.com`. One flag moves all three
-together — `NEXT_PUBLIC_ALLOW_INDEXING=1` at launch. Do not change one signal
-without the others; they contradicted each other once and Google resolves that
-by guessing.
+The app defers to the marketing site while the beta is closed, and it has to say
+so in **six** places at once:
+
+1. the `robots` meta — `noindex, follow`;
+2. `robots.txt` — `Disallow: /`, and no `Sitemap:` line;
+3. `/sitemap.xml` — 404, not an empty `<urlset>` (Search Console keeps an empty
+   one, reports it as an error and re-fetches it);
+4. the canonical on `/` — `https://zabaqist.com`;
+5. every other page's canonical — absent, because `metadataBase` is the
+   marketing site then and a relative canonical would name a URL that does not
+   exist there;
+6. the `Link: rel="alternate" hreflang` **response headers** next-intl publishes
+   from the proxy — off. Google honours those exactly as it honours the head
+   tags, and nothing that reads page source can see them.
+
+`NEXT_PUBLIC_ALLOW_INDEXING=1` moves all six. Do not change one without the
+others; they contradicted each other once and Google resolves that by guessing.
+
+The flag is a `NEXT_PUBLIC_` value, so it is **baked into the bundle by
+`next build`** — setting it when you run the tests changes what they expect and
+nothing about what they are testing. `test:course` therefore reads the posture
+off the running app and uses the environment only to check you are testing the
+build you meant to. CI builds both ways.
 
 ## What this product refuses
 
-Enforced in code and asserted in `test:course`, on the pedagogue's instruction:
+On the pedagogue's instruction. Each of the three is checked as a **property**
+now rather than as a blocklist of the mistake that happened once:
 
 - **No ranking, league or leaderboard.** Progress is compared to the student's
-  own previous window, never to another student.
+  own previous window, never to another student. Checked over every page in both
+  languages, including text `display: none` would hide (`test:course`), and over
+  both message catalogues (`prod:check`). Copy that *denies* ranking — "sans
+  classement", "لا ترتيب" — is allowed by the negation before the word, not by a
+  list of exempt keys.
 - **Nothing invented.** No fabricated testimonials, review counts, durations or
   recommendations; no competitor assets. Every figure shown is derived from the
-  content or the reader's own device. If the data does not exist, the feature
-  does not ship — an honest count beats an invented estimate.
+  content or the reader's own device. `prod:check` looks for the SHAPE: a
+  literal number — never an ICU placeholder, which is filled from data that
+  exists — next to a noun that makes it a claim about people, opinions or the
+  length of the course; a quoted endorsement with a signature; and any asset
+  loaded from a host this product does not own.
 - **No auto-graded mathematics.** The self-assessment asks the chapter's own
   `## Auto-évaluation` items and the reader judges. A wrong "correct answer"
-  teaches a falsehood to someone sitting the Bac.
+  teaches a falsehood to someone sitting the Bac. `prod:check` asserts the
+  machinery is absent — no correct-answer field in the assessment sources, a
+  `checklist` that is still `string[]`, a verdict vocabulary that is still the
+  reader's three words, and no ratio taken over correctness.
+  **One deliberate exception:** the landing page's preview problem *does* say
+  which answer is right. It is one hand-authored illustration, stored and
+  counted nowhere, and `test:course` asserts that it behaves that way. Both
+  scripts carry a comment saying so — do not "fix" it.
 
 ## Branches
 

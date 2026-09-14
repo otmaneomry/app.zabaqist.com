@@ -1,10 +1,27 @@
-# The 189 browser checks, on every push — so a regression is caught by the
-# repository rather than by a student.
+# Every check in the repository, on every push — so a regression is caught here
+# rather than by a student.
 #
-# Supabase credentials are fake on purpose. The suite never signs in for real
-# (OAuth cannot be scripted); it uses the `zb-e2e` bypass in lib/e2e.ts, and the
-# gate is written to fail closed when Supabase is unreachable. Putting the real
-# project's keys in CI would buy nothing and widen their blast radius.
+# No count is written down. Three different ones used to be: "189" here, "189"
+# in prod-check.mjs, "~236" in CLAUDE.md, and all three were stale. Each script
+# prints its own total, and that one is true by construction.
+#
+# ── Credentials ──
+# `NEXT_PUBLIC_SUPABASE_*` are placeholders on purpose. The browser suite never
+# signs in for real (OAuth cannot be scripted); it uses the `zb-e2e` bypass, and
+# the gate fails closed when Supabase is unreachable. Putting the real project's
+# keys here would buy nothing for that half and widen their blast radius.
+#
+# It does cost something, and `db:check` now says so out loud instead of quietly
+# passing: with a placeholder host it can verify the DECLARED schema and nothing
+# live, so it skips its RLS, anonymous-write, allowlist and signup-hook probes
+# and prints "N of M checks ran". If those are ever wanted here, add
+# SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY / SUPABASE_SECRET_KEY as repository
+# secrets and map them onto the env below; the script reads `process.env` now,
+# which the previous version did not — the variables below were decorative.
+#
+# No `continue-on-error` anywhere, and `prod:check` asserts that. It meant a
+# migration that left RLS disabled reported red in the log and green overall,
+# and the pipeline went on to build and deploy it.
 name: CI
 
 on:
@@ -15,12 +32,24 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+
+    # Both sides of the indexing switch, because the launch side had never run
+    # once. `NEXT_PUBLIC_ALLOW_INDEXING` is baked into the bundle by
+    # `next build`, so it cannot be flipped at test time — the whole build has
+    # to happen twice, and the suite reads the posture off the running app.
+    strategy:
+      fail-fast: false
+      matrix:
+        indexing: ['0', '1']
+
+    name: verify (NEXT_PUBLIC_ALLOW_INDEXING=${{ matrix.indexing }})
 
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://ci.invalid
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
       E2E_AUTH_SECRET: ci-only-not-a-secret
+      NEXT_PUBLIC_ALLOW_INDEXING: ${{ matrix.indexing }}
 
     steps:
       - uses: actions/checkout@v4
@@ -36,12 +65,8 @@ jobs:
       - run: npm run check
 
       # Structure, without the network: the live half skips itself when there
-      # are no real credentials, and says so.
-      # No `continue-on-error`. It meant a migration that left RLS disabled, or
-      # an anonymous write the database accepted, reported red here and green
-      # overall — and the pipeline went on to build and deploy it. Without live
-      # credentials db:check skips the live half and passes on structure alone,
-      # so this does not turn a missing secret into a red build.
+      # are no real credentials, names every check it skipped, and says how many
+      # of the checks it declares actually ran.
       - run: npm run db:check
 
       - run: npm run prod:check
