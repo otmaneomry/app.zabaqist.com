@@ -642,9 +642,9 @@ Dans la pratique, lorsque qu'on s'intéresse à la liberté éventuelle d'une fa
 > **Exemples.**
 1) Placons-nous dans $ E = \mathbb{R}^3 $ et considérons les trois vecteurs :
 
-\[
+$$
 \vec {u} _ {1} = (2; - 1; 3) \quad ; \quad \vec {u} _ {2} = (1; - 3; - 1) \quad ; \quad \vec {u} _ {3} = (0; 1; 1)
-\]
+$$
 
 La famille $(\vec{u}_1; \vec{u}_2; \vec{u}_3)$ est liée car $\frac{1}{5} \vec{u}_1 - \frac{2}{5} \vec{u}_2 - \vec{u}_3 = \vec{0}$.
 
@@ -658,9 +658,9 @@ Alors, pour tout $ x \in \mathbb{R} : (\alpha_1 + \alpha_2)x^3 + (\alpha_3 + \al
 
 Alors, pour tout $ x \in \mathbb{R} : (\alpha_1 + \alpha_2)x^3 + (\alpha_3 + \alpha_4)x^2 + (\alpha_2 - \alpha_3)x + (-\alpha_1 - \alpha_4) = 0 $. Un polynôme n'est nul que lorsque tous ses coefficients sont nuls. Cela conduit à résoudre le système :
 
-\[
+$$
 \left\{ \begin{array}{l} \alpha_ {1} + \alpha_ {2} = 0 \\ \alpha_ {3} + \alpha_ {4} = 0 \\ \alpha_ {2} - \alpha_ {3} = 0 \\ - \alpha_ {1} - \alpha_ {4} = 0 \end{array} ; c ^ {\prime} \text {est - à - dire}: \left\{ \begin{array}{l} \alpha_ {2} = - \alpha_ {1} \\ \alpha_ {4} = - \alpha_ {3} \\ - \alpha_ {1} - \alpha_ {3} = 0 \\ - \alpha_ {1} + \alpha_ {3} = 0 \end{array} ; d ^ {\prime} o u: \left\{ \begin{array}{l} \alpha_ {1} = 0 \\ \alpha_ {2} = 0 \\ \alpha_ {3} = 0 \\ \alpha_ {4} = 0 \end{array} . \right. \right. \right.
-\]
+$$
 
 Ainsi, la famille $(P_{1}; P_{2}; P_{3}; P_{4})$ est libre.
 
@@ -674,9 +674,9 @@ Puisque $\sigma \in \mathbb{C} \setminus \mathbb{R}$ alors sa forme algébrique 
 
 Soit maintenant $(\alpha; \beta) \in \mathbb{R}^2$ tel que $\alpha \times 1 + \beta \times \sigma = 0$. On a alors:
 
-\[
+$$
 \alpha + \beta \sigma = 0 \Rightarrow \alpha + \beta (\operatorname{Re} (\sigma) + i \operatorname{Im} (\sigma)) = 0 \Rightarrow \alpha + \beta \operatorname{Re} (\sigma) + i \beta \operatorname{Im} (\sigma) = 0
-\]
+$$
 
 Un nombre complexe est nul si sa partie réelle et sa partie imaginaire sont nulles. On obtient alors
 
@@ -1129,17 +1129,17 @@ Déterminons ensuite une base de $ (E_{p}; + ; \cdot) $ :
 
 On a pour tout $ (a;b)\in\mathbb{R}^{2} $:
 
-\[
+$$
 M _ {p} (a; b) = \left( \begin{array}{c c} a & b \\ p b & a \end{array} \right) = \left( \begin{array}{c c} a & 0 \\ 0 & a \end{array} \right) + \left( \begin{array}{c c} 0 & b \\ p b & 0 \end{array} \right) = a \left( \begin{array}{c c} 1 & 0 \\ 0 & 1 \end{array} \right) + b \left( \begin{array}{c c} 0 & 1 \\ p & 1 \end{array} \right) = a I + b J \quad \text {où} \quad J = \left( \begin{array}{c c} 0 & 1 \\ p & 1 \end{array} \right).
-\]
+$$
 
 ce qui montre que $(I;J)$ est une famille génératrice de l'espace vectoriel réel $(E_p; + ;\cdot)$. Montrons
 
 maintenant la liberté de cette famille. Soit $ (a;b)\in\mathbb{R}^{2} $ tel que $ aI+bJ=O $. On aura alors :
 
-\[
+$$
 a I + b J = O \Rightarrow \left( \begin{array}{c c} a & b \\ p b & a \end{array} \right) = \left( \begin{array}{c c} 0 & 0 \\ 0 & 0 \end{array} \right) \Rightarrow \left\{ \begin{array}{l} a = 0 \\ b = 0 \end{array} \right.
-\]
+$$
 
 Puisque la famille $(I;J)$ est libre et génératrice de $(E_p; + ;\cdot)$, alors c'est une base de $E_{p}$. Ainsi: $\dim E_{p} = 2$.
 
@@ -1147,9 +1147,9 @@ Puisque la famille $(I;J)$ est libre et génératrice de $(E_p; + ;\cdot)$, alor
 
 On a pour tout $ (a;b;c;d)\in\mathbb{R}^{4} $:
 
-\[
+$$
 M _ {p} (a; b) \times M _ {p} (c; d) = \left( \begin{array}{c c} a & b \\ p b & a \end{array} \right) \left( \begin{array}{c c} c & d \\ p d & c \end{array} \right) = \left( \begin{array}{c c} a c + p b d & a d + b c \\ p (a d + b c) & a c + p b d \end{array} \right) = M _ {p} (a c + p b d; a d + b c)
-\]
+$$
 
 Comme $ M_p(ac + pbd; ad + bc) \in E_p $ alors $ E_p $ est stable dans $ (\mathbb{M}_2(\mathbb{R}); \times) $.
 
@@ -1163,9 +1163,9 @@ $ (\mathbb{M}_{2}(\mathbb{R}); + ; \times) $ alors il en est de même dans l'ens
 
 Par conséquent, $ (E_{p}; + ; \times) $ est un anneau. La commutativité de la loi × résulte du fait que :
 
-\[
+$$
 M _ {p} (a; b) \times M _ {p} (c; d) = M _ {p} (a c + p b d; a d + b c) = M _ {p} (c a + p d b; d a + c b) = M _ {p} (c; d) \times M _ {p} (a; b)
-\]
+$$
 
 Ainsi, $ (E_{p}; + ; \times) $ est un anneau commutatif.
 
@@ -1487,18 +1487,18 @@ On considère le sous-ensemble $E$ de $\mathbb{M}_{2}(\mathbb{R})$ défini par: 
 
 On considère les ensembles suivants :
 
-\[
+$$
 \begin{array}{l} E = \left\{\left(x; 0; x\right) / x \in \mathbb {R} \right\}; F = \left\{\left(- x; 2 x; 0\right) / x \in \mathbb {R} \right\} \\ H = \left\{\left(- x + 2 y; 2 x - 3 y; x + y\right) / (x; y) \in \mathbb {R} ^ {2} \right\} \\ K = \left\{\left(- x + 2 y; x + z; x + y\right) / (x; y; z) \in \mathbb {R} ^ {3} \right\} \\ \end{array}
-\]
+$$
 
 1) Montrer que chacun des ensembles ci-dessus, muni des opérations habituelles définies dans $\mathbb{R}^3$, sont des espaces vectoriels réels.
 2) Déterminer une base et la dimension de chacun des espaces vectoriels montrés dans la question 1).
 
 On considère le sous-ensemble suivant de $\mathbb{R}^3$ :
 
-\[
+$$
 F = \left\{\alpha (1; 1; 1) + \beta (1; 0; - 1) / (\alpha , \beta) \in \mathbb {R} ^ {2} \right\}
-\]
+$$
 
 1) Montrer que $F$ est un sous-espace vectoriel de $\mathbb{R}^3$.
 2) Soit $\bar{u} = (x; y; z)$ un élément de $E$.
@@ -1507,9 +1507,9 @@ Quelle relation lie les composantes de vecteur $\bar{u}$ ?
 
 Pour tout $x \in \mathbb{R}$, on pose :
 
-\[
+$$
 A (x) = x e ^ {x}; \quad B (x) = e ^ {x}; \quad C (x) = e ^ {- x}
-\]
+$$
 
 et soit $E$ l'ensemble des fonctions $f$ telles que: $\left(\exists (\alpha ;\beta ;\gamma)\in \mathbb{R}^3\right)f = \alpha A + \beta B + \gamma C$
 
@@ -1528,41 +1528,41 @@ Montrer que si $\alpha\gamma \neq 0$ alors $(f; f'; f'')$ est une base de l'espa
 **Exercice 31.**
 Soit $E$ le sous-ensemble de $\mathbb{R}^{3}$ définie par :
 
-\[
+$$
 E = \left\{\left(x; y; z\right) \in \mathbb {R} ^ {3} / x ^ {2} + 2 y ^ {2} + z ^ {2} + 2 x y + 2 y z = 0 \right\}
-\]
+$$
 
 Est-ce que $E$ est un sous-espace vectoriel de l'espace vectoriel réel $(\mathbb{R}^3; +; \cdot)$? Justifier.
 
 **Exercice 32.**
 Soit $\mathcal{E}$ l'ensemble des fonctions polynômiales :
 
-\[
+$$
 \begin{array}{l} f: x \mapsto a x ^ {2} + b x + c \text {   telles   que   :   } \int_ {0} ^ {1} x ^ {n} f (x) d x = 0 \\ \text {   où   } n \in \mathbb {N} ^ {*} \text {   et   } (a; b; c) \in \mathbb {R} ^ {3}. \end{array}
-\]
+$$
 
 1) On considère les deux fonctions polynômiales $u$ et $v$ définies par :
 
-\[
+$$
 u (x) = x - \frac {n + 1}{n + 2} \quad \text { et } \quad v (x) = x ^ {2} - \frac {n + 1}{n + 3}
-\]
+$$
 
 a) Montrer que la famille $(u; v)$ est libre dans l'espace vectoriel réel $(\mathcal{I}(\mathbb{R}, \mathbb{R}); +; \cdot)$.
 
 b) Montrer que :
 
-\[
+$$
 \left(\forall f \in \mathcal {E}\right) \left(\exists (\alpha ; \beta) \in \mathbb {R} ^ {2}\right) f = \alpha u + \beta v
-\]
+$$
 
 c) Montrer que $(\mathcal{E}; +; \cdot)$ est un espace vectoriel réel de dimension 2.
 
 **Exercice 33.**
 On considère le sous-ensemble $E$ de $\mathbb{M}_{3}(\mathbb{R})$ défini
 
-\[
+$$
 \text { par: } \mathcal {E} = \left\{M (x; y) = \left( \begin{array}{c c c} x & y & y \\ y & x & y \\ y & y & x \end{array} \right) / (x; y) \in \mathbb {R} ^ {2} \right\}
-\]
+$$
 
 Montrer que $(\mathcal{E}; +; \cdot)$ est un espace vectoriel réel puis déterminer sa dimension.
 

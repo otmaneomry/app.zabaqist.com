@@ -371,7 +371,7 @@ d) En déduire la probabilité de l'événement $(Y = 4)$.
 
 3. On suppose maintenant qu'il fait dix tirs et on note Z le nombre de succès obtenus.
 
-On a alors : Z(Ω) = {0; 1; ...; 10}. Montrer que pour tout k ∈ Z(Ω) : P(Z = k) = C_{10}^k \left(\frac{3}{4}\right)^k \left(\frac{1}{4}\right)^{10-k}
+On a alors : $Z(\Omega) = \{0; 1; \dots; 10\}$. Montrer que pour tout $k \in Z(\Omega) : P(Z = k) = C_{10}^k \left(\frac{3}{4}\right)^k \left(\frac{1}{4}\right)^{10-k}$
 
 ## Cours
 ### 1. Le vocabulaire des probabilités
@@ -1505,7 +1505,7 @@ A titre d'exemple, considérons les deux variables aléatoires discrètes X et Y
 
 Un calcul élémentaire montre que les variables X et Y ont même espérance : E(X) = E(Y) = 4,5
 
-Par contre, le calcul de la variance à l'aide de la définition ci-dessus donne : V(X) = 11/4 et V(Y) = 689/4. Ces dernières indiquent une dispersion de Y autour de sa moyenne beaucoup plus grande que celle de X. Pour le calcul de la variance, la formule V(X) = Σ$_{i=1}$$^{n}$ p$_{i}$(x$_{i}$ - E(X))$^{2}$ est un peu lourde et aboutit parfois à des calculs compliqués. C'est pourquoi il est préférable d'utiliser la formule développée suivante nommée « formule de Koenig »
+Par contre, le calcul de la variance à l'aide de la définition ci-dessus donne : V(X) = 11/4 et V(Y) = 689/4. Ces dernières indiquent une dispersion de Y autour de sa moyenne beaucoup plus grande que celle de X. Pour le calcul de la variance, la formule $V(X) = \sum_{i=1}^{n} p_i (x_i - E(X))^2$ est un peu lourde et aboutit parfois à des calculs compliqués. C'est pourquoi il est préférable d'utiliser la formule développée suivante nommée « formule de Koenig »
 
 > **Proposition 7.**
 Soit X une variable aléatoire définie sur un espace probabilisé fini (Ω; P) telle que :

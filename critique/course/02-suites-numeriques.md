@@ -410,7 +410,7 @@ Soit $(u_n)_{n \ge n_0}$ et $(v_n)_{n \ge n_0}$ deux suites numériques telles q
 > **Exemples.**
 1) Soit $(u_n)$ la suite numérique définie par :
 
-$u_n = \sqrt[n^6 + 1 + \sin n]$
+$u_n = \sqrt[3]{n^6 + 1 + \sin n}$
 
 On a pour tout $n \in \mathbb{N}$ : $n^6 + 1 + \sin n \ge n^6$
 
@@ -619,9 +619,9 @@ On admet que les résultats sur les limites des fonctions restent valables pour 
 
 ➤ Limite d'une inverse :
 
-|  $$\lim u_n$$ | $$\ell \neq 0$$ | $$+\infty$$ ou $$+\infty$$ | 0  |
+|  $$\lim u_n$$ | $$\ell \neq 0$$ | $$+\infty$$ ou $$-\infty$$ | 0  |
 | --- | --- | --- | --- |
-|  $$\lim \frac{1}{u_n}$$ | $$\frac{1}{\ell}$$ | 0 | $$\lim \frac{1}{|u_n|} = +\infty$$  |
+|  $$\lim \frac{1}{u_n}$$ | $$\frac{1}{\ell}$$ | 0 | $$\lim \frac{1}{\lvert u_n \rvert} = +\infty$$  |
 
 #### 2.8. LIMITES ET ORDRE
 
@@ -1591,7 +1591,7 @@ $$u_n > 0 \quad \text{et} \quad \frac{\pi^2}{u_n} = \frac{\pi}{2} [2\pi]$$
 3) En déduire $ u_{n} $ en fonction $ n $ puis déterminer $ \lim_{n\to \infty} $
 
 **Exercice 32.**
-Soit $\alpha \in \mathbb{R}_+^n$. On considère la suite $(u_n)$ définie par :
+Soit $\alpha \in \mathbb{R}_+^*$. On considère la suite $(u_n)$ définie par :
 
 $$\begin{cases} u_0 = \alpha \quad (\alpha > \sqrt[3]{a} \text{ et } \alpha \in \mathbb{R}) \\ u_{n+1} = \frac{1}{3} \left( 2u_n + \frac{\alpha}{u_n^2} \right) \end{cases}$$
 

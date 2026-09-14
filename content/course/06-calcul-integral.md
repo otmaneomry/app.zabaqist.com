@@ -103,14 +103,14 @@ B) Soit $f, g$ et $h$ les fonctions numériques définies sur $[0; 2]$ par :
 
 $$f(x) = -3 \quad ; \quad g(x) = 6x - 7 \quad ; \quad \begin{cases} h(x) = 2 - x \text{ si } x \in [0; 1] \\ h(x) = 3x - 2 \text{ si } x \in ]1; 2] \end{cases}$$
 
-1. Montrer que \( f, g \) et \( h \) sont continues sur [0; 2] et déterminer les primitives de chacune d'elles sur [0; 2].
-2. Calculer les intégrales suivantes: \(\int_0^2 f(x)dx\) ； \(\int_0^2 g(x)dx\) ； \(\int_0^2 h(x)dx\)
+1. Montrer que $ f, g $ et $ h $ sont continues sur [0; 2] et déterminer les primitives de chacune d'elles sur [0; 2].
+2. Calculer les intégrales suivantes: $\int_0^2 f(x)dx$ ； $\int_0^2 g(x)dx$ ； $\int_0^2 h(x)dx$
 
 ### PROPRIÉTÉS DE L'INTÉGRALE
 A) Soit $f$ la fonction numérique définie sur $[0; 2]$ par : $f(x) = 2|x - 1|$
 
-1. Montrer que: \(\int_0^2 f(x)dx = \int_0^1 f(x)dx + \int_1^2 f(x)dx\)
-2. En déduire la valeur de l'intégrale \(\int_0^2 f(x)dx\)
+1. Montrer que: $\int_0^2 f(x)dx = \int_0^1 f(x)dx + \int_1^2 f(x)dx$
+2. En déduire la valeur de l'intégrale $\int_0^2 f(x)dx$
 
 De façon générale : Si $f$ est une fonction continue sur un intervalle $I$,
 
@@ -118,11 +118,11 @@ alors pour tous $a, b$ et $c$ de $I$ : $\int_a^b f(x)dx = \int_a^c f(x)dx + \int
 
 Cette égalité s'appelle la relation de Chasles pour les intégrales.
 
-3. Application: Calculer l'intégrale \(\int_{-\frac{\pi}{2}}^{\pi} |\sin x| dx\).
-B) On considere les fonctions \( g \) et \( h \) définies sur l'intervalle [1;5] par: \( g(x) = (x - 1)\sqrt{x - 1} \) et \( h(x) = \sqrt{x - 1} \).
-1. Determiner les primitives des fonctions \( g \) et \( h \) sur l'intervalle [1;5].
-2. Calculer \(\int_{1}^{1}g(x)dx\) et \(\int_{1}^{1}h(x)dx\)
-3. Calculer \(\int_{1}^{1}\left(g(x) + h(x)\right)dx\) et \(\int_{1}^{1}3g(x)dx\). Que remarque-t-on?
+3. Application: Calculer l'intégrale $\int_{-\frac{\pi}{2}}^{\pi} |\sin x| dx$.
+B) On considere les fonctions $ g $ et $ h $ définies sur l'intervalle [1;5] par: $ g(x) = (x - 1)\sqrt{x - 1} $ et $ h(x) = \sqrt{x - 1} $.
+1. Determiner les primitives des fonctions $ g $ et $ h $ sur l'intervalle [1;5].
+2. Calculer $\int_{1}^{1}g(x)dx$ et $\int_{1}^{1}h(x)dx$
+3. Calculer $\int_{1}^{1}\left(g(x) + h(x)\right)dx$ et $\int_{1}^{1}3g(x)dx$. Que remarque-t-on?
 
 De façon générale : Si $g$ et $h$ sont deux fonctions continues sur un intervalle $I$ et $\lambda \in \mathbb{R}$, alors pour tous $a$ et $b$ de $I$ : $\int_a^b (g(x) + h(x))dx = \int_a^b g(x)dx + \int_a^b h(x)dx$ et $\int_a^b \lambda g(x)dx = \lambda \int_a^b g(x)dx$
 
@@ -131,8 +131,8 @@ De façon générale : Si $g$ et $h$ sont deux fonctions continues sur un interv
 ### INTÉGRATION ET DÉRIVATION
 A) Soit $f$ une fonction continue sur un intervalle $I$ et soit $a \in I$.
 
-1. Vérifier que \(\varphi(a) = 0\).
-2. Montrer que \(\varphi\) est une primitive de la fonction \(f\) sur \(I\). On obtient alors le résultat suivant:
+1. Vérifier que $\varphi(a) = 0$.
+2. Montrer que $\varphi$ est une primitive de la fonction $f$ sur $I$. On obtient alors le résultat suivant:
 
 La fonction $x \mapsto \int_{0}^{1} f(t) dt$ est la primitive de la fonction $f$ sur $I$ qui s'annule en $a$.
 
@@ -150,8 +150,8 @@ Soit $\mathcal{C}_k$ ($k \in \{1, 2, 3\}$) la courbe représentative de $f_k$ da
 
 Soit $\sigma(\Delta_k)$ l'aire en $cm^2$ du domaine $\Delta_k$.
 
-a) Calculer \(\sigma (\Delta_k)\) pour \(k\in \{1,2,3\}\)
-b) Montrer que \(\sigma (\Delta_k) = \int_{-1}^{1}f_k(x)dx\) pour tout \(k\in \{1,2,3\}\)
+a) Calculer $\sigma (\Delta_k)$ pour $k\in \{1,2,3\}$
+b) Montrer que $\sigma (\Delta_k) = \int_{-1}^{1}f_k(x)dx$ pour tout $k\in \{1,2,3\}$
 
 B) Soit $f$ la fonction définie sur $[0; 4]$ par : $f(x) = \sqrt{x}$
 
@@ -161,12 +161,12 @@ Pour tout $t \in [0, 4]$ on note $\Delta_t$ le domaine plan délimité par la co
 
 1. Soit $h$ un réel positif tel que : $1 < t + h < 4$
 
-a) Que representation le nombre \(\sigma (t + h) - \sigma (t)\)?
-b) Montrer que: \( h\sqrt{t} \leq \sigma(t + h) - \sigma(t) \leq h\sqrt{t + h} \)
-c) En déduire que \( t \mapsto \sigma(t) \) est une primitive de la fonction \( f \) sur l'intervalle [0;4].
+a) Que representation le nombre $\sigma (t + h) - \sigma (t)$?
+b) Montrer que: $ h\sqrt{t} \leq \sigma(t + h) - \sigma(t) \leq h\sqrt{t + h} $
+c) En déduire que $ t \mapsto \sigma(t) $ est une primitive de la fonction $ f $ sur l'intervalle [0;4].
 
-2. Montrer que pour tout \(t\in [0;4]\) .. \(\sigma (t) = \int_0^t f(x)dx\)
-3. Calculer \(\sigma(t)\) en fonction de \(t\) et en deduire I'aire \(\sigma(4)\)
+2. Montrer que pour tout $t\in [0;4]$ .. $\sigma (t) = \int_0^t f(x)dx$
+3. Calculer $\sigma(t)$ en fonction de $t$ et en deduire I'aire $\sigma(4)$
 
 ### TECHNIQUE D'INTÉGRATION PAR PARTIES
 A) Soit $g$ la fonction numérique définie sur $\mathbb{R}$ par : $g(x) = x \sin x$
@@ -276,14 +276,14 @@ $$\int_{a^2}^{a^2} \frac{\ln x}{x} dx = \left[ \frac{1}{2} \ln^2 x \right]_{a^2}
 $$\int_2^6 \sqrt{2 + x} dx = \int_2^6 (2 + x)^{\frac{1}{2}} dx = \left[ \frac{2}{3} (2 + x)^{\frac{3}{2}} \right]_{2}^{6} = \frac{2}{3} \left( 8^{\frac{3}{2}} - 4^{\frac{3}{2}} \right) = \frac{16}{3} (2\sqrt{2} - 1)$$
 
 > **Applications.**
-1. Determiner la dérivée de la fonction \( F: x \mapsto \ln \left( x + \sqrt{x^2 + 1} \right) \) sur \( \mathbb{R}^* \) puis calculer \( L = \int_0^3 \frac{1}{\sqrt{x^2 + 1}} dx \).
-2. Calculer les intégrales suivantes: \( I = \int_{1}^{\sqrt{2}} \frac{dx}{1 + x^2} \); \( J = \int_{\frac{1}{2}}^{a} \frac{\ln^3 x}{x} dx \); \( K = \int_{-2}^{1} x \cdot 2^{-x^2} dx \)
+1. Determiner la dérivée de la fonction $ F: x \mapsto \ln \left( x + \sqrt{x^2 + 1} \right) $ sur $ \mathbb{R}^* $ puis calculer $ L = \int_0^3 \frac{1}{\sqrt{x^2 + 1}} dx $.
+2. Calculer les intégrales suivantes: $ I = \int_{1}^{\sqrt{2}} \frac{dx}{1 + x^2} $; $ J = \int_{\frac{1}{2}}^{a} \frac{\ln^3 x}{x} dx $; $ K = \int_{-2}^{1} x \cdot 2^{-x^2} dx $
 
 > **Propriété 1.**
 Soit $f$ une fonction continue sur un intervalle $I$. Alors on a pour tous $a, b$ et $c$ de $I$ :
 
-\(\int_{a}^{a}f(x)dx = 0\) et \(\int_{a}^{b}f(x)dx = -\int_{b}^{a}f(x)dx\)
-\(\int_{a}^{b}f(x)dx = \int_{a}^{b}f(x)dx + \int_{c}^{b}f(x)dx\) (C'est la relation de Chasles pour les intégrales).
+$\int_{a}^{a}f(x)dx = 0$ et $\int_{a}^{b}f(x)dx = -\int_{b}^{a}f(x)dx$
+$\int_{a}^{b}f(x)dx = \int_{a}^{b}f(x)dx + \int_{c}^{b}f(x)dx$ (C'est la relation de Chasles pour les intégrales).
 
 Exemple
 Considérons l'intégrale $$I = \int_{-2}^{0} |x(x+1)| dx$$. Le tableau de signe de l'expression $$x(x+1)$$ sur $$[-2, 0]$$ est :
@@ -323,8 +323,8 @@ On peut regrouper les deux formules de la propriété 2 dans la formule suivante
 $$(\forall (\lambda, \mu) \in \mathbb{R}^2) \int_{a}^{b} (\lambda f(x) + \mu g(x)) dx = \lambda \int_{a}^{b} f(x) dx + \mu \int_{a}^{b} g(x) dx$$
 
 > **Exemples.**
-1) On a: \( A = \int_{0}^{1}\frac{1}{4}\left(\frac{1}{x - 2} -\frac{1}{x + 2}\right)dx = \frac{1}{4}\left(\int_{0}^{x}\frac{dx}{x - 2} -\int_{0}^{1}\frac{dx}{x + 2}\right) = \frac{1}{4}\left(\left[\ln |x - 2|\right]_{0}^{x} + \left[\ln |x + 2|\right]_{0}^{x}\right) = -\frac{1}{4}\ln 3 \)
-2) On considere les intégrales: \( K = \int_{0}^{x} \frac{\cos x}{\cos x + \sin x} dx \) et \( L = \int_{0}^{x} \frac{\sin x}{\cos x + \sin x} dx \).
+1) On a: $ A = \int_{0}^{1}\frac{1}{4}\left(\frac{1}{x - 2} -\frac{1}{x + 2}\right)dx = \frac{1}{4}\left(\int_{0}^{x}\frac{dx}{x - 2} -\int_{0}^{1}\frac{dx}{x + 2}\right) = \frac{1}{4}\left(\left[\ln |x - 2|\right]_{0}^{x} + \left[\ln |x + 2|\right]_{0}^{x}\right) = -\frac{1}{4}\ln 3 $
+2) On considere les intégrales: $ K = \int_{0}^{x} \frac{\cos x}{\cos x + \sin x} dx $ et $ L = \int_{0}^{x} \frac{\sin x}{\cos x + \sin x} dx $.
 
 On a: $$K + L = \int_{0}^{x} \frac{\cos x}{\cos x + \sin x} dx + \int_{0}^{x} \frac{\sin x}{\cos x + \sin x} dx = \int_{0}^{x} 1 dx = [x]_{0}^{x} = \frac{\pi}{4}$$
 
@@ -333,9 +333,9 @@ Et: $$K - L = \int_{0}^{x} \frac{\cos x - \sin x}{\cos x + \sin x} dx = [\ln |\c
 Il s'ensuit donc que: $$2K = \frac{\pi}{4} + \frac{1}{2} \ln 2$$ et $$2L = \frac{\pi}{4} - \frac{1}{2} \ln 2$$. D'où: $$K = \frac{\pi}{8} + \frac{1}{4} \ln 2$$ et $$L = \frac{\pi}{8} - \frac{1}{4} \ln 2$$
 
 > **Applications.**
-1. Soit \( n \in \mathbb{N}^* \). Montrer que: \( \int_0^1 \frac{1 + x^{2n+1}}{1 + x} dx = 1 - \frac{1}{2} + \frac{1}{3} - \dots + \frac{1}{2n+1} \).
-2. Calculer l'intégrale suivante: \( I = \int_{1}^{x}\ln xdx + \int_{1}^{x}\left(\frac{2\ln x}{x} +\ln \frac{1}{x}\right)dx \)
-3. On pose: \( K = \int_{0}^{\ln 2}\frac{c' - 1}{c' + 1} dt \) et \( L = \int_{0}^{\ln 2}\frac{1}{c' + 1} dt \).
+1. Soit $ n \in \mathbb{N}^* $. Montrer que: $ \int_0^1 \frac{1 + x^{2n+1}}{1 + x} dx = 1 - \frac{1}{2} + \frac{1}{3} - \dots + \frac{1}{2n+1} $.
+2. Calculer l'intégrale suivante: $ I = \int_{1}^{x}\ln xdx + \int_{1}^{x}\left(\frac{2\ln x}{x} +\ln \frac{1}{x}\right)dx $
+3. On pose: $ K = \int_{0}^{\ln 2}\frac{c' - 1}{c' + 1} dt $ et $ L = \int_{0}^{\ln 2}\frac{1}{c' + 1} dt $.
 
 Calculer $$K + L$$ et $$K + 2L$$ puis en déduire les valeurs de $$K$$ et $$L$$.
 
@@ -405,8 +405,8 @@ $$G'(x) = (5x)^t f(5x) - (3x)^t f(3x) = 5e^{3x^2} - 3e^{9x^2} = 5e^{9x^2} \left(
 Puisque $e^{16x^2} \ge 1$ alors $G'(x) > 0$ pour tout $x \in \mathbb{R}$. Ainsi, la fonction $G$ est strictement croissante sur $\mathbb{R}$.
 
 > **Applications.**
-1. Montrer que les fonctions \( F \) et \( G \) définies par: \( F(x) = \int_{\infty}^{x} \sqrt{1 - t^2} dt \) et \( G(x) = \int_{-x}^{2x} \ln(e^t + 1) dt \) sont dérivables sur \( \mathbb{R} \) et déterminer leurs fonctions dérivées.
-2. Soit \( H \) la fonction numérique définie sur \( \mathbb{R}_+^* \) par: \( H(x) = \int_{x}^{2x} \frac{dt}{\ln(1 + t^2)} \)
+1. Montrer que les fonctions $ F $ et $ G $ définies par: $ F(x) = \int_{\infty}^{x} \sqrt{1 - t^2} dt $ et $ G(x) = \int_{-x}^{2x} \ln(e^t + 1) dt $ sont dérivables sur $ \mathbb{R} $ et déterminer leurs fonctions dérivées.
+2. Soit $ H $ la fonction numérique définie sur $ \mathbb{R}_+^* $ par: $ H(x) = \int_{x}^{2x} \frac{dt}{\ln(1 + t^2)} $
 
 Montrer que $H$ est dérivable sur $\mathbb{R}_+^*$ et que : $\ln(1+x^2)\ln(1+4x^2)H'(x) = \ln\left(\frac{(1+x^2)^2}{1+4x^2}\right)$
 
@@ -589,8 +589,8 @@ que $\int_0^{\frac{\pi}{4}} \ln(\cos x)dx \geq \int_0^{\frac{\pi}{4}} \ln(\cos \
 
 3. Pour tout $n \in \mathbb{N}$, on pose: $I_n = \int_0^{\frac{\pi}{6}} x^n \cos(3x) dx$
 
-a) Montrer que la suite \(\left(I_{n}\right)\) est décroissant.
-b) Montrer que pour tout \(n\in \mathbb{N}\) .. \(0\leq I_n\leq \left(\frac{\pi}{6}\right)^n\) .En deduire \(\lim_{n\to \infty}I_n\)
+a) Montrer que la suite $\left(I_{n}\right)$ est décroissant.
+b) Montrer que pour tout $n\in \mathbb{N}$ .. $0\leq I_n\leq \left(\frac{\pi}{6}\right)^n$ .En deduire $\lim_{n\to \infty}I_n$
 
 ### 3. Intégration et ordre
 
@@ -628,9 +628,9 @@ Soit $f$ une fonction continue sur un segment $[a; b]$ ($a < b$).
 La valeur moyenne de la fonction $f$ sur $[a; b]$ est le nombre réel $\mu = \frac{1}{b-a} \int_a^b f(x) dx$.
 
 > **Remarques.**
-- Très souvent dans la pratique, \( m \) et \( M \) représentent le minimum et le maximum de la fonction \( f \) sur le segment \( [a, b] \).
-Si on a \(m\leq f\leq M\) sur \(\left[a,b\right]\) \((a <   b)\) , alors \(m\leq \mu \leq M\) .C'est pourquoi la proposition 8 porte le nom de « inegalite de la moyenne »
-La formule \(\mu = \frac{1}{b - a}\int_{a}^{b}f(x)dx\) est une generalisation de la formule \(\overline{x} = \frac{1}{N}\sum_{i = 1}^{N}f(x_i)\) donnant la moyenne arithmetique d'une série statistique.
+- Très souvent dans la pratique, $ m $ et $ M $ représentent le minimum et le maximum de la fonction $ f $ sur le segment $ [a, b] $.
+Si on a $m\leq f\leq M$ sur $\left[a,b\right]$ $(a <   b)$ , alors $m\leq \mu \leq M$ .C'est pourquoi la proposition 8 porte le nom de « inegalite de la moyenne »
+La formule $\mu = \frac{1}{b - a}\int_{a}^{b}f(x)dx$ est une generalisation de la formule $\overline{x} = \frac{1}{N}\sum_{i = 1}^{N}f(x_i)$ donnant la moyenne arithmetique d'une série statistique.
 
 > **Proposition 9.**
 Soit $f$ une fonction continue sur un segment $[a; b]$ $(a < b)$.
@@ -640,8 +640,8 @@ Il existe au moins un réel $c \in [a; b]$ tel que : $\int_{a}^{b} f(x)dx = (b -
 Ce résultat porte le nom de « Théorème de la moyenne »
 
 > **Remarques.**
-Si \(f([a,b]) = [m,M]\) et \(F\) designe une primitive de la fonction \(f\) sur \([a,b]\) , alors la formule \(\int_{a}^{b}f(x)dx = (b - a)f(c)\) est equivalente a \(F(b) - F(a) = (b - a)F'(c)\) , et cette formule n'est qu'une copie de la formule du theoreme des accroissements finis appliquee a la fonction \(F\)
-- Graphiquement, une interprétation de ce théorème est que l'aire algébrique sous la courbe \(\mathcal{C}_f\) est égale à celle d'un rectangle de base \([a,b]\), et de hauteur l'ordonnée d'un point moyen de la courbe.
+Si $f([a,b]) = [m,M]$ et $F$ designe une primitive de la fonction $f$ sur $[a,b]$ , alors la formule $\int_{a}^{b}f(x)dx = (b - a)f(c)$ est equivalente a $F(b) - F(a) = (b - a)F'(c)$ , et cette formule n'est qu'une copie de la formule du theoreme des accroissements finis appliquee a la fonction $F$
+- Graphiquement, une interprétation de ce théorème est que l'aire algébrique sous la courbe $\mathcal{C}_f$ est égale à celle d'un rectangle de base $[a,b]$, et de hauteur l'ordonnée d'un point moyen de la courbe.
 
 > **Exemples.**
 La valeur moyenne de la fonction $x \mapsto \ln x \text{ sur } [1, e]$ est $\mu = \frac{1}{e-1} \int_{1}^{e} \ln(x)dx$. Une intégration par parties appliquée à l'intégrale $\int_{1}^{e} \ln(x)dx$ donne : $\int_{1}^{e} \ln(x)dx = [x \ln x]_{1}^{e} - \int_{1}^{e} dx = e - [x]_{1}^{e} = 1$, donc $\mu = \frac{1}{e-1}$.
@@ -654,9 +654,9 @@ $$H(x) = (x^2 - x)f(c_x) + [\ln(t-1)]_x^{x^2} = (x^2 - x)f(c_x) + \ln(x+1)$$
 Ce résultat permet de calculer par exemple $\lim_{x \to 1^\infty} H(x)$ (on trouve : $\lim_{x \to 1^\infty} H(x) \approx \ln 2$)
 
 > **Applications.**
-1. Calculer la valeur moyenne de la fonction \( f: x \mapsto \frac{2e^{2x}}{2e^x - 1} \) sur le segment \( [0, \ln 2] \).
-2. Soit \( a \) un réel strictement positif, et soit \( g \) une fonction continue sur \( [0, a] \). Pour tout \( n \in \mathbb{N} \) on pose: \( u_n = \int_0^a \frac{g(x)}{1 + nx} dx \). Détérminer la limite de la suite \( (u_n) \).
-3. Soit \( h \) une fonction continue sur \( [0,1] \) telle que \( \int_0^h h(x)dx = \frac{\pi}{4} \). En appliquant le théorème de la moyenne à la fonction \( x \mapsto h(x) - \frac{1}{1 + x^2} \) sur \( [0,1] \), montré que: \( (\exists c \in [0,1]) \frac{1}{1 + c} \leq h(c) \leq \frac{1}{2c} \).
+1. Calculer la valeur moyenne de la fonction $ f: x \mapsto \frac{2e^{2x}}{2e^x - 1} $ sur le segment $ [0, \ln 2] $.
+2. Soit $ a $ un réel strictement positif, et soit $ g $ une fonction continue sur $ [0, a] $. Pour tout $ n \in \mathbb{N} $ on pose: $ u_n = \int_0^a \frac{g(x)}{1 + nx} dx $. Détérminer la limite de la suite $ (u_n) $.
+3. Soit $ h $ une fonction continue sur $ [0,1] $ telle que $ \int_0^h h(x)dx = \frac{\pi}{4} $. En appliquant le théorème de la moyenne à la fonction $ x \mapsto h(x) - \frac{1}{1 + x^2} $ sur $ [0,1] $, montré que: $ (\exists c \in [0,1]) \frac{1}{1 + c} \leq h(c) \leq \frac{1}{2c} $.
 
 ### 4. Applications du calcul intégral
 #### 4.1. CALCUL DES AIRES
@@ -678,8 +678,8 @@ $x = a$ et $x = b$. On note $\sigma(\Delta)$ ou $\sigma(f)$
 
 l'aire du domaine $(\Delta)$.
 
-Le nombre positif \(\int_{a}^{b}|f(x)|dx\) est appelé l'aire géométrique du domaine \((\Delta)\)
-Le nombre \(\int_{a}^{b}f(x)dx\) est appelé l'aire algebrique du domaine \((\Delta)\)
+Le nombre positif $\int_{a}^{b}|f(x)|dx$ est appelé l'aire géométrique du domaine $(\Delta)$
+Le nombre $\int_{a}^{b}f(x)dx$ est appelé l'aire algebrique du domaine $(\Delta)$
 
 • Dans le cas où la fonction $f$ est positive sur $[a; b]$, on a déjà vu du paragraphe 1.3, qui concerne l'interprétation géométrique de l'intégrale, que : $\sigma(\Delta) = \int_{a}^{b} f(x) dx$ (unité de mesure).
 
@@ -736,8 +736,8 @@ On considère un solide $(S)$ limité par deux plans parallèles
 
 au plan $(O, \vec{i}, \vec{j})$ :
 
-> le plan de cote a d'équation \( z = a \)
-> le plan de cote b d'equation \(z = b\)
+> le plan de cote a d'équation $ z = a $
+> le plan de cote b d'equation $z = b$
 
 Si $S(t)$ est l'aire de l'intersection du solide $(S)$ avec tout
 
@@ -781,8 +781,8 @@ Le volume du solide engendré par la rotation de la courbe de la fonction $f : x
 $$V = \pi \int_0^1 (e^{2x})^2 dx = \pi \int_0^1 e^{4x} dx = \frac{\pi}{4} [e^{4x}]_0^1 = \frac{\pi (e^4 - 1)}{4} \quad (\text{en unité de volume})$$
 
 > **Applications.**
-1. Soit \( g \) la fonction numérique définie sur \( [0; \pi] \) par: \( g(x) = \sin x \). Calculer le volume du solide engendré par la rotation de la courbe \( \mathcal{C}_g \) autour de l'axe des abscisses un tour complet.
-2. Calculer le volume du solide engendre par la rotation de cercle \((\mathcal{C})\) d'equation \(x^{2} + (y - 2)^{2} = 1\) autour de I'axe des abscisses.
+1. Soit $ g $ la fonction numérique définie sur $ [0; \pi] $ par: $ g(x) = \sin x $. Calculer le volume du solide engendré par la rotation de la courbe $ \mathcal{C}_g $ autour de l'axe des abscisses un tour complet.
+2. Calculer le volume du solide engendre par la rotation de cercle $(\mathcal{C})$ d'equation $x^{2} + (y - 2)^{2} = 1$ autour de I'axe des abscisses.
 
 > **Proposition 14.**
 Soit $f$ une fonction continue et strictement monotone sur un segment $[a; b](a < b)$, et $\mathcal{C}_f$ sa courbe représentative dans un repère orthonormé $(O, \vec{i}, \vec{j})$.
@@ -963,21 +963,21 @@ Principe : le choix de la fonction $u$ (fonction à dériver) se fait selon l'or
 ### B. Suite d'intégrales
 On pose pour tout $n \in \mathbb{N}$ : $I_n = \int_0^1 x^n e^{-x} dx$
 
-1) Calculer \( I_0 \) et \( I_1 \).
-2) Trouver une relation récurrente entre \( I_{n} \) et \( I_{n + 1} \).
-3) Montrer que pour tout entier \(n\in \mathbb{N}\) .. \(\frac{1}{e(n + 1)}\leq I_n\leq \frac{1}{n + 1}\)
-4) On définit une suite \(\left(u_{n}\right)\) en posant pour tout entier \(n\): \(I_{n} = \frac{n!}{e}\left(e - u_{n}\right)\)
+1) Calculer $ I_0 $ et $ I_1 $.
+2) Trouver une relation récurrente entre $ I_{n} $ et $ I_{n + 1} $.
+3) Montrer que pour tout entier $n\in \mathbb{N}$ .. $\frac{1}{e(n + 1)}\leq I_n\leq \frac{1}{n + 1}$
+4) On définit une suite $\left(u_{n}\right)$ en posant pour tout entier $n$: $I_{n} = \frac{n!}{e}\left(e - u_{n}\right)$
 
-a) Trouver une relation récurrente entre \( u_{n} \) et \( u_{n + 1} \).
-b) Calculer \( u_{0} \) puis en déduire l'expression de \( u_{n} \) en fonction de \( n \).
+a) Trouver une relation récurrente entre $ u_{n} $ et $ u_{n + 1} $.
+b) Calculer $ u_{0} $ puis en déduire l'expression de $ u_{n} $ en fonction de $ n $.
 
 5) Calculer $\lim_{n \to +\infty} \left(1 + \frac{1}{1!} + \frac{1}{2!} + \dots + \frac{1}{n!}\right)$.
 
 > **Solution.**
 1) Calcul de $I_0$ et $I_1$ :
 
-- \( I_0 = \int_0^1 e^{-x} dx = \left[-e^{-x}\right]_0^1 = 1 - e^{-1} \)
-Pour le calcul de \(I_{1}\) , une integration par parties donne: \(I_{1} = \left[-xe^{-x}\right]_{0}^{1} + \int_{0}^{1}e^{-x}dx = -e^{-1} + 1 - e^{-1} = 1 - \frac{2}{e}\)
+- $ I_0 = \int_0^1 e^{-x} dx = \left[-e^{-x}\right]_0^1 = 1 - e^{-1} $
+Pour le calcul de $I_{1}$ , une integration par parties donne: $I_{1} = \left[-xe^{-x}\right]_{0}^{1} + \int_{0}^{1}e^{-x}dx = -e^{-1} + 1 - e^{-1} = 1 - \frac{2}{e}$
 
 2) Une intégration par parties sur $I_{n+1} = \int_0^1 x^{n+1} e^{-x} dx$ donne :
 
@@ -1028,11 +1028,11 @@ où les fonctions $f_n$ sont des fonctions continues sur le segment $[a, b]$.
 
 Plusieurs techniques à savoir pour l'étude de la suite $(u_n)$ :
 
-Pour justifier l'existence de \( u_{n} \), il suffit de justifier que la fonction \( f_{n} \) est continue sur \( [a, b] \) pour tout \( n \in \mathbb{N} \). Ceci se fait généralement en une ou deux lignes.
-Pour étudier le signe de \( u_{n} \), on étudie le signe de \( f_{n} \) sur le segment \( [a, b] \).
+Pour justifier l'existence de $ u_{n} $, il suffit de justifier que la fonction $ f_{n} $ est continue sur $ [a, b] $ pour tout $ n \in \mathbb{N} $. Ceci se fait généralement en une ou deux lignes.
+Pour étudier le signe de $ u_{n} $, on étudie le signe de $ f_{n} $ sur le segment $ [a, b] $.
 
-- Si pour tout \( x \in [a; b] \), \( f_{n}(x) \geq 0 \), alors \( u_{n} \geq 0 \).
-- Si pour tout \( x \in [a; b] \), \( f_{n}(x) \leq 0 \), alors \( u_{n} \leq 0 \).
+- Si pour tout $ x \in [a; b] $, $ f_{n}(x) \geq 0 $, alors $ u_{n} \geq 0 $.
+- Si pour tout $ x \in [a; b] $, $ f_{n}(x) \leq 0 $, alors $ u_{n} \leq 0 $.
 
 Bien sûr, ces conditions sont des conditions suffisantes et pas nécessaires.
 
@@ -1040,7 +1040,7 @@ o Pour étudier la monotonie de la suite $(u_n)$, on utilise la linéarité de l
 
 on étudie le signe de la différence : $u_{n+1} - u_n = \int_a^b (f_{n+1}(x) - f_n(x)) dx$
 
-- Si pour tout \( x \in [a; b] \), \( f_{n+1}(x) - f_n(x) \geq 0 \), alors \( u_{n+1} - u_n \geq 0 \). D'où: \( (u_n) \) est croissant.
+- Si pour tout $ x \in [a; b] $, $ f_{n+1}(x) - f_n(x) \geq 0 $, alors $ u_{n+1} - u_n \geq 0 $. D'où: $ (u_n) $ est croissant.
 
 - Si pour tout $x \in [a; b]$, $f_{n+1}(x) - f_n(x) \leq 0$, alors $u_{n+1} - u_n \leq 0$. D'où: $(u_n)$ est décroissante.
 
@@ -1059,9 +1059,9 @@ Montrer que $F$ est dérivable sur $]0; +\infty[$ puis calculer $F'(x)$ pour tou
 
 II) On considère la fonction $f$ définie sur $]0; +\infty[$ par : $f(t) = \frac{t-1}{t \ln t}$ si $t \neq 1$ et $f(1) = 1$.
 
-1) Montrer que \( f \) est continue sur \( ]0; +\infty[ \).
-2) Calculer \(\lim_{t\to 1}\int_{x}^{t^{2}}f(t)dt\)
-3) En déduire la valeur de la limite: \(\lim_{t\to 1}\int_{x}^{t^{2}}\frac{dt}{\ln t}\)
+1) Montrer que $ f $ est continue sur $ ]0; +\infty[ $.
+2) Calculer $\lim_{t\to 1}\int_{x}^{t^{2}}f(t)dt$
+3) En déduire la valeur de la limite: $\lim_{t\to 1}\int_{x}^{t^{2}}\frac{dt}{\ln t}$
 
 > **Solution.**
 I) La fonction $g$ définie sur $]0; +\infty[$ par $g(t) = \frac{e^{-t^2}}{t}$ est continue sur cet intervalle. Elle admet donc une primitive $G$ dérivable sur $]0; +\infty[$. De plus, les fonctions $u$ et $v$ définies sur $]0; +\infty[$ par $u(x) = x$ et $v(x) = x^2$ sont dérivables sur $]0; +\infty[$. On a donc pour tout $x \in ]0; +\infty[$ : $F(x) = G(x^2) - G(x) = G \circ v(x) - G \circ u(x)$
@@ -1182,11 +1182,11 @@ $$I _ { 9 } = \int _ { 0 } ^ { \pi } e ^ { x } \left( \sin x + \cos x \right) d 
 #### Exercice 06
 On considère l'intégrale : $$I = \int _ { 0 } ^ { \frac { \pi } { 4 } } \frac { d x } { 1 + \sin ( 2 x ) }$$
 
-1) Montrer que pour tout \( x \in \left[0; \frac{\pi}{4}\right] \):
-\[
+1) Montrer que pour tout $ x \in \left[0; \frac{\pi}{4}\right] $:
+$$
 \frac { 1 } { 1 + \sin ( 2 x ) } = \frac { 1 + \tan ^ { 2 } x } { ( 1 + \tan x ) ^ { 2 } }
-\]
-2) En déduire la valeur de l'intégrale \(I\)
+$$
+2) En déduire la valeur de l'intégrale $I$
 
 ### LINÉARITÉ - RELATION DE CHASLES
 #### Exercice 07
@@ -1202,8 +1202,8 @@ On considère les intégrales :
 $$I = \int_{0}^{\frac{\pi}{2}} \cos^4 x \, dx \quad ; \quad J = \int_{0}^{\frac{\pi}{2}} \sin^4 x \, dx$$
 $$K = \int_{0}^{\frac{\pi}{2}} 2 \sin^2(x) \cos^2(x) \, dx$$
 
-1) Calculator: \( I - J \) et \( I + J + K \)
-2) a)-Calculer \(2\sin^2 (x)\cos^2 (x)\) en fonction de
+1) Calculator: $ I - J $ et $ I + J + K $
+2) a)-Calculer $2\sin^2 (x)\cos^2 (x)$ en fonction de
 
 $$\sin^2(2x) \text{ et } \cos(4x)$$
 
@@ -1299,13 +1299,13 @@ Calculer $$E + F$$ et $$E - F$$ puis en déduire les valeurs des intégrales $$E
 #### Exercice 18
 On pose pour tout $$n \in \mathbb { N }$$ : $$I _ { n } = \int _ { 0 } ^ { 1 } x ^ { n } \sqrt { 1 - x } d x$$
 
-1) Calculator \(I_0\)
-2) a) En utilisant une intégration par parties, montré que: \((\forall n \in \mathbb{N}), (2n + 5)I_{n+1} = (2n + 2)I_n\)
-b) En déduire les valeurs de \( I_{1} \) et \( I_{2} \).
+1) Calculator $I_0$
+2) a) En utilisant une intégration par parties, montré que: $(\forall n \in \mathbb{N}), (2n + 5)I_{n+1} = (2n + 2)I_n$
+b) En déduire les valeurs de $ I_{1} $ et $ I_{2} $.
 
 #### Exercice 19
-1) Vérifier que: \( \left( {\forall t \in  {\mathbb{R}}^{ * }}\right)  \frac{1}{\left( {t + 1}\right) ^ {2}} = 1 - \frac{t}{t + 1} - \frac{t}{\left( {t + 1}\right) ^ {2}} \)
-2) Calculer l'intégrale: \( I = \int_{0}^{1} \frac{dx}{\left(e^{x} + 1\right)^{2}} \)
+1) Vérifier que: $ \left( {\forall t \in  {\mathbb{R}}^{ * }}\right)  \frac{1}{\left( {t + 1}\right) ^ {2}} = 1 - \frac{t}{t + 1} - \frac{t}{\left( {t + 1}\right) ^ {2}} $
+2) Calculer l'intégrale: $ I = \int_{0}^{1} \frac{dx}{\left(e^{x} + 1\right)^{2}} $
 3) En utilisant une intégration par parties, calculer
 
 l'intégrale suivante : $$J = \int _ { 0 } ^ { 1 } \frac { x e ^ { x } } { \left( e ^ { x } + 1 \right) ^ { 2 } } d x$$
@@ -1321,8 +1321,8 @@ $$\begin{array} { l } { I = \int _ { 0 } ^ { 1 + a } \left( 1 + e ^ { x } \right
 #### Exercice 22
 On pose : $$\left( \forall x \in ] 0 ; 1 [ \right) \quad I ( x ) = \int _ { t } ^ { 1 } t . \operatorname { A r c t a n } \left( \frac { 1 } { t } \right) d t$$
 
-1) En utilisant la formule d'intégration par parties, exprimer \( I(x) \) en fonction de \( x \).
-2) Calculator \(\lim_{x\to 0^{-}}I(x)\)
+1) En utilisant la formule d'intégration par parties, exprimer $ I(x) $ en fonction de $ x $.
+2) Calculator $\lim_{x\to 0^{-}}I(x)$
 
 ### INTEGRATION PAR CHANGEMENT DE VARIABLE
 En utilisant la technique de changement de variable, calculer les intégrales suivantes :
@@ -1425,8 +1425,8 @@ $$\frac{t^2}{t^2 - 1} = 1 + \frac{1}{2} \left(\frac{1}{t - 1} - \frac{1}{t + 1}\
 #### Exercice 33
 On considère l'intégrale : $I = \int_0^1 \frac{e^x}{1 + x} dx$
 
-1) a) Montrer que: \(\left(\forall t\in \mathbb{R}^{+}\right)1 - t\leq e^{-t}\leq 1\)
-b) En déduire que pour tout \( x \in [0,1] \):
+1) a) Montrer que: $\left(\forall t\in \mathbb{R}^{+}\right)1 - t\leq e^{-t}\leq 1$
+b) En déduire que pour tout $ x \in [0,1] $:
 
 $$1 - x \leq e^{-x} \leq 1 - x + \frac{x^2}{2}$$
 
@@ -1447,8 +1447,8 @@ On considère la fonction $F$ définie sur $\mathbb{R}$ par :
 
 $$F(x) = \int_0^{2x} \frac{dt}{\sqrt{1 + t^2 + t^4}}$$
 
-1) Montrer que la fonction \(F\) est paire.
-2) a) Montrer que pour tout \(x \in \mathbb{R}^+\), il existe
+1) Montrer que la fonction $F$ est paire.
+2) a) Montrer que pour tout $x \in \mathbb{R}^+$, il existe
 
 $$c \in [x; 2x] \text{ tel que : } F(x) = \frac{x}{\sqrt{1 + c^2 + e^4}}$$
 
@@ -1579,8 +1579,8 @@ $$\int_{0}^{\alpha} \frac{1}{3+t^2} dt = \frac{1}{\sqrt{3}} \text{Arctan}\left(\
 
 $$F(x) = \int_{0}^{x} \frac{1 + \sin u}{2 + \cos u} du$$
 
-a) Montrer que \(F\) est derivable sur \([0; \pi]\).
-b) En utilisant une integration par changement de variable et en posant \(t = \tan \frac{u}{2}\), montré que:
+a) Montrer que $F$ est derivable sur $[0; \pi]$.
+b) En utilisant une integration par changement de variable et en posant $t = \tan \frac{u}{2}$, montré que:
 
 $$(\forall x \in [0; \pi]) \quad F(x) = 2 \int_{0}^{\tan \frac{x}{2}} \frac{(1+t)^2}{(1+t^2)(3+t^2)} dt$$
 
@@ -1619,8 +1619,8 @@ b) Calculer $S(\alpha)$ et $\lim_{\alpha \to \infty} S(\alpha)$
 #### Exercice 48
 Pour tout $n \in \mathbb{N}$ on pose : $u_n = \int_0^1 \frac{2^n t}{1 + n 2^n t^2} dt$
 
-1) Calculer \(u_{0}\)
-2) Calculer \( u_{n} \) en fonction de \( n \) puis déterminer \( \lim_{n\to \infty}u_n \).
+1) Calculer $u_{0}$
+2) Calculer $ u_{n} $ en fonction de $ n $ puis déterminer $ \lim_{n\to \infty}u_n $.
 
 #### Exercice 49
 On considère la fonction $f$ définie sur $I = \left[0; \frac{\pi}{4}\right]$ par :
@@ -1629,17 +1629,17 @@ $$f(x) = \frac{\sin x}{\cos^3 x}$$
 
 On considère l'intégrale : $K = \int_0^{\frac{\pi}{4}} \frac{1}{\cos^4 x} dx$
 
-1) Montrer que: \((\forall x \in I) f'(x) = \frac{3}{\cos^4 x} - \frac{2}{\cos^2 x}\)
-2) En déduire la valeur de \( K \).
+1) Montrer que: $(\forall x \in I) f'(x) = \frac{3}{\cos^4 x} - \frac{2}{\cos^2 x}$
+2) En déduire la valeur de $ K $.
 
 #### Exercice 50
 Soit $f$ la fonction définie sur $\mathbb{R}$ par : $f(x) = e^{-x} \sin x$
 
-1) Verifier que: \((\forall x \in \mathbb{R}) f'(x) + 2f'(x) + 2f(x) = 0\)
-2) Soit \(n\in \mathbb{N}\) .Calculer: \(a_{n} = \int_{n\times n}^{(n + 1)n}f(x)dx\)
+1) Verifier que: $(\forall x \in \mathbb{R}) f'(x) + 2f'(x) + 2f(x) = 0$
+2) Soit $n\in \mathbb{N}$ .Calculer: $a_{n} = \int_{n\times n}^{(n + 1)n}f(x)dx$
 
 #### Exercice 51
-1) Calculer l'intégrale suivante: \( I = \int_{0}^{\frac{\pi}{4}} \frac{1}{\cos^4 x} dx \)
+1) Calculer l'intégrale suivante: $ I = \int_{0}^{\frac{\pi}{4}} \frac{1}{\cos^4 x} dx $
 2) En utilisant une intégration par parties, calculer
 
 l'intégrale : $J = \int_0^{\frac{\pi}{4}} \frac{x \sin x}{\cos^4 x} dx$
@@ -1659,31 +1659,31 @@ On considère les intégrales suivantes :
 $$I = \int_0^{\pi} e^x \cos^2(x) dx \quad , \quad J = \int_0^{\pi} e^x \sin^2(x) dx$$
 $$K = \int_0^{\pi} e^x \cos(2x) dx$$
 
-1) En utilisant deux fois la formule d'intégration par parties, calculer la valeur du \( K \).
-2) Calculer \( I + J \) et \( I - J \) puis en déduire les valeurs des intégrales \( I \) et \( J \).
-3) Écrire \( \cos^2 x \) et \( \sin^2 x \) en fonction de \( \cos(2x) \) puis calculer la valeur de chacune des intégrales \( I \) et \( J \) en utilisant celle de l'intégrale \( K \).
+1) En utilisant deux fois la formule d'intégration par parties, calculer la valeur du $ K $.
+2) Calculer $ I + J $ et $ I - J $ puis en déduire les valeurs des intégrales $ I $ et $ J $.
+3) Écrire $ \cos^2 x $ et $ \sin^2 x $ en fonction de $ \cos(2x) $ puis calculer la valeur de chacune des intégrales $ I $ et $ J $ en utilisant celle de l'intégrale $ K $.
 
 #### Exercice 54
 Pour tout $x \in \mathbb{R}$ on pose : $f(x) = \int_1^x (t-1)(t+3)e^{-x} dt$
 
-1) Calculer \( f(x) \) en fonction de \( x \).
-2) Determiner \(\lim_{x\to +\infty}f(x)\)
+1) Calculer $ f(x) $ en fonction de $ x $.
+2) Determiner $\lim_{x\to +\infty}f(x)$
 
 #### Exercice 55
-Soit $m \in \mathbb{R}_+^n$. On pose : $I(m) = \int_{-\infty}^m e^{1 - 2x} dx$
+Soit $m \in \mathbb{R}_+^*$. On pose : $I(m) = \int_{-\infty}^m e^{1 - 2x} dx$
 
 Calculer $I(m)$ en fonction de $m$ puis donner $\lim_{m \to +\infty} I(m)$.
 
 #### Exercice 56
-1) Calculer l'intégrale suivante: \( I = \int_{\infty}^{0} \frac{dx}{1 + 2e^x} \)
-2) En utilisant une intégration par parties, calculer l'intégrale: \( I = \int_{\infty}^{0} e^{-x} \ln \left(1 + 2e^{x}\right) dx \)
+1) Calculer l'intégrale suivante: $ I = \int_{\infty}^{0} \frac{dx}{1 + 2e^x} $
+2) En utilisant une intégration par parties, calculer l'intégrale: $ I = \int_{\infty}^{0} e^{-x} \ln \left(1 + 2e^{x}\right) dx $
 
 #### Exercice 57
 Pour tout $n \in \mathbb{N}$, on pose : $I_n = \int_0^1 \frac{x^{2n+1}}{\sqrt{1+x^2}} dx$
 
-1) Calculer \( I_0 \).
-2) En utilisant une intégration par parties, montré que pour tout \( n \in \mathbb{N} \): \( (2n + 3)I_{n+1} = \sqrt{2} - 2(n + 1)I_n \).
-3) En déduire les valeurs de \( I_{1} \) et \( I_{2} \).
+1) Calculer $ I_0 $.
+2) En utilisant une intégration par parties, montré que pour tout $ n \in \mathbb{N} $: $ (2n + 3)I_{n+1} = \sqrt{2} - 2(n + 1)I_n $.
+3) En déduire les valeurs de $ I_{1} $ et $ I_{2} $.
 
 • 4.3. (6) (6) (6) (6) (6) (6) (6) (6)
 
@@ -1692,30 +1692,30 @@ On considère les intégrales :
 
 $$I = \int_0^1 \frac{dx}{\sqrt{x^2 + 2}}, \quad J = \int_0^1 \frac{x^2}{\sqrt{x^2 + 2}} dx, \quad K = \int_0^1 \sqrt{x^2 + 2} dx$$
 
-1) Montrer que: \(J + 2I = K\)
-2) Soit \( f \) la fonction numérique définie sur \([0,1]\) par:
+1) Montrer que: $J + 2I = K$
+2) Soit $ f $ la fonction numérique définie sur $[0,1]$ par:
 
 $$f(x) = \ln\left(x + \sqrt{x^2 + 2}\right)$$
 
-a)-Calculer \(f^{\prime}(x)\) pour tout \(x\in [0,1]\)
-b)-En déduire la valeur de l'intégrale \(I\)
+a)-Calculer $f^{\prime}(x)$ pour tout $x\in [0,1]$
+b)-En déduire la valeur de l'intégrale $I$
 
-3) a)- En utilisant deux fois la formule d'intégration par parties, montré que: \( K = \sqrt{3} - J \)
-b)-En déduire les valeurs de \(J\) et \(K\)
+3) a)- En utilisant deux fois la formule d'intégration par parties, montré que: $ K = \sqrt{3} - J $
+b)-En déduire les valeurs de $J$ et $K$
 
 #### Exercice 6b
 Soit $\lambda \in [0,1]$.
 
-1) En utilisant une intégration par parties, calculer l'intégrale: \( I(\lambda) = \int_0^{1 - \lambda} \ln(1 - t^2) dt \)
-2) Determiner la limite: \(\lim_{\lambda \to 0}I(\lambda)\)
+1) En utilisant une intégration par parties, calculer l'intégrale: $ I(\lambda) = \int_0^{1 - \lambda} \ln(1 - t^2) dt $
+2) Determiner la limite: $\lim_{\lambda \to 0}I(\lambda)$
 
 #### Exercice 6c
 Soit $a \in \mathbb{R}^*$. On considère les intégrales :
 
 $$F_a(x) = \int_0^x \frac{dt}{\sqrt{t^2 + a^2}} \quad \text{et} \quad G_a(x) = \int_0^x \sqrt{t^2 + a^2} dt$$
 
-1) Montrer que: \( F_{a}(x) = \ln \left(x + \sqrt{x^{2} + a^{2}}\right) - \ln a \)
-2) En utilisant une intégration par parties, exprimer \( G_{a}(x) \) en fonction de \( x \).
+1) Montrer que: $ F_{a}(x) = \ln \left(x + \sqrt{x^{2} + a^{2}}\right) - \ln a $
+2) En utilisant une intégration par parties, exprimer $ G_{a}(x) $ en fonction de $ x $.
 
 #### Exercice 6d
 Calculer les intégrales suivantes :
@@ -1727,42 +1727,42 @@ Pour tout $n \in \mathbb{N}$, on pose :
 
 $$A_n = \int_0^{\frac{\pi}{2}} e^{-\pi n} \sin(x) dx \quad \text{et} \quad B_n = \int_0^{\frac{\pi}{2}} e^{-\pi n} \cos(x) dx$$
 
-1) Calculator \(A_0\) et \(B_0\)
+1) Calculator $A_0$ et $B_0$
 2) En utilisant la formule d'intégration par parties,
 
 montrer que : $A_n + nB_n = 1$ et $-nA_n + B_n = e^{-\frac{2\pi}{n}}$
 
-3) a) En déduire \( A_{n} \) et \( B_{n} \) en fonction de \( n \).
-b) Determiner \(\lim_{n\to \infty}A_n\) et \(\lim_{n\to \infty}B_n\)
+3) a) En déduire $ A_{n} $ et $ B_{n} $ en fonction de $ n $.
+b) Determiner $\lim_{n\to \infty}A_n$ et $\lim_{n\to \infty}B_n$
 
 #### Exercice 6f
 Pour tout $n \in \mathbb{N}$ on pose : $u_n = \frac{1}{n!} \int_0^1 (1-x)^n e^x dx$
 
-1) Montrer que: \(\forall n\in \mathbb{N},u_{n + 1} = u_n - \frac{1}{(n + 1)!}\)
-2) En déduire que: \(\forall n\in \mathbb{N},u_n = e - \sum_{k = 0}^{n}\frac{1}{k!}\)
+1) Montrer que: $\forall n\in \mathbb{N},u_{n + 1} = u_n - \frac{1}{(n + 1)!}$
+2) En déduire que: $\forall n\in \mathbb{N},u_n = e - \sum_{k = 0}^{n}\frac{1}{k!}$
 
 #### Exercice 6g
 Pour tout $n \in \mathbb{N}^*$ on pose : $I_n = \int_0^1 \frac{dt}{(1 + t^2)^n}$
 
-1) Calculator \(I_{1}\)
-2) a) En utilisant la formule d'intégration par parties, calculer \( I_{n+1} - I_n \) en fonction de \( I_n \) et \( n \).
-b) En déduire \( I_2 \) et \( I_3 \).
+1) Calculator $I_{1}$
+2) a) En utilisant la formule d'intégration par parties, calculer $ I_{n+1} - I_n $ en fonction de $ I_n $ et $ n $.
+b) En déduire $ I_2 $ et $ I_3 $.
 
 #### Exercice 6h
 En utilisant l'intégration par changement de variable, calculer les intégrales suivantes :
 
-1) \( I = \int_0^{\sqrt{3}} \frac{1 - t^2}{(1 + t^2)\sqrt{1 + t^4}} dt \) avec \( \left(u = t + \frac{1}{t}\right) \)
-2) \(J = \int_{-\frac{\pi}{8}}^{\frac{\pi}{8}}\frac{\sin x}{\cos(2x)\cos x} dx\) avec \((t = \cos 2x)\)
-3) \(K = \int_{-\frac{\pi}{8}}^{\frac{\pi}{8}}\frac{\sin x}{\cos(x)\sqrt{2 + \sin^2x}} dx\) avec \((t = \sin^2 x)\)
-4) \(L = \int_{1}^{t}\frac{\cos(\ln t)}{t} dx\) avec \((x = \ln t)\)
+1) $ I = \int_0^{\sqrt{3}} \frac{1 - t^2}{(1 + t^2)\sqrt{1 + t^4}} dt $ avec $ \left(u = t + \frac{1}{t}\right) $
+2) $J = \int_{-\frac{\pi}{8}}^{\frac{\pi}{8}}\frac{\sin x}{\cos(2x)\cos x} dx$ avec $(t = \cos 2x)$
+3) $K = \int_{-\frac{\pi}{8}}^{\frac{\pi}{8}}\frac{\sin x}{\cos(x)\sqrt{2 + \sin^2x}} dx$ avec $(t = \sin^2 x)$
+4) $L = \int_{1}^{t}\frac{\cos(\ln t)}{t} dx$ avec $(x = \ln t)$
 
 2.4.3. (1) (2) (3) (4) (5) (6) (7) (8) (9) (10)
 
 #### Exercice 66
 Pour tout $$(a; x) \in \mathbb{R}^2$$ on pose : $$F_a(x) = \int_0^x \sqrt{\frac{e^t}{1 + e^t}} dt$$
 
-1) En utilisant l'intégration par changement de variable suivant: \( u = \sqrt{\frac{e^t}{1 + e^t}} \), calculer \( F_{a}(x) \) en fonction de \( a \) et \( x \).
-2) Montrer que: \(\lim_{x\to -\infty}F_a(x) = 2\ln \left(\sqrt{1 + e^x} +\sqrt{e^x}\right)\)
+1) En utilisant l'intégration par changement de variable suivant: $ u = \sqrt{\frac{e^t}{1 + e^t}} $, calculer $ F_{a}(x) $ en fonction de $ a $ et $ x $.
+2) Montrer que: $\lim_{x\to -\infty}F_a(x) = 2\ln \left(\sqrt{1 + e^x} +\sqrt{e^x}\right)$
 
 #### Exercice 67
 1) Soit $$a \in [1; +\infty[$$. Pour tout $$x \in \mathbb{R}^+$$ on pose :
@@ -1802,9 +1802,9 @@ On considère les intégrales suivantes :
 
 $$I = \int_1^1 t \operatorname{Arc} \tan(t) dt \quad \text{et} \quad J = \int_1^1 \frac{t \operatorname{Arc} \tan(t)}{1 + e^t} dt$$
 
-1) En utilisant une intégration par parties, calculer \( I \).
-2) Montrer que: \( J = \int_{-1}^{1} \frac{e^t}{1 + e^t} (t \operatorname{Arc} \tan t) dt \)
-3) En déduire la valeur de l'intégrale \(J\)
+1) En utilisant une intégration par parties, calculer $ I $.
+2) Montrer que: $ J = \int_{-1}^{1} \frac{e^t}{1 + e^t} (t \operatorname{Arc} \tan t) dt $
+3) En déduire la valeur de l'intégrale $J$
 
 #### Exercice 71
 En utilisant une intégration par changement de variable et en posant $$t = \frac{\pi}{4} - x$$, calculer les intégrales :
@@ -1852,16 +1852,16 @@ Montrer que la fonction $$f$$ est impaire.
 #### Exercice 79
 Soit $$f$$ une fonction continue sur $$[-a; a]$$ (où $$a \in \mathbb{R}^+$$).
 
-1) Montrer que: \(\int_{-a}^{a}f(t)dt = \int_{0}^{a}(f(t) + f(-t))dt\)
+1) Montrer que: $\int_{-a}^{a}f(t)dt = \int_{0}^{a}(f(t) + f(-t))dt$
 2) En déduire les implications suivantes:
 
-a)-Si \(f\) est impare alors: \(\int_{-a}^{a}f(t)dt = 0\)
-b)-Si \(f\) est paire alors: \(\int_{-a}^{a}f(t)dt = 2\int_{0}^{a}f(t)dt\)
+a)-Si $f$ est impare alors: $\int_{-a}^{a}f(t)dt = 0$
+b)-Si $f$ est paire alors: $\int_{-a}^{a}f(t)dt = 2\int_{0}^{a}f(t)dt$
 
 #### Exercice 79
 Soit $$f$$ une fonction impaire et continue sur $$\mathbb{R}$$ et $$n$$ un entier naturel.
 
-1) Montrer que: \(\int_{-a}^{a}f(x)\cos (nx)dx = 0\)
+1) Montrer que: $\int_{-a}^{a}f(x)\cos (nx)dx = 0$
 2) Montrer que:
 
 $$\int_{-a}^{a} f(x) \sin(nx) dx = 2 \int_{0}^{a} f(x) \sin(nx) dx$$
@@ -1894,8 +1894,8 @@ $$I = \int_{-1}^{1} \frac{(x^4 + x^2 + 1)^2 e^x + 1}{e^x + 1} dx$$
 puis en déduire la valeur de $$I$$.
 
 #### Exercice 83
-1) a) Montrer que: \(\left(\forall t\in \mathbb{R}^{+}\right)1 - t\leq \frac{1}{1 + t}\leq 1\)
-b) En déduire que pour tout \( x \in \mathbb{R}^+ \):
+1) a) Montrer que: $\left(\forall t\in \mathbb{R}^{+}\right)1 - t\leq \frac{1}{1 + t}\leq 1$
+b) En déduire que pour tout $ x \in \mathbb{R}^+ $:
 
 $$x - \frac{x^2}{2} \leq \ln(1+x) \leq x$$
 
@@ -1923,23 +1923,23 @@ l'intégrale suivante : $$I = \int_{0}^{1} \frac{x^2}{(1+x^2)^2} dx$$
 
 $$J = \int_{0}^{\frac{x}{2}} \frac{1}{2 + \cos x} dx \text{ (on pourra poser : } t = \tan \frac{x}{2})$$
 
-3) Calculer la limite suivante: \(\lim_{n\to \infty}\frac{1}{n^2}\sum_{k = 1}^{n}k e^{k}\)
-4) Calculer l'intégrale: \( K = \int_{0}^{t}\sin^{2}x.\cos^{4}xdx \)
+3) Calculer la limite suivante: $\lim_{n\to \infty}\frac{1}{n^2}\sum_{k = 1}^{n}k e^{k}$
+4) Calculer l'intégrale: $ K = \int_{0}^{t}\sin^{2}x.\cos^{4}xdx $
 
 #### Exercice 86
-On considere la suite \(\left(u_{n}\right)\) définie par: \(u_{n} = \frac{(-1)^{n}}{2n + 1}\)
-On pose pour tout \(n\in \mathbb{N}\) .. \(S_{n} = u_{0} + u_{1} + \ldots +u_{n}\)
-1) Calculer l'intégrale: \(\int_0^1 x^{2n}dx\)
-2) Montrer que: \(S_{n} = \int_{0}^{1}\frac{1 + (-1)^{n}x^{2n + 2}}{1 + x^{2}} dx\)
-3) Montrer que: \((\forall n \in \mathbb{N}) S_n - \frac{\pi}{4} = (-1)^n \int_0^1 \frac{x^{2n+2}}{1 + x^2} dx\) puis calculer \(\lim_{n \to \infty} S_n\).
+On considere la suite $\left(u_{n}\right)$ définie par: $u_{n} = \frac{(-1)^{n}}{2n + 1}$
+On pose pour tout $n\in \mathbb{N}$ .. $S_{n} = u_{0} + u_{1} + \ldots +u_{n}$
+1) Calculer l'intégrale: $\int_0^1 x^{2n}dx$
+2) Montrer que: $S_{n} = \int_{0}^{1}\frac{1 + (-1)^{n}x^{2n + 2}}{1 + x^{2}} dx$
+3) Montrer que: $(\forall n \in \mathbb{N}) S_n - \frac{\pi}{4} = (-1)^n \int_0^1 \frac{x^{2n+2}}{1 + x^2} dx$ puis calculer $\lim_{n \to \infty} S_n$.
 
 #### Exercice 87
 Pour tout $n \in \mathbb{N}^*$ on pose : $I_n = \frac{1}{n! \cdot 2^{n+1}} \int_0^1 (1-t)^n e^{-t/2} dt$
 
-1) Calculator \(I_{1}\).
-2) Montrer que: \((\forall n \in \mathbb{N}^*) I_{n+1} = I_n - \frac{1}{(n+1)! 2^{n+1}}\)
-3) En déduire que: \(\left(\forall n\in \mathbb{N}^{*}\right)\sqrt{e} = \sum_{k = 0}^{n}\frac{1}{k!2^{k}} +I_{n}\)
-4) a)- Montrer qu'il existe \(A \in \mathbb{R}^*\) tel que:
+1) Calculator $I_{1}$.
+2) Montrer que: $(\forall n \in \mathbb{N}^*) I_{n+1} = I_n - \frac{1}{(n+1)! 2^{n+1}}$
+3) En déduire que: $\left(\forall n\in \mathbb{N}^{*}\right)\sqrt{e} = \sum_{k = 0}^{n}\frac{1}{k!2^{k}} +I_{n}$
+4) a)- Montrer qu'il existe $A \in \mathbb{R}^*$ tel que:
 
 $$(\forall n \in \mathbb{N}^*) \ 0 \le I_n \le \frac{A}{2^n \cdot n!}$$
 
@@ -1954,9 +1954,9 @@ $$(\forall n \in \mathbb{N}^*) \ u_n = n \int_1^\pi \frac{\sin x}{x^n} dx$$
 
 que : $(\forall n \ge 2) \ u_n = \frac{n}{n-1} \left( \sin 1 + \int_1^\pi \frac{\cos x}{x^{n-1}} dx \right)$
 
-2) a)- Montrer que: \((\forall n \geq 2) \left| \int_{1}^{\pi} \frac{\cos x}{x^{n-1}} dx \right| \leq \int_{1}^{\pi} \frac{dx}{x^{n-1}}\)
-b)-En déduire que: \(\lim_{n\to \infty}\left(\int_1^x\frac{\cos x}{x^{n - 1}} dx\right) = 0\)
-c)- Montrer que: \(\lim_{n\to \infty}u_n = \sin 1\)
+2) a)- Montrer que: $(\forall n \geq 2) \left| \int_{1}^{\pi} \frac{\cos x}{x^{n-1}} dx \right| \leq \int_{1}^{\pi} \frac{dx}{x^{n-1}}$
+b)-En déduire que: $\lim_{n\to \infty}\left(\int_1^x\frac{\cos x}{x^{n - 1}} dx\right) = 0$
+c)- Montrer que: $\lim_{n\to \infty}u_n = \sin 1$
 
 #### Exercice 89
 Soit $f$ et $g$ deux fonctions continues sur $[a, b]$.
@@ -1971,8 +1971,8 @@ $$\left| \int_0^1 f(x)g(x)dx \right| \le \sqrt{\int_0^1 f^2(x)dx} \times \sqrt{\
 
 3) Montrer les inégalités suivantes :
 
-a) \(\int_{\frac{\pi}{4}}^{\frac{\pi}{2}} \frac{\sin x}{x} dx \le \sqrt{\frac{\pi + 2}{4\pi}}\)
-b) \(\left(\int_0^1 e^{x^2}dx\right)\cdot \left(\int_0^1 e^{-x^2}dx\right)\geq 1\)
+a) $\int_{\frac{\pi}{4}}^{\frac{\pi}{2}} \frac{\sin x}{x} dx \le \sqrt{\frac{\pi + 2}{4\pi}}$
+b) $\left(\int_0^1 e^{x^2}dx\right)\cdot \left(\int_0^1 e^{-x^2}dx\right)\geq 1$
 
 4) Soit $h$ une fonction continue sur $[0; 1]$ telle que :
 
@@ -1994,8 +1994,8 @@ Montrer que : $(\exists c \in ]0; 1[)$ $\int_0^1 f(t)dt = f(c)$
 #### Exercice 91
 Soit $f$ une fonction non constante et dérivable sur $[0; 1]$ telle que $f(0) = 0$. On considère la fonction $g$ définie sur $[0; 1]$ par : $g(x) = (1-x) \int_0^x f(t)dt$
 
-1) Montrer qu'il existe \(\alpha \in ]0,1[\) tel que: \(g^{\prime}(\alpha) = 0\)
-2) En appliquant le théorème de Rolle à la fonction \( h \) définie sur \( [0, \alpha] \) par:
+1) Montrer qu'il existe $\alpha \in ]0,1[$ tel que: $g^{\prime}(\alpha) = 0$
+2) En appliquant le théorème de Rolle à la fonction $ h $ définie sur $ [0, \alpha] $ par:
 
 $$h(x) = -\int_0^x f(x)dx + (1-x)f(x)$$
 
@@ -2008,34 +2008,34 @@ On considère la suite numérique $(u_n)_{n \in \mathbb{N}^*}$ définie par :
 
 $$\left(\forall n \in \mathbb{N}^*\right) u_n = \int_0^1 e^{-\frac{x^2}{n}} dx$$
 
-1) Vérifier que: \((\forall x \in [0,1]) e^{-\frac{1}{n}} \leq e^{-\frac{x^2}{n}} \leq 1\)
-2) En déduire que la suite \(\left(u_{n}\right)_{n\in \mathbb{N}^*}\) est convergente et déterminer sa limite.
-3) Montrer que pour tout \( n \in \mathbb{N}^* \), il existe un réel \( c_n \in [0,1] \) tel que: \( c_n^2 = -n\ln u_n \)
+1) Vérifier que: $(\forall x \in [0,1]) e^{-\frac{1}{n}} \leq e^{-\frac{x^2}{n}} \leq 1$
+2) En déduire que la suite $\left(u_{n}\right)_{n\in \mathbb{N}^*}$ est convergente et déterminer sa limite.
+3) Montrer que pour tout $ n \in \mathbb{N}^* $, il existe un réel $ c_n \in [0,1] $ tel que: $ c_n^2 = -n\ln u_n $
 
 #### Exercice 93
 On considère la fonction numérique $f$ définie par :
 
 $$f(x) = \frac{1}{x} \int_0^x \frac{dt}{\sqrt{1+t^2}} \quad \text{si} \quad x \neq 0 \quad \text{et} \quad f(0) = 1$$
 
-1) Détérminer \(D_{f}\) le domaine de définition de \(f\).
-2) Montrer que la fonction \( f \) est paire.
-3) a) Montrer que pour tout \(x\in \mathbb{R}^*\)
+1) Détérminer $D_{f}$ le domaine de définition de $f$.
+2) Montrer que la fonction $ f $ est paire.
+3) a) Montrer que pour tout $x\in \mathbb{R}^*$
 
 $$\frac{x}{\sqrt{1+x^2}} \leq \int_0^x \frac{dt}{\sqrt{1+t^2}} \leq x$$
 
-b) Montrer que \( f \) est continue et dérivable à droite en zéro.
-4) a) Vérifier que: \( \left(\forall t \in [1, +\infty[\right) \frac{1}{\sqrt{1 + t^2}} \leq \frac{1}{\sqrt{t}} \)
-b) En déduire \(\lim_{x\to +\infty}f(x)\)
-5) Etudier les variations de \( f \) puis tracer sa courbe \( \mathcal{C}_f \).
+b) Montrer que $ f $ est continue et dérivable à droite en zéro.
+4) a) Vérifier que: $ \left(\forall t \in [1, +\infty[\right) \frac{1}{\sqrt{1 + t^2}} \leq \frac{1}{\sqrt{t}} $
+b) En déduire $\lim_{x\to +\infty}f(x)$
+5) Etudier les variations de $ f $ puis tracer sa courbe $ \mathcal{C}_f $.
 
 #### Exercice 94
 On considère la suite numérique $(u_n)_{n \geq 1}$ définie par :
 
 $$u_n = \int_0^n x (\ln x)^n dx$$
 
-1) Montrer que \(\left(u_{n}\right)_{n\geq 1}\) est positive et décroissant.
-2) Montrer que: \(\left(\forall n\in \mathbb{N}^{\prime}\right)2u_{n + 1} + (n + 1)u_n = e^2\)
-3) Montrer que: \(\left(\forall n\in \mathbb{N}^{\prime}\right)\frac{e^{2}}{n + 3}\leq u_{n}\leq \frac{e^{2}}{n + 1}\)
+1) Montrer que $\left(u_{n}\right)_{n\geq 1}$ est positive et décroissant.
+2) Montrer que: $\left(\forall n\in \mathbb{N}^{\prime}\right)2u_{n + 1} + (n + 1)u_n = e^2$
+3) Montrer que: $\left(\forall n\in \mathbb{N}^{\prime}\right)\frac{e^{2}}{n + 3}\leq u_{n}\leq \frac{e^{2}}{n + 1}$
 
 puis en déduire la limite de la suite $(u_n)_{n \geq 1}$.
 
@@ -2060,20 +2060,20 @@ sa limite $\ell$ vérifie : $3 \leq \ell \leq \frac{7}{2}$
 
 et en déduire la valeur de : $I = \int_0^2 \frac{2t+3}{t+2} dt$
 
-b) Montrer que: \(\left(\forall n\in \mathbb{N}^{\prime}\right)I\leq u_{n}\leq e^{n}I\)
-c) En déduire que \(\left(u_{n}\right)_{n\in \mathbb{N}}\) converge en précisant sa limite.
+b) Montrer que: $\left(\forall n\in \mathbb{N}^{\prime}\right)I\leq u_{n}\leq e^{n}I$
+c) En déduire que $\left(u_{n}\right)_{n\in \mathbb{N}}$ converge en précisant sa limite.
 
 #### Exercice 96
 On pose pour tout $n \in \mathbb{N}$ : $u_n = \int_0^1 \frac{e^{-x^2}}{1+t+n} dt$
 
-1) Détérminer la monotonie de la suite \(\left(u_{n}\right)\) puis montré que: \(\left(\forall n\in \mathbb{N}\right)u_n\geq 0\)
-2) Montrer que \(\lim_{n\to \infty}u_n = 0\)
-3) On considere les fonctions \( f \) et \( g \) définies sur [0;1]
+1) Détérminer la monotonie de la suite $\left(u_{n}\right)$ puis montré que: $\left(\forall n\in \mathbb{N}\right)u_n\geq 0$
+2) Montrer que $\lim_{n\to \infty}u_n = 0$
+3) On considere les fonctions $ f $ et $ g $ définies sur [0;1]
 
 par : $f(x) = e^{-x} + x - 1$ et $g(x) = 1 - x + \frac{x^2}{2} - e^{-x}$
 
-a) Etudier les variations de la fonction \( f \).
-b) En déduire le sens de variation de \( g \) sur \([0,1]\).
+a) Etudier les variations de la fonction $ f $.
+b) En déduire le sens de variation de $ g $ sur $[0,1]$.
 c) Montrer que:
 
 $$(\forall x \in [0; 1]) \ 1 - x \leq e^{-x} \leq 1 - x + \frac{x^2}{2}$$
@@ -2089,8 +2089,8 @@ $$(\forall n \ge n_0) \quad u_n \le 10^{-2}$$
 On considère la suite numérique $(u_n)_{n \ge 1}$ définie par :
 $$u_n = \int_0^1 \sqrt{1-x^n} \, dx$$
 
-1) Montrer que \(\left(u_{n}\right)_{n\ge 1}\) est croissant.
-2) a) Verifier que pour tout \(x\in [0,1]\)
+1) Montrer que $\left(u_{n}\right)_{n\ge 1}$ est croissant.
+2) a) Verifier que pour tout $x\in [0,1]$
 
 $$1 - x \le \sqrt{1-x} \le 1 - \frac{x}{2}$$
 
@@ -2105,10 +2105,10 @@ $$u(t) = \ln(t + \sqrt{1+t^2})$$
 
 b) Calculer les intégrales $I_0$ et $I_1$
 
-2) Determiner la monotonie de la suite \(\left(I_{n}\right)\).
-3) Montrer que: \((\forall n \in \mathbb{N}) I_{n+2} + I_n = \int_0^t t^n \sqrt{1 + t^2} dt\)
-4) En utilisant la formule d'intégration par parties, montré que: \((n + 2)I_{n + 2} + (n + 1)I_n = \sqrt{2}\)
-5) En déduire que pour tout \( n \in \mathbb{N} \):
+2) Determiner la monotonie de la suite $\left(I_{n}\right)$.
+3) Montrer que: $(\forall n \in \mathbb{N}) I_{n+2} + I_n = \int_0^t t^n \sqrt{1 + t^2} dt$
+4) En utilisant la formule d'intégration par parties, montré que: $(n + 2)I_{n + 2} + (n + 1)I_n = \sqrt{2}$
+5) En déduire que pour tout $ n \in \mathbb{N} $:
 
 $$(2n+3)I_{n+2} \le \sqrt{2} \le (2n+3)I_n$$
 
@@ -2118,8 +2118,8 @@ On considère la suite numérique $(I_n)$ définie par :
 
 $$I_n = \int_0^1 x^n \sqrt{1-x} \, dx$$
 
-1) Calculer \( I_0 \) et \( I_1 \).
-2) En utilisant le changement \( t = \sqrt{1 - x} \), montré
+1) Calculer $ I_0 $ et $ I_1 $.
+2) En utilisant le changement $ t = \sqrt{1 - x} $, montré
 
 que : $$(\forall n \in \mathbb{N}) I_n = 2 \sum_{k=0}^n C_n^a \frac{(-1)^k}{2k+1}$$
 
@@ -2141,13 +2141,13 @@ b) En déduire la valeur de : $$\int_0^1 \frac{x^2}{x^2-2} \, dx$$
 
 $$J_n = \int_0^1 x^n \frac{\sqrt{1-x}}{1+x} \, dx \quad \text{et} \quad S_n = \sum_{k=0}^n (-1)^k I_k$$
 
-a) En utilisant le changement \( t = \sqrt{1 - x} \), calculer \( J_0 \).
-b) Montrer que: \((\forall n \in \mathbb{N}) 0 \le J_n \le \frac{1}{n+1}\)
+a) En utilisant le changement $ t = \sqrt{1 - x} $, calculer $ J_0 $.
+b) Montrer que: $(\forall n \in \mathbb{N}) 0 \le J_n \le \frac{1}{n+1}$
 
 et en déduire $\lim_{n \to \infty} J_n$.
 
-c) Montrer que: \((\forall n \in \mathbb{N}) S_n = J_0 - (-1)^{n+1} J_{n+1}\)
-d) En déduire la limite de la suite \(\left(S_{n}\right)\).
+c) Montrer que: $(\forall n \in \mathbb{N}) S_n = J_0 - (-1)^{n+1} J_{n+1}$
+d) En déduire la limite de la suite $\left(S_{n}\right)$.
 
 #### Exercice 100
 On pose : $$I = \int_0^x \frac{\sin t}{t} \, dt$$
@@ -2292,13 +2292,13 @@ $$I = \int_0^{\frac{\pi}{4}} \ln(1 + \tan t) dt \quad \text{et} \quad J = \int_0
 
 $$K = \int_0^{\frac{\pi}{4}} \ln(\cos t) dt$$
 
-a) Ecrire l'intégrale \(I\) en fonction de \(J\) et \(K\).
-b) Montrer que: \(J = K\)
-c) Calculator l'integrale \(I\)
+a) Ecrire l'intégrale $I$ en fonction de $J$ et $K$.
+b) Montrer que: $J = K$
+c) Calculator l'integrale $I$
 
 4) On pose pour tout $n \in \mathbb{N}^* : I_n = \frac{1}{2^n} \int_0^{\frac{1}{2}} \frac{(1 - 2x)^n}{(1 - x)^n} dx$
 
-a) Calculer \(I_{1}\).
+a) Calculer $I_{1}$.
 b) En utilisant une intégration par parties, montré
 
 $$\text{que : } (\forall n \in \mathbb{N}^*) I_{n+1} = \frac{-1}{2^{n+1}(n+2)} + \frac{n+1}{n+2} I_n$$
@@ -2448,8 +2448,8 @@ $$I_n(a) = \int_{0}^{\pi} e^{-\infty} \ln(n+x) dx$$
 
 $$(\forall x \in \mathbb{R}_+^*)(\forall n \in \mathbb{N}^*) \ln n \leq \ln(n+x) \leq \ln n + \frac{x}{n}$$
 
-2) Trouver alors un encadrement de \( I_{n}(a) \).
-3) Montrer que la fonction \(a \mapsto I_n(a)\) est croissant sur \(\mathbb{R}^+\).
+2) Trouver alors un encadrement de $ I_{n}(a) $.
+3) Montrer que la fonction $a \mapsto I_n(a)$ est croissant sur $\mathbb{R}^+$.
 
 #### Devoir 6
 **Première Partie.**
@@ -2463,21 +2463,21 @@ Montrer que : $(\forall x \in \mathbb{R}_+^*) h(x) \geq 1$
 
 $$f(0) = 0 \quad \text{et} \quad f(x) = \frac{1}{x - \ln x} \text{ si } x > 0$$
 
-a) Montrer que la fonction \( f \) est continue sur \( \mathbb{R}^* \).
-b) La fonction \( f \) est-elle dérivable à droite en 0?
+a) Montrer que la fonction $ f $ est continue sur $ \mathbb{R}^* $.
+b) La fonction $ f $ est-elle dérivable à droite en 0?
 
 **Deuxième Partie.**
 Soit $F$ la fonction numérique définie sur $\mathbb{R}^*$ par :
 
 $$F(x) = \int_{x}^{2x} f(t) dt$$
 
-1) a) Montrer que \(F\) est derivable sur \(\mathbb{R}^+\).
-b) Montrer que \(F_{\alpha}^{\prime}(0) = 0\) et que:
+1) a) Montrer que $F$ est derivable sur $\mathbb{R}^+$.
+b) Montrer que $F_{\alpha}^{\prime}(0) = 0$ et que:
 
 $$(\forall x \in \mathbb{R}_+^*) F'(x) = \frac{\ln 2 - \ln x}{h(2x) \cdot h(x)}$$
 
-2) a) Verifier que: \(\ln 2 = \int_{x}^{2x} \frac{dt}{t}\)
-b) Montrer que pour tout \(x \in [1; +\infty[\)
+2) a) Verifier que: $\ln 2 = \int_{x}^{2x} \frac{dt}{t}$
+b) Montrer que pour tout $x \in [1; +\infty[$
 
 $$0 \leq F(x) - \ln 2 \leq \frac{\ln(2x)}{x - \ln x}$$
 
@@ -2487,8 +2487,8 @@ c) En déduire la limite : $\lim_{x \to \infty} F(x)$
 
 b) Montrer que : $\left( \exists \alpha \in \left[\frac{1}{2}; 1\right] \right)$; $F(\alpha) = \ln 2$
 
-4) a) Dresser le tableau de variations de \(F\).
-b) Tracer la courbe \(\mathcal{C}_F\) de \(F\) dans un repere orthonormé (On admet que: \(F(1) \approx 0,9\) et \(F(2) \approx 1,1\))
+4) a) Dresser le tableau de variations de $F$.
+b) Tracer la courbe $\mathcal{C}_F$ de $F$ dans un repere orthonormé (On admet que: $F(1) \approx 0,9$ et $F(2) \approx 1,1$)
 
 5) On considère la fonction $G$ définie sur $[1; +\infty[$ par :
 
@@ -2592,17 +2592,17 @@ b) En déduire que la suite $$(u_n)$$ est convergente et déterminer sa limite.
 
 $$\mathbb{R}^* \text{ par : } f(x) = \frac{e^{-x}}{x}$$
 
-1) Calculer les limites de la fonction \( f \) aux bornes de son domaine de definition.
-2) Etudier les variations de la fonction \( f \).
-Soit la courbe représentative de \( f \) dans un repère orthonome \( (O, \bar{I}, \bar{J}) \).
-3) a) Etudier les branches infinies de la courbe \(\mathcal{C}\)
-b) Tracer la courbe \(\mathcal{C}\)
-III) Soit \( (u_{n}) \) la suite définie par: \( u_{n} = 1 \) et pour tout
+1) Calculer les limites de la fonction $ f $ aux bornes de son domaine de definition.
+2) Etudier les variations de la fonction $ f $.
+Soit la courbe représentative de $ f $ dans un repère orthonome $ (O, \bar{I}, \bar{J}) $.
+3) a) Etudier les branches infinies de la courbe $\mathcal{C}$
+b) Tracer la courbe $\mathcal{C}$
+III) Soit $ (u_{n}) $ la suite définie par: $ u_{n} = 1 $ et pour tout
 
 $$n \in \mathbb{N}, u_{n+1} = (u_n)^2 f(u_n) = u_n e^{-u_n}$$
 
-1) Montrer que: \((\forall x \in \mathbb{R}) e^x \geq x + 1\)
-2) En deduire que: \((\forall x \in \mathbb{R}^*) x^2 f(x) \leq \frac{x}{x + 1}\)
+1) Montrer que: $(\forall x \in \mathbb{R}) e^x \geq x + 1$
+2) En deduire que: $(\forall x \in \mathbb{R}^*) x^2 f(x) \leq \frac{x}{x + 1}$
 3a) En utilisant un raisonnement par recurrence,
 
 $$\text{montrer que : } (\forall n \in \mathbb{N}) 0 < u_n < \frac{1}{n+1}$$
@@ -2611,15 +2611,15 @@ b) Montrer que la suite $(u_n)$ est convergente et déterminer sa limite.
 
 4) On pose pour tout $n \in \mathbb{N}^* : v_n = \sum_{k=0}^{n-1} u_k$
 
-a) Montrer que: \(\left(\forall n\in \mathbb{N}^{*}\right)v_{n} = \ln \left(\frac{1}{u_{n}}\right)\)
-b) Determiner la limite de la suite \(\left(v_{n}\right)_{n\in \mathbb{N}}\)
+a) Montrer que: $\left(\forall n\in \mathbb{N}^{*}\right)v_{n} = \ln \left(\frac{1}{u_{n}}\right)$
+b) Determiner la limite de la suite $\left(v_{n}\right)_{n\in \mathbb{N}}$
 
 III) On considère la fonction $F$ définie sur $\mathbb{R}^*$ par :
 
 $$\begin{cases} F(x) = \int_{x^2}^{x^2} f(t) dt \quad \text{si } x > 0 \\ F(0) = 2 \ln 2 \end{cases}$$
 
-1) a) Vérifier que: \(\int_{x^2}^{x^2} \frac{1}{t} dt = 2 \ln 2\)
-b) En utilisant le résultat de la question II)1), monrer que: \((\forall t > 0) - t \leq e^{-t} - 1 \leq 0\)
+1) a) Vérifier que: $\int_{x^2}^{x^2} \frac{1}{t} dt = 2 \ln 2$
+b) En utilisant le résultat de la question II)1), monrer que: $(\forall t > 0) - t \leq e^{-t} - 1 \leq 0$
 
 2) a) Montrer que : $(\forall x > 0) - 3x^2 \leq F(x) - 2 \ln 2 \leq 0$
 
@@ -2692,9 +2692,9 @@ b) Étudier les variations de la fonction $F$ sur $\mathbb{R}^*$.
 
 III)
 
-1)a) Montrer que: \((\forall t\in \mathbb{R}^*) - t\ln t\leq \frac{1}{e}\)
-b) Montrer que: \((\forall t\in \mathbb{R}^*)f(t)\leq \frac{1}{e}\)
-c) En déduire que: \((\forall x > 0) F(x) < x\)
+1)a) Montrer que: $(\forall t\in \mathbb{R}^*) - t\ln t\leq \frac{1}{e}$
+b) Montrer que: $(\forall t\in \mathbb{R}^*)f(t)\leq \frac{1}{e}$
+c) En déduire que: $(\forall x > 0) F(x) < x$
 
 On considère la suite numérique $(u_n)$ définie par :
 
@@ -2702,8 +2702,8 @@ $$u_n \in ]0, 1[ \quad \text{et} \quad (\forall n \in \mathbb{N}) \quad u_{n+1} 
 
 2)a) Montrer que : $(\forall n \in \mathbb{N}) u_n \in ]0, 1[$
 
-b) Montrer que la suite \((u_{n})\) est strictement décroissantie puis en déduire qu'elle est convergente.
-c) Determiner la limite de la suite \((u_{n})\)
+b) Montrer que la suite $(u_{n})$ est strictement décroissantie puis en déduire qu'elle est convergente.
+c) Determiner la limite de la suite $(u_{n})$
 
 L'Atmen National 2014 (Session Normale)
 
@@ -2711,12 +2711,12 @@ On considère la fonction $g$ définie sur $[0; +\infty[$ par :
 
 $$g(x) = \frac{1}{x^2} e^{-\frac{1}{x^2}} \quad \text{si} \quad x > 0 \quad , \text{et} \quad g(0) = 0$$
 
-1) Montrer que \( g \) est continue sur \( [0; +\infty[ \).
-2) Pour tout \( x \in ]0; +\infty[ \) on pose: \( L(x) = \int_0^x g(t)dt \)
+1) Montrer que $ g $ est continue sur $ [0; +\infty[ $.
+2) Pour tout $ x \in ]0; +\infty[ $ on pose: $ L(x) = \int_0^x g(t)dt $
 
-a) Calculer \(L(x)\) pour tout \(x\in ]0; + \infty [\)
-b) Montrer que \(L\) est continue sur \(\left]0; + \infty \right[\)
-c) Calculer la limite \(\lim_{x\to 0^{+}}L(x)\) puis en deduire \(L(0)\)
+a) Calculer $L(x)$ pour tout $x\in ]0; + \infty [$
+b) Montrer que $L$ est continue sur $\left]0; + \infty \right[$
+c) Calculer la limite $\lim_{x\to 0^{+}}L(x)$ puis en deduire $L(0)$
 
 3) Pour tout $n \in \mathbb{N}^*$, on pose : $s_n = \frac{1}{n} \sum_{p=0}^{n \to -1} g\left(\frac{p}{n}\right)$
 
@@ -2732,26 +2732,26 @@ $$f(0) = 0 \quad \text{et} \quad f(x) = x(1 + \ln^2 x) \quad \text{si} \quad x >
 
 Et soit $\mathscr{C}$ sa courbe représentative dans un repère orthonormé $(O; \bar{i}, \bar{j})$.
 
-1) Calculer \(\lim_{x\to +\infty}f(x)\) et \(\lim_{x\to +\infty}\frac{f(x)}{x}\) puis interpréter graphiquement le résultat obtenu.
-2) a) Montrer que \( f \) est continue à droite en 0.
+1) Calculer $\lim_{x\to +\infty}f(x)$ et $\lim_{x\to +\infty}\frac{f(x)}{x}$ puis interpréter graphiquement le résultat obtenu.
+2) a) Montrer que $ f $ est continue à droite en 0.
 
-b) Calculer \(\lim_{x\to 0^{-}}\frac{f(x)}{x}\) puis interpréter le résultat graphiquement.
-c) Calculer \( f'(x) \) pour tout \( x \in \mathbb{R}^* \), puis en déduire que \( f \) est strictement croissant sur \( \mathbb{R}^* \).
+b) Calculer $\lim_{x\to 0^{-}}\frac{f(x)}{x}$ puis interpréter le résultat graphiquement.
+c) Calculer $ f'(x) $ pour tout $ x \in \mathbb{R}^* $, puis en déduire que $ f $ est strictement croissant sur $ \mathbb{R}^* $.
 
-3) a) Montrer que \(\mathcal{C}\) admet un point d'inflexion \(I\) d'abscisse \(e^{-1}\).
-b) Etudier la position relative de la courbe \(\mathcal{C}\) par rapport à la droite \(\mathcal{D}\) d'équation \(y = x\).
-c) Construire la courbe \(\mathcal{C}\). (On prend: \(e^{-1} = 0,4\))
+3) a) Montrer que $\mathcal{C}$ admet un point d'inflexion $I$ d'abscisse $e^{-1}$.
+b) Etudier la position relative de la courbe $\mathcal{C}$ par rapport à la droite $\mathcal{D}$ d'équation $y = x$.
+c) Construire la courbe $\mathcal{C}$. (On prend: $e^{-1} = 0,4$)
 
 **Deuxième Partie.**
 On considère la suite $(u_n)$ définie par :
 
 $$u_n = e^{-1} \quad \text{et} \quad u_{n+1} = f(u_n) \quad \text{pour tout} \quad n \in \mathbb{N}$$
 
-1) Montrer par recurrence que: \((\forall n\in \mathbb{N})e^{-1}\leq u_n <   1\)
-2) Montrer que \((u_{n})\) est strictement croissantie puis en deduire qu'elle est convergente.
-3) On pose: \(\lim_{n\to \infty}u_n = \ell\)
-a) Montrer que \(e^{-1}\leq \ell < 1\)
-b) Détérminer la valeur de \(\ell\).
+1) Montrer par recurrence que: $(\forall n\in \mathbb{N})e^{-1}\leq u_n <   1$
+2) Montrer que $(u_{n})$ est strictement croissantie puis en deduire qu'elle est convergente.
+3) On pose: $\lim_{n\to \infty}u_n = \ell$
+a) Montrer que $e^{-1}\leq \ell < 1$
+b) Détérminer la valeur de $\ell$.
 
 Troisième Partie:
 Soit $F$ la fonction numérique définie sur l'intervalle $[0; +\infty[$ par: $F(x) = \int_x^1 f(t)dt$
@@ -2769,8 +2769,8 @@ c) En déduire que pour tout $x \in \mathbb{R}^*$:
 
 $$F(x) = -\frac{3}{4} + \frac{3}{2}x^2 - \frac{x^2}{2} \ln x + \frac{x^2}{2} \ln^2 x$$
 
-2) a) Montrer que \(F\) est continue sur \(\mathbb{R}^+\).
-b) Calculer \(\lim_{x\to 0^{+}}F(x)\) puis en deduire la valeur de
+2) a) Montrer que $F$ est continue sur $\mathbb{R}^+$.
+b) Calculer $\lim_{x\to 0^{+}}F(x)$ puis en deduire la valeur de
 
 l'intégrale $\int_0^1 f(x)dx$.
 
@@ -2781,9 +2781,9 @@ On considère la fonction $g$ définie sur $\mathbb{R}^*$ par:
 
 $$g(x) = \int_x^{1x} \frac{\cos t}{t} dt$$
 
-1) Montrer que la fonction \( g \) est paire.
-2) Montrer que \( g \) est dérivable sur \( ]0; +\infty[ \) puis calculer \( g'(x) \) pour tout \( x > 0 \).
-3) a) En utilisant la formule d'intégration par parties, vérifier que pour tout \( x > 0 \):
+1) Montrer que la fonction $ g $ est paire.
+2) Montrer que $ g $ est dérivable sur $ ]0; +\infty[ $ puis calculer $ g'(x) $ pour tout $ x > 0 $.
+3) a) En utilisant la formule d'intégration par parties, vérifier que pour tout $ x > 0 $:
 
 $$\int_x^{1x} \frac{\cos t}{t} dt = \frac{\sin 3x - 3 \sin x}{3x} + \int_x^{1x} \frac{\sin t}{t^2} dt$$
 
@@ -2810,8 +2810,8 @@ $$\frac{1}{1 + 2x} \le \frac{1}{1 + 2t} \le 1$$
 
 2) Soit $x \in ]0; 1]$.
 
-a) Montrer que: \(F(x) = \frac{2}{x^2}\int_0^x\frac{t}{1 + 2t} dt\)
-b) Montrer que: \(\frac{1}{1 + 2x}\leq F(x)\leq 1\)
+a) Montrer que: $F(x) = \frac{2}{x^2}\int_0^x\frac{t}{1 + 2t} dt$
+b) Montrer que: $\frac{1}{1 + 2x}\leq F(x)\leq 1$
 
 puis en déduire que la fonction $F$ est continue à droite en zéro.
 
@@ -2840,14 +2840,14 @@ $$f(1) = 0 \text{ et } f(x) = \frac{1}{1 - \ln(1-x)} \text{ si } 0 \le x < 1$$
 
 Et soit $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(O; \bar{i}, \bar{j})$ avec: $[\bar{i}] = [\bar{j}] = 2cm$
 
-1) Montrer que \( f \) est continue a gauche en 1.
-2) Etudier la derivabilité de \( f \) à gauche en 1.
-3) Etudier les variations de la fonction \( f \) sur \( I \) puis donner son tableau de variations.
-4) a) Montrer que \(\mathcal{C}\) admet un unique point d'inflexion dont l'abscisse est \(\frac{e - 1}{\pi}\).
-b) Construire la courbe \(\mathcal{C}\) en indiquant sa demi-tangente au point d'abscisse 0.
-5) Montrer qu'il existe un unique réel \( \alpha \in I \) tel que \( f(\alpha) = \alpha \).
-6) a) Montrer que \( f \) est une bijection de \( I \) vers \( I \).
-b) Determiner \(f^{\prime \prime}(x)\) pour tout \(x\in I\)
+1) Montrer que $ f $ est continue a gauche en 1.
+2) Etudier la derivabilité de $ f $ à gauche en 1.
+3) Etudier les variations de la fonction $ f $ sur $ I $ puis donner son tableau de variations.
+4) a) Montrer que $\mathcal{C}$ admet un unique point d'inflexion dont l'abscisse est $\frac{e - 1}{\pi}$.
+b) Construire la courbe $\mathcal{C}$ en indiquant sa demi-tangente au point d'abscisse 0.
+5) Montrer qu'il existe un unique réel $ \alpha \in I $ tel que $ f(\alpha) = \alpha $.
+6) a) Montrer que $ f $ est une bijection de $ I $ vers $ I $.
+b) Determiner $f^{\prime \prime}(x)$ pour tout $x\in I$
 
 **Deuxième Partie.**
 On pose pour tout $n \in \mathbb{N}$ : $I_n = \int_0^t t^n f(t) dt$
@@ -2899,9 +2899,9 @@ b) Montrer que pour tout $x > 0$:
 
 $$e^{-2x} \ln 2 \le g(x) \le e^{-x} \ln 2$$
 
-c) En déduire que \( g \) est continue à droite en 0.
-2) Montrer que la fonction \( g \) est dérivable sur \( ]0; +\infty[ \) puis calculer \( g'(x) \) pour tout \( x \in \mathbb{R}_+^* \).
-3) a) Montrer que: \((\forall t > 0) - 1 \leq \frac{e^{-t} - 1}{t} \leq -e^{-t}\)
+c) En déduire que $ g $ est continue à droite en 0.
+2) Montrer que la fonction $ g $ est dérivable sur $ ]0; +\infty[ $ puis calculer $ g'(x) $ pour tout $ x \in \mathbb{R}_+^* $.
+3) a) Montrer que: $(\forall t > 0) - 1 \leq \frac{e^{-t} - 1}{t} \leq -e^{-t}$
 
 Puis calculer $g'(x)$ pour tout $x > 0$. (On pourra utiliser le théorème des accroissements finis).
 
@@ -2926,26 +2926,26 @@ interprétation géométrique à chacun des résultats obtenus.
 
 3) Pour tout $n \in \mathbb{N}^*$ on considère la fonction $g_n$ définie sur $]0; 1[$ par : $g_n(x) = f(x) - x^n$
 
-a) Montrer que \(g_{n}\) est strictement décroissant sur l'intervalle \(\left]0;1\right[\).
-b) En déduire que pour tout \( n \in \mathbb{N}^* \), il existe un unique réel \( \alpha_{n} \in ]0; 1[ \) tel que: \( f(\alpha_{n}) = (\alpha_{n})^{n} \).
-c) Montrer que: \((\forall n\in \mathbb{N}^{\prime})g_{n}(\alpha_{n + 1}) <   0\)
-d) Montrer que la suite \((\alpha_{n})_{n\in I}\) est strictement
+a) Montrer que $g_{n}$ est strictement décroissant sur l'intervalle $\left]0;1\right[$.
+b) En déduire que pour tout $ n \in \mathbb{N}^* $, il existe un unique réel $ \alpha_{n} \in ]0; 1[ $ tel que: $ f(\alpha_{n}) = (\alpha_{n})^{n} $.
+c) Montrer que: $(\forall n\in \mathbb{N}^{\prime})g_{n}(\alpha_{n + 1}) <   0$
+d) Montrer que la suite $(\alpha_{n})_{n\in I}$ est strictement
 
 croissante puis en déduire qu'elle est convergente.
 
 4) On pose : $\ell = \lim_{n \to +\infty} \alpha_n$
 
-a) Verifier que: \(0 < \alpha_{1} \leq \ell \leq 1\)
-b) Verifier que \( h(\alpha_{n}) = n \) pour tout \( n \in \mathbb{N}^* \) ou:
+a) Verifier que: $0 < \alpha_{1} \leq \ell \leq 1$
+b) Verifier que $ h(\alpha_{n}) = n $ pour tout $ n \in \mathbb{N}^* $ ou:
 
 $$h(x) = -\frac{1}{2} + \frac{\ln(-\ln(x))}{\ln x}$$
 
-c) Montrer que: \(\ell = 1\)
-d) En déduire que: \(\lim_{n \to +\infty} (\alpha_n)^n = 0\)
+c) Montrer que: $\ell = 1$
+d) En déduire que: $\lim_{n \to +\infty} (\alpha_n)^n = 0$
 
 **Deuxième Partie.**
-1) a) Etudier le signe de l'intégrale \(\int_{x}^{1}f(t)dt\) pour tout \(x\in \mathbb{R}_+^*\)
-b) En utilisant la formule d'intégration par parties, montré que pour tout \( x \in \mathbb{R}_+^* \):
+1) a) Etudier le signe de l'intégrale $\int_{x}^{1}f(t)dt$ pour tout $x\in \mathbb{R}_+^*$
+b) En utilisant la formule d'intégration par parties, montré que pour tout $ x \in \mathbb{R}_+^* $:
 
 $$\int_x^1 f(t)dt = 4 - 4\sqrt{x} + 2\sqrt{x} \ln x$$
 
@@ -3053,10 +3053,10 @@ On considère la fonction $h$ définie sur $[1; +\infty[$ par :
 
 $$h(1) = 1 \quad \text{et} \quad h(x) = \frac{x-1}{x \ln x} \text{ pour tout } x > 1$$
 
-1) a) Monrer que \( h \) est continué à droite en 1.
-b) Monrer que pour tout \( x > 1 \): \( \ln x < x - 1 \) puis en déduire que la fonction \( h \) est strictement décessante sur l'intervalle \( [1; +\infty] \).
-2) a) Calculer \(\lim_{x\to 0}h(x)\) puis dresser le tableau des variations de la fonction \(h\)
-b) En déduire que: \((\forall x\in I),0\leq h(x)\leq 1\)
+1) a) Monrer que $ h $ est continué à droite en 1.
+b) Monrer que pour tout $ x > 1 $: $ \ln x < x - 1 $ puis en déduire que la fonction $ h $ est strictement décessante sur l'intervalle $ [1; +\infty] $.
+2) a) Calculer $\lim_{x\to 0}h(x)$ puis dresser le tableau des variations de la fonction $h$
+b) En déduire que: $(\forall x\in I),0\leq h(x)\leq 1$
 
 Deuxième Partie :
 On considère la fonction $g$ définie sur $[1; +\infty[$ par :
@@ -3126,14 +3126,14 @@ Examen National 2013 (Section Normale)
 
 On pose pour tout $x \in \mathbb{R}^+$ par : $F(x) = \int_{x}^{x} \frac{\ln t}{1 + t^2} dt$
 
-1) Calculer \( F(1) \).
-2) Montrer que \( F \) est dérivable sur \( \mathbb{R}^+ \) et calculer \( F'(x) \). En déduire que: \( (\forall x \in \mathbb{R}^+) F(x) = 0 \)
+1) Calculer $ F(1) $.
+2) Montrer que $ F $ est dérivable sur $ \mathbb{R}^+ $ et calculer $ F'(x) $. En déduire que: $ (\forall x \in \mathbb{R}^+) F(x) = 0 $
 
 3) En utilisant une intégration par parties, montrer que :
 $$F(x) = \left( \text{Arc tan } x + \text{Arc tan } \frac{1}{x} \right) \ln x - \int_{x}^{x} \frac{\text{Arc tan } t}{t} dt$$
 
-4) Montrer que: \((\forall x > 0)\) Arc tan \(\frac{1}{x} = \frac{\pi}{2} -\mathrm{Arc}\tan x\)
-5) En déduire que: \((\forall x > 0)\) \(\ln x = \frac{2}{\pi}\int_{x}^{x}\frac{\operatorname{Arc}\tan t}{t} dt\)
+4) Montrer que: $(\forall x > 0)$ Arc tan $\frac{1}{x} = \frac{\pi}{2} -\mathrm{Arc}\tan x$
+5) En déduire que: $(\forall x > 0)$ $\ln x = \frac{2}{\pi}\int_{x}^{x}\frac{\operatorname{Arc}\tan t}{t} dt$
 
 Examen National 2012 (Section De Retrappage)
 
@@ -3185,8 +3185,8 @@ On note $A_n$ l'aire du domaine délimité par la courbe $^c\mathcal{C}$.
 
 l'axe des abscisses, l'axe des ordonnées et la droite d'équation $x = n$.
 
-1) Calculator \(A_{n}\) en fonction de \(n\)
-2) Calculator \(\lim_{n\to \infty}A_n\)
+1) Calculator $A_{n}$ en fonction de $n$
+2) Calculator $\lim_{n\to \infty}A_n$
 
 **Troisième Partie.**
 Pour tout $n \in \mathbb{N}^*$ on pose : $u_n = n \int_0^1 (f(x))^n dx$
@@ -3203,8 +3203,8 @@ $$x - \frac{x^2}{2n} \le n \ln\left(1 + \frac{x}{n}\right) \le x$$
 
 3) a) Montrer que : $(\forall n \in \mathbb{N}^*) u_n \le \int_0^n e^{-x} dx$
 
-b) Montrer que: \(\left(\forall n\in \mathbb{N}^{\prime}\right)e^{-\frac{1}{2\sqrt{n}}}\int_{0}^{\sqrt{n}}e^{-x}dx\leq u_n\)
-c) En déduire que la suite \(\left(u_{n}\right)_{n\geq 1}\) est convergente et déterminer sa limite.
+b) Montrer que: $\left(\forall n\in \mathbb{N}^{\prime}\right)e^{-\frac{1}{2\sqrt{n}}}\int_{0}^{\sqrt{n}}e^{-x}dx\leq u_n$
+c) En déduire que la suite $\left(u_{n}\right)_{n\geq 1}$ est convergente et déterminer sa limite.
 
 4) Soit $a$ un réel de l'intervalle $]0; 1[$.
 
@@ -3212,8 +3212,8 @@ a) Montrer que :
 
 $$\int_a^1 n(f(x))^n dx \le n(1-a)(f(a))^n$$
 
-b) En déduire que: \(\lim_{n\to \infty}\int_{a}^{1}n(f(x))^n dx = 0\)
-c) Calculator \(\lim_{n\to \infty}\int_0^n n(f(x))^n dx\)
+b) En déduire que: $\lim_{n\to \infty}\int_{a}^{1}n(f(x))^n dx = 0$
+c) Calculator $\lim_{n\to \infty}\int_0^n n(f(x))^n dx$
 
 Examen National 2005 (Session De Rattrapage)
 

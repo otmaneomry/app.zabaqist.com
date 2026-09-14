@@ -1168,7 +1168,7 @@ On a alors les propriétés suivantes :
 
 $$\sqrt[n]{a} \times \sqrt[n]{b} = \sqrt[n]{ab} \quad ; \quad \sqrt[n]{\frac{1}{a}} = \frac{1}{\sqrt[n]{a}} \quad (\text{avec } a \neq 0) \quad ; \quad \sqrt[n]{\frac{a}{b}} = \frac{\sqrt[n]{a}}{\sqrt[n]{b}} \quad (\text{avec } b \neq 0)$$
 
-$$\sqrt[n]{a^p} = \sqrt[n]{a} \quad ; \quad \sqrt[n]{\sqrt[n]{a}} = \sqrt[n]{a} \quad ; \quad (\sqrt[n]{a})^p = \sqrt[n]{a^p}$$
+$$\sqrt[np]{a^p} = \sqrt[n]{a} \quad ; \quad \sqrt[n]{\sqrt[p]{a}} = \sqrt[np]{a} \quad ; \quad (\sqrt[n]{a})^p = \sqrt[n]{a^p}$$
 
 > **Exemple.**
 Simplifions le nombre : $$A = \frac{\sqrt[4]{32} \times \sqrt[4]{27} \times \sqrt[4]{108}}{\sqrt[4]{144}}$$
@@ -1178,8 +1178,8 @@ On a : $$A = \frac{\sqrt[4]{2^1} \times \sqrt[4]{3^1} \times \sqrt[4]{2^2} \time
 > **Applications.**
 1. Simplifier les nombres suivants: $ A = \frac{\sqrt[4]{\sqrt{256}} \times \sqrt[4]{64}}{\sqrt[4]{24300000} \times \sqrt[4]{1024}} $ et $ B = \frac{\sqrt[4]{9} \times \sqrt[4]{\sqrt{3}} \times \sqrt[4]{9}}{\sqrt[4]{729}\sqrt[4]{\sqrt{3}}} $.
 2. Comparer les nombres $\sqrt[4]{5}$ et $\sqrt[4]{4}$.
-3. Montrer que: $(\forall a \in \mathbb{R}^*)(\forall n \in \mathbb{N}^*)(\forall p \in \mathbb{Z}) : \sqrt[a^p] = (\sqrt[a]^p)$
-4. Montrer que: $(\forall a \in \mathbb{R}^*)(\forall n \in \mathbb{N}^*)(\forall p \in \mathbb{N}^*) : \sqrt[a]{a} \times \sqrt[a]{a} = \sqrt[a^{n+p}]$
+3. Montrer que: $(\forall a \in \mathbb{R}^*)(\forall n \in \mathbb{N}^*)(\forall p \in \mathbb{Z}) : \sqrt[n]{a^p} = \left(\sqrt[n]{a}\right)^p$
+4. Montrer que: $(\forall a \in \mathbb{R}^*)(\forall n \in \mathbb{N}^*)(\forall p \in \mathbb{N}^*) : \sqrt[n]{a} \times \sqrt[p]{a} = \sqrt[np]{a^{n+p}}$
 5. Résoudre dans $\mathbb{R}$ l'équation: $\sqrt[3]{(x + 1)^2} -\sqrt[3]{(x - 1)^2} = \sqrt[3]{4x}$
 
 > **Proposition 16.**

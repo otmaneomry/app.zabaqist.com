@@ -182,7 +182,7 @@ b) Montrer que g est continue sur [0; π/2] et dérivable sur ]0; π/2[.
 
 b) Soit $M$ le maximum de $g$ sur $I$.
 
-Montrer qu'il existe un réel $\alpha \in ]0; \frac{\pi}{2[$ tel que $g(\alpha) = M$ et $g'(\alpha) = 0$
+Montrer qu'il existe un réel $\alpha \in ]0; \frac{\pi}{2}[$ tel que $g(\alpha) = M$ et $g'(\alpha) = 0$
 
 C) Soit $h$ la fonction numérique définie par : $h(x) = \frac{x-1}{2x+1}$.
 
@@ -675,9 +675,9 @@ La fonction f est dérivable sur $$\mathbb{R}^*$$ en tant que somme de deux fonc
 $$\text{tout } x \in \mathbb{R}^* : \quad f'(x) = \left(\operatorname{Arc} \tan x + \operatorname{Arc} \tan \frac{1}{x}\right)^* = \frac{1}{1+x^2} + \frac{\frac{1}{x^2}}{1+\frac{1}{x^2}} = \frac{1}{1+x^2} - \frac{1}{1+x^2} = 0$$
 
 Donc f est constante sur $\mathbb{R}^*$ . Comme $f(1) = \operatorname {Arc}\tan 1 + \operatorname {Arc}\tan 1 = \frac{\pi}{4} +\frac{\pi}{4} = \frac{\pi}{2}$ alors pour tout $x\in \mathbb{R}^*$ ..
-\[
+$$
 \begin{array}{l} f (x) = f (1) = \frac {\pi}{2}. \text {Ainsi, pour tout} x \in \mathbb {R} _ {+} ^ {*}: \quad \operatorname {A r c} \tan x + \operatorname {A r c} \tan \frac {1}{x} = \frac {\pi}{2} \end{array}
-\]
+$$
 
 #### 4.2. AXE DE SYMÉTRIE - CENTRE DE SYMÉTRIE
 
@@ -838,7 +838,7 @@ Pour tout $(\alpha ,\beta)\in \mathbb{R}^2$ $\alpha F + \beta G$ est une primiti
 |  x ↦ x* (r ∈ ℚ* - {1}) | x ↦ (xʳ⁺¹/(r+1)) + c | ℝ*  |
 |  x ↦ cos x | x ↦ sin x + c | ℝ  |
 |  x ↦ sin x | x ↦ -cos x + c | ℝ  |
-|  x ↦ 1 + tan² x = 1/cos² x | x ↦ tan x + c | ⌈ - π/2 + kπ; π/2 + kπ⌉ (k ∈ ℤ)  |
+|  x ↦ 1 + tan² x = 1/cos² x | x ↦ tan x + c | ] - π/2 + kπ; π/2 + kπ[ (k ∈ ℤ)  |
 |  x ↦ sin(ax + b) (a ∈ ℝ*) | x ↦ -1/a cos(ax + b) + c | ℝ  |
 |  x ↦ cos(ax + b) (a ∈ ℝ*) | x ↦ 1/a sin(ax + b) + c | ℝ  |
 |  x ↦ 1/(1+x²) | x ↦ Arc tan x + c | ℝ  |
@@ -1568,10 +1568,10 @@ $$f'(x) = (f(x)-1)\sqrt{(f(x))^2 - 2f(x)}$$
 
 4) Montrer que $f^{-1}$ est dérivable sur $]2; +\infty[$ et que:
 
-$$(\forall x \in ]2; +\infty[)$ $(f^{-1})'(x) = \frac{1}{(x-1)\sqrt{x^2 - 2x}}$$
+$$(\forall x \in ]2; +\infty[) (f^{-1})'(x) = \frac{1}{(x-1)\sqrt{x^2 - 2x}}$$
 **Exercice 33.**
 Soit f une fonction dérivable sur un intervalle I. On suppose que f est strictement monotone sur I.
-Montrer que si $x_0 \in I$ et $y_0 = f(x_0)$ avec $f'(x_0) \neq 0$, alors l'équation de la tangente à la courbe $\mathcal{C}_{f'}$, de $f^{-1}$ au point d'abscisse $M(y_0, x_0)$ est donnée par:
+Montrer que si $x_0 \in I$ et $y_0 = f(x_0)$ avec $f'(x_0) \neq 0$, alors l'équation de la tangente à la courbe $\mathcal{C}_{f^{-1}}$, de $f^{-1}$ au point d'abscisse $M(y_0, x_0)$ est donnée par:
 
 $$y = \frac{1}{f'(x_0)}x + x_0 - \frac{f(x_0)}{f'(x_0)}$$
 
@@ -1697,14 +1697,13 @@ $$\frac{1}{3 \times (10,1)^2} \le f'(x) \le \frac{1}{3 \times 10^2}$$
 
 2) En déduire que: $10,0032 < \sqrt[3]{1001} < 10,0034$
 **Exercice 48.**
-Soit $f$ une fonction continue sur $[0; 1]$ et dérivable sur
-$f(0) = 0$ et $f(1) = 1$
+Soit $f$ une fonction continue sur $[0; 1]$ et dérivable sur $]0; 1[$ telle que $f(0) = 0$ et $f(1) = 1$
 Montrer qu'il existe au moins un réel $c \in ]0; 1[$ tel que:
 
 $$f'(c) = \frac{1}{2\sqrt{c}}$$
 
 **Exercice 49.**
-Soit $f$ la fonction définie sur $\mathbb{R}^1$ par: $f(t) = \sqrt[t]{t}$
+Soit $f$ la fonction définie sur $\mathbb{R}_+^*$ par: $f(t) = \sqrt[t]{t}$
 
 1) Soit $x$ un réel strictement positif.
 

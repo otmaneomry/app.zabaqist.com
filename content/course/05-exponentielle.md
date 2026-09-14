@@ -33,17 +33,17 @@
 ### RAPPELS
 A) À Propos des puissances :
 
-1. Soit $r$ un nombre rationnel et $(x, y) \in (\mathbb{R}_+^n)^2$. Simplifier les expressions suivantes :
+1. Soit $r$ un nombre rationnel et $(x, y) \in (\mathbb{R}_+^*)^2$. Simplifier les expressions suivantes :
 
 $$E = \frac{3 \times 8^{r-\frac{1}{3}} + 4^{r+1} \cdot (\sqrt{3})^{2r+4}}{8^r - (16)^{r+\frac{1}{2}} \times 2^{-r-4}} \quad \text{et} \quad F = \frac{\left(x^{-4}y^{\frac{1}{3}}\right)^2 \sqrt[3]{x^2 \cdot 4\sqrt{y}}}{y \cdot x^{-2} \sqrt[6]{x^2 y^{-2}}}$$
 
-2. Résoudre dans Q l'équation suivante: \( 10^{(x - 2)(3 - x)} = \frac{1}{100} \)
-3. Determiner le plus petit entier naturel n vérifiant l'inégalité: \( 3^n > (2016)^{40} \)
-4. Montrer que pour tout \( n \in \mathbb{N} \): \( \sqrt{2^{2n} + 2^{n+1} + 1} - \sqrt{2^{2n} - 2^{n+1} + 1} = 2 \)
+2. Résoudre dans Q l'équation suivante: $ 10^{(x - 2)(3 - x)} = \frac{1}{100} $
+3. Determiner le plus petit entier naturel n vérifiant l'inégalité: $ 3^n > (2016)^{40} $
+4. Montrer que pour tout $ n \in \mathbb{N} $: $ \sqrt{2^{2n} + 2^{n+1} + 1} - \sqrt{2^{2n} - 2^{n+1} + 1} = 2 $
 B) Propriétés algébriques de la fonction logarithme népérien :
 
-1. Simplifier l'ecriture du nombre: \(a = \ln \left(\frac{\sqrt{2} - 1}{\sqrt{2} + 1}\right) - 2\ln \left(\sqrt{2} - 1\right)\)
-2. Résoudre dans \(\mathbb{R}\) les équations suivantes:
+1. Simplifier l'ecriture du nombre: $a = \ln \left(\frac{\sqrt{2} - 1}{\sqrt{2} + 1}\right) - 2\ln \left(\sqrt{2} - 1\right)$
+2. Résoudre dans $\mathbb{R}$ les équations suivantes:
 
 $$\ln(2x - 1) + \ln(2x + 5) = \ln 7 \quad ; \quad 3(\ln x)^2 - 5\ln x + 2 = 0 \quad ; \quad |5 - 2\ln x| = |3 + \ln x^4|$$
 
@@ -63,10 +63,10 @@ $$\begin{cases} f(x) = \frac{\ln(1+x^2)}{x} \text{ si } x > 0 \\ f(0) = 0 \end{c
 
 $\mathcal{C}_f$ sa courbe représentative dans un repère orthonormé $(O; \bar{i}, \bar{j})$.
 
-a) Montrer que \(f\) est derivable à droite en 0.
-b) Determiner la nature de la branche infinie de la courbe \(\mathcal{C}_f\)
-c) Montrer que \(f\) est derivable sur \(]0; +\infty[\) et que: \((\forall x \in ]0; +\infty[)\) \(f'(x) = \frac{\varphi(x^2)}{x^2}\)
-d) Etudier les variations de la fonction \( f \) puis tracer \( \mathcal{C}_f \).
+a) Montrer que $f$ est derivable à droite en 0.
+b) Determiner la nature de la branche infinie de la courbe $\mathcal{C}_f$
+c) Montrer que $f$ est derivable sur $]0; +\infty[$ et que: $(\forall x \in ]0; +\infty[)$ $f'(x) = \frac{\varphi(x^2)}{x^2}$
+d) Etudier les variations de la fonction $ f $ puis tracer $ \mathcal{C}_f $.
 
 A) Première Partie :
 
@@ -135,21 +135,21 @@ $\beta = \ln \alpha \Leftrightarrow \alpha = \exp(\beta)$
 • Le nombre $e$ est l'unique réel tel que : $\ln(e) = 1$
 
 ### DÉRIVÉE DE LA FONCTION EXPONENTIELLE NÉPÉRIENNE
-1. Montrer que la fonction exp est dérivable en 0 et que: \((\exp)'(0) = 1\)
-2.a)Calculer la limite: \(\lim_{t\to 0}\frac{\exp(t) - 1}{t}\)
+1. Montrer que la fonction exp est dérivable en 0 et que: $(\exp)'(0) = 1$
+2.a)Calculer la limite: $\lim_{t\to 0}\frac{\exp(t) - 1}{t}$
 b) Determiner l'equation de la tangente à la courbe exp au point d'abscisse 0.
-3. Soit \( f \) la fonction définie par: \( f(x) = \exp(\sin x) \) et soit \( x_0 = \frac{2017\pi}{2} \).
+3. Soit $ f $ la fonction définie par: $ f(x) = \exp(\sin x) $ et soit $ x_0 = \frac{2017\pi}{2} $.
 
 Montrer que la fonction $f$ est dérivable en $x_0$ et déterminer $f'(x_0)$.
 
 ### FONCTION EXPONENTIELLE DE BASE 10
-1. Montrer que la fonction logarithme decimal \( x \mapsto \log \) est une bijection de \( ]0; +\infty[ \) vers \( \mathbb{R} \), et que log admet une fonction reciproque définie de \( \mathbb{R} \) vers \( ]0; +\infty[ \).
-La fonction reciproque de la fonction logarithme decimal est appelée la fonction exponentielle de base 10, et on la note \(\exp_{10}\).
-2. Montrer que pour tout \(n\in \mathbb{N}\) .. \(\exp_{10}(n) = 10^n\)
-3. Montrer que pour tout \(x \in \mathbb{R}\) .. \(\exp_{10}(x) = \exp(x \ln 10)\)
-4. Montrer que pour tout \(x \in \mathbb{R}\) .. \(\exp_{10}(2x) = (\exp_{10}(x))^2\)
-5. Résoudre dans R l'équation suivante: \(\exp_{10}(2x) - 11\exp_{10}(x) + 10 = 0\)
-6. Calculer \(\lim_{x\to +\infty}\exp_{10}(x)\) et \(\lim_{x\to -\infty}\exp_{10}(x)\).
+1. Montrer que la fonction logarithme decimal $ x \mapsto \log x $ est une bijection de $ ]0; +\infty[ $ vers $ \mathbb{R} $, et que log admet une fonction reciproque définie de $ \mathbb{R} $ vers $ ]0; +\infty[ $.
+La fonction reciproque de la fonction logarithme decimal est appelée la fonction exponentielle de base 10, et on la note $\exp_{10}$.
+2. Montrer que pour tout $n\in \mathbb{N}$ .. $\exp_{10}(n) = 10^n$
+3. Montrer que pour tout $x \in \mathbb{R}$ .. $\exp_{10}(x) = \exp(x \ln 10)$
+4. Montrer que pour tout $x \in \mathbb{R}$ .. $\exp_{10}(2x) = (\exp_{10}(x))^2$
+5. Résoudre dans R l'équation suivante: $\exp_{10}(2x) - 11\exp_{10}(x) + 10 = 0$
+6. Calculer $\lim_{x\to +\infty}\exp_{10}(x)$ et $\lim_{x\to -\infty}\exp_{10}(x)$.
 
 ## Cours
 
@@ -265,9 +265,9 @@ $e^{2x} - (e+1)e^{x+1} + e^3 < 0 \Leftrightarrow (e^x - e)(e^t - e^2) < 0 \Leftr
 Par suite, l'ensemble solution de l'inéquation est : $S = ]1; 2[$
 
 > **Applications.**
-1) On considere la fonction \( f \) définie par \( f(x) = \frac{2e^{2x}}{e^{2x} + 1} \). Montrer que: \( (\forall x \in \mathbb{R})f(x) + f(-x) = 2 \)
-2) Résoudre dans R l'équation: \( e^{\frac{3x}{x - 1}} - e^{\frac{x}{x - 1}} = 2e^{\frac{x}{x - 1}} - 2 \)
-3) Résoudre dans R l'inéquation: \(\frac{(e^{2x} - 16)(e^x - 1)}{e^{x + 1} - e} \geq 0\)
+1) On considere la fonction $ f $ définie par $ f(x) = \frac{2e^{2x}}{e^{2x} + 1} $. Montrer que: $ (\forall x \in \mathbb{R})f(x) + f(-x) = 2 $
+2) Résoudre dans R l'équation: $ e^{\frac{3x}{x - 1}} - e^{\frac{x}{x - 1}} = 2e^{\frac{x}{x - 1}} - 2 $
+3) Résoudre dans R l'inéquation: $\frac{(e^{2x} - 16)(e^x - 1)}{e^{x + 1} - e} \geq 0$
 
 #### 1.4. DÉRIVÉE DE LA FONCTION EXPONENTIELLE NÉPÉRIENNE
 > **Proposition 5.**
@@ -382,9 +382,9 @@ On a pour tout $$x \in \mathbb{R}^*$$ :
 > **Proposition 10.**
 Soit $a$ un réel strictement positif et différent de $1$. Alors :
 
-\(\left(\forall x\in \mathbb{R}\right)\left(\forall y\in \mathbb{R}_{+}^{*}\right)\quad y = a^{x}\Leftrightarrow x = \frac{\ln y}{\ln a}\)
-\(\left(\forall x\in \mathbb{R}\right)\log_a\left(a^x\right) = x\) et \(\left(\forall x\in \mathbb{R}_{+}^{*}\right)a^{\log_{a}(x)} = x\)
-Pour tout \((x,y)\in \mathbb{R}^2\) .. \(a^{x + y} = a^x\times a^y\) et \(a^{x - y} = \frac{a^x}{a^y}\)
+$\left(\forall x\in \mathbb{R}\right)\left(\forall y\in \mathbb{R}_{+}^{*}\right)\quad y = a^{x}\Leftrightarrow x = \frac{\ln y}{\ln a}$
+$\left(\forall x\in \mathbb{R}\right)\log_a\left(a^x\right) = x$ et $\left(\forall x\in \mathbb{R}_{+}^{*}\right)a^{\log_{a}(x)} = x$
+Pour tout $(x,y)\in \mathbb{R}^2$ .. $a^{x + y} = a^x\times a^y$ et $a^{x - y} = \frac{a^x}{a^y}$
 
 > **Remarque.**
 Dans ce paragraphe, on a supposé que $a > 0$ et $a \neq 1$, et après avoir prolongé l'écriture $\exp_a$ sous la forme d'une puissance de $a$, on a obtenu : $(\forall x \in \mathbb{R}) a^x = e^{x \ln a}$
@@ -422,13 +422,13 @@ l'ensemble solution de cette inéquation est : $S = \left[ \frac{\ln 5}{2 \ln 3 
 Cette inéquation est équivalente à $7.7^s - \frac{1}{7^s} - 6 < 0$, c'est-à-dire à $7.7^{2s} - 6.7^s - 1 < 0$. Or, on sait que
 pour tout $t \in \mathbb{R}$, $7t^2 - 6t - 1 = (7t + 1)(t - 1)$. il s'ensuit donc que l'inéquation $7.7^{2s} - 6.7^s - 1 < 0$ est
 équivalente à $(7^{s+1} + 1)(7^s - 1) < 0$, c'est-à-dire que $7^s < 1$ (ceci car $7^{s+1} + 1 > 0$). Ainsi, l'ensemble
-solution de cette inéquation est : $S = \mathbb{R}^s$.
+solution de cette inéquation est : $S = \mathbb{R}_-^*$.
 
 > **Applications.**
 Applications
-1) Resoudre dans \(\mathbb{R}\) les equations suivantes: \(-5\times 4^{r + 1} + 2\times 4^{-r} = 3\) \(3^{r} - 5\sqrt{3^{r}} +4 = 0\) \(9^{2r + 1} = \frac{36}{6^r}\) \(16^r -3^{2r - \frac{1}{2}} = 3^{2r - \frac{1}{2}} - 2^{4r - 1}\)
-2) Resoudre dans \(\mathbb{R}\) l'inéquation suivante: \(\log 2 + \log (4^{r - 2} + 9)\leq 1 + \log (2^{r - 2} + 1)\)
-3) Montrer que pour tout \((a,b,c)\in \left(\mathbb{R}_{+}^{r}\right)^{3}:a^{\frac{\ln b}{c}}.b^{\frac{\ln c}{a}}.c^{\frac{\ln a}{b}} = 1\)
+1) Resoudre dans $\mathbb{R}$ les equations suivantes: $-5\times 4^{x + 1} + 2\times 4^{-x} = 3$ $3^{x} - 5\sqrt{3^{x}} +4 = 0$ $9^{2x + 1} = \frac{36}{6^x}$ $16^x -3^{2x - \frac{1}{2}} = 3^{2x - \frac{1}{2}} - 2^{4x - 1}$
+2) Resoudre dans $\mathbb{R}$ l'inéquation suivante: $\log 2 + \log (4^{x - 1} + 9)\leq 1 + \log (2^{x - 1} + 1)$
+3) Montrer que pour tout $(a,b,c)\in \left(\mathbb{R}_{+}^{*}\right)^{3}:a^{\ln\frac{b}{c}}.b^{\ln\frac{c}{a}}.c^{\ln\frac{a}{b}} = 1$
 
 ### 2. Fonction exponentielle de base $a$
 
@@ -443,8 +443,8 @@ Calculons la dérivée de chacune des fonctions définies par :
 
 $$f(x) = 4^x + 4^{-4x} \quad ; \quad g(x) = 5^{\sqrt{x+1}} \quad ; \quad h(x) = 2^{\frac{x}{x^2+1}}$$
 
-La fonction \(f\) est derivable sur \(\mathbb{R}\) et on a: \((\forall x\in \mathbb{R})f^{\prime}(x) = 4^{x}.\ln 4 - 4\times 4^{-4x}\ln 4 = (4^{x} - 4^{-4x + 1})\ln 4\)
-On a pour tout \(x\in [-1, + \infty [\cdot ,g(x) = e^{\sqrt{x + 1}\ln (5)}.\) Donc la fonction \(g\) est derivable sur \([-1; + \infty [\) et on a
+La fonction $f$ est derivable sur $\mathbb{R}$ et on a: $(\forall x\in \mathbb{R})f^{\prime}(x) = 4^{x}.\ln 4 - 4\times 4^{-4x}\ln 4 = (4^{x} - 4^{-4x + 1})\ln 4$
+On a pour tout $x\in [-1, + \infty [\cdot ,g(x) = e^{\sqrt{x + 1}\ln (5)}.$ Donc la fonction $g$ est derivable sur $[-1; + \infty [$ et on a
 
 $$\text{pour tout } x \in ]-1; +\infty[ : \quad g'(x) = \left(e^{\sqrt{x+1} \ln(5)}\right)' = \left(\sqrt{x+1} \ln(5)\right)' e^{\sqrt{x+1} \ln(5)} = \frac{\ln 5}{2\sqrt{x+1}}.5^{\sqrt{x+1}}$$
 
@@ -468,12 +468,12 @@ $$g(x) = \left(\frac{2}{3}\right)^x \quad ; \quad h(x) = \left(3^x + 2^x - 5^x\r
 
 2) On considère la fonction $f$ définie sur $]0, +\infty[$ par : $f(x) = 2^x + 2^{\frac{6}{x}}$
 
-a)-Calculer \(f^{\prime}(x)\) puis monrer que \(f\) est strictement decroissant sur \(\left]0;\sqrt{6}\right]\) et strictement croissant sur \(\left[\sqrt{6};+\infty\right]\).
-b)-En déduire que l'équation \( f(x) = 12 \) admet une solution unique sur \( ]0; +\infty[ \) que l'on déterminera.
+a)-Calculer $f^{\prime}(x)$ puis monrer que $f$ est strictement decroissant sur $\left]0;\sqrt{6}\right]$ et strictement croissant sur $\left[\sqrt{6};+\infty\right]$.
+b)-En déduire que l'équation $ f(x) = 12 $ admet une solution unique sur $ ]0; +\infty[ $ que l'on déterminera.
 
 > **Proposition 14.**
-- Si \( a > 1 \) alors: \( \lim_{x \to +\infty} a^x = +\infty \) et \( \lim_{x \to -\infty} a^x = 0 \).
-- Si \( 0 < a < 1 \) alors: \( \lim_{x \to +\infty} a^x = 0 \) et \( \lim_{x \to -\infty} a^x = +\infty \)
+- Si $ a > 1 $ alors: $ \lim_{x \to +\infty} a^x = +\infty $ et $ \lim_{x \to -\infty} a^x = 0 $.
+- Si $ 0 < a < 1 $ alors: $ \lim_{x \to +\infty} a^x = 0 $ et $ \lim_{x \to -\infty} a^x = +\infty $
 
 > **Exemples.**
 $$\lim_{x \to +\infty} \left(\frac{\pi}{3}\right)^x = +\infty \quad ; \quad \lim_{x \to -\infty} \left(\frac{\pi}{3}\right)^x = 0 \quad ; \quad \lim_{x \to +\infty} \left(\frac{1 + \sqrt{2}}{3}\right)^x = 0 \quad ; \quad \lim_{x \to +\infty} \left(\frac{1 + \sqrt{2}}{3}\right)^x = +\infty$$
@@ -483,20 +483,20 @@ $$\lim_{x \to +\infty} \left(3^x - e^x\right) = \lim_{x \to +\infty} 3^x \left(1
 > **Application.**
 On considère la fonction numérique définie par : $f(x) = 4^x - 2^{x+1}$
 
-1) Determiner \(D_{f}\) le domaine de definition de la fonction \(f\).
-2) Calculer les limites de la fonction \( f \) aux bornes du domaine de définition.
-3) Etudier les variations de la fonction \( f \).
-4) Ecrire l'equation de la tangente à la courbe \(\mathcal{C}_f\) de \(f\) au point d'abscisse 0.
-5) Construire la courbe \(\mathcal{C}_f\) dans un repere orthonorme.
+1) Determiner $D_{f}$ le domaine de definition de la fonction $f$.
+2) Calculer les limites de la fonction $ f $ aux bornes du domaine de définition.
+3) Etudier les variations de la fonction $ f $.
+4) Ecrire l'equation de la tangente à la courbe $\mathcal{C}_f$ de $f$ au point d'abscisse 0.
+5) Construire la courbe $\mathcal{C}_f$ dans un repere orthonorme.
 
 > **Solution.**
 1) Calcul des limites :
 
-- \(\lim_{x \to +\infty} \left( x^3 + 5x^2 - e^x \right) = \lim_{x \to +\infty} e^x \left( x^3 e^{-x} + 5x^2 e^{-x} - 1 \right) = -\infty\) (car \(\lim_{x \to +\infty} x^3 e^{-x} = \lim_{x \to +\infty} x^2 e^{-x} = 0\))
-- \(\lim_{x \to +\infty} \frac{x^3}{e^x - 1} = \lim_{x \to +\infty} \frac{x^3}{e^x (1 - e^{-x})} = \lim_{x \to +\infty} \frac{x^3}{e^x} \times \frac{1}{1 - e^{-x}} = 0\) (car \(\lim_{x \to +\infty} \frac{x^3}{e^x} = 0\) et \(\lim_{x \to +\infty} \frac{1}{1 - e^{-x}} = 1\))
-- \(\lim_{x \to +\infty} \frac{1}{x^2} e^{\frac{1}{x^2}} = 0\) (car \(\lim_{x \to +\infty} \frac{1}{x^2} = 0\) et \(\lim_{x \to +\infty} e^{-\frac{1}{x^2}} = e^0 = 1\))
-- \(\lim_{x \to +\infty} \frac{x^5}{5^x} = \lim_{x \to +\infty} e^{\ln \left( \frac{x^5}{5^x} \right)} = \lim_{x \to +\infty} e^{5 \ln x - x \ln 5} = \lim_{x \to +\infty} e^{x \left( 5 \frac{\ln x}{x} - \ln 5 \right)} = 0\) (car \(\lim_{x \to +\infty} \frac{\ln x}{x} = 0\))
-- \(\lim_{x \to 0^+} (1 + x)^{\frac{1}{x}} = \lim_{x \to 0^+} e^{\frac{\ln(1 + x)}{x}} = e^1 = e\) (car \(\lim_{x \to 0} \frac{\ln(1 + x)}{x} = 1\))
+- $\lim_{x \to +\infty} \left( x^3 + 5x^2 - e^x \right) = \lim_{x \to +\infty} e^x \left( x^3 e^{-x} + 5x^2 e^{-x} - 1 \right) = -\infty$ (car $\lim_{x \to +\infty} x^3 e^{-x} = \lim_{x \to +\infty} x^2 e^{-x} = 0$)
+- $\lim_{x \to +\infty} \frac{x^3}{e^x - 1} = \lim_{x \to +\infty} \frac{x^3}{e^x (1 - e^{-x})} = \lim_{x \to +\infty} \frac{x^3}{e^x} \times \frac{1}{1 - e^{-x}} = 0$ (car $\lim_{x \to +\infty} \frac{x^3}{e^x} = 0$ et $\lim_{x \to +\infty} \frac{1}{1 - e^{-x}} = 1$)
+- $\lim_{x \to +\infty} \frac{1}{x^2} e^{\frac{1}{x^2}} = 0$ (car $\lim_{x \to +\infty} \frac{1}{x^2} = 0$ et $\lim_{x \to +\infty} e^{-\frac{1}{x^2}} = e^0 = 1$)
+- $\lim_{x \to +\infty} \frac{x^5}{5^x} = \lim_{x \to +\infty} e^{\ln \left( \frac{x^5}{5^x} \right)} = \lim_{x \to +\infty} e^{5 \ln x - x \ln 5} = \lim_{x \to +\infty} e^{x \left( 5 \frac{\ln x}{x} - \ln 5 \right)} = 0$ (car $\lim_{x \to +\infty} \frac{\ln x}{x} = 0$)
+- $\lim_{x \to 0^+} (1 + x)^{\frac{1}{x}} = \lim_{x \to 0^+} e^{\frac{\ln(1 + x)}{x}} = e^1 = e$ (car $\lim_{x \to 0} \frac{\ln(1 + x)}{x} = 1$)
 
 2) a) On a immédiatement : $$\lim_{x \to +\infty} f(x) = \lim_{x \to +\infty} x^x = \lim_{x \to +\infty} e^{x \ln x} = +\infty$$ car $$\lim_{x \to +\infty} x \ln x = +\infty$$.
 
@@ -530,14 +530,14 @@ Conclusion : La fonction $f$ n'est pas continue en $x_0 = 0$.
 
 - On retiendra que si $a$ et $b$ sont deux réels strictement positifs :
 
-\(a^{f(x)} = b^{g(x)}\Leftrightarrow \exp \left(f(x)\ln a\right) = \exp \left(g(x)\ln b\right)\Leftrightarrow f(x)\ln a = g(x)\ln b\)
-- Des que l'on rencontres une expression du type \( X^{Y} \) avec \( Y \) non entier alors on commence par écrire \( X^{Y} = e^{Y\ln X} \) (définition d'une puissance réelle), ce qui montre que cette écriture n'a un sens que pour \( X > 0 \).
-Pour tout \(m\in \mathbb{R}^*\) , on a I'equivalence suivante: \(e^x = m\Leftrightarrow x = \ln m\)
-- Soit \(\alpha\) un réel strictement positif et \(\beta\) un réel quelconque. Il faut savoir et savoir démontré les résultats suivants, très utiles en pratique :
+$a^{f(x)} = b^{g(x)}\Leftrightarrow \exp \left(f(x)\ln a\right) = \exp \left(g(x)\ln b\right)\Leftrightarrow f(x)\ln a = g(x)\ln b$
+- Des que l'on rencontres une expression du type $ X^{Y} $ avec $ Y $ non entier alors on commence par écrire $ X^{Y} = e^{Y\ln X} $ (définition d'une puissance réelle), ce qui montre que cette écriture n'a un sens que pour $ X > 0 $.
+Pour tout $m\in \mathbb{R}^*$ , on a I'equivalence suivante: $e^x = m\Leftrightarrow x = \ln m$
+- Soit $\alpha$ un réel strictement positif et $\beta$ un réel quelconque. Il faut savoir et savoir démontré les résultats suivants, très utiles en pratique :
 
-\(\lim_{x \to +\infty} \frac{(\ln x)^{\beta}}{x^{\alpha}} = 0\) \(\lim_{x \to +\infty} \frac{e^{\alpha x}}{x^{\beta}} = +\infty\) \(\lim_{x \to 0^{\alpha}} x^{\alpha} |\ln x|^{\beta} = 0\)
-\(\mathrm{Si}a\in ]1, + \infty [\mathrm{alors}:\lim_{x\to +\infty}\frac{a^x}{x^{\alpha}} = +\infty\) et \(\lim_{x\to -\infty}|x|^{\alpha}a^{x} = 0\)
-\(\mathrm{Si}a\in ]0,1[\mathrm{alors}:\lim_{x\to +\infty}x^{\alpha}a^{x} = 0\) et \(\lim_{x\to -\infty}\frac{a^x}{|x|^{\alpha}} = +\infty\)
+$\lim_{x \to +\infty} \frac{(\ln x)^{\beta}}{x^{\alpha}} = 0$ $\lim_{x \to +\infty} \frac{e^{\alpha x}}{x^{\beta}} = +\infty$ $\lim_{x \to 0^{\alpha}} x^{\alpha} |\ln x|^{\beta} = 0$
+$\mathrm{Si}a\in ]1, + \infty [\mathrm{alors}:\lim_{x\to +\infty}\frac{a^x}{x^{\alpha}} = +\infty$ et $\lim_{x\to -\infty}|x|^{\alpha}a^{x} = 0$
+$\mathrm{Si}a\in ]0,1[\mathrm{alors}:\lim_{x\to +\infty}x^{\alpha}a^{x} = 0$ et $\lim_{x\to -\infty}\frac{a^x}{|x|^{\alpha}} = +\infty$
 
 On retiendra ces formules en disant que, lorsqu'il s'agit d'une forme indéterminée :
 
@@ -545,7 +545,7 @@ La puissance l'emporte sur le logarithme
 
 L'exponentielle l'emporte sur la puissance
 
-- Si \(\lim_{x \to x_0} u(x) = 0\) alors \(\lim_{x \to x_0} \frac{e^{u(x)} - 1}{u(x)} = 1\). En pratique, on pose \(t = u(x)\) et la limite devient: \(\lim_{t \to 0} \frac{e^t - 1}{t} = 1\)
+- Si $\lim_{x \to x_0} u(x) = 0$ alors $\lim_{x \to x_0} \frac{e^{u(x)} - 1}{u(x)} = 1$. En pratique, on pose $t = u(x)$ et la limite devient: $\lim_{t \to 0} \frac{e^t - 1}{t} = 1$
 - Parfois un changement de variable simple permet d'aboutir à une limite de reférence. Par exemple,
 
 pour calculer $\lim_{x \to +\infty} x \left( e^{\frac{1}{x}} - 1 \right)$, on pourra poser $t = \frac{1}{x}$ et donc : $\lim_{x \to +\infty} x \left( e^{\frac{1}{x}} - 1 \right) = \lim_{t \to 0} \frac{e^t - 1}{t} = 1$
@@ -767,8 +767,8 @@ On considère la fonction $$f$$ définie par :
 
 $$f(x) = e^{-\ln(2x)} - \ln\left(e^{\frac{2x+1}{2x}}\right)$$
 
-1) Determiner \(D\), le domaine de definition de \(f\).
-2) Montrer que \(f\) est constante sur \(D\).
+1) Determiner $D$, le domaine de definition de $f$.
+2) Montrer que $f$ est constante sur $D$.
 
 #### Exercice 07
 Soit $$f$$ et $$g$$ les fonctions définies sur $$\mathbb{R}$$ par : ($$a \in \mathbb{R}^*$$)
@@ -879,27 +879,27 @@ $$\lim_{x \to -\infty} x^2\left(\frac{1}{e^x} - e^{\frac{1}{x-1}}\right) \quad ;
 #### Exercice 19
 Étudier la dérivabilité de la fonction $f$ puis calculer sa dérivée dans chacun des cas suivants :
 
-1) \(f(x) = e^{2x - 1}\) 2) \(f(x) = e^{-3x^2 + 2x - 7}\)
-3) \(f(x) = \frac{e^x - 1}{e^x + 1}\); 4) \(f(x) = e^{\sqrt{2x} - 1}\)
-5) \(f(x) = \sqrt{e^{2x} - e^x}\); 6) \(f(x) = e^{\cos x} - e^{-\cos x}\)
-7) \(f(x) = \ln \left(4 + e^{5x}\right)\) 8) \(f(x) = xe^{\mathrm{Arc}\tan x}\)
-9) \(f(x) = xe^{\frac{2x}{x^2 - 1}}\); 10) \(f(x) = \ln \left(\left|e^{2x} - 1\right|\right)\)
+1) $f(x) = e^{2x - 1}$ 2) $f(x) = e^{-3x^2 + 2x - 7}$
+3) $f(x) = \frac{e^x - 1}{e^x + 1}$; 4) $f(x) = e^{\sqrt{2x} - 1}$
+5) $f(x) = \sqrt{e^{2x} - e^x}$; 6) $f(x) = e^{\cos x} - e^{-\cos x}$
+7) $f(x) = \ln \left(4 + e^{5x}\right)$ 8) $f(x) = xe^{\mathrm{Arc}\tan x}$
+9) $f(x) = xe^{\frac{2x}{x^2 - 1}}$; 10) $f(x) = \ln \left(\left|e^{2x} - 1\right|\right)$
 
 ### DÉTERMINATION DES PRIMITIVES
 #### Exercice 20
 Dans chacun des cas suivants, déterminer une primitive de la fonction $f$ sur un intervalle convenable :
 
-1) \(f(x) = e^{-2x + 5}\); 2) \(f(x) = \sqrt{e^{2x}}\)
-3) \(f(x) = xe^{x^2 + 1}\); 4) \(f(x) = \frac{e^{2x}}{\sqrt{2e^{2x} + 3}}\)
-5) \(f(x) = \frac{e^{-\operatorname{Arc}\tan x}}{1 + x^2}\); 6) \(f(x) = \frac{e^x}{e^x + 1}\)
-7) \(f(x) = \cos x.e^{\cos x}\); 8) \(f(x) = \frac{e^{4x} + e^x}{e^{4x} + 4e^x + 3}\)
-9) \(f(x) = (1 + \tan^2 x)e^{-\tan x}\); 10) \(f(x) = 2^{x}\)
+1) $f(x) = e^{-2x + 5}$; 2) $f(x) = \sqrt{e^{2x}}$
+3) $f(x) = xe^{x^2 + 1}$; 4) $f(x) = \frac{e^{2x}}{\sqrt{2e^{2x} + 3}}$
+5) $f(x) = \frac{e^{-\operatorname{Arc}\tan x}}{1 + x^2}$; 6) $f(x) = \frac{e^x}{e^x + 1}$
+7) $f(x) = \cos x.e^{\cos x}$; 8) $f(x) = \frac{e^{4x} + e^x}{e^{4x} + 4e^x + 3}$
+9) $f(x) = (1 + \tan^2 x)e^{-\tan x}$; 10) $f(x) = 2^{x}$
 
 #### Exercice 21
 On considère la fonction numérique $f$ définie sur $\mathbb{R}$ par : $f(x) = e^{2x} \cos x$
 
-1) Montrer qu'il existe deux réels \( \alpha \) et \( \beta \) à déterminer tels que: \( (\forall x \in \mathbb{R}) f(x) - \alpha f'(x) + \beta f''(x) = 0 \)
-2) En déduire les primitives de \( f \) sur \( \mathbb{R} \).
+1) Montrer qu'il existe deux réels $ \alpha $ et $ \beta $ à déterminer tels que: $ (\forall x \in \mathbb{R}) f(x) - \alpha f'(x) + \beta f''(x) = 0 $
+2) En déduire les primitives de $ f $ sur $ \mathbb{R} $.
 
 ### FONCTIONS PUISSANCES
 #### Exercice 22
@@ -933,8 +933,8 @@ $$2^{2x-1} + 3^x + 4^{x-\frac{1}{2}} - 9^{\frac{x}{2}+1} = 0 \quad ; \quad x^{\s
 EXERCICE 26
 
 #### Exercice 26
-1) Resoudre dans \(\mathbb{R}\) l'équation suivante: \(2^{\sin^2 x} = \cos x\)
-2) Soit \( a \) le nombre: \( a = \frac{\sqrt{5} + 1}{\sqrt{5} - 1} \)
+1) Resoudre dans $\mathbb{R}$ l'équation suivante: $2^{\sin^2 x} = \cos x$
+2) Soit $ a $ le nombre: $ a = \frac{\sqrt{5} + 1}{\sqrt{5} - 1} $
 
 Montrer que l'équation $a^{2x} - 3a^x + 1 = 0$ admet deux solutions réels $\alpha$ et $\beta$ telles que : $\alpha\beta = -1$
 
@@ -950,7 +950,7 @@ Résoudre dans $\mathbb{R}$ les inéquations suivantes :
 $$\begin{array}{l} \log(2) + \log(4^{x-1} + 9) \le 1 + \log(2^{x-1} + 1) ; 2^x < \frac{1}{2} \\ \left(2^{\frac{x-1}{2}}\right)^2 - 2^{2x\frac{2}{x}} - 2^{2x\frac{1}{x}} + 2 > 0 ; (\sqrt{7})^x \ge 125 \\ \ln(e^{x^2 - 4} - 6e^{4x^2}) \ge 0 ; \left(\frac{\pi}{2}\right)^x > 3 ; 11^{-x} < 11^{2x} \\ \left(\frac{1}{13}\right)^{4x} \le \frac{5}{4} ; 2^x + 2^{-x} \ge \frac{5}{2} ; 3^{2x} + 3^x - 2 \le 0 \\ (5^x - 2)(3^{x-1} - 9^{x-1} - 18) \le 0 ; \frac{2^x}{2^x + 2^{-x}} < \frac{1}{3} \end{array}$$
 
 #### Exercice 28
-Calculer les limites suivantes : $(m \in \mathbb{R}_+^n)$
+Calculer les limites suivantes : $(m \in \mathbb{R}_+^*)$
 
 $$\begin{array}{l} \lim_{x \to \infty} \left(\frac{2}{3}\right)^x ; \lim_{x \to 0} x^{\frac{x}{2}} ; \lim_{x \to 1} \frac{x^{\frac{x}{2}} - 1}{x - 1} ; \lim_{x \to 0} (1 - x)^{\frac{1}{x}} \\ \lim_{x \to \infty} (\tan x)^{\frac{x}{2}} ; \lim_{x \to 0} (x^2)^{\frac{1}{2x^2}} ; \lim_{x \to \infty} x^{\frac{1}{2}} \\ \lim_{x \to 0} \left(\frac{1 + \sin x}{1 + x}\right)^{\frac{1}{x}} ; \lim_{x \to \infty} \left(\frac{4x + 15}{4x + 7}\right)^x ; \lim_{x \to 0} (\cos x)^{\frac{1}{x}} \\ \lim_{x \to \infty} \left(\frac{\ln x}{\ln(x + 1)}\right)^{\frac{1}{x}} ; \lim_{x \to \infty} \left(\frac{x}{x - m}\right)^x \\ \lim_{x \to \infty} \frac{x^x - x}{\ln(1 + \sqrt{x^2 - 1})} ; \lim_{x \to \infty} x \left(\left(m + \frac{1}{x}\right)^{\frac{1}{x}} - 1\right) \end{array}$$
 
@@ -963,8 +963,8 @@ $$\begin{array}{l} \begin{cases} 3^x + 7^x = 16 \\ 3^x - 7^x = 2 \end{cases} ; \
 #### Exercice 30
 Soit $f$ la fonction définie sur $\mathbb{R}$ par : $f(x) = \frac{e^{2x} - 1}{e^{2x} + 1}$
 
-1) Montrer que la fonction \( f \) est impaire.
-2) Montrer que: \((\forall x \in \mathbb{R}) f(2x) = \frac{2f(x)}{1 + f^2(x)}\)
+1) Montrer que la fonction $ f $ est impaire.
+2) Montrer que: $(\forall x \in \mathbb{R}) f(2x) = \frac{2f(x)}{1 + f^2(x)}$
 3) Montrer que:
 
 $$(\forall (x, y) \in \mathbb{R}^2) f(x+y) = \frac{f(x) + f(y)}{1 + f(x)f(y)}$$
@@ -974,9 +974,9 @@ Pour tout entier $n \ge 3$ on considère la fonction $f_n$ définie sur $\mathbb
 
 $$f_n(x) = \frac{x^n}{e^n - 1} \le x \ne 0 \quad \text{et} \quad f_n(0) = 0$$
 
-1) Montrer que la fonction \( f_{n} \) est continue en 0.
-2) Montrer que \( f_{n} \) est dérivable à droite en 0.
-3) Calculator la limite: \(\lim_{x\to +x}f_n(x)\)
+1) Montrer que la fonction $ f_{n} $ est continue en 0.
+2) Montrer que $ f_{n} $ est dérivable à droite en 0.
+3) Calculator la limite: $\lim_{x\to +x}f_n(x)$
 
 #### Exercice 32
 Soit $a$ un réel strictement positif et différent de 1. Discuter selon les valeurs de réel $a$, le nombre de solutions de l'équation :
@@ -1066,11 +1066,11 @@ $$f(x) = \ln(e^x + e^{-x} + 1)$$
 
 et en déduire que la fonction $f$ est paire.
 
-2) Calculer les limites: \(\lim_{x\to +\infty}f(x)\) et \(\lim_{x\to +\infty}f(x)\)
-3) Montrer que les droites d'équations \(y = x\) et \(y = -x\) sont des asymptotes à la courbe \(\mathcal{C}\).
-4) Etudier les variations de la fonction \( f \).
-5) Tracer la courbe \(\mathcal{C}\).
-6) Soit \( g \) la fonction définie sur \( \mathbb{R} \) par: \( g(x) = e^{-f(x)} \). Etudier les variations de \( g \) et tracer sa courbe \( \Gamma \).
+2) Calculer les limites: $\lim_{x\to +\infty}f(x)$ et $\lim_{x\to +\infty}f(x)$
+3) Montrer que les droites d'équations $y = x$ et $y = -x$ sont des asymptotes à la courbe $\mathcal{C}$.
+4) Etudier les variations de la fonction $ f $.
+5) Tracer la courbe $\mathcal{C}$.
+6) Soit $ g $ la fonction définie sur $ \mathbb{R} $ par: $ g(x) = e^{-f(x)} $. Etudier les variations de $ g $ et tracer sa courbe $ \Gamma $.
 
 #### RÈGLIER 10.0
 
@@ -1080,10 +1080,10 @@ $$f(x) = \frac{e^x}{\sqrt{e^{2x} - 2e^x + 2}}$$
 
 et soit $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(O, \bar{i}, \bar{j})$ avec : $\|\bar{i}\| = 3cm$.
 
-1) Calculer les limites: \(\lim_{x\to -\infty}f(x)\) et \(\lim_{x\to +\infty}f(x)\)
-2) Etudier les variations de la fonction \( f \).
-3) Etudier la position relative de la courbe \(\mathcal{C}\) et de la droite \((\Delta)\) d'équation \(y = 1\)
-4) a) Montrer que pour tout \( x \in \mathbb{R} \):
+1) Calculer les limites: $\lim_{x\to -\infty}f(x)$ et $\lim_{x\to +\infty}f(x)$
+2) Etudier les variations de la fonction $ f $.
+3) Etudier la position relative de la courbe $\mathcal{C}$ et de la droite $(\Delta)$ d'équation $y = 1$
+4) a) Montrer que pour tout $ x \in \mathbb{R} $:
 
 $$f''(x) = \frac{e^x(e^x - 1)}{(e^{2x} - 2e^x + 2)^{\frac{1}{2}}}((e^x - 1)^2 - 5)$$
 
@@ -1099,17 +1099,17 @@ $$f(x) = \sqrt{1 - e^{-2x}}$$
 
 et soit $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(O, \bar{i}, \bar{j})$.
 
-1) Determiner le domaine de definition de \( f \).
-2) a) Montrer que pour tout \( x \in D - \{0\} \):
+1) Determiner le domaine de definition de $ f $.
+2) a) Montrer que pour tout $ x \in D - \{0\} $:
 
 $$\frac{f(x)}{x} = \sqrt{\frac{2}{x}\left(\frac{e^{-2x} - 1}{-2x}\right)}$$
 
 b) Calculer $\lim_{x \to 0^+} \frac{f(x)}{x}$ puis interpréter géométriquement le résultat obtenu.
 
-3) Etudier les variations de la fonction \( f \).
-4) Etudier les branches infinies de la courbe \(\mathcal{C}\).
-5) Tracer la courbe \(\mathcal{C}\).
-6) a) Montrer que pour tout \( x \in D - \{0\} \):
+3) Etudier les variations de la fonction $ f $.
+4) Etudier les branches infinies de la courbe $\mathcal{C}$.
+5) Tracer la courbe $\mathcal{C}$.
+6) a) Montrer que pour tout $ x \in D - \{0\} $:
 
 $$f(x) = f'(x)\left(-1 + \frac{1}{2(1+f(x))} + \frac{1}{2(1-f(x))}\right)$$
 
@@ -1121,111 +1121,109 @@ Soit $f$ la fonction numérique définie sur $\mathbb{R}$ par :
 
 $$f(x) = \frac{2x - 1}{x^2} e^{1 - \frac{1}{x}} \text{ si } x \neq 0 \quad \text{et} \quad f(0) = 0$$
 
-1) a) Etudier la continuite de \( f \) en 0.
-b) Montrer que \( f \) est dérivable à droite en 0 puis interpréter géométriequement le résultat obtenu.
-2) Etudier les variations de la fonction \( f \).
-3) Tracer la courbe \(\mathcal{C}_f\) de \(f\) dans un repere orthonorme.
-4) Determiner les reels \(a\) et \(b\) pour que la fonction \(F\)
+1) a) Etudier la continuite de $ f $ en 0.
+b) Montrer que $ f $ est dérivable à droite en 0 puis interpréter géométriequement le résultat obtenu.
+2) Etudier les variations de la fonction $ f $.
+3) Tracer la courbe $\mathcal{C}_f$ de $f$ dans un repere orthonorme.
+4) Determiner les reels $a$ et $b$ pour que la fonction $F$
 
 définie par : $F(x) = \left(a + \frac{b}{x}\right)e^{1 - \frac{1}{x}}$
 
 soit une primitive de la fonction $f$ sur $\mathbb{R}^*$.
 
-A.  \( \left[\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right)\left(\frac{1}{2}\right) \)
+1) On considère les fonctions $ g $ et $ h $ définies sur $ \mathbb{R} $ par :
 
-1) On consider les fonctions \( y \) et \( h \) défilées sur \( \mathbb{R} \) par :
-
-\[
+$$
 \varepsilon (t) = 1 + t - e ^ {t} \quad \text { et } \quad h (t) = (1 - t) e ^ {t}
-\]
+$$
 
-1) a) Monter que pour tout \( t \in \mathbb{R} \):
+1) a) Monter que pour tout $ t \in \mathbb{R} $:
 
-\[
+$$
 \varepsilon (t) \leq 0 \quad \text {   et   } \quad h (t) <   1
-\]
+$$
 
-b) En déduire que:  \( \left(\forall i\in\{-\infty,1\}\right)1+i\leq e^{i}\leq\frac{1}{1-i} \)
+b) En déduire que:  $ \left(\forall i\in\{-\infty,1\}\right)1+i\leq e^{i}\leq\frac{1}{1-i} $
 
-2) Moniter que:  \( \left(\forall x\in\mathbb{R}^{2}\right)\frac{x}{x-1}\leq x\left(e^{1}-1\right)\leq1 \)
+2) Moniter que:  $ \left(\forall x\in\mathbb{R}^{2}\right)\frac{x}{x-1}\leq x\left(e^{1}-1\right)\leq1 $
 
-11) On considère la fonction \( f \) définie sur \( \mathbb{R} \) par :
+11) On considère la fonction $ f $ définie sur $ \mathbb{R} $ par :
 
-\[
+$$
 \left\{ \begin{array}{l l} f (x) = x e ^ {\frac {1}{x}} & \text { si } x <   0 \\ f (x) = x \ln (1 + x) & \text { si } x \geq 0 \end{array} \right.
-\]
+$$
 
-1) Étudier la continuité et la dérivabilité de \( f \) en 0.
+1) Étudier la continuité et la dérivabilité de $ f $ en 0.
 
-2) a) Étudier les variations de la fonction \( f \).
+2) a) Étudier les variations de la fonction $ f $.
 
-b) Moniter que:  \( \left(\forall x\in\mathbb{R}^{2}\right)\frac{1}{x-1}\leq x^{2}-x-1\leq0 \)
+b) Moniter que:  $ \left(\forall x\in\mathbb{R}^{2}\right)\frac{1}{x-1}\leq x^{2}-x-1\leq0 $
 
-c) En déduire que la courbe \(\mathcal{C}_{\varepsilon}\) de \(f\) admet une asymptote oblique \((\Lambda)\) à déterminer, puis étudier la position relative de \(\mathcal{C}_{\varepsilon}\) et \((\Lambda)\) sur \(\mathbb{R}^{2}\).
+c) En déduire que la courbe $\mathcal{C}_{\varepsilon}$ de $f$ admet une asymptote oblique $(\Lambda)$ à déterminer, puis étudier la position relative de $\mathcal{C}_{\varepsilon}$ et $(\Lambda)$ sur $\mathbb{R}^{2}$.
 
-5) Étudier l'intersection de la courbe \(\mathcal{C}_{\varepsilon}\) et de la droite \((2): y = x\), puis tracer la courbe \(\mathcal{C}_{\varepsilon}\).
+5) Étudier l'intersection de la courbe $\mathcal{C}_{\varepsilon}$ et de la droite $(2): y = x$, puis tracer la courbe $\mathcal{C}_{\varepsilon}$.
 
-4) a) Montrer que \( f \) admet une fonction réciproque \( f^{-1} \) définie sur un intervalle \( J \) à déterminer.
+4) a) Montrer que $ f $ admet une fonction réciproque $ f^{-1} $ définie sur un intervalle $ J $ à déterminer.
 
-b) Tracer la courbe de \( f^{-1} \) dans le même repère.
+b) Tracer la courbe de $ f^{-1} $ dans le même repère.
 
-Dans chacun des cas suivants, étudier les variations de la fonction \( u \) puis étudier son signe. Étudier ensuite la fonction \( f \) (les limites et les variations)
+Dans chacun des cas suivants, étudier les variations de la fonction $ u $ puis étudier son signe. Étudier ensuite la fonction $ f $ (les limites et les variations)
 
-1) \( f(x) = e^{-x} + \ln(1 + x) \) et \( u(x) = 1 - (x + 1)e^{-x} \)
+1) $ f(x) = e^{-x} + \ln(1 + x) $ et $ u(x) = 1 - (x + 1)e^{-x} $
 
-2) \( f(x) = \frac{x + 1}{2e^{x} - 1} \) et \( u(x) = 1 + 2xe^{x} \)
+2) $ f(x) = \frac{x + 1}{2e^{x} - 1} $ et $ u(x) = 1 + 2xe^{x} $
 
-3) \( f(x) = \frac{(x - 2)e^x}{e^x + 1} \) et \( u(x) = e^x + x - 1 \)
+3) $ f(x) = \frac{(x - 2)e^x}{e^x + 1} $ et $ u(x) = e^x + x - 1 $
 
 #### EXHIC 41
 
-Soil \( f \) la fonction définie sur \( [1, +\infty] \) par :
+Soil $ f $ la fonction définie sur $ [1, +\infty] $ par :
 
-\[
+$$
 \left\{ \begin{array}{l} f (x) = (\ln x) ^ {x} = e ^ {\frac {1}{x} \ln (\ln x)} \quad \text { si } x > 1 \\ f (1) = 0 \end{array} \right.
-\]
+$$
 
-1) Calculer la limite:  \( \lim_{x\to\infty}f(x) \)
+1) Calculer la limite:  $ \lim_{x\to\infty}f(x) $
 
-2) Montrer que \( f \) est continue sur \( [1, +\infty] \).
+2) Montrer que $ f $ est continue sur $ [1, +\infty] $.
 
-3) Déterminer la limite:  \( \lim_{h\to0}\frac{f(1+h)-f(1)}{h} \)
+3) Déterminer la limite:  $ \lim_{h\to0}\frac{f(1+h)-f(1)}{h} $
 
 f est-elle dérivable à droite en zéro ? Justifier.
 
-4) a) Étudier les variations de la fonction \(\varphi\) définie sur \([1, +\infty]\) par: \(\varphi(x) = 1 + \ln(x)\ln(\ln x)\)
+4) a) Étudier les variations de la fonction $\varphi$ définie sur $[1, +\infty]$ par: $\varphi(x) = 1 + \ln(x)\ln(\ln x)$
 
-b) En déduire que \( f \) est croissante sur \( [1, +\infty[ \).
+b) En déduire que $ f $ est croissante sur $ [1, +\infty[ $.
 
-5) a) Montrer que pour tout \( x \in [1, +\infty] \):
+5) a) Montrer que pour tout $ x \in [1, +\infty] $:
 
-\[
+$$
 \ln \left(\frac {f (x)}{x}\right) = x \ln (\ln x) - \ln (x)
-\]
+$$
 
-b) Calculer:  \( \lim_{x\to\infty}\left(x\ln(\ln x)-\ln(x)\right) \)
+b) Calculer:  $ \lim_{x\to\infty}\left(x\ln(\ln x)-\ln(x)\right) $
 
-c) En déduire que:  \( \lim_{x\to\infty}\frac{f(x)}{x}=+\infty \)
+c) En déduire que:  $ \lim_{x\to\infty}\frac{f(x)}{x}=+\infty $
 
-6) Tracer la courbe de \( f \) dans un repère orthonormé.
+6) Tracer la courbe de $ f $ dans un repère orthonormé.
 
 #### 2.1.1.1
 
-Montrer que:  \( \lim_{x\to\infty}\left(e^{x+1}-e^{x}\right)^{\frac{1}{x}}=e \)
+Montrer que:  $ \lim_{x\to\infty}\left(e^{x+1}-e^{x}\right)^{\frac{1}{x}}=e $
 
 #### 2.1.1.2
 
-Pour tout \( n \in \mathbb{N}^+ \), on considère la fonction \( f_n \) définie sur \( \mathbb{R} \) par: \( f_n(x) = xe^x - n \)
+Pour tout $ n \in \mathbb{N}^+ $, on considère la fonction $ f_n $ définie sur $ \mathbb{R} $ par: $ f_n(x) = xe^x - n $
 
-1) Montrer que \( f_{n} \) est strictement croissante sur l'intervalle \( [-1, +\infty[ \).
+1) Montrer que $ f_{n} $ est strictement croissante sur l'intervalle $ [-1, +\infty[ $.
 
-2) Montrer que l'équation \( f_n(x) = 0 \) admet une solution unique \( u_n \) dans l'intervalle \( [0, +\infty[ \).
+2) Montrer que l'équation $ f_n(x) = 0 $ admet une solution unique $ u_n $ dans l'intervalle $ [0, +\infty[ $.
 
-3) Montrer que \( (u_{n})_{n\geq 1} \) est strictement décroissant.
+3) Montrer que $ (u_{n})_{n\geq 1} $ est strictement décroissant.
 
-4) Montrer que pour tout entier \( n \geq 3 \): \( \ln(n) - \ln(\ln n) \leq u_n \leq \ln(n) \)
+4) Montrer que pour tout entier $ n \geq 3 $: $ \ln(n) - \ln(\ln n) \leq u_n \leq \ln(n) $
 
-5) Determiner alors la limite:  \( \lim_{n\to\infty}\frac{u_{n}}{n} \)
+5) Determiner alors la limite:  $ \lim_{n\to\infty}\frac{u_{n}}{n} $
 
 EXERCICE 47
 Soit $f$ la fonction définie sur $\mathbb{R}^*$ par : $f(x) = \frac{e^x}{x}$
@@ -1279,25 +1277,25 @@ Pour tout $n \in \mathbb{N}^*$, on considère la fonction $f_n$ définie sur $\m
 
 Première Partie : On considère la fonction $g_n$ définie sur $\mathbb{R}$ par : $g_n(x) = (x+1)e^x - n$
 
-1) Etudier les variations de la fonction \( g_{n} \).
-2) a) Montrer qu'il existe un unique réel \( \alpha_{n} \) tel que
+1) Etudier les variations de la fonction $ g_{n} $.
+2) a) Montrer qu'il existe un unique réel $ \alpha_{n} $ tel que
 
 $g_n(\alpha_n) = 0$ et que $0 \le \alpha_n \le \ln(n)$.
 
-b) Justifier l'égalité: \(\alpha_{n} = \ln \left(\frac{n}{1 + \alpha_{n}}\right)\)
-3) a) Montrer que: \((\forall x \in \mathbb{R}^*) \ln x \leq x - 1\)
-b) En déduire que: \((\forall n \in \mathbb{N}^*) \frac{1}{2} \ln(n) \leq \alpha_n\)
-c) Determiner les limites: \(\lim_{n\to \infty}\alpha_n\) et \(\lim_{n\to \infty}\frac{\alpha_n}{n}\)
+b) Justifier l'égalité: $\alpha_{n} = \ln \left(\frac{n}{1 + \alpha_{n}}\right)$
+3) a) Montrer que: $(\forall x \in \mathbb{R}^*) \ln x \leq x - 1$
+b) En déduire que: $(\forall n \in \mathbb{N}^*) \frac{1}{2} \ln(n) \leq \alpha_n$
+c) Determiner les limites: $\lim_{n\to \infty}\alpha_n$ et $\lim_{n\to \infty}\frac{\alpha_n}{n}$
 
 Deuxième Partie : Soit $\mathcal{C}_n$ la courbe représentative de $f_n$ dans un repère orthonormé $(O; \bar{i}, \bar{j})$.
 
-1) a) Etudier les variations de la fonction \( f_{n} \).
-b) Montrer que: \(f_{n}(\alpha_{n}) = -\frac{n\alpha_{n}^{2}}{1 + \alpha_{n}}\)
-2) Montrer que la courbe \(\mathcal{C}_n\) admet une asymptote oblique \(D_{n}\) qu'on déterminera.
-3) Etudier la position relative de la courbe \(\mathcal{C}_n\) et de l'axe des abscisses.
-4) Etudier la position relative des courbes \(\mathcal{C}_n\) et \(\mathcal{C}_{n + 1}\)
-5) a) Montrer que \(\frac{7}{20} \leq \alpha_{2} \leq \frac{2}{5}\) puis en déduire un encadrement de \(f_{2}(\alpha_{2})\).
-b) Construire \(\mathcal{C}_1\) et \(\mathcal{C}_2\) dans un même repere.
+1) a) Etudier les variations de la fonction $ f_{n} $.
+b) Montrer que: $f_{n}(\alpha_{n}) = -\frac{n\alpha_{n}^{2}}{1 + \alpha_{n}}$
+2) Montrer que la courbe $\mathcal{C}_n$ admet une asymptote oblique $D_{n}$ qu'on déterminera.
+3) Etudier la position relative de la courbe $\mathcal{C}_n$ et de l'axe des abscisses.
+4) Etudier la position relative des courbes $\mathcal{C}_n$ et $\mathcal{C}_{n + 1}$
+5) a) Montrer que $\frac{7}{20} \leq \alpha_{2} \leq \frac{2}{5}$ puis en déduire un encadrement de $f_{2}(\alpha_{2})$.
+b) Construire $\mathcal{C}_1$ et $\mathcal{C}_2$ dans un même repere.
 
 #### EXERCISE
 
@@ -1309,8 +1307,8 @@ $u(x) = 1 + x + \frac{x^2}{2} - e^x$ et $v(x) = 1 + x - \left(1 - \frac{x^2}{2}\
 
 b) Étudier les variations de la fonction $u$ sur $\mathbb{R}$
 
-2) a) Etudier les variations de la fonction \( v' \) et en déduire que: \( (\forall x \in \mathbb{R}) \, v'(x) \geq 0 \)
-b) Etudier les variations de la fonction \(\mathbf{v}\) sur \(\mathbb{R}\)
+2) a) Etudier les variations de la fonction $ v' $ et en déduire que: $ (\forall x \in \mathbb{R}) \, v'(x) \geq 0 $
+b) Etudier les variations de la fonction $\mathbf{v}$ sur $\mathbb{R}$
 3) Deduire de ce qui precede que:
 
 $\left(\forall x \in \mathbb{R}^*\right) \frac{x^2}{2}e^x \le e^x - 1 - x \le \frac{x^2}{2}$
@@ -1320,8 +1318,8 @@ $\left(\forall x \in \mathbb{R}^*\right) \frac{x^2}{2} \le e^x - 1 - x \le \frac
 
 $\begin{cases} f(x) = \frac{e^x - 1 - x}{x^2} - \frac{1}{2} \text{ si } x = 0 \\ f(0) = 0 \end{cases}$
 
-a) Montrer que \(f\) est continue sur \(\mathbb{R}\)
-b) En déduire que pour tout \(x \in \mathbb{R}\):
+a) Montrer que $f$ est continue sur $\mathbb{R}$
+b) En déduire que pour tout $x \in \mathbb{R}$:
 
 $e^x = 1 + x + \frac{x^2}{2} + x^2 f(x)$ avec $\lim_{x \to 0} f(x) = 0$
 
@@ -1331,15 +1329,15 @@ $g(x) = \frac{e^x - 1}{x} \text{ si } x \neq 0 \text{ et } g(0) = 1$
 
 $\mathcal{C}_n$ désigne sa courbe représentative dans un repère orthonormé $(O; \bar{i}, \bar{j})$.
 
-1) Montrer que \( g \) est dérivable en 0 et préciser \( g'(0) \).
-2) Etudier les branches infinies de la courbe \(\mathcal{C}_g\)
-3) Etudier les variations de la fonction \( g \) et dresser sur tableau de variations.
-4) Tracer la courbe \(\mathcal{C}_g\)
-C) Soit \( h \) la fonction définie par: \( h(x) = \sqrt{e^x - 1 - x} \).
+1) Montrer que $ g $ est dérivable en 0 et préciser $ g'(0) $.
+2) Etudier les branches infinies de la courbe $\mathcal{C}_g$
+3) Etudier les variations de la fonction $ g $ et dresser sur tableau de variations.
+4) Tracer la courbe $\mathcal{C}_g$
+C) Soit $ h $ la fonction définie par: $ h(x) = \sqrt{e^x - 1 - x} $.
 
-1) Determiner \(D_{h}\) le domaine de definition de \(h\)
-2) Etudier la derivabilité de \( h \) en 0.
-D) Soit \(F\) la fonction définie sur \(\big] - 1; + \infty [\) par:
+1) Determiner $D_{h}$ le domaine de definition de $h$
+2) Etudier la derivabilité de $ h $ en 0.
+D) Soit $F$ la fonction définie sur $\big] - 1; + \infty [$ par:
 
 $F(t) = \frac{\ln(1+t)}{t} \text{ si } t \neq 0 \text{ et } F(0) = 1$
 
@@ -1348,26 +1346,26 @@ En utilisant le résultat de A)4), montrer que $F$ est dérivable en 0 et déter
 **Partie A.**
 1) Soit $g$ la fonction définie par : $g(x) = \frac{x-1}{x} - \ln|x|$
 
-a) Etudier les variations de la fonction \( g \).
-b) Montrer qu'il existe un reel negatif unique \(\alpha\) tel que \(g(\alpha) = 0\)
-c) En déduire le signe de \( g(x) \).
+a) Etudier les variations de la fonction $ g $.
+b) Montrer qu'il existe un reel negatif unique $\alpha$ tel que $g(\alpha) = 0$
+c) En déduire le signe de $ g(x) $.
 
 2) Soit $h$ la fonction numérique définie sur $]1, +\infty[$
 
 par : $h(x) = \frac{1}{x(x-1)} - \frac{\ln(x)}{(x-1)^2} = \frac{g(x)}{(x-1)^2}$
 
-a) Montrer que \( h'(x) = \frac{u(x)}{(x - 1)^1} \) ou \( u \) est une fonction définie sur \( ]1; +\infty[ \).
-b) Etudier les variations de la fonction \( u \) et en déduire le signe de \( u(x) \) et celui de \( h'(x) \) sur \( ]1; +\infty[ \).
+a) Montrer que $ h'(x) = \frac{u(x)}{(x - 1)^1} $ ou $ u $ est une fonction définie sur $ ]1; +\infty[ $.
+b) Etudier les variations de la fonction $ u $ et en déduire le signe de $ u(x) $ et celui de $ h'(x) $ sur $ ]1; +\infty[ $.
 
 **Partie B.**
 Soit $f$ la fonction numérique définie par :
 
 $$f(x) = |x|^{\frac{1}{x-1}}$$
 
-1) Determiner \(D_{f}\) le domaine de definition de \(f\) et les limites de \(f\) aux bornes de \(D_{f}\).
-2) Montrer que \( f \) est prolongable par continuité en \( x_0 = 1 \) et donner son prolongement.
-3) Etudier les variations de \( f \) sur \( D_{f} \).
-4) Construire la courbe représentative de \( f \) dans un repère orthonormé \( (O, \vec{i}, \vec{j}) \) (unité \( 2cm \)).
+1) Determiner $D_{f}$ le domaine de definition de $f$ et les limites de $f$ aux bornes de $D_{f}$.
+2) Montrer que $ f $ est prolongable par continuité en $ x_0 = 1 $ et donner son prolongement.
+3) Etudier les variations de $ f $ sur $ D_{f} $.
+4) Construire la courbe représentative de $ f $ dans un repère orthonormé $ (O, \vec{i}, \vec{j}) $ (unité $ 2cm $).
 
 (On donne $\alpha \approx -3, 6$)
 
@@ -1382,8 +1380,8 @@ $$u_0 = 4 \text{ et } u_{n+1} = f(u_n) \text{ avec } n \in \mathbb{N}.$$
 
 $$\left( \forall x \ge \frac{3}{2} \right) |f'(x)| \le q$$
 
-2) Montrer que: \((\forall n \in \mathbb{N}) |u_{n+1} - \ell| \le q |u_n - \ell|\)
-3) Determiner \(\lim_{n\to \infty}u_n\)
+2) Montrer que: $(\forall n \in \mathbb{N}) |u_{n+1} - \ell| \le q |u_n - \ell|$
+3) Determiner $\lim_{n\to \infty}u_n$
 
 #### Exercice 54
 Etudier puis représenter les fonctions suivantes :
@@ -1395,9 +1393,9 @@ On considère les fonctions numériques $f$, $g$ et $h$ définies sur $\mathbb{R
 
 $$\begin{array}{l} f(x) = -x + \frac{1}{2} \ln \left| \frac{x+1}{x-1} \right| : \quad g(x) = \frac{x^3}{3(1-x^2)} \\ h(x) = f(x) - g(x) \end{array}$$
 
-1) a) Dresser le tableau des variations de \( f \) et \( g \).
-b) Etudier le signe de \( h(x) \) sur \( ] - 1; 1[ \).
-2) Soit \( n \in \mathbb{N}^* \). Exprimer en fonction \( n \):
+1) a) Dresser le tableau des variations de $ f $ et $ g $.
+b) Etudier le signe de $ h(x) $ sur $ ] - 1; 1[ $.
+2) Soit $ n \in \mathbb{N}^* $. Exprimer en fonction $ n $:
 
 $$(2n+1)f\left(\frac{1}{2n+1}\right) \text{ et } (2n+1)g\left(\frac{1}{2n+1}\right)$$
 
@@ -1417,9 +1415,9 @@ $$\lim_{x \to \infty} \frac{e^{x^2} - \cos x}{x^2} ; \lim_{x \to \infty} \frac{e
 $$\lim_{x \to \infty} (\ln(1 + x))^x ; \lim_{x \to \infty} \frac{x^{\ln x}}{(\ln x)^x} ; \lim_{x \to \infty} \left(1 + \frac{1}{x}\right)^x$$
 $$\lim_{x \to \infty} (\cos x + \sin x)^{\frac{1}{x}} ; \lim_{x \to \infty} (\cos x)^{\frac{1}{\ln x}}$$
 
-2) Soit \(\alpha \in \mathbb{R}^*\). Etudier les variations des fonctions \(f_{\alpha}\) définies sur \(]0; +\alpha[\) par: \(f_{\alpha}(x) = (1 + x^{\alpha})^{\frac{1}{\alpha}}\)
-3) Montrer que: \((\forall x \in \mathbb{R}_{+}^{*})\left(1 + \frac{1}{x}\right)^{x} < e < \left(1 + \frac{1}{x}\right)^{x + 1}\)
-4) Soit \( f \) la fonction définie par: \( f(x) = e^{x + 1} \sin x \). Montrer que pour tout \( n \in \mathbb{N} \):
+2) Soit $\alpha \in \mathbb{R}^*$. Etudier les variations des fonctions $f_{\alpha}$ définies sur $]0; +\alpha[$ par: $f_{\alpha}(x) = (1 + x^{\alpha})^{\frac{1}{\alpha}}$
+3) Montrer que: $(\forall x \in \mathbb{R}_{+}^{*})\left(1 + \frac{1}{x}\right)^{x} < e < \left(1 + \frac{1}{x}\right)^{x + 1}$
+4) Soit $ f $ la fonction définie par: $ f(x) = e^{x + 1} \sin x $. Montrer que pour tout $ n \in \mathbb{N} $:
 
 $$f^{(n)}(x) = 2^n e^{x + 1} \sin\left(x + \frac{n\pi}{6}\right)$$
 
@@ -1433,29 +1431,29 @@ Où T est la température (en Kelvin), m la masse d'une molécule et c et k des 
 
 lieu en $$v = \sqrt{\frac{2kT}{m}}$$.
 
-Soit \(f\) la fonction definie sur \(\mathbb{R}\) par: \(f(x) = e^{\frac{1}{x}}\)
-1) a) Etudier les variations de la fonction \( f \).
-b) En déduire que: \( f([0,1]) \subset [0,1] \).
-2) Montrer que: \((\forall x \in [0,1]) |f'(x)| \leq \frac{1}{2}\).
-3) On considere la suite numérique \(u_{0} = 0\) et \(u_{n + 1} = f(u_n)\) pour tout \(n\in \mathbb{N}\)
-a) Montrer que: \((\forall n\in \mathbb{N})u_n\in [0,1]\)
-b) En utilisant l'inégalité des accroissements fin, monrer que: \((\forall n\in \mathbb{N})|u_{n + 1} - 1|\leq \frac{1}{2} |u_n - 1|\)
-c) En déduire que la suite \((u_{n})\) est convergente et déterminant sa limite.
+Soit $f$ la fonction definie sur $\mathbb{R}$ par: $f(x) = e^{\frac{1}{x}}$
+1) a) Etudier les variations de la fonction $ f $.
+b) En déduire que: $ f([0,1]) \subset [0,1] $.
+2) Montrer que: $(\forall x \in [0,1]) |f'(x)| \leq \frac{1}{2}$.
+3) On considere la suite numérique $u_{0} = 0$ et $u_{n + 1} = f(u_n)$ pour tout $n\in \mathbb{N}$
+a) Montrer que: $(\forall n\in \mathbb{N})u_n\in [0,1]$
+b) En utilisant l'inégalité des accroissements fin, monrer que: $(\forall n\in \mathbb{N})|u_{n + 1} - 1|\leq \frac{1}{2} |u_n - 1|$
+c) En déduire que la suite $(u_{n})$ est convergente et déterminant sa limite.
 
 #### Devoir 3
 Soit f la fonction définie sur R par : $$f(x) = \frac{x}{e^{x} + 1}$$
 
-1) a) Montrer que \( f \) est paire.
-b) Etudier les variations de \( f \) et tracer l'allure de sa courbe.
-c) Montrer qu'il existe un unique reel positif tel que \( f(\ell) = \ell \), puis justifier que \( 0 \leq \ell \leq \frac{1}{2} \).
-d) Montrer que pour tout \(x \in \mathbb{R}^*\): \(|f'(x)| \leq \frac{1}{2}\).
+1) a) Montrer que $ f $ est paire.
+b) Etudier les variations de $ f $ et tracer l'allure de sa courbe.
+c) Montrer qu'il existe un unique reel positif tel que $ f(\ell) = \ell $, puis justifier que $ 0 \leq \ell \leq \frac{1}{2} $.
+d) Montrer que pour tout $x \in \mathbb{R}^*$: $|f'(x)| \leq \frac{1}{2}$.
 
 2) On considère la suite numérique (uₙ) définie par :
 
 $$u_0 = 0 \text{ et } u_{n+1} = f(u_n)$$
 
-a) Montrer que pour tout \(n\in \mathbb{N}\) .. \(u_{n}\in \left[0,\frac{1}{2}\right]\)
-b) Montrer que pour tout \(n\in \mathbb{N}\)
+a) Montrer que pour tout $n\in \mathbb{N}$ .. $u_{n}\in \left[0,\frac{1}{2}\right]$
+b) Montrer que pour tout $n\in \mathbb{N}$
 
 $$|u_{n+1} - \ell| \leq \frac{1}{2} |u_n - \ell|$$
 
@@ -1468,36 +1466,36 @@ $$g(t) = \frac{t}{t+1} - \ln(1+t)$$
 
 On note $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(O; \vec{i}, \vec{j})$.
 
-1) Donner \(\mathfrak{D}_k\), l'ensemble de definition de \(g\).
-2) Montrer que \(\lim_{t\to +1}g(t) = -\infty\) .Qu'en deduit-on?
-3) Etudier la nature de la branche infinie en \(+\infty\)
-4) Dresser le tableau complet de variations de \(g\)
-5) Preciser le signe de \(g\) sur \(\mathfrak{D}_g\)
+1) Donner $\mathfrak{D}_k$, l'ensemble de definition de $g$.
+2) Montrer que $\lim_{t\to +1}g(t) = -\infty$ .Qu'en deduit-on?
+3) Etudier la nature de la branche infinie en $+\infty$
+4) Dresser le tableau complet de variations de $g$
+5) Preciser le signe de $g$ sur $\mathfrak{D}_g$
 
 **Partie II:** On définit la fonction $f$ sur $\mathbb{R}$ par :
 
 $$f(x) = e^{-x} \ln(1+e^x)$$
 
-1) Justifier que \(f\) est bien definie sur \(\mathbb{R}\)
-2) Determiner \(\lim_{x\to +\infty}f(x)\) et \(\lim_{x\to +\infty}f(x)\) puis interpréter géométriequement les résultats obtenus.
-3) Montrer que pour tout \(x \in \mathbb{R}\): \(f'(x) = e^{-x} g(e^x)\)
-4) En déduire le tableau de variation complet de \( f \).
-5) Verifier que pour tout \( x \in \mathbb{R} : 0 \leq f(x) \leq 1 \)
-6) On introduit la fonction \( h \) définie sur \( \mathbb{R} \) par:
+1) Justifier que $f$ est bien definie sur $\mathbb{R}$
+2) Determiner $\lim_{x\to +\infty}f(x)$ et $\lim_{x\to +\infty}f(x)$ puis interpréter géométriequement les résultats obtenus.
+3) Montrer que pour tout $x \in \mathbb{R}$: $f'(x) = e^{-x} g(e^x)$
+4) En déduire le tableau de variation complet de $ f $.
+5) Verifier que pour tout $ x \in \mathbb{R} : 0 \leq f(x) \leq 1 $
+6) On introduit la fonction $ h $ définie sur $ \mathbb{R} $ par:
 
 $$h(x) = f(x) - x$$
 
-a) Montrer que \( h \) est strictement décroissant sur \( \mathbb{R} \).
-b) En déduire que l'équation \( h(x) = 0 \) admet une unique solution, que l'on notera \( \alpha \).
-c) Verifier que \(\alpha \in [0,1]\)
+a) Montrer que $ h $ est strictement décroissant sur $ \mathbb{R} $.
+b) En déduire que l'équation $ h(x) = 0 $ admet une unique solution, que l'on notera $ \alpha $.
+c) Verifier que $\alpha \in [0,1]$
 
 **Partie III:** On introduit la suite $(u_n)$ définie par :
 
 $$u_0 = 0 \text{ et } u_{n+1} = f(u_n) \text{ pour tout } n \in \mathbb{N}$$
 
-1) Montrer que pour tout \(n\in \mathbb{N}\) .. \(u_{n}\in [0,1]\)
-2) Montrer que: \((\forall n\in \mathbb{N})|u_{n + 1} - \alpha |\leq 0,6|u_n - \alpha |\)
-3) En déduire que la suite \(\left(u_{n}\right)\) est convergente et déterminer sa limite.
+1) Montrer que pour tout $n\in \mathbb{N}$ .. $u_{n}\in [0,1]$
+2) Montrer que: $(\forall n\in \mathbb{N})|u_{n + 1} - \alpha |\leq 0,6|u_n - \alpha |$
+3) En déduire que la suite $\left(u_{n}\right)$ est convergente et déterminer sa limite.
 
 #### Devoir 5
 Soit la fonction $f$ définie sur $\mathbb{R}$ par :
@@ -1506,25 +1504,25 @@ $$f(x) = (x^2 + 1)e^{-x}$$
 
 On note $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(O; \vec{i}, \vec{j})$.
 
-1) Etudier les branches infinies de la courbe \(\mathcal{C}\).
-2) Montrer que: \((\forall x \in \mathbb{R}) f'(x) = -(1 - x)^2 e^{-x}\)
-3) Dresser le tableau de variation de \( f \).
-4) Tracer la courbe \(\mathcal{C}\).
-5) On considere maintainant la fonction \( h \) définie sur \( \mathbb{R} \) par: \( h(x) = f(x) - x \)
+1) Etudier les branches infinies de la courbe $\mathcal{C}$.
+2) Montrer que: $(\forall x \in \mathbb{R}) f'(x) = -(1 - x)^2 e^{-x}$
+3) Dresser le tableau de variation de $ f $.
+4) Tracer la courbe $\mathcal{C}$.
+5) On considere maintainant la fonction $ h $ définie sur $ \mathbb{R} $ par: $ h(x) = f(x) - x $
 
-a) Montrer que \( h \) est strictement décroissant sur \( \mathbb{R} \).
-b) Etabir que l'équation \( f(x) = x \) admet une unique solution, notée \( \alpha \). Vérifier que \( \alpha \in \left[\frac{1}{2}; 1\right] \).
+a) Montrer que $ h $ est strictement décroissant sur $ \mathbb{R} $.
+b) Etabir que l'équation $ f(x) = x $ admet une unique solution, notée $ \alpha $. Vérifier que $ \alpha \in \left[\frac{1}{2}; 1\right] $.
 
-6) a) Justifier que: \( f\left(\left[\frac{1}{2}; 1\right]\right) \subset \left[\frac{1}{2}; 1\right] \).
-b) Montrer que: \(\left(\forall x\in \left[\frac{1}{2};1\right]\right)\left|f^{\prime}(x)\right|\leq \frac{1}{4}\)
+6) a) Justifier que: $ f\left(\left[\frac{1}{2}; 1\right]\right) \subset \left[\frac{1}{2}; 1\right] $.
+b) Montrer que: $\left(\forall x\in \left[\frac{1}{2};1\right]\right)\left|f^{\prime}(x)\right|\leq \frac{1}{4}$
 
 7) On considère la suite $(u_n)$ définie par :
 
 $$u_0 = 1 \text{ et } u_{n+1} = f(u_n)$$
 
-a) Montrer que pour tout \(n\in \mathbb{N}\) .. \(u_{n}\in \left[\frac{1}{2};1\right]\)
-b) Montrer que: \((\forall n \in \mathbb{N}) |u_{n+1} - \alpha| \leq \frac{1}{2} |u_n - \alpha|\)
-c) En déduire que la suite \(\left(u_{n}\right)\) est convergente et déterminer sa limite.
+a) Montrer que pour tout $n\in \mathbb{N}$ .. $u_{n}\in \left[\frac{1}{2};1\right]$
+b) Montrer que: $(\forall n \in \mathbb{N}) |u_{n+1} - \alpha| \leq \frac{1}{2} |u_n - \alpha|$
+c) En déduire que la suite $\left(u_{n}\right)$ est convergente et déterminer sa limite.
 
 #### Devoir 6
 La fonction *cosinus hyperbolique*, notée $\text{ch}$, est définie pour tout $x \in \mathbb{R}$ par : $\text{ch} x = \frac{e^x + e^{-x}}{2}$.
@@ -1628,11 +1626,11 @@ $f_n(x) = x + e^{nx}$
 
 Et soit $\Gamma_n$ sa courbe représentative dans un repère orthonormé $(O, \bar{i}, \bar{j})$.
 
-1) Etudier les variations de la fonction \( f_{n} \).
-2) En déduire que l'équation \( f_{n}(x) = 0 \) admet une solution unique \( \alpha_{n} \).
-3) a) Montrer que \(\alpha_{1}\in ] - \ln 2; - \frac{1}{2} [\)
-b) Montrer que les quantités \((x - \alpha_{1})\) et \((e^{x} + \alpha_{1})\) ont le même signe.
-4) On considere la fonction \(\varphi\) definie sur \([- \infty, -\frac{1}{2}]\)
+1) Etudier les variations de la fonction $ f_{n} $.
+2) En déduire que l'équation $ f_{n}(x) = 0 $ admet une solution unique $ \alpha_{n} $.
+3) a) Montrer que $\alpha_{1}\in ] - \ln 2; - \frac{1}{2} [$
+b) Montrer que les quantités $(x - \alpha_{1})$ et $(e^{x} + \alpha_{1})$ ont le même signe.
+4) On considere la fonction $\varphi$ definie sur $[- \infty, -\frac{1}{2}]$
 
 par : $\varphi(x) = e^x - \frac{1}{\sqrt{e}}x$
 
@@ -1662,10 +1660,10 @@ On considère la fonction $g_n$ définie sur $\mathbb{R}^*$ par :
 
 $$g_n(x) = nx + 2 \ln x$$
 
-1) Dresser le tableau de variations de \( g_{n} \).
-2) Montrer que: \(\left(\forall x\in \mathbb{R}_{+}^{*}\right)\sqrt{x} >\ln x\)
-3) a) Montrer que l'équation \( g_{n}(x) = 0 \) admet une solution unique \( \alpha_{n} \) dans \( \mathbb{R}_{+}^{*} \) et que \( \frac{1}{n} < \alpha_{n} < \frac{1}{\sqrt{n}} \).
-b) En déduire \(\lim_{n\to \infty}\alpha_n\)
+1) Dresser le tableau de variations de $ g_{n} $.
+2) Montrer que: $\left(\forall x\in \mathbb{R}_{+}^{*}\right)\sqrt{x} >\ln x$
+3) a) Montrer que l'équation $ g_{n}(x) = 0 $ admet une solution unique $ \alpha_{n} $ dans $ \mathbb{R}_{+}^{*} $ et que $ \frac{1}{n} < \alpha_{n} < \frac{1}{\sqrt{n}} $.
+b) En déduire $\lim_{n\to \infty}\alpha_n$
 
 Deuxième Partie :
 
@@ -1675,8 +1673,8 @@ $$f(x) = \sqrt[3]{x} e^{-x}$$
 
 Et soit $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(O, \bar{i}, \bar{j})$ avec : $\|\bar{i}\| = \|\bar{j}\| = 3cm$
 
-1) Etudier la derivabilité de la fonction \( f \) à droite en 0 puis interpréter le résultat géométriquement.
-2) Calculer \(\lim_{x\to \infty}f(x)\) puis interpréter le résultat géométriequement.
+1) Etudier la derivabilité de la fonction $ f $ à droite en 0 puis interpréter le résultat géométriquement.
+2) Calculer $\lim_{x\to \infty}f(x)$ puis interpréter le résultat géométriequement.
 
 3) a) Montrer que : $$(\forall x \in \mathbb{R}^+)f'(x) = \frac{1 - 3x}{3x} f(x)$$
 
@@ -1787,21 +1785,21 @@ I) Soit $$g$$ la fonction définie sur $$[0; +\infty[$$ par :
 
 $$g(x) = \ln(1+x) - \frac{x}{1+x}$$
 
-1) Etudier les variations de la fonction \( g \) sur \( [0; +\infty[ \).
-2) En déduire le signe de \( g(x) \) sur \( [0; +\infty[ \).
-II) Soit \( f \) la fonction définie sur \( \mathbb{R} \) par:
+1) Etudier les variations de la fonction $ g $ sur $ [0; +\infty[ $.
+2) En déduire le signe de $ g(x) $ sur $ [0; +\infty[ $.
+II) Soit $ f $ la fonction définie sur $ \mathbb{R} $ par:
 
 $$f(x) = e^x \ln(1+e^{-x})$$
 
-1) Montrer que: \(\lim_{x \to +\infty} f(x) = 1\) et \(\lim_{x \to -\infty} f(x) = 0\)
-2) Montrer que: \((\forall x \in \mathbb{R}) f'(x) = e^x g(e^{-x})\)
-3) Dresser le tableau de variations de la fonction \( f \).
-4) On note \(\mathcal{C}\) la courbe représentative de \(f\), et \(\mathcal{C}'\) celle de la fonction \((-f)\).
+1) Montrer que: $\lim_{x \to +\infty} f(x) = 1$ et $\lim_{x \to -\infty} f(x) = 0$
+2) Montrer que: $(\forall x \in \mathbb{R}) f'(x) = e^x g(e^{-x})$
+3) Dresser le tableau de variations de la fonction $ f $.
+4) On note $\mathcal{C}$ la courbe représentative de $f$, et $\mathcal{C}'$ celle de la fonction $(-f)$.
 
 Tracer $$\mathcal{C}$$ et $$\mathcal{C}'$$ dans un même repère orthonormé $$(O; \vec{i}, \vec{j})$$. (On admet que $$\mathcal{C}$$ admet un unique point d'inflexion d'abscisse $$x_0 \approx -0,7$$).
 
-5) Montrer que: \((\forall x \in [-1;0]) 0 < f'(x) \leq g(e)\)
-6) Montrer que l'equation \( f(x) + x = 0 \) admet une
+5) Montrer que: $(\forall x \in [-1;0]) 0 < f'(x) \leq g(e)$
+6) Montrer que l'equation $ f(x) + x = 0 $ admet une
 
 solution $$\alpha$$ dans $$\mathbb{R}$$ et que $$-1 < \alpha < 0$$.
 
@@ -1809,7 +1807,7 @@ solution $$\alpha$$ dans $$\mathbb{R}$$ et que $$-1 < \alpha < 0$$.
 
 $$u_0 = 0$$ et $$u_{n+1} = -f(u_n)$$ pour tout $$n \in \mathbb{N}$$
 
-a) Montrer que: \((\forall n \in \mathbb{N}) - 1 \leq u_n \leq 0\)
+a) Montrer que: $(\forall n \in \mathbb{N}) - 1 \leq u_n \leq 0$
 b) Montrer que:
 
 $$(\forall n \in \mathbb{N}) |u_{n+1} - \alpha| \le g(e)|u_n - \alpha|$$
@@ -1828,21 +1826,21 @@ $$f_n(x) = \frac{1}{1+e^{-\frac{x}{2}(1-n)}}$$
 
 Et soit $$\mathcal{C}_n$$ sa courbe représentative dans un repère orthonormé $$(O; \vec{i}, \vec{j})$$.
 
-1) a) Calculer \(\lim_{x \to +\infty} f_n(x)\) et \(\lim_{x \to -\infty} f_n(x)\) puis interpréter graphiquement les résultats obtenus.
-b) Montrer que la fonction \( f_{n} \) est dérivable sur \( \mathbb{R} \) puis calculer \( f_{n}'(x) \) pour tout \( x \in \mathbb{R} \).
-c) Montrer que \( f_{n} \) est strictement croissant sur \( \mathbb{R} \).
+1) a) Calculer $\lim_{x \to +\infty} f_n(x)$ et $\lim_{x \to -\infty} f_n(x)$ puis interpréter graphiquement les résultats obtenus.
+b) Montrer que la fonction $ f_{n} $ est dérivable sur $ \mathbb{R} $ puis calculer $ f_{n}'(x) $ pour tout $ x \in \mathbb{R} $.
+c) Montrer que $ f_{n} $ est strictement croissant sur $ \mathbb{R} $.
 
 2) a) Montrer que le point $$I_n\left(n, \frac{1}{2}\right)$$ est un centre de symétrie de la courbe $$\mathcal{C}_n$$.
 
 b) Construire la courbe $$\mathcal{C}_1$$.
 
-3) a) Montrer que l'equation \( f_{n}(x) = x \) admet une unique solution \( u_{n} \) dans l'intervalle \( ]0; n[ \).
+3) a) Montrer que l'equation $ f_{n}(x) = x $ admet une unique solution $ u_{n} $ dans l'intervalle $ ]0; n[ $.
 b) Montrer que:
 
 $$(\forall n \in \mathbb{N}^*) (\forall x \in \mathbb{R}) f_{n+1}(x) < f_n(x)$$
 
-c) Montrer que la suite \(\left(u_{n}\right)_{n\ge 1}\) est strictement decroissante puis qu'elle est convergente.
-d) Calculer \(\lim_{n\to +\infty}u_n\)
+c) Montrer que la suite $\left(u_{n}\right)_{n\ge 1}$ est strictement decroissante puis qu'elle est convergente.
+d) Calculer $\lim_{n\to +\infty}u_n$
 
 Recherche Nationale 2015 (Session De Rechanger)
 
@@ -1857,24 +1855,24 @@ $$f_n(x) = \frac{x}{n} - e^{-nx}$$
 
 Et soit $\mathcal{C}_n$ sa courbe représentative dans un repère orthonormé $(O; \bar{i}, \bar{j})$.
 
-1)a) Calculer \(\lim_{x\to +x}f_n(x)\) et \(\lim_{x\to -x}f_n(x)\)
-b) Etudier les branches infinies de la courbe \(\mathcal{C}_n\)
-2) Calculer \( f_{n}^{\prime}(x) \) pour tout \( x \in \mathbb{R} \) puis dresser le tableau de variations de la fonction \( f_{n} \).
-3)a) Montrer que l'équation \( f_{n}(x) = 0 \) admet une unique solution \( \alpha_{n} \) dans \( \mathbb{R} \).
-b) Montrer que \( f_{n}\left(\frac{1}{n}\right) < 0 \).
-c) Montrer que pour tout \( x \in \mathbb{R} : e^x \geq x + 1 \) puis en déduire que \( f_n(1) > 0 \).
-d) Montrer que: \(\frac{1}{n} <  \alpha_{n} <   1\)
+1)a) Calculer $\lim_{x\to +x}f_n(x)$ et $\lim_{x\to -x}f_n(x)$
+b) Etudier les branches infinies de la courbe $\mathcal{C}_n$
+2) Calculer $ f_{n}^{\prime}(x) $ pour tout $ x \in \mathbb{R} $ puis dresser le tableau de variations de la fonction $ f_{n} $.
+3)a) Montrer que l'équation $ f_{n}(x) = 0 $ admet une unique solution $ \alpha_{n} $ dans $ \mathbb{R} $.
+b) Montrer que $ f_{n}\left(\frac{1}{n}\right) < 0 $.
+c) Montrer que pour tout $ x \in \mathbb{R} : e^x \geq x + 1 $ puis en déduire que $ f_n(1) > 0 $.
+d) Montrer que: $\frac{1}{n} <  \alpha_{n} <   1$
 
-4) Tracer la courbe \(\mathcal{C}_2\) (On donne: \(\alpha_{2}\approx 0,6\)
+4) Tracer la courbe $\mathcal{C}_2$ (On donne: $\alpha_{2}\approx 0,6$
 5)a) Montrer que:
 
 $$f_{n+1}(\alpha_n) = \frac{ne^{-(n+1)\alpha_n}}{n+1} \left( e^{\alpha_n} - \frac{1}{n} - 1 \right)$$
 
-b) En déduire que: \((\forall n \geq 2) f_{n+1}(\alpha_n) \geq 0\)
-c) Montrer que la suite \((\alpha_{n})_{n\geq 2}\) est decroissante puis en deduire qu'elle est convergente.
-6)a) En utilisant le résultat de la question 3)d), monr er que: \((\forall n\geq 2)\frac{1}{n^2} < e^{-n\alpha_n} <   \frac{1}{n}\)
-b) En déduire que: \((\forall n \geq 2) \frac{\ln n}{n} < \alpha_n < \frac{2 \ln n}{n}\)
-c) Determiner \(\lim_{n\to \infty}\alpha_n\)
+b) En déduire que: $(\forall n \geq 2) f_{n+1}(\alpha_n) \geq 0$
+c) Montrer que la suite $(\alpha_{n})_{n\geq 2}$ est decroissante puis en deduire qu'elle est convergente.
+6)a) En utilisant le résultat de la question 3)d), monr er que: $(\forall n\geq 2)\frac{1}{n^2} < e^{-n\alpha_n} <   \frac{1}{n}$
+b) En déduire que: $(\forall n \geq 2) \frac{\ln n}{n} < \alpha_n < \frac{2 \ln n}{n}$
+c) Determiner $\lim_{n\to \infty}\alpha_n$
 
 Examen National 2006 (Session De Rattrapage)
 
@@ -1887,15 +1885,15 @@ $$f(0) = 0 \quad \text{et} \quad f(x) = (x+2)e^{-\frac{x}{2}} \quad \text{si} \q
 
 Et soit $\mathcal{C}$ sa courbe dans un repère orthonormé.
 
-1) a) Montrer que \( f \) est continue à droite en 0.
-b) Montrer que \( f \) est dérivable à droite en 0.
-c) Montrer que \( f \) est strictement croissant sur \( \mathbb{R}^+ \).
+1) a) Montrer que $ f $ est continue à droite en 0.
+b) Montrer que $ f $ est dérivable à droite en 0.
+c) Montrer que $ f $ est strictement croissant sur $ \mathbb{R}^+ $.
 
 2) a) Calculer la limite $\lim_{x\to+\infty} f(x)$.
 
-b) Montrer que: \((\forall t \in \mathbb{R}^+)\) \(0 \leq e^{-t} + t - 1 \leq \frac{t^2}{2}\)
-c) Montrer que: \((\forall x \in \mathbb{R}_+^+)\frac{-4}{x} \leq f(x) - x \leq \frac{4}{x^2} - \frac{2}{x}\)
-d) En déduire que la courbe \(\mathcal{C}\) admet une asymptote oblique \(\mathcal{D}\) qu'on déterminera par une équation cartésienne.
+b) Montrer que: $(\forall t \in \mathbb{R}^+)$ $0 \leq e^{-t} + t - 1 \leq \frac{t^2}{2}$
+c) Montrer que: $(\forall x \in \mathbb{R}_+^+)\frac{-4}{x} \leq f(x) - x \leq \frac{4}{x^2} - \frac{2}{x}$
+d) En déduire que la courbe $\mathcal{C}$ admet une asymptote oblique $\mathcal{D}$ qu'on déterminera par une équation cartésienne.
 
 3) Tracer la droite $\mathcal{D}$ et la courbe $\mathcal{C}$.
 
@@ -1903,18 +1901,18 @@ Deuxième Partie : $n$ est un entier naturel non nul. On considère la fonction 
 
 $$f_n(0) = 0 \quad \text{et} \quad f_n(x) = \left( x + \frac{2}{n} \right) e^{-\frac{x}{2}} \quad \text{si} \quad x > 0$$
 
-1) Montrer que \( f_{n} \) est dérivable à droite en 0.
-2) Etudier les variations de la fonction \( f_{n} \) sur \( \mathbb{R}^+ \).
-3) a) Montrer que l'équation \( f_{n}(x) = \frac{2}{n} \) admet une unique solution \( a_{n} \) dans \( \mathbb{R}^{+} \).
+1) Montrer que $ f_{n} $ est dérivable à droite en 0.
+2) Etudier les variations de la fonction $ f_{n} $ sur $ \mathbb{R}^+ $.
+3) a) Montrer que l'équation $ f_{n}(x) = \frac{2}{n} $ admet une unique solution $ a_{n} $ dans $ \mathbb{R}^{+} $.
 
 b) Montrer que :
 
 $$(\forall x > 0) (\forall n \in \mathbb{N}^+) f_{n+1}(x) - \frac{2}{n+1} > f_n(x) - \frac{2}{n}$$
 
-c) En déduire que la suite \(\left(a_{n}\right)_{n\geq 1}\) est décroissant.
-puis qu'elle est convergente. On note: \(a = \lim_{n\to \infty}a_n\)
-d) Montrer que: \((\forall n \in \mathbb{N}^{+}) na_{n} = 2e^{\frac{2}{n}} - 2\)
-e) Montrer que \(a = 0\)
+c) En déduire que la suite $\left(a_{n}\right)_{n\geq 1}$ est décroissant.
+puis qu'elle est convergente. On note: $a = \lim_{n\to \infty}a_n$
+d) Montrer que: $(\forall n \in \mathbb{N}^{+}) na_{n} = 2e^{\frac{2}{n}} - 2$
+e) Montrer que $a = 0$
 
 Examen National 2006 (Session No 1)
 
@@ -1926,9 +1924,9 @@ $$\text{que } e^0 = \frac{1}{1 - e^{-1}}$$
 
 2) En déduire que
 
-a) \((\forall x > 0) 1 - x < e^{-1}\)
-b) \((\forall x > 0) x + 1 < e^{-1}\)
-c) \((\forall x > 0) 0 < \ln \left(\frac{10^{-1}}{e^{-1} - 1}\right) < x\)
+a) $(\forall x > 0) 1 - x < e^{-1}$
+b) $(\forall x > 0) x + 1 < e^{-1}$
+c) $(\forall x > 0) 0 < \ln \left(\frac{10^{-1}}{e^{-1} - 1}\right) < x$
 
 Deuxième Partie :
 
@@ -1938,8 +1936,8 @@ $$f(0) = 1 \quad \text{et} \quad f(x) = \frac{10^{-1}}{e^{-1} - 1} \quad \text{s
 
 Et soit $\mathcal{C}$ sa courbe représentative dans un repère orthonormé $(0, 1, 2)$.
 
-1) a) Montrer que \( f \) est continue à droite en 0.
-b) Montrer que \(\lim_{x\to 0}\left(f(x) - x\right) = 0\) puis interpréter graphiquement le résultat obtenu.
+1) a) Montrer que $ f $ est continue à droite en 0.
+b) Montrer que $\lim_{x\to 0}\left(f(x) - x\right) = 0$ puis interpréter graphiquement le résultat obtenu.
 
 2) a) Montrer que : $(\forall x \ge 0) x - \frac{x^2}{2} \le -e^{-1} + 1$
 
@@ -1971,19 +1969,19 @@ On considère la suite numérique $(u_n)$ définie par :
 
 $$u_n > 0 \quad \text{et} \quad u_{n+1} = \ln(f(u_n)) \quad \text{pour tout } n \in \mathbb{N}$$
 
-1) Montrer que pour tout \( n \in \mathbb{N} : u_n > 0 \)
-2) Montrer que la suite \((u_{n})\) est strictement derrroissante puis en deduire qu'elle est convergente (On pourra utiliser le résultat de la question 2) y de la première partie)
-3) Montrer que 0 est l'unique solution de l'equation \(\ln (f(x)) = x\) puis déterminer la limite de la suite \((u_{n})\).
+1) Montrer que pour tout $ n \in \mathbb{N} : u_n > 0 $
+2) Montrer que la suite $(u_{n})$ est strictement derrroissante puis en deduire qu'elle est convergente (On pourra utiliser le résultat de la question 2) y de la première partie)
+3) Montrer que 0 est l'unique solution de l'equation $\ln (f(x)) = x$ puis déterminer la limite de la suite $(u_{n})$.
 
 Examen National 2016 (Session Normale)
 
 #### Problème 10
 Soit $f$ la fonction définie sur $\mathbb{R}^+$ par : $f(x) = 2x - e^{-x^2}$. Et soit $\mathcal{C}_f$ sa courbe dans un repère orthonormé.
 
-1) Calculer \(\lim_{x\to 0}\left(f(x) - 2x\right)\) puis interpréter le résultat graphiquement.
-2) Calculer \( f'(x) \) pour tout \( x \in \mathbb{R}^+ \), puis dresser le tableau de variations de la fonction \( f \).
-3) Montrer que l'equation \( f(x) = 0 \) admet une solution unique \( \alpha \) sur \( \mathbb{R}^+ \), et que \( 0 < \alpha < 1 \).
-4) Tracer la courbe \(\mathcal{C}_f\)
+1) Calculer $\lim_{x\to 0}\left(f(x) - 2x\right)$ puis interpréter le résultat graphiquement.
+2) Calculer $ f'(x) $ pour tout $ x \in \mathbb{R}^+ $, puis dresser le tableau de variations de la fonction $ f $.
+3) Montrer que l'equation $ f(x) = 0 $ admet une solution unique $ \alpha $ sur $ \mathbb{R}^+ $, et que $ 0 < \alpha < 1 $.
+4) Tracer la courbe $\mathcal{C}_f$
 
 Examen National 2008 (Session Normale)
 

@@ -64,6 +64,15 @@ export interface CourseMeta {
    * the loader (which reads the filesystem). It is not a guess and must not
    * become one: `scripts/test-course.mjs` re-derives both from every chapter and
    * fails if a number here has drifted from the document it describes.
+   *
+   * `sections` moves for reasons that are not edits to the prose. `isLight` in
+   * `lib/courseDoc.ts` calls a `##` heavy at more than sixty lines OR more than
+   * forty formulas, and cuts a heavy one at its `###`. Repairing three chapters
+   * whose maths was written `\(…\)` — which `remark-math` does not parse, so it
+   * reached the reader as literal TeX — turned 1 197 fragments into formulas
+   * the counter could finally see, and those chapters paginated further: 15→16,
+   * 25→27, 7→9. Nothing was added to any of them. Re-derive these numbers after
+   * touching delimiters, not only after touching text.
    */
   sections: number
   exercises: number
@@ -201,7 +210,7 @@ export const COURSE_CATALOG: CourseMeta[] = [
     level: LEVEL,
     levelAr: LEVEL_AR,
     semester: 2,
-    sections: 15,
+    sections: 16,
     exercises: 6,
     branch: 'analyse',
     n: 5,
@@ -220,7 +229,7 @@ export const COURSE_CATALOG: CourseMeta[] = [
     level: LEVEL,
     levelAr: LEVEL_AR,
     semester: 2,
-    sections: 25,
+    sections: 27,
     exercises: 13,
     branch: 'analyse',
     n: 6,
@@ -239,7 +248,7 @@ export const COURSE_CATALOG: CourseMeta[] = [
     level: LEVEL,
     levelAr: LEVEL_AR,
     semester: 2,
-    sections: 7,
+    sections: 9,
     exercises: 3,
     branch: 'analyse',
     n: 7,

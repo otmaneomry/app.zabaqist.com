@@ -307,7 +307,7 @@ Soit a, b et c des entiers relatifs non nuls et n un entier naturel. Alors :
 
 2) a ∨ b = b ∨ a ;
 
-3) a \mid b ⇔ a ∧ b = |a| ⇔ a ∨ b = |b|
+3) $a \mid b$ ⇔ a ∧ b = |a| ⇔ a ∨ b = |b|
 
 4) (a ∧ b) ∧ c = a ∧ (b ∧ c) ;
 
@@ -650,7 +650,7 @@ Technique de résolution de l'équation $(E')$ dans $\mathbb{Z}^2$ :
 
 Soit $(x_0; y_0)$ une solution (particulière) de l'équation $(E')$. On a donc $a'x_0 + b'y_0 = c'$ et l'équation $(E')$ se lit alors : $a'x + b'y = a'x_0 + b'y_0$, c'est-à-dire : $a'(x - x_0) = b'(y_0 - y)$ (*)
 
-La relation (*) entraîne $b' \\mid a'(x - x_0)$, et comme $a' \wedge b' = 1$, le théorème de Gauss nous donne $b' \\mid x - x_0$.
+La relation (*) entraîne $b' \mid a'(x - x_0)$, et comme $a' \wedge b' = 1$, le théorème de Gauss nous donne $b' \mid x - x_0$.
 Soit $k \in \mathbb{Z}$ tel que $x - x_0 = b'k$. La relation (*) donne alors $y - y_0 = a'k$. Les solutions de $(E')$ dans $\mathbb{Z}^2$ ne peuvent être que $(x_0 + b'k; y_0 - a'k)$.
 
 Pour conclure, il suffit de vérifier que tous ces couples sont solutions de $(E')$. D'où le théorème suivant :
@@ -807,7 +807,7 @@ Soit n un entier naturel non nul.
 On dit que deux entiers relatifs a et b sont congrus modulo n si n divise b - a, c'est-à-dire s'il existe un entier k ∈ ℤ tel que b = a + kn. On écrit: a ≡ b [n]
 
 > **Exemples.**
-1) On a $247 \equiv 7$ [15] car 15 \mid 247 - 7. De même: $163 \equiv -2$ [15] car 15 \mid 163 + 2.
+1) On a $247 \equiv 7$ [15] car $15 \mid 247 - 7$. De même: $163 \equiv -2$ [15] car $15 \mid 163 + 2$.
 2) $\operatorname{Si} n \in \mathbb{Z}$ alors: $n(n + 1) \equiv 0$ [2] et $(2n + 1)^2 \equiv 1$ [4]
 
 > **Proposition 4.**
@@ -1209,13 +1209,13 @@ Pour tout x ∈ ℤ, on désigne par x̄ la classe d'équivalence de x modulo n.
 > **Exemples.**
 1) On considère l'ensemble $\mathbb{Z}/2\mathbb{Z}$ :
 
-On a : $\mathbb{Z}/2\mathbb{Z}$ = {0; 1} avec 0̄ = {2k \mid k ∈ ℤ} et 1̄ = {2k + 1 \mid k ∈ ℤ}.
+On a : $\mathbb{Z}/2\mathbb{Z}$ = {0; 1} avec 0̄ = $\{2k \mid k \in \mathbb{Z}\}$ et 1̄ = $\{2k + 1 \mid k \in \mathbb{Z}\}$.
 
 On a : 4̄ = 0̄ = 8̄ = 20̄ = 2018 et 13̄ = 1̄ = 5̄ = 17̄ = 2019
 
 2) On considère l'ensemble $\mathbb{Z}/3\mathbb{Z}$ :
 
-On a : $\mathbb{Z}/3\mathbb{Z}$ = {0̄; 1̄; 2̄} avec 0̄ = {3k \mid k ∈ ℤ} et 1̄ = {3k + 1 \mid k ∈ ℤ} et 2̄ = {3k + 2 \mid k ∈ ℤ}
+On a : $\mathbb{Z}/3\mathbb{Z}$ = {0̄; 1̄; 2̄} avec 0̄ = $\{3k \mid k \in \mathbb{Z}\}$ et 1̄ = $\{3k + 1 \mid k \in \mathbb{Z}\}$ et 2̄ = $\{3k + 2 \mid k \in \mathbb{Z}\}$
 
 On a : 0̄ = 3̄ = 66̄ = 2016 et 1̄ = 4̄ = 7̄ = 2017 et 2̄ = 8̄ = 83̄ = 2018
 
@@ -1267,7 +1267,7 @@ On a : $\mathbb{Z}/7\mathbb{Z}$ = {0; 1; 2; 3; 4; 5; 6}. On obtient alors le tab
 > L'ensemble des solutions de l'équation $ x^2 - \overline{3}x + \overline{2} = \overline{0} $ est: $ S = \{\overline{1};\overline{2}\} $.
 
 > **Applications.**
-1. Résoudre dans \mathbb{Z}/6\mathbb{Z} les équations suivantes :
+1. Résoudre dans $\mathbb{Z}/6\mathbb{Z}$ les équations suivantes :
 
 $$\overline{4}x = \overline{2} \quad ; \quad \overline{3}x^2 + x + \overline{1} = \overline{0} \quad ; \quad (\overline{4}x - \overline{1})(\overline{2}x + \overline{3}) = \overline{0} \quad ; \quad x^3 = x$$
 
@@ -1539,7 +1539,7 @@ $$\left\{ \begin{array}{l} x \wedge y = 18 \\ x \vee y = 540 \end{array} \right.
 
 Posons $d = (3^{123} - 5) \wedge 25$. On a $d \mid 25$ donc $d \in \{1; 5; 25\}$. Or 5 ne divise pas $3^{123}$ (car sinon, on aura $5 \mid 3$ car 5 est premier). Par conséquent, $3^{123} - 5$ n'est pas divisible par 5. Ainsi: $(3^{123} - 5) \wedge 25 = 1$. Calculons $(2^{443} + 7) \wedge 15$:
 
-Posons $d' = (2^{443} + 7) \wedge 15$. On a $d' \\mid 15$ donc $d' \in \{1; 3; 5; 15\}$. On a $2^2 \equiv 1$ [3] donc $2^{442} \equiv 1$ [3].
+Posons $d' = (2^{443} + 7) \wedge 15$. On a $d' \mid 15$ donc $d' \in \{1; 3; 5; 15\}$. On a $2^2 \equiv 1$ [3] donc $2^{442} \equiv 1$ [3].
 
 Cela donne $2^{443} \equiv 2$ [3] et $2^{443} + 7 \equiv 0$ [3] et par conséquent, $3 \mid 2^{443} + 7$.
 
@@ -1640,7 +1640,7 @@ $$S = \{(540;18); (18;540); (270;36); (36;270); (180;54); (54;180); (108;90); (9
 
 • Le système { x + y = 56; x ∨ y = 105 } :
 
-Posons d = x ∧ y. On a d \mid x et d \mid y, donc d \mid x + y et d \mid (x ∨ y), d'où d \mid (56 ∧ 105), c'est-à-dire d \mid 7. Deux cas peuvent se présenter :
+Posons d = x ∧ y. On a $d \mid x$ et $d \mid y$, donc $d \mid x + y$ et $d \mid (x \vee y)$, d'où $d \mid (56 \wedge 105)$, c'est-à-dire $d \mid 7$. Deux cas peuvent se présenter :
 
 • Si d = 1 alors le système devient : { x + y = 56; x, y = 105 } . Ce système n'a aucune solution dans ℕ².
 
@@ -1728,7 +1728,7 @@ Ce qui donne $$(n+1)C_{2n}^{n+1}=nC_{2n}^{n}$$, et Par conséquent $$(n+1) \mid 
 
 Posons $d = a \wedge c$ et $d' = a \wedge (bc)$. On a bien $d \mid d'$ car si $d \mid a$ et $d \mid c$ alors $d \mid bc$ et donc $d \mid a \wedge (bc)$.
 
-Montrons maintenant que $d' \\mid d$. On a $d' \\mid a$ et $d' \\mid bc$, et puisque $a \wedge b = 1$ alors $d' \wedge b = 1$ car sinon il existerait un diviseur premier $p$ commun à $d'$ et $b$, ce qui entraîne $p \mid a$ et $p \mid b$. $d'$ divise $bc$ et $d' \wedge b = 1$ donc d'après le théorème de Gauss $d' \\mid c$. Par conséquent, $d' \\mid a \wedge c$ et $d' \\mid d$.
+Montrons maintenant que $d' \mid d$. On a $d' \mid a$ et $d' \mid bc$, et puisque $a \wedge b = 1$ alors $d' \wedge b = 1$ car sinon il existerait un diviseur premier $p$ commun à $d'$ et $b$, ce qui entraîne $p \mid a$ et $p \mid b$. $d'$ divise $bc$ et $d' \wedge b = 1$ donc d'après le théorème de Gauss $d' \mid c$. Par conséquent, $d' \mid a \wedge c$ et $d' \mid d$.
 
 Conclusion : $a \wedge b = 1 \Rightarrow a \wedge (bc) = a \wedge c$.
 
@@ -2631,9 +2631,9 @@ Le plan est muni d'un repère orthonormé $(O; \vec{i}, \vec{j})$.
 
 On considère les plans $\mathcal{P}$ et $\mathcal{Q}$ définis par :
 
-\[
+$$
 \mathscr {P}: x + 2 y - z + 2 = 0 \text { et } \mathscr {Q}: 3 x - y + 5 z = 0
-\]
+$$
 
 1) Montrer que les plans $\mathcal{P}$ et $\mathcal{Q}$ se coupent selon une droite $\mathcal{D}$.
 2) Soit $ M(x; y; z) $ un point de l'espace.
@@ -2643,33 +2643,33 @@ Montrer que: $M \in \mathcal{D} \Leftrightarrow 8x + 9y + 10 = 0$
 **Exercice 70.**
 1) Montrer que pour tout $(a; b; c) \in \mathbb{Z}^3$:
 
-\[
+$$
 a \wedge b = b \wedge (a - b c)
-\]
+$$
 
 2) Montrer que pour tout $n \in \mathbb{Z}$:
 
-\[
+$$
 \left(5 n ^ {3} - n\right) \wedge (n + 2) = (n + 2) \wedge 38
-\]
+$$
 
 3) Déterminer l'ensemble H définie par :
 
-\[
+$$
 H = \left\{n \in \mathbb {Z} \mid (n + 2) \mid (5 n ^ {3} - n) \right\}
-\]
+$$
 
 4) Quelles sont les valeurs possibles de nombre :
 
-\[
+$$
 \left(5 n ^ {3} - n\right) \wedge (n + 2)?
-\]
+$$
 
 5) Déterminer l'ensemble K définie par :
 
-\[
+$$
 K = \left\{n \in \mathbb {Z} \mid (5 n ^ {3} - n) \wedge (n + 2) = 19 \right\}
-\]
+$$
 
 **Exercice 71.**
 Résoudre dans $\left(\mathbb{N}^{*}\right)^{2}$ les systèmes suivants :
@@ -2696,28 +2696,28 @@ Soit $(x;p;q;d)\in (\mathbb{N}^{*})^{4}$ avec $x > 1$.
 
 b) En déduire que si $ p \wedge q = d $, alors il existe un couple $ (m; n) \in \mathbb{N}^2 $ tel que :
 
-\[
+$$
 \left(x ^ {m p} - 1\right) - \left(x ^ {n q} - 1\right) x ^ {d} = x ^ {d} - 1
-\]
+$$
 
 3) Déduire de ce qui précède que :
 
-\[
+$$
 \left(x ^ {m p} - 1\right) \wedge \left(x ^ {n q} - 1\right) = x ^ {d} - 1
-\]
+$$
 
 **Exercice 75.**
 Soit a et b deux entiers naturels non nuls.
 
 1) Montrer que :
 
-\[
+$$
 (a \wedge b) + (a \vee b) = a + b \Leftrightarrow (a \mid b \text {   et   } b \mid a)
-\]
+$$
 
-\[
+$$
 \left(a ^ {2} + a b + b ^ {2}\right) \wedge (a b) = (a \wedge b) ^ {2}
-\]
+$$
 
 2) a) Montrer l'équivalence: $a^2 \mid b^2 \Leftrightarrow a \mid b$
 
@@ -2726,9 +2726,9 @@ b) En déduire que: $(\forall r \in \mathbb{Q}^*) r^2 \in \mathbb{Z} \Leftrighta
 **Exercice 76.**
 On considère l'ensemble :
 
-\[
+$$
 S = \left\{\left(x; y\right) \in \mathbb {N} ^ {2} \mid 2 ^ {x} - 3 ^ {y} = 1 \right\}
-\]
+$$
 
 1) Montrer que:  $ (2;1)\in S $  et  $ (1;0)\in S $
 2) Soit $(x; y) \in \mathbb{N}^2$ tel que: $(x; y) \notin \{(1; 0); (2; 1)\}$ On suppose que $y \geq 2$.
@@ -3330,7 +3330,7 @@ u ∧ v = 1 ⇒ φ(u × v) = φ(u) × φ(v)
 
 d) Soit n ∈ N* - {1} et n = p_1^{α_1} × p_2^{α_2} × ... × p_k^{α_k} sa décomposition en produits de facteurs premiers. Montrer que :
 
-φ(n) = n(1 - 1 \mid p_1)(1 - 1 \mid p_2) ... (1 - 1 \mid p_k)
+φ(n) = n(1 - 1/p_1)(1 - 1/p_2) ... (1 - 1/p_k)
 
 e) Calculer φ(3240).
 

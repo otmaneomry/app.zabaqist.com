@@ -174,9 +174,9 @@ Indication : On pourra utiliser les égalités : $\vec{i} \wedge \vec{i} = \vec{
 ### ANNEAU
 1. On considère l'ensemble $\mathbb{R}$ muni de deux lois de composition internes $T$ et $*$ définies par :
 
-\[
+$$
 \left(\forall (x; y) \in \mathbb {R} ^ {2}\right) \left\{ \begin{array}{l} x T y = x + y - 1 \\ x * y = (x - 1) (y - 1) + 1 \end{array} \right.
-\]
+$$
 
 a) Montrer que $(\mathbb{R};\mathsf{T})$ est un groupe commutatif.
 b) Montrer que la loi * est associative et distributive par rapport à la loi T dans R.
@@ -189,9 +189,9 @@ c) Vérifier que * admet un élément neutre u à déterminer. On dit que (R; T;
 
 2. Les ensembles suivants munis de deux lois de composition internes sont-ils des anneaux ? Si c'est le cas, sont-ils commutatif ? sont-ils unitaires ?
 
-\[
+$$
 (\mathbb {C}; +; \times) \quad ; \quad (\mathbb {Z} / 4 \mathbb {Z}; +; \times) \quad ; \quad (\mathbb {M} _ {2} (\mathbb {R}); +; \times) \quad ; \quad (\mathcal {V} _ {3}; +; \wedge)
-\]
+$$
 
 3. Soit $ (A;T;*) $ un anneau d'élément neutre $ 0_{A} $ pour la loi T.
 
@@ -353,17 +353,17 @@ $ \checkmark(H;*) $ est un groupe.
 6) $(\mathbb{Z}^{*};\times)$ n'est pas un sous-groupe de $(\mathbb{R}^{*};\times)$.
 7) On pose: $ E = \left\{\begin{pmatrix} 1 & a \\ 2 & 0 \end{pmatrix} / a \in \mathbb{R}\right\} $. Alors, $ (E; + ) $ n'est pas un sous-groupe de $ (\mathbb{M}_2(\mathbb{R}); + ) $, car :
 
-\[
+$$
 A = \left( \begin{array}{c c} 1 & 0 \\ 2 & 0 \end{array} \right) \in E \text {   mais   sa   matrice   opposée   } - A = \left( \begin{array}{c c} - 1 & 0 \\ - 2 & 0 \end{array} \right) \text {   n'appartient   pas   à   } E
-\]
+$$
 
 #### 1.4. Propriété caractéristique d'un sous-groupe
 > **Proposition 3.**
 Soit $ (G;*) $ un groupe d'élément neutre e, et H une partie de G.
 
-\[
+$$
 H \text {   est   un   sous - groupe   de   } (G; *) \Leftrightarrow \left\{ \begin{array}{l} H \neq \emptyset \\ (\forall (x; y) \in H ^ {2}) x * y ^ {\prime} \in H \end{array} \right.
-\]
+$$
 
 où $ y' $ est le symétrique de $ y $ dans $ (G;*) $.
 
@@ -954,9 +954,9 @@ Par suite, pour tout $(x; y) \in G^2$, $y \cdot x = x \cdot y$, c'est-à-dire qu
 
 2) On a pour tout $ x \in G $, $ x \cdot x = e $; donc pour tout $ (x; y) \in G^2 $, $ (x \cdot y) \cdot (x \cdot y) = e $, c'est-à-dire que $ x \cdot (y \cdot x) \cdot y = e $; il s'ensuit donc les implications suivantes:
 
-\[
+$$
 x \cdot (y \cdot x) \cdot y = e \Rightarrow x \cdot (x \cdot (y \cdot x) \cdot y) \cdot y = x \cdot y \Rightarrow (x \cdot x) \cdot (y \cdot x) \cdot (y \cdot y) = x \cdot y \Rightarrow e \cdot (y \cdot x) \cdot e = x \cdot y
-\]
+$$
 
 Par suite, pour tout $ (x; y) \in G^{2} $, $ y \cdot x = x \cdot y $, c'est-à-dire que la loi • est commutative dans $ G $.
 
@@ -973,15 +973,15 @@ d) On a pour tout $ (x; y) \in A^2 : (y \top x)' = x \top y $ et $ (y \top x)' =
 
 Pour tout $(x; y) \in A^2$, on pose: $z = (x \top y) \top (x * y)$. Puisque la loi $\top$ est associative et distributive par rapport à la loi $*$, alors:
 
-\[
+$$
 z = x \top (y \top (x * y)) = x \top ((y \top x) * (y \top y)) = x \top ((y \top x) * y) = (x \top (y \top x)) * (x \top y) \quad (\text { car } y \top y = y)
-\]
+$$
 
 Il en résulte de l'égalité $(y\top x)' = x\top y$ et la commutativité de la loi T que :
 
-\[
+$$
 z = \left(\left(x \top x\right) \top y\right) * (x \top y) = \left(x \top y\right) ^ {\prime} * (x \top y) = e. \text {   Ainsi:   } \left(\forall (x; y) \in A ^ {2}\right) (x \top y) \top (x * y) = e
-\]
+$$
 
 ### C. Étude d'une loi, sous-groupe et morphisme
 On définit sur $\mathbb{R}^2$ une loi de composition interne $\top$ comme suit :
@@ -997,9 +997,9 @@ c) Montrer que $(G; \top)$ est un groupe commutatif.
 
 3) On considère l'application $f$ définie de $\mathbb{C}^*$ dans $G$ par :
 
-\[
+$$
 \text { Pour   tout } (a; b) \in \mathbb {R} ^ {2} - \{(0; 0) \}: f (a + i b) = (2 b; 3 a)
-\]
+$$
 
 a) Montrer que $ f $ est un isomorphisme de $ (\mathbb{C}^*; \times) $ dans $ (G; \top) $.
 b) Retrouver le résultat de la question 2) c).
@@ -1765,7 +1765,7 @@ $$\beta^n = \underbrace{\beta \top \beta \top \dots \top \beta}_{n \text{ fois}}
 Calculer $\beta^n$ en fonction de $n$.
 
 **Partie C :**
-Soit $m \in \mathbb{R}_+^n$. On pose $I = ]-m; m[$ et on considère la fonction $f_m$ définie sur $\mathbb{R}$ par :
+Soit $m \in \mathbb{R}_+^*$. On pose $I = ]-m; m[$ et on considère la fonction $f_m$ définie sur $\mathbb{R}$ par :
 
 $$(\forall x \in \mathbb{R}) \ f_m(x) = m \left( \frac{e^{2mx} - 1}{e^{2mx} + 1} \right)$$
 
@@ -2331,25 +2331,25 @@ c) Montrer que l'ensemble $\Gamma = \left\{\sqrt{1 + 2^m} / m \in \mathbb{Z}\rig
 **Problème 8.**
 On rappelle que $(\mathbb{M}_3(\mathbb{R}); + ;\times)$ est un anneau d'unité
 
-\[
+$$
 I = \left( \begin{array}{c c c} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{array} \right), \text { et   que } (\mathbb {C}; +; \times) \text { est   un   corps   com- }
-\]
+$$
 
 mutatif.
 
 Pour tout $z = x + iy$ avec $(x;y)\in \mathbb{R}^2$ , on pose:
 
-\[
+$$
 M (z) = \left( \begin{array}{c c c} x + 2 y & 0 & 5 y \\ 0 & 1 & 0 \\ - y & 0 & x - 2 y \end{array} \right)
-\]
+$$
 
 et on considère l'ensemble $E=\{M(z)/z\in\mathbb{C}\}$.
 
 1) On munit E d'une loi de composition interne comme suit : Pour tout  $ (z; z') \in \mathbb{C}^{2} $ :
 
-\[
+$$
 M (z) * M \left(z ^ {\prime}\right) = M (z) + M \left(z ^ {\prime}\right) - M (0)
-\]
+$$
 
 Montrer que $(E;*)$ est un groupe commutatif.
 
@@ -2372,15 +2372,15 @@ et on considère l'ensemble: $ E = \{M(x) / x \in \mathbb{R}\} $
 
 On munit E d'une loi de composition interne T donnée par :
 
-\[
+$$
 \forall (x; y) \in \mathbb {R} ^ {2} M (x) \top M (y) = M (x + y + 1)
-\]
+$$
 
 1) Soit $\varphi$ l'application définie de $\mathbb{R}$ dans $E$ par:
 
-\[
+$$
 (\forall x \in \mathbb {R}) \varphi (x) = M (x - 1)
-\]
+$$
 
 a) Montrer que $\varphi$ est un morphisme de $(\mathbb{R}; + )$ dans $(E; \top)$.
 
@@ -2388,9 +2388,9 @@ b) Montrer que $(E; \top)$ est un groupe commutatif.
 
 2) a) Montrer que pour tout $(x;y)\in \mathbb{R}^2$
 
-\[
+$$
 M (x) \times M (y) = M (x + y + x y)
-\]
+$$
 
 b) En déduire que $E$ est stable dans $(\mathbb{M}_{2}(\mathbb{R});\times)$ et que la loi « × » est commutatif dans $E$.
 
@@ -2400,9 +2400,9 @@ d) Vérifier que $ M(-1) $ est l'élément neutre dans $ (E; \top) $ et que $ I 
 
 3) a) Vérifier que pour tout $x \in \mathbb{R} - \{-1\}$:
 
-\[
+$$
 M (x) \times M \left(\frac {- x}{1 + x}\right) = I
-\]
+$$
 
 b) Montrer que $(E; \top; \times)$ est un corps commutatif.
 
@@ -2411,15 +2411,15 @@ b) Montrer que $(E; \top; \times)$ est un corps commutatif.
 **Problème 10.**
 On rappelle que $(\mathbb{M}_2(\mathbb{R}); + ; \times)$ est un anneau d'unité
 
-\[
+$$
 I = \left( \begin{array}{c c} 1 & 0 \\ 0 & 1 \end{array} \right). \text { Soit } F \text { l'ensemble des matrices } M (x; y)
-\]
+$$
 
 de $\mathbb{M}_{2}(\mathbb{R})$ telles que :
 
-\[
+$$
 M (x; y) = \left( \begin{array}{c c} x & y \\ 0 & \frac {1}{x} \end{array} \right) \text { avec } (x; y) \in \mathbb {R} ^ {*} \times \mathbb {R}
-\]
+$$
 
 1) a) Montrer que $F$ est une partie stable de $(\mathbb{M}_2(\mathbb{R}); \times)$.
 

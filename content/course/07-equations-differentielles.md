@@ -12,8 +12,8 @@ Source : https://fr.wikipedia.org
 
 ## Capacités attendues
 
-- Resoudre de I'equation \(y^{\prime} = ay + b\)
-- Resoudre de I'equation \(y^{\prime \prime} + ay^{\prime} + by = 0\)
+- Resoudre de I'equation $y^{\prime} = ay + b$
+- Resoudre de I'equation $y^{\prime \prime} + ay^{\prime} + by = 0$
 - Resolution d'équations différentielles se ramenant à la résolution de l'une des deux équations précédentes.
 
 ## Plan du cours
@@ -45,10 +45,10 @@ b) Dans les deux cas suivants, la fonction $g$ est-elle solution de l'équation 
 
 $1^{er}$ cas : $g(x) = e^{-2x}$ ; $2^{nd}$ cas : $g(x) = 4e^{-2x} - \frac{2}{5}e^{-3x}$
 
-2. Determiner les solutions de l'equation differentielle: \( y' = 3x^2 \)
-3. Determiner les solutions de l'equation differentielle: \( y' = 2x - 1 \)
-4. Verifier que la fonction \( h: x \mapsto e^{5x} - \frac{2}{5} \) est une solution de l'équation différentielle: \( y' = 5y + 2 \)
-5. Verifier que la fonction \(\varphi : x \mapsto e^{-x} (\cos(2x) + \sin(2x))\) est une solution de l'équation \(y'' + 2y' + 5y = 0\).
+2. Determiner les solutions de l'equation differentielle: $ y' = 3x^2 $
+3. Determiner les solutions de l'equation differentielle: $ y' = 2x - 1 $
+4. Verifier que la fonction $ h: x \mapsto e^{5x} - \frac{2}{5} $ est une solution de l'équation différentielle: $ y' = 5y + 2 $
+5. Verifier que la fonction $\varphi : x \mapsto e^{-x} (\cos(2x) + \sin(2x))$ est une solution de l'équation $y'' + 2y' + 5y = 0$.
 6. Résoudre chacune des équations différentielles suivantes:
 
 $y'' + 9y = 0$ ; $2y'' + 3y = 0$ ; $y'' + 6y' = 0$
@@ -56,22 +56,22 @@ $y'' + 9y = 0$ ; $2y'' + 3y = 0$ ; $y'' + 6y' = 0$
 ### RÉSOLUTION DE L'ÉQUATION DIFFÉRENTIELLE $y' = ay + b$ où $a \neq 0$
 On considère l'équation différentielle : $(E_1)$ : $y' = 2y$
 
-1. Montrer que les fonctions définies par \( x \mapsto \lambda e^{2x} \) ou \( \lambda \in \mathbb{R} \), sont des solutions de l'equation différentielle \( (E_1) \).
-2. Soit \( f \) une fonction numérique dérivable sur \( \mathbb{R} \). On suppose que \( f \) est solution de l'équation \( (E_1) \).
+1. Montrer que les fonctions définies par $ x \mapsto \lambda e^{2x} $ ou $ \lambda \in \mathbb{R} $, sont des solutions de l'equation différentielle $ (E_1) $.
+2. Soit $ f $ une fonction numérique dérivable sur $ \mathbb{R} $. On suppose que $ f $ est solution de l'équation $ (E_1) $.
 
 On pose : $g(x) = f(x)e^{-2x}$
 
-a) Montrer que la fonction \( g \) est constante sur \( \mathbb{R} \).
-b) En déduire qu'il existe un réel \( \lambda \) tel que: \( (\forall x \in \mathbb{R}) \) \( f(x) = \lambda e^{2x} \)
-c) Determiner les solutions de l'equation différentielle \((E_{1})\) qui verifie la condition initiale: \(f(\ln 2) = 4\)
+a) Montrer que la fonction $ g $ est constante sur $ \mathbb{R} $.
+b) En déduire qu'il existe un réel $ \lambda $ tel que: $ (\forall x \in \mathbb{R}) $ $ f(x) = \lambda e^{2x} $
+c) Determiner les solutions de l'equation différentielle $(E_{1})$ qui verifie la condition initiale: $f(\ln 2) = 4$
 
 3. On considère l'équation différentielle : $(E_2)$ : $y' = 2y + 3$
 
-a) Verifier que la fonction \( y_0: x \mapsto -\frac{3}{2} \) est une solution de l'équation \( (E_2) \).
-b) Montrer l'equivalence suivante: \([y\) est solution de \((E_2)]\Leftrightarrow [(y - y_0)\) est solution de \((E_1)]\)
-c) En déduire les solutions de l'equation différentielle \((E_2)\).
+a) Verifier que la fonction $ y_0: x \mapsto -\frac{3}{2} $ est une solution de l'équation $ (E_2) $.
+b) Montrer l'equivalence suivante: $[y$ est solution de $(E_2)]\Leftrightarrow [(y - y_0)$ est solution de $(E_1)]$
+c) En déduire les solutions de l'equation différentielle $(E_2)$.
 
-### RÉSOLUTION DE L'ÉQUATION DIFFÉRENTIELLE $y' + by = 0$
+### RÉSOLUTION DE L'ÉQUATION DIFFÉRENTIELLE $y'' + by = 0$
 A) On considère l'équation différentielle : $(E)$ : $y'' - 4y = 0$
 
 1. Déterminer les valeurs du réel $r$ pour que la fonction $x \mapsto e^{rx}$ soit solution de l'équation différentielle $(E)$.
@@ -178,7 +178,7 @@ la dérivée $y'$ de cette fonction. On a constaté que $y'(t) = ky(t)$, où $k$
 un coefficient strictement positif. On désigne par $N$ le nombre de microbes à l'instant $t = 0$.
 
 Déterminons l'unique solution de l'équation différentielle $y' = ky$ telle que $y(0) = N$ :
-La solution générale de l'équation $y' = ky$ est $y = \alpha e^{ky}$ où $\alpha \in \mathbb{R}$. Si on désigne par $f$ la solution de $y' = ky$ vérifiant $y(0) = N$, on trouve $\alpha = N$, ce qui donne $f(t) = Ne^{kt}$.
+La solution générale de l'équation $y' = ky$ est $y = \alpha e^{kt}$ où $\alpha \in \mathbb{R}$. Si on désigne par $f$ la solution de $y' = ky$ vérifiant $y(0) = N$, on trouve $\alpha = N$, ce qui donne $f(t) = Ne^{kt}$.
 
 > **Applications.**
 1. Résoudre les équations différentielles suivantes: $y' = 5y$ ; $y' + \sqrt{2}y = 0$ ; $y' = (\ln 2)y$
@@ -193,7 +193,7 @@ Soit $y$ une solution de l'équation $y' = ay + b$. Puisque $y'_0 = ay_0 + b$ al
 La solution générale de l'équation différentielle $y' = ay + b$ est : $y = \lambda e^{ax} - \frac{b}{a}$ où $\lambda \in \mathbb{R}$.
 
 > **Exemple.**
-La solution générale de l'équation différentielle $y' = 3y + 2$ est : $y = \lambda e^{3y} - \frac{2}{3}$ où $\lambda \in \mathbb{R}$.
+La solution générale de l'équation différentielle $y' = 3y + 2$ est : $y = \lambda e^{3x} - \frac{2}{3}$ où $\lambda \in \mathbb{R}$.
 
 Déterminons la solution $f$ de l'équation $y' = 3y + 2$ qui vérifie la condition $f(-1) = \frac{1}{3}$.
 
@@ -204,18 +204,18 @@ Il s'ensuit donc : $(\forall x \in \mathbb{R}) f(x) = e^{3x+3} - \frac{2}{3}$
 > **Applications.**
 1. Résoudre les équations différentielles suivantes :
 
-$y' + 4y - 7 = 0$ ; $y' = -9y + 2$ ; $3y' + 5y = 8$ ; $y'' = -2y' + 3$
+$y' + 4y - 7 = 0$ ; $y' = -9y + 2$ ; $3y' + 5y = 8$ ; $y' = -2y + 3$
 
-2. Determiner la solution \( f \) de l'equation \( y' - 6y = 3 \) verifiant la condition: \( f\left(\frac{1}{6}\right) = 0 \)
-3. Determiner la solution \( g \) de l'equation \( y' = \pi y + \sqrt{2} \) verifiant la condition: \( g(0) = -1 \)
+2. Determiner la solution $ f $ de l'equation $ y' - 6y = 3 $ verifiant la condition: $ f\left(\frac{1}{6}\right) = 0 $
+3. Determiner la solution $ g $ de l'equation $ y' = \pi y + \sqrt{2} $ verifiant la condition: $ g(0) = -1 $
 
 ### 2. Équations différentielles du second ordre
 #### 2.1. L'ÉQUATION DIFFÉRENTIELLE $y'' + ay' + by = 0$ ($(a; b) \in \mathbb{R}^2$)
 Soit $(a, b) \in \mathbb{R}^2$. L'équation $y'' + ay' + by = 0$ où l'inconnue est une fonction numérique $y$, deux fois dérivable sur $\mathbb{R}$ (ou sur un intervalle de $\mathbb{R}$) est appelée équation différentielle du second ordre.
 Cas Particuliers :
 
-- Cas où \( a = b = 0 \): Dans ce cas, l'équation différentielle ci-dessus devient sous la forme \( y^{*} = 0 \) et ceci est équivaut à: \( y = ax + \beta \) avec \( (\alpha; \beta) \in \mathbb{R}^2 \).
-- Cas où \( b = 0 \): Dans ce cas, l'équation différentielle ci-dessus devient sous la forme
+- Cas où $ a = b = 0 $: Dans ce cas, l'équation différentielle ci-dessus devient sous la forme $ y^{*} = 0 $ et ceci est équivaut à: $ y = ax + \beta $ avec $ (\alpha; \beta) \in \mathbb{R}^2 $.
+- Cas où $ b = 0 $: Dans ce cas, l'équation différentielle ci-dessus devient sous la forme
 
 $y'' + ay' = 0$ ou aussi $(y' + ay)' = 0$, et ceci est équivalent à : $(\exists \beta \in \mathbb{R})$ ; $y' + ay = \beta$
 
@@ -227,9 +227,9 @@ Soit $a$ et $b$ deux réels quelconques. On considère l'équation différentiel
 
 L'équation caractéristique de $(E)$ est $r^2 + ar + b = 0$. Son discriminant est : $\Delta = a^2 - 4b$
 
-1) Si \(\Delta > 0\), alors l'équation caractéristique admet deux racines réelles distinctes \(r_1\) et \(r_2\), et la solution générale de \((E)\) est donnée par: \(y = \alpha e^{r_1x} + \beta e^{r_2x}\) ou \((\alpha; \beta) \in \mathbb{R}^2\)
-2) Si \(\Delta = 0\), alors l'équation caractéristique admet une racine double \(r\), et la solution générale de \((E)\) est donnée par: \(y = (\alpha x + \beta)e^{rx}\) ou \((\alpha; \beta) \in \mathbb{R}^2\)
-3) Si \(\Delta < 0\), alors l'équation caractéristique admet deux racines complexes conjuguées. En posant \(r_1 = p + iq\) et \(r_2 = p - iq\) avec \((p;q) \in \mathbb{R}^2\), la solution générale de \((E)\) est donnée par:
+1) Si $\Delta > 0$, alors l'équation caractéristique admet deux racines réelles distinctes $r_1$ et $r_2$, et la solution générale de $(E)$ est donnée par: $y = \alpha e^{r_1x} + \beta e^{r_2x}$ ou $(\alpha; \beta) \in \mathbb{R}^2$
+2) Si $\Delta = 0$, alors l'équation caractéristique admet une racine double $r$, et la solution générale de $(E)$ est donnée par: $y = (\alpha x + \beta)e^{rx}$ ou $(\alpha; \beta) \in \mathbb{R}^2$
+3) Si $\Delta < 0$, alors l'équation caractéristique admet deux racines complexes conjuguées. En posant $r_1 = p + iq$ et $r_2 = p - iq$ avec $(p;q) \in \mathbb{R}^2$, la solution générale de $(E)$ est donnée par:
 
 $y = (\alpha \cos(qx) + \beta \sin(qx))e^{rx}$ où $(\alpha; \beta) \in \mathbb{R}^2$
 
@@ -271,7 +271,7 @@ a) Vérifier que la fonction $g$ définie par $g(x) = 2xe^{-2x}$ est une solutio
 b) Déterminer la solution $f$ de $(E)$ dont la courbe passe par le point $A(0, -1)$ et admet en ce point une tangente parallèle à l'axe des abscisses.
 
 > **Remarques.**
-• Pour tout $(x_0; y_0; z_0) \in \mathbb{R}^1$ il existe une unique solution de l'équation $(E)$ : $y'' + ay' + by = 0$ vérifiant les conditions initiales : $y(x_0) = y_0$ et $y'(x_0) = z_0$
+• Pour tout $(x_0; y_0; z_0) \in \mathbb{R}^3$ il existe une unique solution de l'équation $(E)$ : $y'' + ay' + by = 0$ vérifiant les conditions initiales : $y(x_0) = y_0$ et $y'(x_0) = z_0$
 
 • L'équation $y'' + \omega^2 y = 0$ est un cas particulier de l'équation différentielle $(E)$ : $y'' + ay' + by = 0$ :
 
@@ -302,8 +302,8 @@ Trouver la solution de $$(E_1)$$ vérifiant $$y(0) = -7$$
 
 2) On considère l'équation différentielle suivante : $$(E_2) : y'' + y' - 2y = 0$$
 
-a) Resoudre \((E_{2})\)
-b) Trouver la solution de \((E_2)\) verifiant \(y(0) = 1\) et \(y'(0) = 1\)
+a) Resoudre $(E_{2})$
+b) Trouver la solution de $(E_2)$ verifiant $y(0) = 1$ et $y'(0) = 1$
 
 3) Soit $$(\tau; i_0) \in \mathbb{R}^* \times \mathbb{R}^*$$. Déterminer la fonction $$i$$ dérivable sur $$[0; +\infty[$$, vérifiant :
 
@@ -330,8 +330,8 @@ $$y(0) = 1 \Leftrightarrow \lambda + \mu = 1 \quad \text{et} \quad y'(0) = 1 \Le
 
 La résolution de système $$\begin{cases} \lambda + \mu = 1 \\ \lambda - 2\mu = 1 \end{cases}$$ donne $$\begin{cases} \lambda = 1 \\ \mu = 0 \end{cases}$$. La solution demandée est : $$y = e^x$$
 
-3) Puisque la fonction \(i\) vérifie \(\frac{di}{dt} + 3\frac{i}{\tau} = 0\), alors \(i(t) = \lambda e^{-\frac{1}{\tau}}\) avec \(\lambda \in \mathbb{R}\). Or \(i(0) = -i_0\), donc \(i(t) = -i_0e^{-\frac{1}{\tau}}\).
-4) L'accroissement de la population est mesurée par \( P'(t) \). Par hypothèse, \( P'(t) \) et \( P(t) \) sont proportionnelles, ce qui se traduit par l'existence d'un réel \( \alpha \in \mathbb{R} \) tel que \( P'(t) = \alpha P(t) \). Par suite, \( P(t) \) s'écrit sous la forme \( P(t) = ke^{\alpha t} \) ou \( k \in \mathbb{R} \). Comme la population double tous les 50 ans, alors cela se traduit par:
+3) Puisque la fonction $i$ vérifie $\frac{di}{dt} + 3\frac{i}{\tau} = 0$, alors $i(t) = \lambda e^{-\frac{1}{\tau}}$ avec $\lambda \in \mathbb{R}$. Or $i(0) = -i_0$, donc $i(t) = -i_0e^{-\frac{1}{\tau}}$.
+4) L'accroissement de la population est mesurée par $ P'(t) $. Par hypothèse, $ P'(t) $ et $ P(t) $ sont proportionnelles, ce qui se traduit par l'existence d'un réel $ \alpha \in \mathbb{R} $ tel que $ P'(t) = \alpha P(t) $. Par suite, $ P(t) $ s'écrit sous la forme $ P(t) = ke^{\alpha t} $ ou $ k \in \mathbb{R} $. Comme la population double tous les 50 ans, alors cela se traduit par:
 
 $$(\forall t \in \mathbb{R}^*) \quad P(t+50) = 2P(t)$$
 
@@ -350,14 +350,14 @@ La vitesse de prolifération à l'instant $t$ du nombre des microbes est la dér
 
 On désigne par $N$ le nombre de microbes à l'instant $t = 0$.
 
-1) Détérminer l'unique solution de l'équation différentielle \( y' = ky \) telle que \( y(0) = N \)
-2) Sachant qu'au bout de \( 2h \), le nombre de microbes a quadruple, déterminer l'équation qui permet de trouver la constante \( k \).
-3) Détérminer la valeur de \( N \) (au microbes pres) sachant que la culture contient 6400 microbes au bout de cinq heures.
+1) Détérminer l'unique solution de l'équation différentielle $ y' = ky $ telle que $ y(0) = N $
+2) Sachant qu'au bout de $ 2h $, le nombre de microbes a quadruple, déterminer l'équation qui permet de trouver la constante $ k $.
+3) Détérminer la valeur de $ N $ (au microbes pres) sachant que la culture contient 6400 microbes au bout de cinq heures.
 
 > **Solution.**
-1) La solution générale de l'équation \( y' = ky \) est \( y = \alpha e^{kt} \) ou \( \alpha \in \mathbb{R} \). Si on désigne par \( f \) la solution de \( y' = ky \) vérifier \( y(0) = N \), on trouve \( \alpha = N \), ce qui donne \( f(t) = Ne^{kt} \).
-2) Au bout de \( 2h \), la population est quadruplee, donc \( f(2) = 4N \) ce qui donne \( e^{2k} = 4 \) (attention: ne pas transformer \( 2h \) en seconde car l'énoncé indique que \( t \) en \( h \)). Par suite \( k = \ln 2 \).
-3) D'après les données de l'exercice \( f(t) = N e^{t \ln 2} \) et \( f(5) = 6400 \) d'ou: \( N = \frac{6400}{e^{5 \ln 2}} = \frac{6400}{e^{\ln 32}} = \frac{6400}{32} = 200 \).
+1) La solution générale de l'équation $ y' = ky $ est $ y = \alpha e^{kt} $ ou $ \alpha \in \mathbb{R} $. Si on désigne par $ f $ la solution de $ y' = ky $ vérifier $ y(0) = N $, on trouve $ \alpha = N $, ce qui donne $ f(t) = Ne^{kt} $.
+2) Au bout de $ 2h $, la population est quadruplee, donc $ f(2) = 4N $ ce qui donne $ e^{2k} = 4 $ (attention: ne pas transformer $ 2h $ en seconde car l'énoncé indique que $ t $ en $ h $). Par suite $ k = \ln 2 $.
+3) D'après les données de l'exercice $ f(t) = N e^{t \ln 2} $ et $ f(5) = 6400 $ d'ou: $ N = \frac{6400}{e^{5 \ln 2}} = \frac{6400}{e^{\ln 32}} = \frac{6400}{32} = 200 $.
 
 ### C. Équation différentielle en mécanique
 On étudie un élément d'une structure métallique soumis à une force concentrée en un point. Cette force est la résultante des forces dues aux effets du vent sur la structure.
@@ -438,18 +438,18 @@ L'ÉQUATION DIFFÉRENTIELLE $y' = ay$
 #### Exercice 01
 Résoudre les équations différentielles suivantes :
 
-1) \( y' = 3y \); 2) \( y' = -2y \); 3) \( 2y' + 3y = 0 \)
-4) \(\sqrt{2} y' - \sqrt{3} y = 0\) ; 5) \((\ln 2)y - \pi y' = 0\)
-6) \(ny' + (n + 1)y = 0\) (ou \(n\in \mathbb{N}\)
+1) $ y' = 3y $; 2) $ y' = -2y $; 3) $ 2y' + 3y = 0 $
+4) $\sqrt{2} y' - \sqrt{3} y = 0$ ; 5) $(\ln 2)y - \pi y' = 0$
+6) $ny' + (n + 1)y = 0$ (ou $n\in \mathbb{N}$
 
 #### Exercice 02
 Déterminer la solution de l'équation différentielle $(E)$
 
 qui vérifie la condition initiale $y(x_0) = y_0$ dans chacun des cas suivants :
 
-1) \((E): y' - 4y = 0\) et \(x_0 = 0\) et \(y_0 = 2\)
-2) \((E): y' + 3y = 0\) et \(x_0 = -1\) et \(y_0 = 1\)
-3) \((E): 2y' - \sqrt{2} y = 0\) et \(x_0 = -2\) et \(y_0 = -3\)
+1) $(E): y' - 4y = 0$ et $x_0 = 0$ et $y_0 = 2$
+2) $(E): y' + 3y = 0$ et $x_0 = -1$ et $y_0 = 1$
+3) $(E): 2y' - \sqrt{2} y = 0$ et $x_0 = -2$ et $y_0 = -3$
 
 #### Exercice 03
 Soit $f$ la fonction définie sur $\mathbb{R}$ par : $f(x) = 3e^{-\frac{1}{2}x}$
@@ -460,36 +460,36 @@ L'ÉQUATION DIFFÉRENTIELLE $y' = ay + b$
 #### Exercice 04
 Résoudre les équations différentielles suivantes :
 
-1) \( y' = 2y + 3 \); 2) \( \sqrt{2} y' + \sqrt{2} y = \sqrt{3} \)
-3) \( 3y' + 2y = 4 \); 4) \( y' - (\ln 2)y = \ln 3 \)
+1) $ y' = 2y + 3 $; 2) $ \sqrt{2} y' + \sqrt{2} y = \sqrt{3} $
+3) $ 3y' + 2y = 4 $; 4) $ y' - (\ln 2)y = \ln 3 $
 
 #### Exercice 05
 Déterminer la solution $y$ de l'équation différentielle $(E)$ qui vérifie la condition initiale $y_0 = y(x_0)$ pour chacun des cas suivants :
 
 1) $(E) : 2y' + 5y = \frac{1}{2}$ et $x_0 = -1$ et $y_0 = 2$
 
-2) \((E): 3y' - 4y = \sqrt{2}\) et \(x_0 = -2\) et \(y_0 = -3\)
-3) \((E): y' \ln 2 + y = \ln 8\) et \(x_0 = \ln 2\) et \(y_0 = \frac{1}{e}\)
+2) $(E): 3y' - 4y = \sqrt{2}$ et $x_0 = -2$ et $y_0 = -3$
+3) $(E): y' \ln 2 + y = \ln 8$ et $x_0 = \ln 2$ et $y_0 = \frac{1}{e}$
 
 L'ÉQUATION DIFFÉRENTIELLE $y'' + ay' + by = 0$
 
 #### Exercice 06
 Résoudre les équations différentielles suivantes :
 
-1) \( y'' + 2y' - 3y = 0 \); 2) \( y'' + 3y' - 4y = 0 \)
-3) \( y'' - y' - 2y = 0 \); 4) \( y'' + 10y' + 25y = 0 \)
-5) \( y'' + 6y' + \frac{5}{2} y = 0 \); 6) \( y'' - \sqrt{3} y' + \frac{3}{4} y = 0 \)
-7) \(2y^{\prime \prime} - 2\sqrt{3} y^{\prime} = 0\) 8) \(4y^{\prime \prime} + 25y = 0\)
-9) \(5y^{\prime \prime} - 4y = 0\) 10) \(-2y^{\prime \prime} - \sqrt{3} y^{\prime} + y = 0\)
+1) $ y'' + 2y' - 3y = 0 $; 2) $ y'' + 3y' - 4y = 0 $
+3) $ y'' - y' - 2y = 0 $; 4) $ y'' + 10y' + 25y = 0 $
+5) $ y'' + 6y' + \frac{5}{2} y = 0 $; 6) $ y'' - \sqrt{3} y' + \frac{3}{4} y = 0 $
+7) $2y^{\prime \prime} - 2\sqrt{3} y^{\prime} = 0$ 8) $4y^{\prime \prime} + 25y = 0$
+9) $5y^{\prime \prime} - 4y = 0$ 10) $-2y^{\prime \prime} - \sqrt{3} y^{\prime} + y = 0$
 
 #### Exercice 07
 Déterminer la solution $y$ de l'équation différentielle $(E)$ qui vérifie les conditions initiales données pour chacun des cas suivants :
 
-1) \((E): 2y'' - 3y' - 2y = 0\) et \(y(0) = 1\) et \(y'(0) = 1\)
-2) \((E): 2y'' + 3y' + y = 0\) et \(y(0) = -1\) et \(y'(0) = 2\)
-3) \((E): y'' - 6y' + 9y = 0\) et \(y(-1) = 1\) et \(y'(-1) = 3\)
-4) \((E): y'' + \pi^2 y = 0\) et \(y(1) = 1\) et \(y(1) = -1\)
-5) \((E): y'' - 16y = 0\) et \(y(0) = 1\) et \(y'(0) = -1\)
+1) $(E): 2y'' - 3y' - 2y = 0$ et $y(0) = 1$ et $y'(0) = 1$
+2) $(E): 2y'' + 3y' + y = 0$ et $y(0) = -1$ et $y'(0) = 2$
+3) $(E): y'' - 6y' + 9y = 0$ et $y(-1) = 1$ et $y'(-1) = 3$
+4) $(E): y'' + \pi^2 y = 0$ et $y(1) = 1$ et $y(1) = -1$
+5) $(E): y'' - 16y = 0$ et $y(0) = 1$ et $y'(0) = -1$
 
 #### Exercice 08
 1) Résoudre l'équation différentielle :
@@ -506,44 +506,44 @@ b) Étudier les variations de la fonction $g$.
 
 SECTION 1
 
-#### NORDICATION DE L'ÉQUATION DIFFÉRENTIELLE
+#### MODÉLISATION DE L'ÉQUATION DIFFÉRENTIELLE
 
-Soit $f$ une fonction dérivable sur $\mathbb{R}$ et $e^{\prime}$ est courbe représentative dans un repère orthonormé $(O, \bar{l}, \bar{j})$.
+Soit $f$ une fonction dérivable sur $\mathbb{R}$ et $\mathcal{C}_f$ est courbe représentative dans un repère orthonormé $(O, \vec{i}, \vec{j})$.
 
 Déterminer la fonction $f$ vérifiant les deux conditions :
 
-a) Pour tout \(x \in \mathbb{R} : f(x) = -5f'(x)\)
-b) \(A(-2,1)\) est un point de la courbe \(\mathcal{C}\)
+a) Pour tout $x \in \mathbb{R} : f(x) = -5f'(x)$
+b) $A(-2,1)$ est un point de la courbe $\mathcal{C}$
 
 On considère l'équation différentielle suivante :
 
 $$(E) : 4y^2 + x^2y = 0$$
 
-1) Resoudre I'equation differentielle \((E)\)
-2) Determiner la fonction \( g \) solution de l'equation \( (E) \) verifiant les deux conditions suivantes:
+1) Resoudre I'equation differentielle $(E)$
+2) Determiner la fonction $ g $ solution de l'equation $ (E) $ verifiant les deux conditions suivantes:
 
-a) $A\left(\frac{1}{2}, \frac{\sqrt{2}}{2}\right)$ est un point de la courbe $e^{\prime}_e$ de $g$ dans un repère orthonormé $(O, \bar{l}, \bar{j})$.
+a) $A\left(\frac{1}{2}, \frac{\sqrt{2}}{2}\right)$ est un point de la courbe $\mathcal{C}_g$ de $g$ dans un repère orthonormé $(O, \vec{i}, \vec{j})$.
 
-b) $e^{\prime}_e$ admet une tangente horizontale en $A$.
+b) $\mathcal{C}_g$ admet une tangente horizontale en $A$.
 
 On considère l'équation différentielle :
 
 $$(E) : y' - 2y = e^{2x}$$
 
-1) Montrer que la fonction \( u: x \mapsto xe^{2x} \) est une solution de l'equation \( (E) \).
-2) Resoudre I'equation differentielle: \(\left(E_{n}\right):y^{\prime} - 2y = 0\)
-3) Soit \( f \) une fonction définie et dérivable sur \( \mathbb{R} \). Montrer que la fonction \( f \) est une solution de \( (E) \) si, et seulement si, la fonction \( (f - u) \) est solution de l'équation différentielle \( (E_0) \).
-4) En déduire les solutions de l'equation \((E)\).
-5) Determiner la solution \( g \) de \( (E) \) telle que: \( g(0) = 1 \)
+1) Montrer que la fonction $ u: x \mapsto xe^{2x} $ est une solution de l'equation $ (E) $.
+2) Resoudre I'equation differentielle: $\left(E_{n}\right):y^{\prime} - 2y = 0$
+3) Soit $ f $ une fonction définie et dérivable sur $ \mathbb{R} $. Montrer que la fonction $ f $ est une solution de $ (E) $ si, et seulement si, la fonction $ (f - u) $ est solution de l'équation différentielle $ (E_0) $.
+4) En déduire les solutions de l'equation $(E)$.
+5) Determiner la solution $ g $ de $ (E) $ telle que: $ g(0) = 1 $
 
 On considère l'équation différentielle :
 
 $$(E) : 2y' + 3y = 6x^2 - 7x + 2$$
 
-1) Montrer que I'equation \((E)\) admet une solution \(u\) de la forme: \(u: x \mapsto ax^2 + bx + c\)
-2) Resoudre I'equation differentielle: \(\left(E_{n}\right): 2y^{\prime} + 3y = 0\)
-3) Soit \( f \) une fonction définie et dérivable sur \( \mathbb{R} \). Montrer que la fonction \( f \) est une solution de \( (E) \) si, et seulement si, la fonction \( (f - u) \) est solution de l'équation différentielle \( (E_0) \).
-4) En déduire les solutions de l'equation \((E)\).
+1) Montrer que I'equation $(E)$ admet une solution $u$ de la forme: $u: x \mapsto ax^2 + bx + c$
+2) Resoudre I'equation differentielle: $\left(E_{n}\right): 2y^{\prime} + 3y = 0$
+3) Soit $ f $ une fonction définie et dérivable sur $ \mathbb{R} $. Montrer que la fonction $ f $ est une solution de $ (E) $ si, et seulement si, la fonction $ (f - u) $ est solution de l'équation différentielle $ (E_0) $.
+4) En déduire les solutions de l'equation $(E)$.
 
 On considère l'équation différentielle :
 
@@ -561,9 +561,9 @@ Soit $f$ une fonction numérique dérivable sur $\mathbb{R}$ telle que pour tout
 
 $$f(x) \neq 0 \quad \text{et} \quad f'(x) = f(x)(1 - f(x))$$
 
-1) On pose \( g = \frac{1}{f} \). Montrer que la fonction \( g \) est solution de l'equation différentielle: \( (E): y' = -y + 1 \)
-2) Resoudre I'equation differentielle \((E)\)
-3) En déduire toutes les fonctions \( f \).
+1) On pose $ g = \frac{1}{f} $. Montrer que la fonction $ g $ est solution de l'equation différentielle: $ (E): y' = -y + 1 $
+2) Resoudre I'equation differentielle $(E)$
+3) En déduire toutes les fonctions $ f $.
 
 #### Exercice 15
 On considère l'équation différentielle :
@@ -687,11 +687,11 @@ On considère l'équation différentielle :
 
 $$(E) : y'' - y' - 2y = (-6x - 4)e^{-4}$$
 
-1) Résoudre l'équation: \((E_0): y'' - y' - 2y = 0\)
-2) Démontré que la fonction \( u \) définie sur \( \mathbb{R} \) par \( u(x) = (x^2 + 2x)e^{-4} \) est une solution de \( (E) \).
-3) Soit \( f \) une fonction définie et dérivable sur \( \mathbb{R} \). Montré que la fonction \( f \) est une solution de \( (E) \) si, et seulement si, la fonction \( (f - u) \) est solution de l'équation différentielle \( (E_0) \).
-4) En déduire l'ensemble des solutions de \((E)\).
-5) Détérminer la solution \( g \) de \( (E) \) vérifier les conditions initiales: \( g(0) = g'(0) = 1 \).
+1) Résoudre l'équation: $(E_0): y'' - y' - 2y = 0$
+2) Démontré que la fonction $ u $ définie sur $ \mathbb{R} $ par $ u(x) = (x^2 + 2x)e^{-4} $ est une solution de $ (E) $.
+3) Soit $ f $ une fonction définie et dérivable sur $ \mathbb{R} $. Montré que la fonction $ f $ est une solution de $ (E) $ si, et seulement si, la fonction $ (f - u) $ est solution de l'équation différentielle $ (E_0) $.
+4) En déduire l'ensemble des solutions de $(E)$.
+5) Détérminer la solution $ g $ de $ (E) $ vérifier les conditions initiales: $ g(0) = g'(0) = 1 $.
 
 #### Exercice 24
 Une citerne calorifugée chauffée par une résistance à sa température $\theta(t)$ (en $^\circ$C) l'instant $t$ (en $s$) vérifie l'équation différentielle $(E) : y' = a - by$ avec :
@@ -699,33 +699,33 @@ Une citerne calorifugée chauffée par une résistance à sa température $\thet
 $$a = 2,088 \times 10^{-2} \text{ et } b = 2,32 \times 10^{-4}.$$
 
 1) Résoudre l'équation différentielle.
-2) En déduire l'expression de \(\theta(t)\) en fonction de \(t\) sachant que \(\theta(0) = 20\).
-3) Au bout de combien de temps la température atteint-elle \(80^{\circ}C?\)
-
-#### Exercice 24
-L'étude d'un mouvement a montré que la vitesse exprimée, en mètres par seconde est une fonction dérivable $y$ de la variable réelle positive $t$ vérifiant l'équation différentielle : $(E) : y' + 2y = 50$
-
-1) Résoudre l'équation différentielle \((E)\).
-2) Sachant que \( y(0) = 0 \), déterminer la vitesse \( y \) en fonction de \( t \).
+2) En déduire l'expression de $\theta(t)$ en fonction de $t$ sachant que $\theta(0) = 20$.
+3) Au bout de combien de temps la température atteint-elle $80^{\circ}C?$
 
 #### Exercice 25
+L'étude d'un mouvement a montré que la vitesse exprimée, en mètres par seconde est une fonction dérivable $y$ de la variable réelle positive $t$ vérifiant l'équation différentielle : $(E) : y' + 2y = 50$
+
+1) Résoudre l'équation différentielle $(E)$.
+2) Sachant que $ y(0) = 0 $, déterminer la vitesse $ y $ en fonction de $ t $.
+
+#### Exercice 26
 L'objet de ce problème est l'étude de la décharge d'un condensateur de capacité $C$ dans un circuit comprenant une résistance $R$ et une inductance $L$. On admet que la
 
 décharge $q$ du condensateur est une fonction du temps qui vérifie :
 
 $$Lq''(t) + Rq'(t) + \frac{1}{C}q(t) = 0$$
 
-1) On donne \( L = 10H \), \( C = 0,2F \) et \( R = 22,5\Omega \). Détérminer la solution \( q \) de l'équation différentielle telle que \( q(0) = 1 \) et \( q'(0) = \frac{13}{4} \).
-2) Soit \( g \) la fonction définie sur \( \mathbb{R}^* \) par:
+1) On donne $ L = 10H $, $ C = 0,2F $ et $ R = 22,5\Omega $. Détérminer la solution $ q $ de l'équation différentielle telle que $ q(0) = 1 $ et $ q'(0) = \frac{13}{4} $.
+2) Soit $ g $ la fonction définie sur $ \mathbb{R}^* $ par:
 
 $$g(t) = -2e^{-2t} + 3e^{-\frac{t}{4}}$$
 
-a) Calculator \(\lim_{t\to \infty}g(t)\)
-b) Calculer \( g'(t) \). Détérminer la valeur exacte de la solution \( \alpha \) de l'équation \( g'(t) = 0 \) puis donner une valeur approchée de \( \alpha \) à \( 10^{-2} \) pres.
-c) Etudier le signe de \( g'(t) \) puis dresser le tableau de variations de la fonction \( g \) sur \( \mathbb{R}^* \).
+a) Calculator $\lim_{t\to \infty}g(t)$
+b) Calculer $ g'(t) $. Détérminer la valeur exacte de la solution $ \alpha $ de l'équation $ g'(t) = 0 $ puis donner une valeur approchée de $ \alpha $ à $ 10^{-2} $ pres.
+c) Etudier le signe de $ g'(t) $ puis dresser le tableau de variations de la fonction $ g $ sur $ \mathbb{R}^* $.
 
-3) Tracer la courbe \(\mathcal{C}_g\) de \(g\) dans un repere orthonorme et sa tangente \(\mathcal{T}\) au point d'abscisse 0.
-4) Utiliser la courbe \(\mathcal{C}\) pour déterminer une valeur approchée à 0,2 seconde pres de l'instant où la charge du condensateur est devenue inférieure à 0,2 coulomb.
+3) Tracer la courbe $\mathcal{C}_g$ de $g$ dans un repere orthonorme et sa tangente $\mathcal{T}$ au point d'abscisse 0.
+4) Utiliser la courbe $\mathcal{C}$ pour déterminer une valeur approchée à 0,2 seconde pres de l'instant où la charge du condensateur est devenue inférieure à 0,2 coulomb.
 
 ## Problèmes de synthèse
 
@@ -799,7 +799,7 @@ $$f(x) = \frac{1}{x^{n+1}} \int_0^t u^n \sin(u) du$$
 
 $$(\forall x \in \mathbb{R}^*) \quad x.f'(x) + (n+1)f(x) = \sin x$$
 
-2) Determiner l'expression de \( f(x) \) pour \( n = 1 \).
+2) Determiner l'expression de $ f(x) $ pour $ n = 1 $.
 3) On considere l'equation differentielle:
 
 $$(E): xy' + 2y = \sin(x) \text{ avec } x \in \mathbb{R}^*$$
@@ -810,10 +810,10 @@ a) Montrer que $y$ est une solution de $(E)$ si, et seulement si, $z$ est une so
 
 $$(E'): xz' + 2z = 0 \text{ avec } x \in \mathbb{R}^*$$
 
-b) Resoudre l'equation differentielle \((E^{\prime})\)
-c) En déduire les solutions de l'equation \((E)\).
+b) Resoudre l'equation differentielle $(E^{\prime})$
+c) En déduire les solutions de l'equation $(E)$.
 
-#### DÉFOND
+#### Devoir 5
 
 Un condensateur de capacité $C$ est chargé sous une tension initiale de 20 volts. Il se décharge ensuite dans un résistor de résistance $R$.
 
@@ -821,17 +821,17 @@ La tension aux bornes du condensateur est une fonction $u$ (du temps) définie s
 
 $$(E): u'(t) + \frac{1}{RC} u(t) = 0$$
 
-1) Determiner toutes les solutions de l'equation différentielle \((E)\).
-2) On rappelle que \( u(0) = 20 \). Détérminer la fonction \( u \). Dans la suite: \( R = 1000\Omega \) et \( C = 10^{-4}\Omega \)
-3) a) Montrer que pour tout \( t \in \mathbb{R}^* \): \( u(t) = 20e^{-10t} \)
-b) Determiner les valeurs de \( t \) pour lesquelles on a: \( u(t) \geq 0.02 \)
+1) Determiner toutes les solutions de l'equation différentielle $(E)$.
+2) On rappelle que $ u(0) = 20 $. Détérminer la fonction $ u $. Dans la suite: $ R = 1000\Omega $ et $ C = 10^{-4}\Omega $
+3) a) Montrer que pour tout $ t \in \mathbb{R}^* $: $ u(t) = 20e^{-10t} $
+b) Determiner les valeurs de $ t $ pour lesquelles on a: $ u(t) \geq 0.02 $
 
-4) L'intensité traversant le circuit est une fonction \( i \) (du temps) définie sur \( [0; +\infty[ \) par: \( i(t) = Cu'(t) \) a) Déterminer \( i(t) \).
-b) L'énergie \( W \) (exprimée en joules) dissipée dans le résistor, entre les instants \( t = 0 \) et \( t = 0.69s \), est égale à \( W = \int_{0}^{0.69} R \cdot i^2(t) dt \).
+4) L'intensité traversant le circuit est une fonction $ i $ (du temps) définie sur $ [0; +\infty[ $ par: $ i(t) = Cu'(t) $ a) Déterminer $ i(t) $.
+b) L'énergie $ W $ (exprimée en joules) dissipée dans le résistor, entre les instants $ t = 0 $ et $ t = 0.69s $, est égale à $ W = \int_{0}^{0.69} R \cdot i^2(t) dt $.
 
 Calculer $W$ à 0,01 près.
 
-#### DÉFOND
+#### Devoir 6
 
 On se propose de déterminer toutes les fonctions $f$ définies et dérivables sur $]0; +\infty[$ vérifiant l'équation différentielle :
 
@@ -841,10 +841,10 @@ $$(E): xf'(x) - (2x+1)f(x) = 8x^2$$
 
 b) Démontrer que si $h$ est solution de $(E')$ alors la fonction $f$ définie par $f(x) = xh(x)$ est solution de $(E)$.
 
-2) Résoudre \((E^{\prime})\) et en déduire toutes les solutions de l'équation différentielle \((E)\).
-3) Existe-il une fonction \( f \) solution de l'equation différentielle \( (E) \) dont la représentation graphique dans un repère donné passse par le point \( A(\ln 2;0) \).
+2) Résoudre $(E^{\prime})$ et en déduire toutes les solutions de l'équation différentielle $(E)$.
+3) Existe-il une fonction $ f $ solution de l'equation différentielle $ (E) $ dont la représentation graphique dans un repère donné passse par le point $ A(\ln 2;0) $.
 
-#### DÉFOND
+#### Devoir 7
 
 **Partie A.**
 1) Trouver trois réels $a, b$ et $c$ tels que :
@@ -878,7 +878,7 @@ d) Donner toutes les solutions de $(E)$ sur $\mathbb{R}^*$.
 e) Déterminer la solution $y$ de $(E)$ vérifiant :
 $y(1) = 0$ et $y'(1) = 2$
 
-#### REVERSE
+#### Devoir 8
 
 Soit $(E)$ l'équation différentielle :
 
@@ -908,7 +908,7 @@ $$(E^*): z''' - 5z'' + 6z' = (2t - 1)e^t$$
 
 vérifiant : $$z'\left(\frac{3}{2}\right) = z''\left(\frac{3}{2}\right) = 0$$
 
-#### DEVOIR SI
+#### Devoir 9
 
 Soit $S$ l'ensemble des fonctions $f$ définies et dérivables sur $\mathbb{R}$ et qui vérifient la condition suivante :
 
