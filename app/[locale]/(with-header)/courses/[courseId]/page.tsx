@@ -134,6 +134,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
           activeId={view.id}
           viewIds={viewIds}
           xpByView={xpByView}
+          cpsByView={cpsByView}
           markVisited={false}
         />
 

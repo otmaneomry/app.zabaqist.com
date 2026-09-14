@@ -92,10 +92,10 @@ export default function DemarrerPage() {
     // switching to SX leaves the SM track on disk until the option step is
     // reached again — restoring the pair unchecked re-enables Continue with a
     // track from the filière the reader has just left.
-    if (
-      saved.track &&
-      (!saved.filiere || FILIERE_TRACKS[saved.filiere]?.includes(saved.track))
-    )
+    // A filière is REQUIRED for a track to mean anything. `!saved.filiere ||`
+    // let a stored `{"track":"bogus"}` through on a page anyone can reach,
+    // enabling Continue and writing a choice with no filière behind it.
+    if (saved.filiere && saved.track && FILIERE_TRACKS[saved.filiere]?.includes(saved.track))
       setTrack(saved.track)
     setRestored(true)
   }, [])

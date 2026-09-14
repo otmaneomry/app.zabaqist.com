@@ -50,9 +50,16 @@ export default async function WithHeaderLayout({
       const { data: allowed, error } = await supabase.rpc('is_email_allowed', {
         addr: account.email,
       })
-      // A check that FAILED is not a refusal — the same distinction the
-      // callback makes. A database hiccup must not throw out an invited
-      // student mid-session.
+      // This FAILS OPEN, and `app/auth/callback/route.ts` fails CLOSED on the
+      // identical error. That asymmetry is deliberate, and an earlier version
+      // of this comment was simply wrong to call them the same.
+      //
+      // The callback is the door: refusing there costs an invited student one
+      // retry, and they are told why. This runs on every page of a session
+      // already open, so refusing here would throw a student out mid-chapter
+      // because a lookup timed out. Since 0004 the guest list is enforced
+      // before an account can even be created, so what survives a failed check
+      // here is an account that already existed — not a new way in.
       if (!error && allowed === false) {
         // NOT `signOut()` here. A server component cannot write cookies —
         // `lib/supabase/server.ts` swallows the attempt by design — so the

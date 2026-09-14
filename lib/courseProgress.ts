@@ -20,6 +20,17 @@ export interface CheckpointState {
   tried: boolean
   verdict: Verdict | null
   hints: number
+  /**
+   * When this attempt was last touched, ISO.
+   *
+   * The sync used to stamp every checkpoint it pushed with the current time,
+   * including ones nothing had changed. Migration 0006 decides which side of a
+   * merge wins by date, so a tab that had been open since before "Réessayer"
+   * could reconnect, have its stale draft stamped `now`, and resurrect the
+   * attempt the student had just abandoned. The row has to carry the moment it
+   * actually changed, not the moment it was uploaded.
+   */
+  at?: string
 }
 
 export const EMPTY_CHECKPOINT: CheckpointState = {
@@ -67,7 +78,10 @@ export function readCheckpoint(key: string): CheckpointState {
 export function writeCheckpoint(key: string, state: CheckpointState): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(key, JSON.stringify(state))
+    localStorage.setItem(
+      key,
+      JSON.stringify({ ...state, at: new Date().toISOString() }),
+    )
     // A plain `storage` event does not fire in the tab that wrote it, so the
     // progress bar on the same page needs an explicit nudge.
     window.dispatchEvent(new Event('zabaqist:progress'))

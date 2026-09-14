@@ -336,18 +336,57 @@ let inFlight: Promise<void> = Promise.resolve()
  * second and put the server back.
  */
 export function pushAll(userId: string, email: string): Promise<void> {
-  inFlight = inFlight.catch(() => {}).then(() => pushNow(userId, email))
+  // Read the stores NOW, not when the queue reaches us.
+  //
+  // `pushNow` used to read them at the moment it ran, which is fine until two
+  // things added on the same day meet: the queue above, and `claimDevice`
+  // wiping and repopulating those same stores when a DIFFERENT student signs
+  // in. A push queued for A, running after B has claimed the device, read B's
+  // work and filed it under A. Capturing here makes the snapshot belong to the
+  // account that asked for it.
+  const snapshot = {
+    owner: readOwner(),
+    filiere: readJSON<FiliereChoice | null>(FILIERE_KEY, null),
+    onboarding: readJSON<Answers>(ONBOARDING_KEY, {}),
+    progress: readJSON<Record<string, CourseProgress>>(PROGRESS_KEY, {}),
+    activity: readJSON<Record<string, DayActivity>>(ACTIVITY_KEY, {}),
+    checkpoints: localCheckpoints(),
+  }
+  inFlight = inFlight.catch(() => {}).then(() => pushNow(userId, email, snapshot))
   return inFlight
 }
 
-async function pushNow(userId: string, email: string): Promise<void> {
+type Snapshot = {
+  owner: string | null
+  filiere: FiliereChoice | null
+  onboarding: Answers
+  progress: Record<string, CourseProgress>
+  activity: Record<string, DayActivity>
+  checkpoints: ReturnType<typeof localCheckpoints>
+}
+
+/** Whose work is in localStorage right now, or null on a fresh device. */
+function readOwner(): string | null {
+  try {
+    return localStorage.getItem(OWNER_KEY)
+  } catch {
+    return null
+  }
+}
+
+async function pushNow(
+  userId: string,
+  email: string,
+  snap: Snapshot,
+): Promise<void> {
+  // The device changed hands between the queue and here. The snapshot is one
+  // student's work and `userId` is another's; sending it would be the very
+  // thing `claimDevice` exists to prevent.
+  if (snap.owner !== null && snap.owner !== userId) return
+
   const supabase = createClient()
 
-  const filiere = readJSON<FiliereChoice | null>(FILIERE_KEY, null)
-  const onboarding = readJSON<Answers>(ONBOARDING_KEY, {})
-  const progress = readJSON<Record<string, CourseProgress>>(PROGRESS_KEY, {})
-  const activity = readJSON<Record<string, DayActivity>>(ACTIVITY_KEY, {})
-  const checkpoints = localCheckpoints()
+  const { filiere, onboarding, progress, activity, checkpoints } = snap
   const now = new Date().toISOString()
 
   const jobs: PromiseLike<unknown>[] = []
@@ -386,7 +425,11 @@ async function pushNow(userId: string, email: string): Promise<void> {
     tried: c.state.tried ?? false,
     verdict: c.state.verdict,
     hints: c.state.hints ?? 0,
-    updated_at: now,
+    // When the ATTEMPT changed, not when it was uploaded. Stamping `now` on
+    // every checkpoint made migration 0006's date rule meaningless: a tab open
+    // since before "Réessayer" would reconnect, have its stale draft dated to
+    // this instant, and win the merge it should have lost.
+    updated_at: c.state.at ?? now,
   }))
   if (cpRows.length) jobs.push(supabase.from('checkpoints').upsert(cpRows))
 
