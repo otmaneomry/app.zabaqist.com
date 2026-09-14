@@ -11,6 +11,18 @@
  * routing an avatar through the optimiser means either allow-listing a Google
  * domain in next.config or a build-time failure the first time someone signs in
  * with a photo.
+ *
+ * ── The fallback has to cover a photo that FAILS, not only one that is absent ─
+ * `image ? <img> : initial` treats "Google gave us no URL" as the only way to
+ * end up without a picture. A URL that is present and does not load — an ad
+ * blocker or privacy extension refusing `googleusercontent.com`, a phone with
+ * no signal, an expired link — left the browser's own broken-image glyph inside
+ * a 36px circular button: a grey or blue box with a question mark in it, which
+ * is precisely the "looks broken" this component's fallback exists to avoid.
+ * Verified from the outside first: Google answers that URL 200 with
+ * `access-control-allow-origin: *` under every request shape, and this app
+ * sends no CSP or COEP that could block it, so the failure is in the reader's
+ * browser and nothing here can prevent it — only stop it from showing.
  */
 
 import React, { useEffect, useRef, useState } from 'react'
@@ -30,6 +42,10 @@ export default function AccountMenu({
 }) {
   const t = useTranslations('auth')
   const [open, setOpen] = useState(false)
+  // Set when the photo fails to load, so the initial takes over. Keyed by the
+  // URL: a student who signs in as someone else must not inherit the previous
+  // account's failure.
+  const [brokenSrc, setBrokenSrc] = useState<string | null>(null)
   const box = useRef<HTMLDivElement>(null)
 
   // Close on an outside click or Escape — a menu that can only be dismissed by
@@ -60,9 +76,20 @@ export default function AccountMenu({
         aria-label={t('account')}
         className="block size-9 overflow-hidden rounded-full border border-zb-line bg-zb-mint-soft transition-shadow hover:shadow-[var(--zb-shadow-sm)]"
       >
-        {image ? (
+        {image && brokenSrc !== image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={image} alt="" width={36} height={36} className="size-full object-cover" />
+          <img
+            src={image}
+            alt=""
+            width={36}
+            height={36}
+            className="size-full object-cover"
+            // Google serves these with `access-control-allow-origin: *` and no
+            // referer requirement, but some hosts 403 a hotlinked avatar and
+            // the referer buys us nothing either way.
+            referrerPolicy="no-referrer"
+            onError={() => setBrokenSrc(image)}
+          />
         ) : (
           <span className="grid size-full place-items-center text-sm font-bold text-zb-mint-deep">
             {initial}

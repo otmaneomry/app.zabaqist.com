@@ -605,7 +605,23 @@ let inFlight: Promise<void> = Promise.resolve()
  * the air at once, and the one that started with the OLDER snapshot could land
  * second and put the server back.
  */
-export function pushAll(userId: string, email: string): Promise<void> {
+/**
+ * What Google told us about the person, as the header already draws it.
+ *
+ * Not device state, so it is NOT part of the snapshot below: it comes from the
+ * session on the server and is the same on every device the student signs in
+ * on. It is passed through rather than read here because `lib/supabase/client`
+ * has no session to read it from.
+ */
+export type Identity = { name: string | null; avatar: string | null }
+
+const NO_IDENTITY: Identity = { name: null, avatar: null }
+
+export function pushAll(
+  userId: string,
+  email: string,
+  identity: Identity = NO_IDENTITY,
+): Promise<void> {
   // Sealed means another account has taken this device while this tab was still
   // open. Whatever is in storage now is theirs, and the snapshot below would
   // read it.
@@ -627,7 +643,9 @@ export function pushAll(userId: string, email: string): Promise<void> {
     activity: readJSON<Record<string, DayActivity>>(ACTIVITY_KEY, {}),
     checkpoints: localCheckpoints(),
   }
-  inFlight = inFlight.catch(() => {}).then(() => pushNow(userId, email, snapshot))
+  inFlight = inFlight
+    .catch(() => {})
+    .then(() => pushNow(userId, email, identity, snapshot))
   return inFlight
 }
 
@@ -656,6 +674,7 @@ const UNDATED = new Date(0).toISOString()
 async function pushNow(
   userId: string,
   email: string,
+  identity: Identity,
   snap: Snapshot,
 ): Promise<void> {
   // The device changed hands between the queue and here. The snapshot is one
@@ -674,10 +693,24 @@ async function pushNow(
   // Upsert, not update: an account that signed in before the schema existed
   // never fired the profile trigger, so an update would write to no row at all
   // — and say nothing about it.
+  //
+  // `full_name` and `avatar_url` are sent because THIS upsert is what creates
+  // the row for such an account, and `handle_new_user` fires only on `auth.users`
+  // INSERT — which will never happen again for someone who already has an
+  // account. A profile deleted during testing, or created before those columns
+  // existed, was recreated here with both fields null and nothing ever filled
+  // them: the app was reading the name and the photo out of the session to draw
+  // the header, and dropping them on the way to the table.
+  //
+  // Null is safe to send. `profiles_merge` (0006, clamped in 0007) resolves
+  // them with `coalesce(new, old)`, so a device that has no identity to offer
+  // cannot blank one another device already stored.
   jobs.push(
     supabase.from('profiles').upsert({
       id: userId,
       email,
+      full_name: identity.name,
+      avatar_url: identity.avatar,
       filiere: (filiere?.filiere ?? null) as Filiere | null,
       track: (filiere?.track ?? null) as Track | null,
       onboarding,

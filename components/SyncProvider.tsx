@@ -36,9 +36,21 @@ const DEBOUNCE_MS = 1500
 export default function SyncProvider({
   userId,
   email,
+  name = null,
+  avatar = null,
 }: {
   userId: string
   email: string
+  /**
+   * What Google told the server about this person, as the header draws it.
+   *
+   * Passed in rather than read here: the browser client has no session to read
+   * it from, and `profiles.full_name` / `avatar_url` are otherwise written by
+   * nothing at all once an account exists — `handle_new_user` fires only on
+   * `auth.users` INSERT, which never happens twice.
+   */
+  name?: string | null
+  avatar?: string | null
 }) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Set while the initial pull is writing to localStorage, so the events it
@@ -49,9 +61,9 @@ export default function SyncProvider({
     if (pulling.current || deviceIsSealed()) return
     if (timer.current) clearTimeout(timer.current)
     timer.current = setTimeout(() => {
-      void pushAll(userId, email)
+      void pushAll(userId, email, { name, avatar })
     }, DEBOUNCE_MS)
-  }, [userId, email])
+  }, [userId, email, name, avatar])
 
   useEffect(() => {
     let cancelled = false
@@ -88,7 +100,7 @@ export default function SyncProvider({
         // only if the pull actually finished. Pushing after a partial pull
         // hands the server this device's unmerged copy and deletes the rows the
         // pull failed to read.
-        if (!cancelled && complete) void pushAll(userId, email)
+        if (!cancelled && complete) void pushAll(userId, email, { name, avatar })
       }
     })()
 
@@ -141,7 +153,7 @@ export default function SyncProvider({
         !pulling.current &&
         !deviceIsSealed()
       )
-        void pushAll(userId, email)
+        void pushAll(userId, email, { name, avatar })
     }
     document.addEventListener('visibilitychange', onHide)
 
@@ -153,7 +165,7 @@ export default function SyncProvider({
       window.removeEventListener('storage', onOwnerChanged)
       document.removeEventListener('visibilitychange', onHide)
     }
-  }, [userId, email, push])
+  }, [userId, email, name, avatar, push])
 
   return null
 }

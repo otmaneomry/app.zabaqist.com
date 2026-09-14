@@ -106,8 +106,18 @@ export default async function WithHeaderLayout({
       {/* Only for a real session. A request through the e2e bypass has no
           `auth.uid()`, so every RLS policy would refuse it and the sync would
           retry forever against a database that is right to say no. */}
+      {/* The same two fields the header draws, sent on to `profiles`. They
+          were being read here and nowhere else: `handle_new_user` fills them
+          only when `auth.users` gains a row, which never happens twice, so any
+          account whose profile was recreated later — by the sync's own upsert —
+          kept a null name and a null photo for good. */}
       {account?.email && (
-        <SyncProvider userId={account.id} email={account.email} />
+        <SyncProvider
+          userId={account.id}
+          email={account.email}
+          name={user?.name ?? null}
+          avatar={user?.image ?? null}
+        />
       )}
       <Header user={user} />
       <main>{children}</main>
