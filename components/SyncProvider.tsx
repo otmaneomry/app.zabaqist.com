@@ -152,8 +152,13 @@ export default function SyncProvider({
         document.visibilityState === 'hidden' &&
         !pulling.current &&
         !deviceIsSealed()
-      )
+      ) {
+        // The flush makes any scheduled push redundant; leaving the timer
+        // running sent a second one a moment later, from a tab the student
+        // has already left.
+        if (timer.current) clearTimeout(timer.current)
         void pushAll(userId, email, { name, avatar })
+      }
     }
     document.addEventListener('visibilitychange', onHide)
 

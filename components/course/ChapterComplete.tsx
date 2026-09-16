@@ -19,7 +19,7 @@
  * every visit is wallpaper.
  */
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { Khatam } from '@/components/landing/Zellige'
@@ -43,17 +43,27 @@ export default function ChapterComplete({
   // depend on the joined key rather than the identity. Hoisted because a
   // dependency has to be a plain expression, not a call.
   const idsKey = viewIds.join(',')
+  /**
+   * The once, when storage cannot hold it.
+   *
+   * The catch below said "celebrate this once, in memory" and there was no
+   * memory: in private mode the write throws, nothing records that the
+   * chapter was celebrated, and every later `zabaqist:progress` event re-ran
+   * this and re-opened the dialog the reader had just dismissed.
+   */
+  const celebrated = useRef(false)
 
   const check = useCallback(() => {
     const seen = getCourseProgress(slug)?.completedTabs ?? []
     const done = viewIds.every((id) => seen.includes(id))
-    if (!done) return
+    if (!done || celebrated.current) return
     try {
       if (localStorage.getItem(seenKey(slug))) return
       localStorage.setItem(seenKey(slug), new Date().toISOString())
     } catch {
-      /* storage unavailable — celebrate this once, in memory */
+      /* storage unavailable — the ref below is the only record there will be */
     }
+    celebrated.current = true
     // The points the chapter advertises on its own card ("… · 400 points"),
     // paid in full for finishing it. XP pays for COMPLETION — scoring the
     // celebration on checkpoints attempted would hand a reader who read all 33

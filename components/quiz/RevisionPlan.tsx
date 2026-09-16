@@ -324,9 +324,9 @@ export default function RevisionPlan({ chapters }: { chapters: ChapterCheck[] })
         {/* Nothing judged anywhere: one clear way in, under the map it refers
             to, rather than a box occupying the fold before the reader has seen
             what the page is. */}
-        {judged === 0 && (
+        {judged === 0 && chapters[0] && (
           <Link
-            href={`/quiz/${chapters[0]?.slug ?? ''}`}
+            href={`/quiz/${chapters[0].slug}`}
             className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-zb-mint px-6 text-[15px] font-bold text-white no-underline shadow-[0_3px_0_0_var(--zb-mint-deep),var(--zb-shadow-sm)] transition-colors hover:bg-zb-mint-deep"
           >
             {t('emptyCta')}

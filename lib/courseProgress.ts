@@ -247,9 +247,18 @@ export function rememberCourseShape(
   try {
     const all = readShapes()
     const ids = Object.keys(xpByView)
-    // Cheap equality: same count and same total is the same chapter.
+    // Same ids, same points. The comment said "same count and same total" and
+    // the code compared the count alone, so a chapter republished with the
+    // same NUMBER of sections — renamed ids, retuned XP, a section swapped for
+    // another — kept the old shape for ever, and every percentage derived from
+    // it (`readSectionCount`, `totalXp`, the dashboard) stayed wrong with
+    // nothing to show for it.
     const prev = all[slug]
-    if (prev && Object.keys(prev).length === ids.length) {
+    const unchanged =
+      prev !== undefined &&
+      Object.keys(prev).length === ids.length &&
+      ids.every((id) => prev[id] === xpByView[id])
+    if (unchanged) {
       if (cpsByView) rememberCheckpointCounts(slug, cpsByView)
       return
     }

@@ -760,7 +760,14 @@ async function pushNow(
     last_visited_view: p.lastVisitedTab || null,
     completed_views: p.completedTabs ?? [],
     time_spent_seconds: p.timeSpent ?? 0,
-    updated_at: now,
+    // When the chapter was last worked on, not when this device happened to
+    // connect — the same rule the checkpoints below follow. Stamping `now`
+    // re-dated every chapter on every push, so `lastUpdated` came back from a
+    // pull meaning "the last time anything synced" for all of them at once,
+    // and the "most recent course" ordering it is documented to serve had
+    // nothing left to order by. 0006 takes `greatest(new, old)`, so sending
+    // the older, truer date cannot move the server backwards.
+    updated_at: p.lastUpdated || now,
   }))
   if (progressRows.length)
     jobs.push(supabase.from('course_progress').upsert(progressRows))
