@@ -11,10 +11,15 @@
  * Postgres (`public.allowed_emails`) rather than in the code, so adding a
  * tester is one row and not a deployment.
  *
- * Every outcome is written to `public.auth_events`. Until it was, an invited
- * account that could not get in left no trace at all — not the address it
- * tried, not the reason — so the only evidence was a screenshot of the refusal
- * and a person saying "but I am on the list".
+ * Every outcome OF THE CHECK is written to `public.auth_events` — allowed,
+ * denied, and the check itself failing. Until it was, an invited account that
+ * could not get in left no trace at all — not the address it tried, not the
+ * reason — so the only evidence was a screenshot of the refusal and a person
+ * saying "but I am on the list".
+ *
+ * The two exits above it are not logged and cannot be: arriving with no
+ * `code`, and Supabase being unconfigured, both happen before there is a
+ * client to write with or an address to write down.
  */
 
 import { NextResponse, type NextRequest } from 'next/server'

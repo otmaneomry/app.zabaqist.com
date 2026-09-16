@@ -27,10 +27,12 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   // Send the origin to other sites, never the full path a student is reading.
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  // Nothing here needs a camera, a microphone or a location.
+  // Nothing here needs a camera, a microphone or a location. `interest-cohort`
+  // is gone from this list: it was the FLoC opt-out, and FLoC was removed from
+  // Chromium in 2022 — a directive no browser has read since.
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    value: 'camera=(), microphone=(), geolocation=()',
   },
 ]
 

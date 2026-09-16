@@ -195,16 +195,12 @@ export function windowFor(
   }
 }
 
-/** Totals across the whole recorded history. */
 /** A day counts as worked if anything at all was logged on it. */
 const worked = (d?: DayActivity) =>
   !!d && (d.sections > 0 || d.checkpoints > 0 || d.seconds > 0)
 
-const shift = (d: Date, days: number) => {
-  const n = new Date(d)
-  n.setDate(n.getDate() + days)
-  return n
-}
+/** `addDays` under the name the streak code reads better with. */
+const shift = addDays
 
 export interface WeekDay {
   key: string
@@ -282,6 +278,7 @@ export function longestStreak(): number {
   return best
 }
 
+/** Totals across the whole recorded history. */
 export function lifetime(): DayActivity & { days: number } {
   const log = readLog()
   const days = Object.keys(log).length

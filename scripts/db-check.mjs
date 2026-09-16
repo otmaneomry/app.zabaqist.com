@@ -161,6 +161,38 @@ const names = Object.keys(tables)
 
 check(names.length > 0, 'fail', 'sql-parsed', 'no CREATE TABLE found in supabase/migrations/')
 
+/**
+ * Can the profile trigger refuse a signup?
+ *
+ * `public.profiles.email` is `not null` (0001) and `handle_new_user` inserts
+ * `new.email` from an AFTER trigger on `auth.users` — so an account with no
+ * address does not fail to get a profile, it fails to be CREATED: the
+ * exception rolls back GoTrue's own insert. Google always sends an address,
+ * which is the only reason this has never happened; adding a provider that
+ * does not would break the first signup through it, and the trail would lead
+ * back to a not-null constraint written years earlier.
+ *
+ * Declared, not probed. The only honest live test is to create a user with no
+ * email, which is a write, and this script does not write. What it can do is
+ * refuse to let the guard be dropped again: 0009 is the last definition of
+ * this function, so it is the one whose body has to carry the early return.
+ */
+{
+  const defs = [...sql.matchAll(
+    /create or replace function public\.handle_new_user[\s\S]*?\$\$;/gi,
+  )].map((m) => m[0])
+  if (defs.length === 0)
+    check(false, 'fail', 'profile-trigger-declared',
+      'supabase/migrations declares no public.handle_new_user',
+      'nothing would fill a profile from the identity Google returns')
+  else
+    check(/if\s+new\.email\s+is\s+null\s+then/i.test(defs[defs.length - 1]),
+      'fail', 'profile-trigger-null-email',
+      'the last public.handle_new_user has no null-email guard',
+      'profiles.email is `not null` and this is an AFTER trigger, so a signup' +
+      ' with no address would be rolled back — the account could not be created')
+}
+
 for (const t of names) {
   // The LAST word wins. Migrations are concatenated in order, so a later
   // `DISABLE ROW LEVEL SECURITY` is what the database ends up with — and a test

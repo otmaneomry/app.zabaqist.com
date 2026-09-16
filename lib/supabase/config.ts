@@ -14,9 +14,9 @@
  * completely ordinary thing to do, so the software should say so plainly
  * instead of retrying a request that can never succeed.
  *
- * `configured()` returns false for anything unusable, and the callers treat
- * that as "nobody is signed in" — the same fail-closed path as an unset
- * variable, which the public pages already survive.
+ * `supabaseConfig()` returns `ok: false` for anything unusable, and the
+ * callers treat that as "nobody is signed in" — the same fail-closed path as
+ * an unset variable, which the public pages already survive.
  */
 
 const URL_ = process.env.NEXT_PUBLIC_SUPABASE_URL
