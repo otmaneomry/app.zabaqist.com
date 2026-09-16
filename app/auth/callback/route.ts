@@ -62,6 +62,22 @@ export async function GET(request: NextRequest) {
   // normalises both sides, so `omry.otmane@` and `omryotmane@` are one account.
   const email = data.user.email
 
+  /**
+   * End the session, whatever the network says.
+   *
+   * Both refusals below sign out before redirecting, and an unhandled
+   * rejection there turns a clean "not yet invited" into a 500 — on the path
+   * whose whole job is to explain itself to someone who has just come back
+   * from Google.
+   */
+  const endSession = async () => {
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      /* the cookies expire on their own; the redirect below still lands */
+    }
+  }
+
   /** Never let the journal break a sign-in that would otherwise work. */
   const log = async (event: string, detail: Record<string, unknown> = {}) => {
     try {
@@ -88,14 +104,14 @@ export async function GET(request: NextRequest) {
       code: checkError.code ?? null,
       message: checkError.message ?? null,
     })
-    await supabase.auth.signOut()
+    await endSession()
     return NextResponse.redirect(`${origin}/signin?error=check-failed`)
   }
 
   if (!allowed) {
     await log('signin_denied', { reason: 'not_on_allowlist' })
     // Do not leave a usable session behind for an address that is not invited.
-    await supabase.auth.signOut()
+    await endSession()
     return NextResponse.redirect(`${origin}/signin?error=not-allowed`)
   }
 

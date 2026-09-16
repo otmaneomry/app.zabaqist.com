@@ -47,15 +47,26 @@ export async function signInWithGoogle(next?: string) {
     process.env.NEXT_PUBLIC_SITE_URL ??
     (forwardedHost ? `${proto}://${forwardedHost}` : '')
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safe)}`,
-      // Ask Google for a fresh account choice rather than silently reusing the
-      // one already signed in on the device. Students share machines.
-      queryParams: { prompt: 'select_account' },
-    },
-  })
+  // The result is destructured below, but the CALL can reject outright — the
+  // auth endpoint is a network hop. Unhandled, that answers the sign-in form
+  // with a server error instead of the message this page already has for
+  // exactly this case. Only the call is wrapped: `redirect()` works by
+  // throwing, so a catch around it would swallow the navigation.
+  let result
+  try {
+    result = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safe)}`,
+        // Ask Google for a fresh account choice rather than silently reusing
+        // the one already signed in on the device. Students share machines.
+        queryParams: { prompt: 'select_account' },
+      },
+    })
+  } catch {
+    redirect('/signin?error=1')
+  }
+  const { data, error } = result
 
   if (error || !data.url) redirect('/signin?error=1')
   redirect(data.url)

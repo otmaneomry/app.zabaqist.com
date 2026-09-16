@@ -39,6 +39,15 @@ import { getCourseProgress } from '@/lib/progressTracking'
 const GRANULARITIES: Granularity[] = ['week', 'month', 'year']
 
 const EMPTY_WINDOW: Window = { label: '', buckets: [] }
+/**
+ * The chart's accessible name lives in the heading above it.
+ *
+ * `role="img"` flattens everything inside into one node, so without a name the
+ * whole activity chart announced itself as an unlabelled image and the numbers
+ * in it were unreachable. Naming it after the heading a sighted reader uses
+ * keeps the two in step, and there is one chart on the page.
+ */
+const CHART_TITLE_ID = 'activity-chart-title'
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
@@ -156,15 +165,22 @@ export default function ProgressDashboard() {
           </button>
         </div>
 
+        {/* A group of toggles, not tabs. `role="tablist"` promises a
+            `tabpanel` for each tab, `aria-controls` linking them and arrow-key
+            navigation between them; none of the three existed, so a screen
+            reader announced a tab interface and then had nowhere to send the
+            reader. These change one number on the page above them, which is
+            what `aria-pressed` describes. */}
         <div
-          role="tablist"
+          role="group"
+          aria-label={t('chartTitle')}
           className="flex rounded-full border border-gray-200 p-1"
         >
           {GRANULARITIES.map((k) => (
             <button
               key={k}
-              role="tab"
-              aria-selected={g === k}
+              type="button"
+              aria-pressed={g === k}
               onClick={() => {
                 setG(k)
                 setOffset(0)
@@ -192,10 +208,17 @@ export default function ProgressDashboard() {
 
       {/* Chart */}
       <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-6 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <h2
+          id={CHART_TITLE_ID}
+          className="mb-6 text-sm font-semibold uppercase tracking-wide text-gray-500"
+        >
           {t('chartTitle')}
         </h2>
-        <ActivityChart buckets={win.buckets} emptyLabel={t('empty')} />
+        <ActivityChart
+          buckets={win.buckets}
+          emptyLabel={t('empty')}
+          labelledBy={CHART_TITLE_ID}
+        />
         {sections === 0 && (
           <p className="mt-2 text-center text-xs text-gray-400">
             {t('emptyHint')}

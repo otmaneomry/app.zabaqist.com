@@ -533,14 +533,26 @@ export async function pullAll(userId: string): Promise<PullResult> {
         ...(local?.completedTabs ?? []),
         ...((row.completed_views ?? []) as string[]),
       ])
-      map[row.course_slug] = {
+      const merged: CourseProgress = {
         courseId: row.course_slug,
         lastVisitedTab: local?.lastVisitedTab || (row.last_visited_view ?? ''),
         completedTabs: [...views],
         lastUpdated: row.updated_at ?? local?.lastUpdated ?? new Date().toISOString(),
         timeSpent: Math.max(local?.timeSpent ?? 0, row.time_spent_seconds ?? 0),
       }
-      changed = true
+      map[row.course_slug] = merged
+      // Only when it actually moved. This said `changed = true` for every row
+      // the server returned, so every pull told `SyncProvider` the interface
+      // was stale and every card, the dashboard and the header re-read on
+      // every mount — the same false alarm the checkpoint block below was
+      // already fixed for, one merge up.
+      if (
+        !local ||
+        local.lastVisitedTab !== merged.lastVisitedTab ||
+        local.timeSpent !== merged.timeSpent ||
+        local.completedTabs.length !== merged.completedTabs.length
+      )
+        changed = true
     }
     kept(writeJSON(PROGRESS_KEY, map))
   }

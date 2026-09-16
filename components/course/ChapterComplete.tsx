@@ -19,7 +19,7 @@
  * every visit is wallpaper.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { Khatam } from '@/components/landing/Zellige'
@@ -52,6 +52,8 @@ export default function ChapterComplete({
    * this and re-opened the dialog the reader had just dismissed.
    */
   const celebrated = useRef(false)
+  const dismiss = useRef<HTMLButtonElement>(null)
+  const titleId = useId()
 
   const check = useCallback(() => {
     const seen = getCourseProgress(slug)?.completedTabs ?? []
@@ -80,12 +82,26 @@ export default function ChapterComplete({
     return () => window.removeEventListener('zabaqist:progress', check)
   }, [check])
 
+  // A full-screen `aria-modal` with no name, no focus and no way out but the
+  // mouse: a screen reader announced "dialog" and read nothing, and the
+  // keyboard stayed behind it on the chapter it had covered.
+  useEffect(() => {
+    if (!open) return
+    dismiss.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open])
+
   if (!open) return null
 
   return (
     <div
       role="dialog"
       aria-modal="true"
+      aria-labelledby={titleId}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-zb-cream px-6 text-center"
     >
       <span aria-hidden className="animate-[pulse_2s_ease-in-out_infinite]">
@@ -102,12 +118,15 @@ export default function ChapterComplete({
         {t('donePoints')}
       </p>
 
-      <h2 className="mt-6 font-display text-3xl font-bold">{t('doneTitle')}</h2>
+      <h2 id={titleId} className="mt-6 font-display text-3xl font-bold">
+        {t('doneTitle')}
+      </h2>
       <p className="mt-3 max-w-sm leading-relaxed text-gray-600">
         {t('doneSub', { sections: viewIds.length })}
       </p>
 
       <button
+        ref={dismiss}
         type="button"
         onClick={() => setOpen(false)}
         className="mt-10 h-14 w-full max-w-[420px] rounded-full bg-zb-ink text-base font-semibold text-white shadow-[0_3px_0_0_var(--zb-mint-deep),var(--zb-shadow-sm)] transition-transform active:translate-y-[2px] active:shadow-[0_1px_0_0_var(--zb-mint-deep)]"

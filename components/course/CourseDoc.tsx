@@ -200,8 +200,20 @@ export default function CourseDoc({
     // A ```geogebra fence is a figure, not code. Everything else stays code.
     code: ({ children, className }) => {
       if (/language-geogebra/.test(className ?? '')) {
-        const spec = parseSpec(textOf(children))
-        return spec ? <GeogebraBlock spec={spec} /> : null
+        const source = textOf(children)
+        const spec = parseSpec(source)
+        // A fence that does not parse used to render NOTHING: the figure the
+        // pedagogue authored disappeared from the chapter with nothing to say
+        // it had been there, which is the one failure nobody would notice.
+        // Showing the source is ugly on purpose — it is addressed to whoever
+        // has to fix it, and `<pre>` keeps the JSON readable.
+        return spec ? (
+          <GeogebraBlock spec={spec} />
+        ) : (
+          <pre className="my-4 overflow-x-auto rounded-lg border border-zb-rose bg-gray-100 p-4 text-xs">
+            {source}
+          </pre>
+        )
       }
       // Inside a fence the `<pre>` below carries the surface; the pill is for
       // `code` spans in running prose.

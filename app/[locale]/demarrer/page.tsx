@@ -203,10 +203,11 @@ function Funnel({ index }: { index: number }) {
 
         {step.id === 'motivation' && (
           <>
-            <h1 className="text-3xl font-bold leading-tight">
+            <h1 id="q-motivation" className="text-3xl font-bold leading-tight">
               {t('motivationTitle')}
             </h1>
             <ChoiceGrid
+              labelledBy="q-motivation"
               choices={motivationChoices}
               value={motivation}
               onChange={(id) => setMotivation(id as Motivation)}
@@ -231,13 +232,14 @@ function Funnel({ index }: { index: number }) {
 
         {step.id === 'filiere' && (
           <>
-            <h1 className="text-3xl font-bold leading-tight">
+            <h1 id="q-filiere" className="text-3xl font-bold leading-tight">
               {t('filiereTitle')}
             </h1>
             <p className="mt-3 leading-relaxed text-gray-600">
               {t('filiereBody')}
             </p>
             <ChoiceGrid
+              labelledBy="q-filiere"
               choices={filiereChoices}
               value={filiere}
               onChange={(id) => {
@@ -250,10 +252,11 @@ function Funnel({ index }: { index: number }) {
 
         {step.id === 'option' && (
           <>
-            <h1 className="text-3xl font-bold leading-tight">
+            <h1 id="q-option" className="text-3xl font-bold leading-tight">
               {t('optionTitle')}
             </h1>
             <ChoiceGrid
+              labelledBy="q-option"
               choices={optionChoices}
               value={track}
               onChange={(id) => setTrack(id as Track)}

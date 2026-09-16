@@ -221,7 +221,13 @@ for (const v of doc.views) {
   const res = await get(url(v.id))
   const html = await res.text()
   if (!res.ok || html.includes('__next_error__')) broken.push(`${v.id} (${res.status})`)
-  if (/\/signin/.test(res.url)) broken.push(`${v.id} (redirected to sign-in)`)
+  // `res.url`, with `redirect: 'manual'`, is the URL REQUESTED — never the
+  // gate's destination — so this read `/courses/…` every time and could not
+  // fire for any section, ever. The Location header is where the gate says
+  // where it is sending someone, and it says something `!res.ok` does not.
+  const sentTo = res.headers.get('location')
+  if (sentTo && /\/signin/.test(sentTo))
+    broken.push(`${v.id} (gate sent it to ${sentTo})`)
 }
 ok(broken.length === 0, `all ${doc.views.length} sections return 200`, broken.join(', '))
 
@@ -686,18 +692,22 @@ section('Progress dashboard')
 
   // The bucket contract: 7 daily / 4 weekly / 12 monthly.
   ok((await bars()) === 7, 'Week draws 7 daily buckets')
-  await pg.getByRole('tab', { name: pr.month }).click()
+  // `button`, not `tab`: the granularity switcher stopped claiming
+  // `role="tablist"` — it has no tabpanels to switch between, only one chart
+  // whose window changes — so these are toggle buttons now. What is asserted
+  // either way is that pressing « Mois » redraws the chart.
+  await pg.getByRole('button', { name: pr.month }).click()
   await pg.waitForTimeout(350)
   ok(
     (await bars()) === 4,
     'Month draws 4 WEEKLY buckets over 28 days, not a calendar month',
   )
-  await pg.getByRole('tab', { name: pr.year }).click()
+  await pg.getByRole('button', { name: pr.year }).click()
   await pg.waitForTimeout(350)
   ok((await bars()) === 12, 'Year draws 12 monthly buckets')
 
   // The only comparison this product makes.
-  await pg.getByRole('tab', { name: pr.week }).click()
+  await pg.getByRole('button', { name: pr.week }).click()
   await pg.waitForTimeout(350)
   const shown = await pg.locator('main, body').first().innerText()
   ok(

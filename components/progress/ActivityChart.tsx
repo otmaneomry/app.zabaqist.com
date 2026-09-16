@@ -16,9 +16,12 @@ import type { Bucket } from '@/lib/activity'
 export default function ActivityChart({
   buckets,
   emptyLabel,
+  labelledBy,
 }: {
   buckets: Bucket[]
   emptyLabel: string
+  /** The id of the heading that names this chart — see `role="img"` below. */
+  labelledBy: string
 }) {
   const max = Math.max(...buckets.map((b) => b.sections), 1)
   const anything = buckets.some((b) => b.sections > 0)
@@ -28,7 +31,11 @@ export default function ActivityChart({
       {/* `items-stretch`, not `items-end`: the columns must be full height for
           a bar's percentage height to resolve against anything. Each column
           then pushes its own bar to the bottom. */}
-      <div className="flex h-44 items-stretch gap-2" role="img">
+      <div
+        className="flex h-44 items-stretch gap-2"
+        role="img"
+        aria-labelledby={labelledBy}
+      >
         {buckets.map((b) => {
           const pct = (b.sections / max) * 100
           return (

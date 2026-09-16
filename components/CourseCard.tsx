@@ -15,7 +15,7 @@
  * `CourseCover` draws the brand's own khatim instead, seeded by the slug.
  */
 
-import React from 'react'
+import React, { useId } from 'react'
 
 import { Link } from '@/i18n/navigation'
 import CourseCover, { type CoverTone } from '@/components/course/CourseCover'
@@ -40,6 +40,8 @@ export default function CourseCard({
   tone = 'neutral',
   progress,
 }: CourseCardProps) {
+  const titleId = useId()
+  const pct = Math.min(100, Math.max(0, Math.round(progress ?? 0)))
   const body = (
     <>
       <div className="mx-auto mb-3 w-16 transition-transform duration-200 group-hover:scale-105">
@@ -48,18 +50,25 @@ export default function CourseCard({
       <p className="mb-1 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-zb-mint-deep">
         {level}
       </p>
-      <h3 className="text-center text-sm font-bold text-zb-ink">{title}</h3>
+      <h3 id={titleId} className="text-center text-sm font-bold text-zb-ink">
+        {title}
+      </h3>
       {progress !== undefined && (
         <div
           className="mt-4 h-1 overflow-hidden rounded-full bg-zb-cream-3"
           role="progressbar"
-          aria-valuenow={Math.round(progress)}
+          // Named by the chapter it belongs to — "progress bar, 40%" on a page
+          // of cards says nothing about which chapter is 40% read. And the
+          // value announced is the one DRAWN: they came from the same number
+          // but only one of them was clamped.
+          aria-labelledby={titleId}
+          aria-valuenow={Math.round(pct)}
           aria-valuemin={0}
           aria-valuemax={100}
         >
           <div
             className="h-full rounded-full bg-zb-mint transition-[width] duration-500"
-            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+            style={{ width: `${pct}%` }}
           />
         </div>
       )}

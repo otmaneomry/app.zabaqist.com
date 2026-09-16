@@ -264,7 +264,10 @@ export function currentStreak(): number {
 
 /** The best run ever recorded on this device. */
 export function longestStreak(): number {
-  const keys = Object.keys(readLog()).filter((k) => worked(readLog()[k])).sort()
+  // Read once. `readLog()` inside the filter re-fetched and re-parsed the
+  // whole store for every day it had ever recorded.
+  const log = readLog()
+  const keys = Object.keys(log).filter((k) => worked(log[k])).sort()
   let best = 0
   let run = 0
   let previous: string | null = null

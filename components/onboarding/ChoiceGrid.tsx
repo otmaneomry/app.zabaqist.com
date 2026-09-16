@@ -11,7 +11,7 @@
  * Selecting never auto-advances; the reader presses Continue.
  */
 
-import React from 'react'
+import React, { useRef } from 'react'
 
 export interface Choice {
   id: string
@@ -29,25 +29,73 @@ export default function ChoiceGrid({
   value,
   onChange,
   columns = 2,
+  labelledBy,
 }: {
   choices: Choice[]
   value: string | null
   onChange: (id: string) => void
   columns?: 1 | 2
+  /**
+   * The id of the question this answers.
+   *
+   * A `radiogroup` with no name announces itself as "group" and the reader is
+   * left to infer the question from the options. The step's own heading is
+   * already on screen saying it; this points at that rather than repeating it
+   * in a second string to translate.
+   */
+  labelledBy: string
 }) {
+  const buttons = useRef<(HTMLButtonElement | null)[]>([])
+
+  /**
+   * Arrow keys move the selection, as a radio group does everywhere else.
+   *
+   * With plain buttons the reader had to Tab through every option, and Tab in
+   * a radio group is supposed to leave it. Down/Right advance and Up/Left go
+   * back in both writing directions: the vertical pair always means what it
+   * says, which is what a reader falls back on when the horizontal pair does
+   * not match the script.
+   */
+  const move = (from: number, delta: number) => {
+    const to = (from + delta + choices.length) % choices.length
+    const target = choices[to]
+    if (!target) return
+    onChange(target.id)
+    buttons.current[to]?.focus()
+  }
+
+  // One tab stop for the whole group — the selected option, or the first one
+  // when nothing is selected yet.
+  const stop = choices.findIndex((c) => c.id === value)
+  const tabStop = stop === -1 ? 0 : stop
+
   return (
     <div
       role="radiogroup"
+      aria-labelledby={labelledBy}
       className={`mt-8 grid gap-3 ${columns === 2 ? 'sm:grid-cols-2' : ''}`}
     >
-      {choices.map((c) => {
+      {choices.map((c, i) => {
         const active = value === c.id
         return (
           <button
             key={c.id}
+            ref={(el) => {
+              buttons.current[i] = el
+            }}
             type="button"
             role="radio"
             aria-checked={active}
+            tabIndex={i === tabStop ? 0 : -1}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault()
+                move(i, 1)
+              } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault()
+                move(i, -1)
+              }
+            }}
             onClick={() => onChange(c.id)}
             className={`flex flex-col items-start gap-2 rounded-2xl border-2 p-5 text-start transition-colors ${
               active

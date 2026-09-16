@@ -29,6 +29,13 @@ on:
     branches: [main]
   pull_request:
 
+# Each ref gets one run. A force-push, or three commits in a minute, used to
+# leave two supersed runs finishing a matrix that nobody was going to read —
+# and this matrix builds the app twice.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-latest
