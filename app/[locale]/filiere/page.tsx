@@ -20,13 +20,21 @@ import { useTranslations } from 'next-intl'
 import FilierePicker from '@/components/filiere/FilierePicker'
 import Logo from '@/components/landing/Logo'
 import { useRouter } from '@/i18n/navigation'
-import { safeInternalPath } from '@/lib/safePath'
+import { safeUnprefixedPath } from '@/lib/safePath'
 
 /** Where the picker goes when `?next=` says nothing usable. */
 const DEFAULT_NEXT = '/home'
 
-/** An in-app destination, or `/home`. Anything else is refused. */
-const safeNext = (raw: string | null) => safeInternalPath(raw, DEFAULT_NEXT)
+/**
+ * An in-app destination, or `/home`. Anything else is refused.
+ *
+ * `safeUnprefixedPath`, not `safeInternalPath`: `router` here is the
+ * locale-aware one, so a `?next=/ar/progres` would be pushed as
+ * `/ar/ar/progres` — and validating before stripping is the ordering that was
+ * an open redirect on the sign-in page. One function does both, in the order
+ * that holds.
+ */
+const safeNext = (raw: string | null) => safeUnprefixedPath(raw, DEFAULT_NEXT)
 
 function Picker({ next }: { next: string }) {
   const router = useRouter()

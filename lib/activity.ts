@@ -282,11 +282,16 @@ export function longestStreak(): number {
 export function lifetime(): DayActivity & { days: number } {
   const log = readLog()
   const days = Object.keys(log).length
+  // Coerced, because these come back from `JSON.parse` of a store anyone can
+  // edit: one string among the numbers turned the sum into concatenation, and
+  // one `null` turned it into NaN — which the dashboard then printed, in
+  // words, next to the student's name.
+  const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0)
   return Object.values(log).reduce(
     (a, d) => ({
-      sections: a.sections + d.sections,
-      checkpoints: a.checkpoints + d.checkpoints,
-      seconds: a.seconds + d.seconds,
+      sections: a.sections + n(d?.sections),
+      checkpoints: a.checkpoints + n(d?.checkpoints),
+      seconds: a.seconds + n(d?.seconds),
       days,
     }),
     { ...EMPTY, days },

@@ -151,12 +151,20 @@ const hrefArg = (body, from) => {
   return body.slice(from).trim()
 }
 
+/**
+ * Both spellings, because the fix moved. `safeUnprefixedPath` strips the
+ * locale and validates what is left, in one call, so that a caller cannot get
+ * the order wrong; naming only the old function here would have left this
+ * check passing over the very line it was written for.
+ */
+const SANITISERS = /safe(Internal|Unprefixed)Path/
+
 const rewrapped = []
 for (const f of src) {
   const body = stripComments(read(f))
   for (const m of body.matchAll(/redirect\(\s*\{[\s\S]{0,200}?href:\s*/g)) {
     const expr = hrefArg(body, m.index + m[0].length)
-    if (/safeInternalPath/.test(expr) && !/^safeInternalPath\s*\(/.test(expr))
+    if (SANITISERS.test(expr) && !new RegExp(`^${SANITISERS.source}\\s*\\(`).test(expr))
       rewrapped.push(`${f}: ${expr}`)
   }
 }

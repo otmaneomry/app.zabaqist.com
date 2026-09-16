@@ -91,7 +91,7 @@ export default function PlanPicker({
           at all. Rounded down to the dirham; the exact figure is above. */}
       {plan?.period === 'year' && (
         <p className="mt-1 text-center text-sm text-zb-ink-2">
-          {t('annualEquivalent', { n: Math.round(plan.price / 12) })}
+          {t('annualEquivalent', { n: Math.floor(plan.price / 12) })}
         </p>
       )}
 

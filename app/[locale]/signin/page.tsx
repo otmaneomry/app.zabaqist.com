@@ -22,7 +22,7 @@ import { routing, type Locale } from '@/i18n/routing'
 import Logo from '@/components/landing/Logo'
 import GoogleButton from '@/components/auth/GoogleButton'
 import { alternatesFor } from '@/lib/publicPaths'
-import { safeInternalPath } from '@/lib/safePath'
+import { safeUnprefixedPath } from '@/lib/safePath'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseConfigError } from '@/lib/supabase/config'
 
@@ -32,25 +32,6 @@ import { supabaseConfigError } from '@/lib/supabase/config'
  * is no second form to build here.
  */
 const WAITLIST = 'https://www.zabaqist.com/#waitlist'
-
-/**
- * `next=` as a path with no language in it.
- *
- * `proxy.ts` sets it to the full pathname, so an Arabic reader turned away from
- * `/ar/progres` arrives here with `next=/ar/progres` — already prefixed — while
- * the fallback is the bare `/home`. Handing either straight to a locale-aware
- * redirect would produce `/ar/ar/progres` or drop the reader into French.
- * Stripping first means one shape goes in and the redirect puts back the prefix
- * the reader is actually reading in. (`proxy.ts` has the same function under
- * the name `withoutLocale`; it runs at the edge and cannot import from here.)
- */
-const unprefixed = (p: string): string => {
-  for (const l of routing.locales) {
-    if (p === `/${l}`) return '/'
-    if (p.startsWith(`/${l}/`)) return p.slice(l.length + 1)
-  }
-  return p
-}
 
 /**
  * Sign-in names itself, rather than inheriting the root layout's canonical.
@@ -90,13 +71,12 @@ export default async function SignInPage({
   // Already signed in: this page has nothing to offer. The locale-aware
   // redirect, or an Arabic reader is sent to the French copy of wherever they
   // were going.
-  // Strip first, THEN validate. The other order let `/fr//evil.com` through:
-  // `safeInternalPath` saw a single leading slash followed by `f` and passed
-  // it, `unprefixed` then removed `/fr` and handed `//evil.com` to a redirect
-  // that adds no prefix for the default locale — a protocol-relative Location
-  // header, reached through a genuine Zabaqist sign-in link. Sanitising the
-  // value that is actually redirected to is the only order that holds.
-  if (user) redirect({ href: safeInternalPath(unprefixed(next ?? '')), locale })
+  // `proxy.ts` sets `next` to the full pathname, so an Arabic reader turned
+  // away from `/ar/progres` arrives here already prefixed and the locale-aware
+  // redirect below would put a second one on. `safeUnprefixedPath` takes the
+  // prefix off and validates what is left — in that order, which is the whole
+  // reason it is one function and not two calls.
+  if (user) redirect({ href: safeUnprefixedPath(next), locale })
 
   const t = await getTranslations('auth')
   const notAllowed = error === 'not-allowed'

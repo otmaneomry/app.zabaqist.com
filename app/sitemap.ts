@@ -61,9 +61,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: 'weekly' as const,
     priority: 1,
     alternates: {
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [l, url(l, path)]),
-      ),
+      languages: {
+        ...Object.fromEntries(routing.locales.map((l) => [l, url(l, path)])),
+        // `alternatesFor` publishes an `x-default` in the head and this did
+        // not, so the two hreflang signals for the same URL disagreed about
+        // which version an unmatched reader should get. Google reads both.
+        'x-default': url(routing.defaultLocale, path),
+      },
     },
   }))
 }

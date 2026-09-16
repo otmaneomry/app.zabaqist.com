@@ -80,6 +80,27 @@ const ok = (pass, label, detail = '') => {
 const section = (t) => console.log(`\n${t}`)
 
 /**
+ * A check whose failure makes everything after it meaningless.
+ *
+ * Several blocks asserted a document existed with a non-fatal `ok` and then
+ * dereferenced it on the next line. When it was missing the suite did not
+ * report a red line and carry on — it threw a TypeError and ended, taking the
+ * `N of M` summary with it. The one number CLAUDE.md insists is printed rather
+ * than written down was then not printed either.
+ *
+ * So: say what failed, print the count reached, and stop deliberately.
+ */
+const need = (value, label, detail = '') => {
+  ok(!!value, label, detail)
+  if (!value) {
+    console.log(`\n  …and nothing after this could run.`)
+    console.log(`\n✗ ${failures} of ${checks} check(s) failed`)
+    process.exit(1)
+  }
+  return value
+}
+
+/**
  * Fetch as a signed-in reader, and do NOT follow the gate's redirect.
  *
  * Both halves matter. A bare `fetch` of a gated path is answered by `proxy.ts`
@@ -363,7 +384,10 @@ await arrived(
 )
 
 // A solution stays closed until asked for.
-const gated = doc.views.find((v) => /^> \*\*(Solution|Preuve|Démonstration)/im.test(v.body))
+const gated = need(
+  doc.views.find((v) => /^> \*\*(Solution|Preuve|Démonstration)/im.test(v.body)),
+  'the chapter has a section with a gated solution to open',
+)
 await open(url(gated.id))
 const gate = page.getByRole('button', { name: /SOLUTION|PREUVE/i }).first()
 const bodyText = () => page.locator('.course-doc').innerText()
@@ -522,7 +546,17 @@ section('Landing page')
         [messages.nav.dashboard, '/home'],
       ].map(async ([name, want]) => [
         name,
-        [await lp.getByRole('link', { name }).first().getAttribute('href'), want],
+        // `.catch`, because `getAttribute` on a link that is not there rejects
+        // inside `Promise.all` and ends the run. A null href fails the
+        // comparison below and says which one was missing.
+        [
+          await lp
+            .getByRole('link', { name })
+            .first()
+            .getAttribute('href')
+            .catch(() => null),
+          want,
+        ],
       ]),
     ),
   )
@@ -585,7 +619,7 @@ section('Landing page')
   )
 
   // After reading, the station resumes where the student stopped.
-  const at = doc.views[5]
+  const at = need(doc.views[5], 'the chapter has at least six sections to resume into')
   await lp.goto(url(at.id), { waitUntil: 'load' })
   await lp.waitForSelector(HYDRATED)
   await lp.waitForTimeout(400)
@@ -1327,8 +1361,10 @@ section('Migrated chapter')
 {
   // The hand-written course became a document, and a ```geogebra fence keeps the
   // interactive figure it used to declare in JSX.
-  const migrated = await loadCourseDoc('fonctions-logarithmiques')
-  ok(!!migrated, 'the chapter loads from content/course/')
+  const migrated = need(
+    await loadCourseDoc('fonctions-logarithmiques'),
+    'the chapter loads from content/course/',
+  )
   const tabsHere = tabsOf(migrated.views).map((t) => t.label)
   ok(
     ['Introduction', 'Cours', 'Graphique', 'Exercices', 'Devoir', 'Résumé'].every(
@@ -1381,7 +1417,7 @@ section('Programme complet (13 chapitres)')
   const docs = new Map()
   for (const c of all) docs.set(c.slug, await loadCourseDoc(c.slug))
 
-  ok(
+  need(
     all.every((c) => docs.get(c.slug)),
     'every catalogue row has a document behind it',
     all.filter((c) => !docs.get(c.slug)).map((c) => c.slug).join(', '),

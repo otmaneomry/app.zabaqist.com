@@ -580,7 +580,11 @@ export async function pullAll(userId: string): Promise<PullResult> {
       tried: fresher ? !!row.tried : local.tried || row.tried,
       verdict: fresher ? (row.verdict ?? null) : (local.verdict ?? row.verdict ?? null),
       // The one that only grows: the XP penalty already paid.
-      hints: Math.max(local.hints, row.hints ?? 0),
+      // `?? 0`, as the comparison below already does. A checkpoint stored
+      // before `hints` existed has none, `Math.max(undefined, 0)` is NaN, and
+      // NaN was then written to the store and pushed to the server as the
+      // number of hints a student had paid for.
+      hints: Math.max(local.hints ?? 0, row.hints ?? 0),
       ...(at ? { at } : {}),
     }
     // Field by field, and the attempt apart from its date. A stamp that moved

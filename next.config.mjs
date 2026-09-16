@@ -9,9 +9,18 @@ import createNextIntlPlugin from 'next-intl/plugin'
  * added in Report-Only first, with the report read for a week — the same
  * escalation LOOP.md applies to everything else here.
  *
- * These four cost nothing and are safe today.
+ * These five cost nothing and are safe today.
  */
 const securityHeaders = [
+  // HTTPS only, from the first visit after this response. Without it the very
+  // first navigation a student types can be plain HTTP, and a session cookie
+  // is what would be riding on it. Two years, subdomains included; no
+  // `preload`, which is a one-way submission to a browser-vendor list and not
+  // this file's decision to make.
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains',
+  },
   // The app is never meant to be framed; this blocks clickjacking outright.
   { key: 'X-Frame-Options', value: 'DENY' },
   // Stop a browser guessing that an uploaded file is really a script.

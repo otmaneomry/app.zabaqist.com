@@ -24,7 +24,7 @@ const BrowseAllCourses = () => {
 
             <div style={{position: 'relative', marginBottom: '2rem'}}>
                 <TextInput
-                    placeholder="Rechercher une thématique..."
+                    placeholder={t('catalogSearch')}
                     leftSection={<IconSearch size={20} style={{color: '#9ca3af'}} />}
                     styles={{
                         input: {
