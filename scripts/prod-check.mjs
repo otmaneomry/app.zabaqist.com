@@ -121,6 +121,49 @@ check(!/E2E_AUTH_SECRET\s*=/.test(read('.env.production') + read('vercel.json'))
   'blocker', 'e2e-in-prod', 'E2E_AUTH_SECRET is set in a production config file',
   'it opens the test bypass to anyone who guesses the value')
 
+/**
+ * Is the value that is REDIRECTED TO the value that was checked?
+ *
+ * `lib/safePath.ts` rejects `//host`, and `app/[locale]/signin/page.tsx` also
+ * has to strip the locale before handing the path to a locale-aware redirect
+ * that will put one back. Both were there; they ran in the wrong order.
+ * `safeInternalPath('/fr//evil.com')` passes — one leading slash, then `f` —
+ * and stripping `/fr` afterwards turns it back into `//evil.com`, which the
+ * default locale takes no prefix for. A protocol-relative `Location`, reached
+ * through a real Zabaqist sign-in link: exactly the attack safePath documents,
+ * rebuilt downstream of it.
+ *
+ * So this reads the expression each `redirect({ href })` is given and asks
+ * whether the sanitiser is the OUTERMOST call — not whether it appears, which
+ * it did the whole time. Renaming `unprefixed` cannot slip past it; only
+ * putting something back around the check can.
+ */
+const hrefArg = (body, from) => {
+  let depth = 0
+  for (let i = from; i < body.length; i++) {
+    const c = body[i]
+    if ('([{'.includes(c)) depth++
+    else if (')]}'.includes(c)) {
+      if (depth === 0) return body.slice(from, i).trim()
+      depth--
+    } else if (c === ',' && depth === 0) return body.slice(from, i).trim()
+  }
+  return body.slice(from).trim()
+}
+
+const rewrapped = []
+for (const f of src) {
+  const body = stripComments(read(f))
+  for (const m of body.matchAll(/redirect\(\s*\{[\s\S]{0,200}?href:\s*/g)) {
+    const expr = hrefArg(body, m.index + m[0].length)
+    if (/safeInternalPath/.test(expr) && !/^safeInternalPath\s*\(/.test(expr))
+      rewrapped.push(`${f}: ${expr}`)
+  }
+}
+check(rewrapped.length === 0, 'blocker', 'redirect-sanitised-last',
+  'a redirect target is rewritten AFTER it was checked, so the check no longer describes it',
+  rewrapped.join(' · '))
+
 const robots = read('app/robots.ts')
 
 /**

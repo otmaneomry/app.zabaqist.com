@@ -203,14 +203,40 @@ export default function CourseDoc({
         const spec = parseSpec(textOf(children))
         return spec ? <GeogebraBlock spec={spec} /> : null
       }
+      // Inside a fence the `<pre>` below carries the surface; the pill is for
+      // `code` spans in running prose.
+      const fenced = /language-/.test(className ?? '')
       return (
-        <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[0.9em]">
+        <code
+          className={
+            fenced
+              ? 'font-mono text-[0.9em]'
+              : 'rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[0.9em]'
+          }
+        >
           {children}
         </code>
       )
     },
-    // react-markdown wraps a fence in <pre>; the figure supplies its own frame.
-    pre: ({ children }) => <>{children}</>,
+    // react-markdown wraps a fence in <pre>, and the geogebra figure supplies
+    // its own frame — so that wrapper was dropped. For EVERY fence, though,
+    // not just the figure: ordinary fenced code came out of `code` above as an
+    // inline element with no `<pre>` and no `whitespace-pre`, so a multi-line
+    // block collapsed onto one line. `code` has already run by the time this
+    // does, so what identifies the figure is what it returned.
+    pre: ({ children }) => {
+      const child = React.Children.toArray(children)[0]
+      const isFigure =
+        child === undefined ||
+        (React.isValidElement(child) && child.type === GeogebraBlock)
+      return isFigure ? (
+        <>{children}</>
+      ) : (
+        <pre className="my-4 overflow-x-auto rounded-lg bg-gray-100 p-4">
+          {children}
+        </pre>
+      )
+    },
     blockquote: ({ children }) => {
       const label = textOf(children).trim()
       const kind = CALLOUTS.find((c) => c.match.test(label))

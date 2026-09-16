@@ -21,8 +21,14 @@ export interface GeogebraSpec {
 /** Parses the fence body, returning null rather than throwing on bad JSON. */
 export function parseSpec(source: string): GeogebraSpec | null {
   try {
-    const spec = JSON.parse(source) as GeogebraSpec
-    return typeof spec === 'object' && spec ? spec : null
+    const spec: unknown = JSON.parse(source)
+    // `typeof [] === 'object'` and `[]` is truthy, so a fence containing
+    // `[1,2,3]` came back as a spec and `GeogebraBlock` then read `.commands`
+    // off an array and got undefined — an empty applet where a figure should
+    // be, with the null this function promises never returned.
+    return typeof spec === 'object' && spec !== null && !Array.isArray(spec)
+      ? (spec as GeogebraSpec)
+      : null
   } catch {
     return null
   }

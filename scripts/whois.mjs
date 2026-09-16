@@ -67,11 +67,16 @@ let anyAllowed = false
 // a row that is already there, because the connection failed, sends them to fix
 // the one thing that was never broken.
 let anyAnswered = false
+// And did any form fail to get one? `anyAnswered` flips on the FIRST success,
+// so one erroring form and one honest `false` used to read as a clean refusal
+// — the same misleading outcome as above, arrived at from the other side.
+let anyErrored = false
 for (const form of forms(addr)) {
   const { data, error } = await sb.rpc('is_email_allowed', { addr: form })
   if (error) {
     console.log(`  ERROR    ${form}`)
     console.log(`           ${error.code ?? ''} ${error.message}`)
+    anyErrored = true
     continue
   }
   anyAnswered = true
@@ -93,10 +98,20 @@ if (anyAllowed) {
   console.log('  re-run. Do not add a row on the strength of this output.')
   console.log()
   process.exit(1)
+} else if (anyErrored) {
+  console.log('  PARTIAL ANSWER. Some forms above errored, so the list was')
+  console.log('  never asked about every spelling of this address — and the')
+  console.log('  one it was not asked about is the one that would match.')
+  console.log('  Fix the connection and re-run before adding a row.')
+  console.log()
+  process.exit(1)
 } else {
   console.log('  Not on the list in any form. Add it with:')
   console.log(`    insert into public.allowed_emails (email, note)`)
-  console.log(`    values ('${addr}', 'why');`)
+  // Doubled, because the statement is meant to be pasted and run verbatim and
+  // an apostrophe is legal in the local part: `o'connor@gmail.com` produced
+  // SQL that either failed or did something other than what it reads as.
+  console.log(`    values ('${addr.replace(/'/g, "''")}', 'why');`)
   console.log('  The trigger from 0002 normalises it on the way in, so a typed')
   console.log('  address with dots or capitals now matches what Google sends.')
 }
