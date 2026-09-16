@@ -187,11 +187,25 @@ export function claimDevice(userId: string): boolean {
     const previous = localStorage.getItem(OWNER_KEY)
     const takenFromSomeoneElse = previous !== null && previous !== userId
     if (takenFromSomeoneElse) {
-      // Set aside, wipe, hand back. `resetLocalState` spares the archives, so
-      // the order below only has to get the LIVE keys out of the way first.
+      // Set aside, wipe, hand back — and `theirs` is an IN-MEMORY copy, so
+      // whether it survives depends entirely on that write landing. It was
+      // attempted once, after the wipe, with its result discarded: quota or
+      // private mode — the two failures `writeJSON` returns false for, both
+      // documented at the top of this file — and the outgoing student's
+      // self-assessments were gone with nothing left to restore them from.
+      //
+      // Twice, then, either side of the wipe. Before, because the data still
+      // exists to be re-read if it fails; after, because `resetLocalState`
+      // frees exactly the space their own keys were occupying, so the retry
+      // has room the first attempt did not. The wipe itself stays
+      // unconditional: a device that cannot archive must still not show this
+      // student the last one's work, which is the leak this function exists
+      // to prevent.
       const theirs = deviceLocalEntries()
+      const filed =
+        Object.keys(theirs).length === 0 || writeJSON(archiveKey(previous), theirs)
       resetLocalState()
-      if (Object.keys(theirs).length) writeJSON(archiveKey(previous), theirs)
+      if (!filed) writeJSON(archiveKey(previous), theirs)
       const mine = readJSON<Record<string, string>>(archiveKey(userId), {})
       for (const [k, v] of Object.entries(mine)) {
         try {
@@ -400,6 +414,10 @@ function instant(value?: string | null): number | null {
  * both sort BELOW `Z`, so a string comparison reported a remote row that was
  * genuinely newer as older. This is the sole tie-breaker for the « Réessayer »
  * rule — getting it backwards keeps a draft the student had just abandoned.
+ *
+ * The fallback only, since the merge below started comparing the two attempts'
+ * own stamps: this answers "has the server moved at all", which is the best
+ * that can be said about a local attempt stored before `at` was carried.
  */
 function remoteIsNewer(remoteAt?: string | null): boolean {
   const remote = instant(remoteAt)
@@ -531,7 +549,19 @@ export async function pullAll(userId: string): Promise<PullResult> {
     // "Réessayer" clears all three on purpose — reprise illimitée — so folding
     // them with `local || row` resurrected the failed attempt the moment an
     // older row came back from another device. The date decides instead.
-    const fresher = remoteIsNewer(row.updated_at)
+    // Which attempt is newer is a question about the two ATTEMPTS.
+    // `remoteIsNewer` answers a different one — "has the server been written
+    // to since this device last pulled" — and an attempt made on this device
+    // after that pull is invisible to it. An older remote row that also
+    // postdates the pull therefore won, resurrecting the very attempt
+    // « Réessayer » had just cleared. Both sides carry their own stamp now,
+    // so compare those; the pull stamp stays as the fallback for state
+    // written before `at` existed, which has no date of its own to offer.
+    const remoteAt = instant(row.updated_at)
+    const localAt = instant(local.at)
+    const fresher =
+      remoteAt !== null &&
+      (localAt !== null ? remoteAt > localAt : remoteIsNewer(row.updated_at))
     // The stamp travels with the attempt it describes — the winning side's.
     // Building `merged` without it broke two things at once: the next push had
     // no date to send and fell back to the moment of upload, and the object

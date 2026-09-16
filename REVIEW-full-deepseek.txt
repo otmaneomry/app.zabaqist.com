@@ -1,0 +1,3022 @@
+
+─── app/globals.css:88-90 ───
+[bug · medium] The `.dark` theme block only redefines the shadcn HSL tokens; none of the `--zb-*`
+brand tokens are given dark-mode values. Components throughout the app bind directly to these tokens
+(e.g. `bg-zb-mint`, `text-zb-ink`, `border-zb-line`, `--zb-mint-soft`, `--zb-ink-3`, `--zb-cream`),
+so when dark mode is active they keep their light-mode values: light borders/surfaces (`--zb-line`,
+`--zb-cream`, `--zb-mint-soft`) stay bright against the dark `--background`, and mid-tone text like
+`--zb-ink-3` (oklch 0.47) drops below readable contrast on dark surfaces. Add a `.dark { --zb-…: …;
+}` mapping so brand surfaces/text swap to dark-appropriate values.
+
+
+
+─── app/globals.css:200-204 ───
+[bug · medium] This global rule forces every `<button>` to at least 44×44px below 769px.
+`min-width`/`min-height` are separate properties from `width`/`height`, so buttons with explicit
+fixed sizing are still stretched: e.g. the avatar menu button in `components/auth/AccountMenu.tsx`
+uses `size-9` (36px) but will render at 44×44 on mobile, breaking the intended compact icon-button
+layout. Scope the minimum to controls that actually need it instead of every button element.
+
+-   /* Touch-friendly buttons (mobile-first) */
+-   button {
++   /* Only auto-sized buttons need the enlarged tap target */
++   button:not([class*='size-']):not([class*='h-']):not([class*='w-']) {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+
+─── app/globals.css:153-156 ───
+[maintainability · low] The comment calls these "hard bans", but this unlayered rule can still be
+overridden by later unlayered component styles (CSS modules) or inline styles that set
+`letter-spacing`/`font-style` on Arabic elements — only Tailwind's layered utilities are guaranteed
+to lose to it. If the bans must be truly enforced for Arabic typography, use `!important` or a
+higher-specificity scoped rule; otherwise the comment overstates what the CSS guarantees.
+
+
+
+─── app/globals.css:178-180 ───
+[other · low] `overflow-x: clip` keeps the page from scrolling horizontally, but it also makes the
+tail of any overflowing inline formula unreachable (clipped with no scroll affordance), so content
+is silently lost at narrow viewports (cf. WCAG 1.4.10 reflow). Consider letting only the overflowing
+`.katex` element scroll or wrap, rather than clipping at the container level.
+
+
+
+─── package.json:27-28 ───
+[maintainability · low] `postcss-preset-mantine` and `postcss-simple-vars` are build-time PostCSS
+plugins (consumed via the PostCSS config during `next build`), not runtime imports. Declaring them
+under `dependencies` means they get installed in production deployments, unnecessarily enlarging the
+runtime install surface. Move both to `devDependencies` alongside `postcss` and `tailwindcss`.
+
+
+
+─── package.json:4-4 ───
+[maintainability · low] The scripts rely on modern Node features such as
+`--experimental-strip-types` (Node >= 22.6) and `--no-warnings`, but there is no `engines` field to
+document or enforce the minimum Node version. Contributors on older Node versions will hit confusing
+runtime errors. Add an `engines` constraint so the requirement is explicit (and optionally
+enforceable via `.npmrc` `engine-strict`).
+
+    "private": true,
++   "engines": {
++     "node": ">=22.6.0"
++   },
+
+
+─── package.json:10-10 ───
+[security · low] `test:course` falls back to the well-known secret `e2e-local-only` when
+`E2E_AUTH_SECRET` is unset. If the env var is missing in a shared CI/remote environment, tests would
+run with a predictable secret. Prefer failing fast when the secret is absent rather than defaulting
+to a public constant.
+
+-     "test:course": "E2E_AUTH_SECRET=${E2E_AUTH_SECRET:-e2e-local-only} node --experimental-strip-types --no-warnings scripts/test-course.mjs",
++     "test:course": "E2E_AUTH_SECRET=${E2E_AUTH_SECRET:?E2E_AUTH_SECRET must be set} node --experimental-strip-types --no-warnings scripts/test-course.mjs",
+
+
+─── package.json:14-14 ───
+[bug · medium] The `loop` script uses the arithmetic ternary `$(( db > pc ? db : pc ))`, which is a
+bashism not supported by POSIX `sh`. npm runs scripts with `/bin/sh` by default (dash on
+Debian/Ubuntu), so this script fails with a syntax error there; it also does not work on Windows
+(cmd). Use a POSIX-compatible conditional to propagate the larger exit code.
+
+-     "loop": "npm run db:check; db=$?; npm run prod:check; pc=$?; exit $(( db > pc ? db : pc ))",
++     "loop": "npm run db:check; db=$?; npm run prod:check; pc=$?; if [ \"$db\" -gt \"$pc\" ]; then exit \"$db\"; else exit \"$pc\"; fi",
+
+
+─── next.config.mjs:6-10 ───
+[security · medium] This deferral leaves the app with no CSP at all (no `default-src`/`script-src`
+allow-list, no `frame-ancestors`) as an XSS defense-in-depth layer, even though the app renders
+markdown/KaTeX and mentions handling uploaded files. The follow-up is prose only:
+`scripts/prod-check.mjs` merely asserts that a `headers()` block exists (lines 697-699), and LOOP.md
+contains no CSP/Report-Only item, so nothing forces this rollout to actually happen. A
+`Content-Security-Policy-Report-Only` header can be shipped today with zero breakage risk — it only
+logs violations — while still giving the promised week of report data; consider adding it now (with
+a `report-to`/`report-uri` endpoint) or a concrete, dated tracking item so the gap cannot persist
+indefinitely.
+
+
+
+─── next.config.mjs:24-24 ───
+[maintainability · low] `interest-cohort` was the FLoC opt-out directive; FLoC was deprecated and
+removed from Chromium back in 2022, so modern browsers ignore this token. It now provides no
+protection while implying that cohort-based tracking is blocked. Drop it from the value to keep the
+policy accurate.
+
+-     value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
++     value: 'camera=(), microphone=(), geolocation=()',
+
+
+─── next.config.mjs:14-14 ───
+[security · low] `Strict-Transport-Security` is missing from the header set. For an authenticated
+app (Supabase sessions) this leaves the very first navigation open to an SSL-stripping attack until
+the browser happens to connect over HTTPS once. Consider adding `Strict-Transport-Security:
+max-age=63072000; includeSubDomains` — ideally at the CDN/edge, and only with `includeSubDomains`
+after confirming every subdomain is served over HTTPS. It is safe on the local dev server (browsers
+ignore HSTS received over plain HTTP).
+
+
+
+─── eslint.config.mjs:17-19 ───
+[maintainability · medium] This override disables `@typescript-eslint/no-explicit-any` repo-wide,
+but the comment says `any` is only needed at the GeoGebra and mock-API boundaries. As written, `any`
+introduced anywhere else in the codebase (e.g. new components, data-fetching code, utilities) will
+also pass silently, weakening the type gate the project otherwise relies on. Consider scoping this
+to the specific files with a `files` override instead of a global rule.
+
+-       // `any` is used at the GeoGebra and mock-API boundaries, where the
+-       // third-party surface genuinely is untyped.
++   {
++     // Scope the escape hatch to the untyped third-party boundaries only.
++     files: ['**/geogebra/**', '**/mocks/**'],
++     rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
++     },
++   }
+
+
+─── eslint.config.mjs:12-12 ───
+[maintainability · low] `**/*.d.ts` ignores every declaration file in the repository, which hides
+declaration-quality/type-surface issues. `next-env.d.ts` is already covered by eslint-config-next's
+own global ignores (and `node_modules/**` is ignored by default), so the blanket pattern removes
+lint coverage without adding anything beyond that one generated file. Consider dropping `**/*.d.ts`
+(and the redundant `next-env.d.ts`/`node_modules/**` entries) or narrowing it to specific generated
+declaration files.
+
+-     ignores: ['.next/**', 'out/**', 'node_modules/**', 'next-env.d.ts', '**/*.d.ts'],
++     ignores: ['.next/**', 'out/**']
+
+
+─── scripts/events.mjs:113-113 ───
+[bug · medium] `r.json()` is only guarded by `if (!r.ok)` above, so a 2xx response with a non-JSON
+body (e.g., an HTML login page from a proxy, an empty 204, or a malformed payload) throws an
+unhandled `SyntaxError` with a raw stack trace instead of the friendly diagnostics this script uses
+elsewhere. Wrap the parse in try/catch and exit with a clear message.
+
+- const rows = await r.json()
++ let rows
++ try {
++   rows = await r.json()
++ } catch {
++   console.error(`\n  Supabase returned HTTP ${r.status} with an unreadable body`)
++   process.exit(1)
++ }
+
+
+─── scripts/events.mjs:147-147 ───
+[bug · medium] `row.event.padEnd(20)` throws a `TypeError` when `event` is NULL (the column is free
+text and may be unset). Note `tone()` tolerates null via regex coercion, so this is the only line
+that crashes. Guard with a fallback before calling `padEnd`.
+
+-     `  ${GREY}${at}${OFF}  ${tone(row.event)}${row.event.padEnd(20)}${OFF}` +
++     `  ${GREY}${at}${OFF}  ${tone(row.event)}${(row.event ?? '—').padEnd(20)}${OFF}` +
+
+
+─── scripts/events.mjs:93-94 ───
+[security · medium] `who` and `event` are interpolated directly into PostgREST filter syntax. After
+URL-decoding, characters such as `(`, `)`, `,`, `.` and `*` are treated as filter grammar, so
+crafted CLI values can inject additional clauses or alter which rows are read (or produce a
+confusing 400). Validate both flags against an allowlist before building the filters.
+
+- if (who) params.append('email', `ilike.*${who}*`)
+- if (event) params.append('event', `eq.${event}`)
++ const safeWho = (s) => /^[\w@.+\-*% ]+$/.test(s)
++ const safeEvent = (s) => /^[\w.]+$/.test(s)
++ if (who) {
++   if (!safeWho(who)) {
++     console.error('--who contains characters PostgREST treats as filter syntax')
++     process.exit(1)
++   }
++   params.append('email', `ilike.*${who}*`)
++ }
++ if (event) {
++   if (!safeEvent(event)) {
++     console.error('--event must be a plain event name')
++     process.exit(1)
++   }
++   params.append('event', `eq.${event}`)
++ }
+
+
+─── scripts/events.mjs:80-80 ───
+[bug · low] This coerces non-numeric input to 30 but passes negative, fractional, and unbounded
+values through: `--n -1` yields `limit=-1`, `--n 10.5` yields `10.5`, and `--n 1e9` requests a huge
+result set, all producing confusing API behavior or a generic refusal. Validate/clamp to a positive
+integer.
+
+- const limit = Number(flag('n') ?? 30) || 30
++ const rawLimit = Number(flag('n') ?? 30)
++ const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(Math.floor(rawLimit), 1000) : 30
+
+
+─── scripts/events.mjs:97-97 ───
+[bug · medium] The `fetch` call has no try/catch. Network failures (DNS resolution, connection
+refused, proxy/SSRF gate down) reject and surface as an unhandled top-level rejection with a raw
+stack trace. Per the async error-handling standard, catch the rejection and print a user-friendly
+diagnostic before exiting.
+
+- const r = await fetch(`${URL_}/rest/v1/auth_events?${params}`, {
++ let r
++ try {
++   r = await fetch(`${URL_}/rest/v1/auth_events?${params}`, {
+
+
+─── scripts/events.mjs:32-36 ───
+[maintainability · low] Any `.env.local` read failure (missing is expected, but also permission
+errors or a malformed file) is silently swallowed as `{}`. When `process.env` happens to contain a
+`SUPABASE_SECRET_KEY`/`SUPABASE_SERVICE_ROLE_KEY`, the script proceeds with that key without any
+indication that `.env.local` could not be read, which can silently send the wrong key. Distinguish
+"not found" from other read errors with a warning.
+
+-   try {
+-     raw = readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
+-   } catch {
++   } catch (err) {
++     if (err.code !== 'ENOENT') {
++       console.warn(`Could not read .env.local (${err.code}); relying on process.env only`)
++     }
+      return {}
+    }
+
+
+─── scripts/whois.mjs:71-78 ───
+[bug · high] Partial RPC failure is reported as a definitive refusal. `anyAnswered` flips true on
+the first successful call, so when some forms error and the rest answer `false`, the final branch
+prints "Not on the list in any form" and tells the operator to insert a row — exactly the misleading
+outcome the header says this tool exists to prevent ("an error is not a no"). Track how many forms
+errored and, when `anyErrored > 0 && !anyAllowed`, print a distinct "partial answer" message and
+exit non-zero instead of asserting a clean refusal.
+
+    const { data, error } = await sb.rpc('is_email_allowed', { addr: form })
+    if (error) {
+      console.log(`  ERROR    ${form}`)
+      console.log(`           ${error.code ?? ''} ${error.message}`)
++     anyErrored += 1
+      continue
+    }
+    anyAnswered = true
+    if (data) anyAllowed = true
+
+
+─── scripts/whois.mjs:98-99 ───
+[security · high] The suggested INSERT interpolates `addr` (raw `process.argv[2]`) directly into a
+SQL literal. A single quote in the local part is valid in an email address (e.g.
+`o'connor@gmail.com`) and produces broken SQL or an injection when the operator pastes this into the
+SQL editor. Escape single quotes by doubling them before embedding, since the statement is meant to
+be run verbatim.
+
+    console.log(`    insert into public.allowed_emails (email, note)`)
+-   console.log(`    values ('${addr}', 'why');`)
++   console.log(`    values ('${addr.replace(/'/g, "''")}', 'why');`)
+
+
+─── scripts/whois.mjs:14-18 ───
+[documentation · medium] This comment inverts the key model. The tool uses `SUPABASE_SECRET_KEY`,
+which is the service-role "secret" key: it bypasses RLS and CAN read `allowed_emails` and
+`auth_events` (AUTH.md says the journal *requires* this key, and db-check.mjs reads `allowed_emails`
+with the same key), and it must never ship to a browser. It is the *publishable* key that ships to
+every browser and is barred from those tables by the absent SELECT policies. Correct this so
+operators do not underrate the secret key's power or overrate the browser's isolation.
+
+-  * operator, so it has the secret key anyway; it still cannot read
+-  * `allowed_emails`
+-  * or `auth_events`. That is deliberate: those hold every invited address, and
+-  * this key ships to every browser. To READ the journal, use the dashboard or a
+-  * service key.
++  * operator, so it has the secret key anyway. That key is the service role:
++  * it bypasses RLS and CAN read `allowed_emails` and `auth_events`, and it
++  * never ships to a browser. What keeps those tables out of browsers is that
++  * only the publishable key is bundled and it has no SELECT policy.
+
+
+─── scripts/whois.mjs:25-25 ───
+[maintainability · low] `readFileSync` throws an unhandled ENOENT when `.env.local` does not exist,
+so the operator gets a raw stack trace instead of the friendly guidance printed below for missing
+keys. Since this is a support tool, catch the read failure (or check existence first) and print an
+actionable message before exiting.
+
+
+
+─── scripts/test-course.mjs:2405-2405 ───
+[bug · high] When every SX chapter is authored, `find` returns `undefined` and this block navigates
+to `/courses/undefined`: the `res.status() === 200` assertion fails and the `soonTitle`/`soonQuiz`
+fallback can never be exercised. The suite goes red (or skips by accident) the day the last SX
+chapter is written — the exact failure mode the comment above claims to avoid. Guard it: if
+`!pending`, print a NAMED skip and stop the block instead of continuing with `undefined`.
+
+
+
+─── scripts/test-course.mjs:1744-1745 ───
+[bug · high] This loop subscribes only to `pageerror`. React 19.2 production hydration mismatches
+(Minified React #418/423/425) are emitted as `console.error`, so the check `'all 13 chapters render
+without errors'` cannot fail on hydration errors — the file's own `isHydrationError` helper is never
+used here. Add a per-chapter `console` listener and filter through `isHydrationError`, mirroring the
+dashboard hydration check earlier in this section.
+
+
+
+─── scripts/test-course.mjs:1375-1376 ───
+[maintainability · medium] Hard-codes the catalogue total (`13`, also written in the section title).
+Per the repo rule 'never write a count down', this goes stale silently when a chapter is added or
+removed. Compare against the programme source (`all.length === CHAPTERS_SM.length`) rather than a
+literal, and drop 'thirteen' from the label.
+
+
+
+─── scripts/test-course.mjs:1554-1555 ───
+[maintainability · medium] Hard-codes the capability total (`84`). When checklist items change, this
+silently tests the wrong threshold. Derive the expected count from the authored data (e.g. sum of
+`docs.get(c.slug).checklist.length`) so the expectation moves with the content.
+
+
+
+─── scripts/test-course.mjs:1726-1730 ───
+[maintainability · low] Hard-codes the 7/6 branch split. Derive it from `CHAPTERS_SM` (e.g. compare
+against `CHAPTERS_SM.filter(c => c.branch === 'analyse').length`) so adding a chapter to a branch
+updates the expectation instead of turning this check red for no fault.
+
+
+
+─── scripts/test-course.mjs:366-367 ───
+[bug · medium] `find` can return `undefined` (no solution-gated view), and `gated.id` then throws
+and aborts the run before the final `N of M` summary is printed. Guard it (`ok(!!gated, ...)` +
+skip). The same unprotected-dereference pattern repeats for `withCp` a few lines below and `cp` in
+the Learning loop.
+
+
+
+─── scripts/test-course.mjs:1386-1388 ───
+[bug · medium] The preceding `ok(all.every((c) => docs.get(c.slug)), ...)` is non-fatal, so when
+`loadCourseDoc` returns null for a slug this line dereferences `null.views` and throws, killing the
+run. Use `docs.get(c.slug)?.views.length` here, and guard the later loops that read
+`docs.get(c.slug).views[0].id` and `.checklist.length`.
+
+
+
+─── scripts/test-course.mjs:523-526 ───
+[bug · medium] `getAttribute` waits for the element and throws if a link is missing; inside
+`Promise.all` that rejection is unhandled and aborts the whole run with no red line. Use the
+`count() === 1 ? await ...getAttribute('href') : null` guard already used elsewhere in this file, or
+catch per link so one missing link becomes a failed assertion instead of a crash.
+
+
+
+─── scripts/test-course.mjs:341-342 ───
+[bug · medium] `waitForSelector(HYDRATED)` is not wrapped the way `arrived` wraps navigation. If a
+page fails to hydrate — precisely the regression this suite exists to catch — the 30s timeout throws
+an unhandled rejection, the run dies mid-file, later failures are hidden, and the final `N of M`
+summary never prints. Catch the timeout and emit `ok(false, ...)` (or route through a helper that
+does) so a hydration failure stays a single red line.
+
+
+
+─── scripts/test-course.mjs:202-203 ───
+[bug · low] With `redirect: 'manual'` the response is not followed, so `res.url` stays the original
+request URL and this branch can never match — it is dead code, and the `!res.ok` condition above
+already records the 307. Remove the dead branch or, if the intent is to name the redirect
+explicitly, assert on `res.status === 307` / the `location` header.
+
+
+
+─── scripts/test-course.mjs:588-588 ───
+[bug · low] Assumes at least six views. If a chapter has fewer, `at` is `undefined` and `url(at.id)`
+below throws, aborting the run. Guard with a length check/skip before using it.
+
+
+
+─── scripts/test-course.mjs:1327-1329 ───
+[bug · medium] `ok(!!migrated, ...)` is non-fatal, so when the document is missing `migrated.views`
+throws and aborts the run instead of printing a red line and continuing. Guard before dereferencing
+(early-exit the block when `!migrated`).
+
+
+
+─── commitDate.sh:11-14 ───
+[bug · high] No error handling exists for the add/commit/push pipeline. Only `git add` and `git
+commit` are joined with `&&`, so if `git commit` fails (e.g., nothing staged, a failing pre-commit
+hook, or an empty commit), the script still proceeds to `git push origin main`. This can push older
+local commits that were never intended for the remote, and a failed `git push` is likewise silently
+ignored. Guard each stage and abort before pushing on failure.
+
+- git add . && git commit -m "$commitName"
++ git add . && git commit -m "$commitName" || { echo "git add/commit failed; aborting push" >&2; exit 1; }
+  
+- echo "**************************************** GITHUB : push to origin main :" + $commitName
+- git push origin main
++ echo "**************************************** GITHUB : push to origin main : $commitName"
++ git push origin main || { echo "push failed" >&2; exit 1; }
+
+
+─── commitDate.sh:11-11 ───
+[security · medium] `git add .` blindly stages every untracked and modified file under the current
+directory, which can sweep in sensitive files such as `.env`, credentials, private keys, or
+unrelated work into the same commit and push. Prefer staging tracked changes explicitly (e.g., `git
+add -u`) or list specific paths, and review `git status` before committing.
+
+- git add . && git commit -m "$commitName"
++ git add -u && git commit -m "$commitName" || { echo "git add/commit failed; aborting push" >&2; exit 1; }
+
+
+─── commitDate.sh:14-14 ───
+[bug · medium] The push target is hardcoded to `origin main`. If the script is run while on another
+branch (or in a repo whose default branch is `master` or whose remote has a different name), this
+either fails or pushes the local `main` ref regardless of the currently checked-out branch, which
+can push stale/incorrect code. Derive the current branch dynamically and validate it before pushing.
+
+- git push origin main
++ branch=$(git rev-parse --abbrev-ref HEAD)
++ git push origin "$branch" || { echo "push failed" >&2; exit 1; }
+
+
+─── commitDate.sh:13-13 ───
+[bug · low] `$commitName` is unquoted, so the shell applies word splitting and glob expansion:
+messages containing `*`, `?`, or `[...]` will expand to matching filenames, multiple spaces are
+collapsed, and a message such as `-n`/`-e` can alter `echo` behavior. Also note the `+` here is just
+a literal character, not string concatenation as the layout suggests. Quote the variable inside the
+string or use `printf`.
+
+- echo "**************************************** GITHUB : push to origin main :" + $commitName
++ echo "**************************************** GITHUB : push to origin main : $commitName"
+
+
+─── supabase/migrations/0008_profile_identity_refresh.sql:47-50 ───
+[bug · high] `public.profiles.email` is `not null` (0001), but this trigger inserts `new.email` with
+no null guard. For an `auth.users` row with a null email (phone signup, or an OAuth identity that
+doesn't return one), the INSERT raises a not-null violation, and because this is an AFTER trigger
+the exception rolls back the auth INSERT/UPDATE itself — signup/login fails. The backfill in this
+same file already acknowledges the case with `where u.email is not null`; the trigger should too.
+
++   if new.email is null then
++     return new;
++   end if;
++ 
+    insert into public.profiles (id, email, full_name, avatar_url)
+    values (
+      new.id,
+      new.email,
+
+
+─── supabase/migrations/0008_profile_identity_refresh.sql:69-71 ───
+[bug · low] The header claims "une reconnexion suffit" to repair an incomplete profile, but the
+trigger is restricted to `after insert or update of raw_user_meta_data`. The file's own comment on
+this trigger says GoTrue writes only `last_sign_in_at` on every connection — so a plain reconnect
+that doesn't change metadata never fires it. A profile recreated empty after this migration would
+stay empty on reconnect unless the OAuth metadata actually changes or `lib/sync.ts` re-sends the
+fields. Either broaden the trigger (with an in-function guard if needed) or correct the header's
+claim so it doesn't assert a repair that won't happen on a plain reconnect.
+
+
+
+─── i18n/navigation.ts:11-12 ───
+[maintainability · low] This wrapper's stated purpose is to be the single locale-aware navigation
+entrypoint (so the `/ar` prefix is never dropped). However, next-intl 4.14.2's `createNavigation`
+(see `node_modules/next-intl/dist/types/navigation/react-client/createNavigation.d.ts:444`) also
+returns a locale-aware `permanentRedirect`, which is omitted from this re-export. A consumer that
+later needs a permanent redirect would have to import `permanentRedirect` from `next/navigation`
+(which drops the locale prefix — the exact bug this file guards against) or from
+`next-intl/navigation` directly (bypassing this single entrypoint). Consider re-exporting it for
+completeness.
+
+- export const { Link, redirect, usePathname, useRouter, getPathname } =
+-   createNavigation(routing)
++ export const {
++   Link,
++   redirect,
++   permanentRedirect,
++   usePathname,
++   useRouter,
++   getPathname,
++ } = createNavigation(routing)
+
+
+─── i18n/request.ts:14-18 ───
+[bug · medium] This dynamic import has no error handling. Although `hasLocale` restricts `locale` to
+`routing.locales` (`fr`/`ar`), if the corresponding `../messages/<locale>.json` file is missing or
+contains invalid JSON (e.g. a locale is added to `routing.locales` without its message file), the
+promise rejects and Next.js surfaces an unhandled 500 with no actionable message. Wrap the import in
+try/catch and either fall back to `routing.defaultLocale` messages or rethrow with a descriptive
+error identifying the missing file.
+
+-     messages: (
++   let messages: Record<string, unknown>
++   try {
++     messages = (
+        (await import(`../messages/${locale}.json`)) as {
+          default: Record<string, unknown>
+        }
+-     ).default,
++     ).default
++   } catch (error) {
++     throw new Error(
++       `Failed to load messages for locale "${locale}". Ensure ../messages/${locale}.json exists and is valid JSON.`,
++       { cause: error }
++     )
++   }
++ 
++   return { locale, messages }
+
+
+─── i18n/request.ts:15-17 ───
+[maintainability · low] Casting the imported module to `Record<string, unknown>` discards the
+concrete message shape. While this is convenient, it means a malformed or mismatched messages file
+(missing keys, wrong nesting) is only discovered at runtime when `t()`/`useTranslations` lookups
+fail. Consider defining a shared `Messages` type for the JSON files (or validating the default
+export) so message-structure mismatches are caught at compile time or during import rather than by
+consumers.
+
+
+
+─── app/sitemap.ts:55-56 ───
+[bug · low] The `=== '/' ? '' : …` branch strips the trailing slash from the root URL, so `/` is
+emitted as `https://app.zabaqist.com` (no slash). For the same page, the document head resolves
+`rootAlternates()` in `app/[locale]/layout.tsx` against `metadataBase: new URL(siteUrl())` and emits
+the canonical, the `fr` hreflang and `x-default` as `https://app.zabaqist.com/` (with slash).
+`siteUrl()` already returns `url.origin` with no trailing slash (see `lib/siteUrl.ts`), so plain
+concatenation cannot double up the slash and this special case only creates a mismatch between the
+two signals. Emit `${SITE}${localeHref(locale, path)}` directly.
+
+    const url = (locale: string, path: string) =>
+-     `${SITE}${localeHref(locale, path) === '/' ? '' : localeHref(locale, path)}`
++     `${SITE}${localeHref(locale, path)}`
+
+
+─── app/sitemap.ts:63-67 ───
+[bug · medium] The document head for this exact page (`rootAlternates()` in
+`app/[locale]/layout.tsx`) publishes `x-default` alongside `fr` and `ar`, but the sitemap's
+`alternates.languages` omits it, so the two hreflang surfaces a crawler sees for `/` disagree. Add
+`'x-default': url(routing.defaultLocale, path)` so the sitemap's language set matches the head. Note
+this is the same drift the file's own comment warns about: the sitemap rebuilds the locale pairing
+by hand instead of sharing the helper the layout uses.
+
+      alternates: {
+-       languages: Object.fromEntries(
++       languages: {
++         ...Object.fromEntries(
+-         routing.locales.map((l) => [l, url(l, path)]),
++           routing.locales.map((l) => [l, url(l, path)]),
+-       ),
++         ),
++         'x-default': url(routing.defaultLocale, path),
++       },
+      },
+
+
+─── app/auth/callback/route.ts:26-26 ───
+[security · medium] Redirect origins are derived from untrusted request data
+(Host/x-forwarded-host/Origin/request.url) in app/auth/callback/route.ts and
+app/[locale]/signin/actions.ts. Derive from an allow-listed site URL env var and validate any
+header-derived host before using it in redirects or OAuth redirectTo.
+
+
+
+─── app/auth/callback/route.ts:44-46 ───
+[bug · high] `exchangeCodeForSession` sets the session cookies before it returns. When `error` is
+null but `data.user?.email` is missing (no user, or a user whose email is absent), this branch
+redirects without calling `supabase.auth.signOut()`, leaving a live session that was never checked
+against `is_email_allowed` — the closed-beta gate is silently bypassed for that session. Split the
+two conditions and sign out (and ideally log) before redirecting.
+
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+-   if (error || !data.user?.email)
++   if (error) return NextResponse.redirect(`${origin}/signin?error=1`)
++   if (!data.user?.email) {
++     await supabase.auth.signOut()
+      return NextResponse.redirect(`${origin}/signin?error=1`)
++   }
+
+
+─── app/auth/callback/route.ts:87-90 ───
+[bug · medium] Supabase sign-out error paths are not handled robustly: app/auth/callback/route.ts
+awaits signOut without catch and can turn the error redirect into a 500; app/auth/signout/route.ts
+leaves Supabase session cookies when createClient or signOut fails; app/[locale]/signin/actions.ts
+awaits signOut without checking its error and clears only E2E_COOKIE when createClient throws.
+Catch/log sign-out failures and always clear known sb-* session cookies and complete the redirect.
+
+      await log('signin_denied', { reason: 'not_on_allowlist' })
+      // Do not leave a usable session behind for an address that is not invited.
+-     await supabase.auth.signOut()
++     await supabase.auth.signOut().catch(() => {})
+      return NextResponse.redirect(`${origin}/signin?error=not-allowed`)
+
+
+─── app/auth/callback/route.ts:33-33 ───
+[maintainability · low] The header docblock claims "Every outcome is written to
+`public.auth_events`", but the missing-`code`, `createClient` failure, and exchange/email-missing
+outcomes all return before `log_auth_event` is invoked (and before the `log` helper is even
+defined); only `signin_check_failed`, `signin_denied` and `signin_ok` are recorded. The
+exchange-failure and email-missing cases are exactly the outcomes a beta operator most wants a trace
+of. Move the `log` helper up and record those outcomes (logging with the email when available), or
+correct the comment so the guarantee is not overstated.
+
+
+
+─── app/auth/callback/route.ts:35-35 ───
+[maintainability · low] `let supabase` has no type annotation, so TypeScript infers an
+implicit/evolving `any`. A typo on `supabase.auth.exchangeCodeForSession(...)` or a wrong argument
+would not be caught by the compiler. Annotate it (e.g. `let supabase: Awaited<ReturnType<typeof
+createClient>>`) or restructure to `const` inside the try/catch.
+
+-   let supabase
++   let supabase: Awaited<ReturnType<typeof createClient>>
+
+
+─── app/robots.ts:91-91 ───
+[bug · medium] The MUST_EXIST guard below only catches an *empty* walk, but the failure mode its
+comment promises to catch is a *missing/unreadable* `app/[locale]` or a build running from another
+cwd — in those cases `readdirSync(join(process.cwd(), 'app', '[locale]'))` throws a raw `ENOENT` at
+module scope and the descriptive error at the `missing` check is never produced. Wrap the walk so
+the friendly diagnostic actually fires (and carry the original error as the cause).
+
+- const routes = [...new Set(routesUnder(join(process.cwd(), 'app', '[locale]'), ''))]
++ const routes = (() => {
++   try {
++     return [...new Set(routesUnder(join(process.cwd(), 'app', '[locale]'), ''))]
++   } catch (err) {
++     throw new Error(
++       'app/robots.ts: could not walk app/[locale] — ' +
++         'refusing to publish a crawl policy derived from an unreadable tree.',
++       { cause: err },
++     )
++   }
++ })()
+
+
+─── app/robots.ts:69-70 ───
+[bug · medium] Every dynamic segment (`[courseId]`, `[quizId]`) is collapsed to its parent prefix,
+so `routes` can never contain a path like `/courses/[courseId]`. The subtraction against
+`INDEXABLE_PATHS` (the `filter` at the `PRIVATE` declaration) therefore cannot un-disallow a dynamic
+route: adding `/courses/[courseId]` to `INDEXABLE_PATHS` leaves `/courses` in `PRIVATE` (still
+`Disallow: /courses`), so robots.txt blocks the very chapters `app/sitemap.ts` advertises; adding
+the parent `/courses` instead removes the whole prefix and opens every dynamic child with no
+per-child control. Align the two semantics — emit the dynamic segment from the walk (and list the
+concrete chapter paths) or make the comparison prefix-aware and document that opening a dynamic page
+means opening its parent prefix.
+
+
+
+─── app/robots.ts:123-126 ───
+[maintainability · low] These are hardcoded URL prefixes and the only non-locale routes in the list;
+the walk only covers `app/[locale]`, so any future top-level private route outside the locale tree
+(e.g. a `/webhooks` or `/health` handler) would silently be crawlable because nothing derives its
+disallow rule. Consider walking `app/` outside `[locale]` (excluding `robots.ts`/`sitemap.ts`
+themselves) and deriving this list instead of hand-maintaining it.
+
+
+
+─── app/auth/signout/route.ts:101-102 ───
+[security · medium] This GET route performs two destructive actions — Supabase sign-out and wiping
+every `zabaqist*` key from `localStorage` — and is reachable by a plain cross-site top-level
+navigation (an `<a>` link, a form GET, or `window.location` from any other origin). Supabase auth
+cookies are typically `SameSite=Lax`, which *is* sent on top-level GET navigations, so an attacker
+page can force a sign-out **and** erase the victim's device-local progress with no CSRF token or
+same-origin check. Logout CSRF alone is low impact, but the localStorage wipe is real data loss.
+Consider requiring a POST with CSRF protection (or validating `Origin`/`Sec-Fetch-Site`) while
+keeping a same-origin link for the allowlist-refusal redirect, or at minimum documenting this
+trade-off explicitly.
+
+
+
+─── app/auth/signout/route.ts:84-88 ───
+[bug · medium] The inline wipe removes every key matching `^zabaqist[:_]`, which also matches
+archive keys under `ARCHIVE_PREFIX` (`zabaqist:device-local:`). `resetLocalState()` in `lib/sync.ts`
+deliberately skips those archives because they "belong to students who are not party" — but on a
+shared machine, one student signing out here erases every other student's archived data, undermining
+the archive mechanism the code elsewhere goes out of its way to preserve. If the intent is only to
+clear the signing-out student's traces, the script should exclude `ARCHIVE_PREFIX` (or only the
+current owner's archive), matching `resetLocalState()`.
+
+
+
+─── app/auth/signout/route.ts:82-84 ───
+[style · low] The generated browser script declares its variables with `var`, which the project
+rules prohibit (use `let`/`const`). These are real JS declarations authored in this repo even though
+they live inside a template string — switch to `const`/`let` (e.g. `const doomed = []`, `for (let i
+= 0; ...)`).
+
+
+
+─── app/[locale]/signin/actions.ts:50-50 ───
+[bug · medium] Unlike the surrounding `createClient()` call, `signInWithOAuth` is not wrapped in a
+try/catch. A network failure from the Supabase auth endpoint rejects the promise and escapes the
+action as an unhandled server error instead of the graceful `/signin?error=1` fallback used
+everywhere else. Catch the rejection and route it to the same error page for a consistent user
+experience.
+
+-   const { data, error } = await supabase.auth.signInWithOAuth({
++   const { data, error } = await supabase.auth
++     .signInWithOAuth({
++       provider: 'google',
++       options: {
++         redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safe)}`,
++         queryParams: { prompt: 'select_account' },
++       },
++     })
++     .catch(() => ({ data: { url: null }, error: new Error('OAuth request failed') }))
+
+
+─── app/[locale]/signin/actions.ts:105-105 ───
+[bug · medium] The reader's chapter/checkpoint/funnel state lives in `localStorage` and is only
+cleared by the page `/auth/signout` renders after this redirect. The session has already been ended
+server-side at this point, so if the client-side navigation is interrupted, or that route's clearing
+script fails to run (blocked JS, network error), the next student on a shared machine inherits the
+previous student's device state while the session is gone. This is inherent to a server action not
+touching localStorage, but consider a safety net — e.g. also clearing/refreshing device state on the
+next anonymous visit or first render — so the data wipe does not depend on a single best-effort
+redirect.
+
+
+
+─── app/[locale]/signin/actions.ts:91-91 ───
+[maintainability · low] `locale as never` is a type-unsafe escape hatch: it silences the mismatch
+between the cookie's `string` value and `routing.locales`' element type without actually validating
+or narrowing it. Prefer an honest cast of the array to `readonly string[]` (or a proper type guard)
+so the type system still reflects the runtime comparison.
+
+-     locale && locale !== routing.defaultLocale && routing.locales.includes(locale as never)
++     locale && locale !== routing.defaultLocale && (routing.locales as readonly string[]).includes(locale)
+
+
+─── lib/activity.ts:38-43 ───
+[bug · high] Synchronous localStorage reads guarded only by typeof window produce server/client
+hydration mismatches when called during render. Affected helpers: readLog in lib/activity.ts,
+chapterTotals/totalXp/summarize in lib/courseProgress.ts, readAnswers in lib/onboarding.ts,
+getCourseProgress in lib/progressTracking.ts, and readSelfCheck in lib/selfCheck.ts. Read device
+state only in effects and render the same zero/empty state on both server and client.
+
+
+
+─── lib/activity.ts:52-63 ───
+[bug · high] Device-store keys are not scoped to the current account/owner, so students sharing a
+machine read and write each other's data: activity zabaqist:activity (lib/activity.ts),
+checkpoint/shape/count keys (lib/courseProgress.ts), onboarding zabaqist:onboarding
+(lib/onboarding.ts), and progress zabaqist_course_progress (lib/progressTracking.ts). Namespace
+these keys by the current user and re-scope on sign-in/out.
+
+
+
+─── lib/activity.ts:285-289 ───
+[bug · medium] JSON.parse results from device storage are cast to typed shapes without runtime shape
+validation, allowing null/non-object/undefined fields to crash or corrupt aggregations: readLog
+entries (lib/activity.ts), readShapes/readCourseShape (lib/courseProgress.ts), onboarding answers
+fields (lib/onboarding.ts), progressMap entries (lib/progressTracking.ts), and selfCheck read
+(lib/selfCheck.ts). Validate and sanitize parsed values before indexing, spreading, or aggregating.
+
+
+
+─── lib/activity.ts:63-63 ───
+[bug · medium] Non-atomic localStorage read-modify-write sequences can lose concurrent tab updates:
+bump (lib/activity.ts), saveAnswers (lib/onboarding.ts), and saveCourseProgress/markTabCompleted
+(lib/progressTracking.ts). Serialize the read+write (e.g. navigator.locks) or merge concurrent
+storage events.
+
+
+
+─── lib/activity.ts:267-267 ───
+[performance · low] readLog() re-parses localStorage on every iteration of `filter` — O(n)
+JSON.parse/getItem calls, plus each call returns a fresh object. Read the log once: `const log =
+readLog(); const keys = Object.keys(log).filter((k) => worked(log[k])).sort()`.
+
+
+
+─── lib/activity.ts:203-207 ───
+[maintainability · low] `shift` is identical to `addDays` (same clone + setDate). Extract one shared
+helper and reuse it to avoid the duplicate implementation drifting.
+
+
+
+─── lib/activity.ts:198-200 ───
+[documentation · low] The "Totals across the whole recorded history" doc comment belongs to
+`lifetime()` (defined at the bottom of the file) but is attached to `worked`, which the following
+line already documents. Move the comment next to `lifetime` or delete it to avoid misdocumenting
+`worked`.
+
+
+
+─── lib/geogebraSpec.ts:25-25 ───
+[bug · high] An array passes this check: `typeof [] === 'object'` and `[]` is truthy, so
+`parseSpec('[1,2,3]')` returns the array as if it were a `GeogebraSpec`. Downstream (`<GeogebraBlock
+spec={spec} />` in CourseDoc.tsx) will then read `spec.commands`/`spec.coords` and get `undefined`,
+violating the documented contract of returning `null` on bad input. Reject arrays explicitly.
+
+-     return typeof spec === 'object' && spec ? spec : null
++     return typeof spec === 'object' && spec !== null && !Array.isArray(spec) ? spec : null
+
+
+─── lib/geogebraSpec.ts:24-24 ───
+[bug · medium] The unchecked `as GeogebraSpec` cast only validates JSON syntax, not the shape. A
+fence body is user-authored content, so `coords` can be any length (GeoGebra expects exactly four
+numbers), `commands` can contain non-strings, `appName` can be an arbitrary string, and
+`points`/`style` can be malformed — all of which pass through to GeoGebra code that assumes the
+`GeogebraSpec` shape. Add a runtime type guard (or schema validation) rather than trusting the cast.
+
+-     const spec = JSON.parse(source) as GeogebraSpec
++     const value: unknown = JSON.parse(source)
++     return isGeogebraSpec(value) ? value : null
+
+
+─── lib/courseProgress.ts:251-255 ───
+[bug · medium] The early-return equality check only compares the stored shape's key count, but the
+comment claims "same count and same total". If a chapter is re-published with the same number of
+sections but different view ids or different per-view XP values, `prev` is kept and the stored shape
+(and therefore `readSectionCount`, `totalXp`, and the dashboard percentages derived from them) stays
+stale forever. Compare the actual shape content (e.g. `JSON.stringify(prev) !==
+JSON.stringify(xpByView)`), not just its length.
+
+      const prev = all[slug]
+-     if (prev && Object.keys(prev).length === ids.length) {
++     if (prev && JSON.stringify(prev) === JSON.stringify(xpByView)) {
+        if (cpsByView) rememberCheckpointCounts(slug, cpsByView)
+        return
+      }
+
+
+─── lib/onboarding.ts:41-42 ───
+[documentation · low] The file header states the flow 'never asks twice in a row early on', but
+`filiere` and `option` are consecutive `ask` steps (fills 75 and 100). Either interleave a `give`
+step between them or correct the header so the documented rhythm matches the actual STEPS sequence.
+
+
+
+─── lib/e2e.ts:24-24 ───
+[bug · medium] This module reads `E2E_AUTH_SECRET` at module scope but never enforces a server-only
+boundary. It is currently imported only by `proxy.ts` (edge) and a server layout, but nothing stops
+a future Client Component from importing it. Next.js only inlines `NEXT_PUBLIC_*` variables into
+browser bundles, so on the client `process.env.E2E_AUTH_SECRET` evaluates to `undefined` and `isE2E`
+silently always returns `false` — no secret leak, but also no build error to reveal the wiring
+mistake, and the suite gate quietly stops working. Add `import 'server-only'` at the top of this
+file (the package is not currently in `package.json`, so install it) so an accidental client import
+fails the build instead of silently disabling the bypass.
+
+
+
+─── lib/e2e.ts:26-27 ───
+[security · low] `cookieValue === secret` compares the bypass secret in non-constant time. The
+cookie value is fully attacker-controllable, and native string equality short-circuits at the first
+mismatching character, which can leak the secret prefix through response-timing differences. Since
+this value is what grants passage past the auth gate, prefer a constant-time comparison over
+fixed-length digests (e.g. SHA-256 both sides, then compare with a constant-time routine compatible
+with the edge runtime) rather than a raw strict equality. Low severity here because
+`E2E_AUTH_SECRET` must never be set in production, but it is cheap defense-in-depth.
+
+
+
+─── lib/filiere.ts:44-45 ───
+[bug · medium] `isTrack` uses the `in` operator, which also walks the prototype chain. For a plain
+object literal, `'constructor' in TRACK_FILIERE`, `'toString' in TRACK_FILIERE`, `'__proto__' in
+TRACK_FILIERE`, etc. are all true. So a stored (or hand-edited) `track` value of `"constructor"`
+passes the guard, and `readFiliere` then returns `{ track: 'constructor', filiere:
+TRACK_FILIERE['constructor'] }` — i.e. `filiere` is the `Object` function, which violates the
+`Filiere` type and can crash downstream consumers (`FILIERE_TRACKS[filiere]` becomes `undefined`,
+`.map`/`.includes` throws). Use an own-property check to make the guard sound.
+
+  const isTrack = (v: unknown): v is Track =>
+-   typeof v === 'string' && v in TRACK_FILIERE
++   typeof v === 'string' && Object.hasOwn(TRACK_FILIERE, v)
+
+
+─── lib/filiere.ts:63-66 ───
+[bug · medium] `saveFiliere` trusts its `track` argument without a runtime guard. If a caller passes
+a value that is not a key of `TRACK_FILIERE` (e.g. a value cast from a URL query parameter),
+`TRACK_FILIERE[track]` is `undefined` and the literal written to storage is `{ track, filiere:
+undefined }`, which violates `FiliereChoice`. `readFiliere` then rejects it on the next load,
+silently discarding the choice. Guard with the (own-property-fixed) `isTrack` before writing so the
+write path and read path stay consistent.
+
+  export function saveFiliere(track: Track): void {
+-   if (typeof window === 'undefined') return
++   if (typeof window === 'undefined' || !isTrack(track)) return
+    try {
+      const choice: FiliereChoice = { track, filiere: TRACK_FILIERE[track] }
+
+
+─── lib/filiere.ts:67-68 ───
+[maintainability · low] This custom event is only received on the tab that dispatched it; the
+browser never forwards it to other open tabs. Consumers that only subscribe to `FILIERE_EVENT` (e.g.
+the course catalog, programme section and continue-learning section) therefore keep showing the old
+filière when the choice is changed in another tab, while only the dashboards also listen for the
+browser's `storage` event. Since `saveFiliere`/`clearFiliere` are the single write path for
+`zabaqist:filiere`, the cross-tab contract should be explicit: either document that cross-tab
+consumers must also subscribe to `storage`, or have this module expose/publish that requirement.
+
+
+
+─── lib/filiere.ts:41-42 ───
+[maintainability · low] Exported functions with no callers in the codebase: isFiliere
+(lib/filiere.ts), isPublicPath (lib/publicPaths.ts), and scoreOf (lib/selfCheck.ts). Remove them or
+wire them into a real validation path.
+
+
+
+─── lib/progressTracking.ts:102-106 ───
+[bug · medium] When no record exists yet (e.g. a course page rendered with `markVisited=false`, or
+time elapsing before the first `markTabCompleted`), this returns without recording anything, so the
+elapsed seconds and the `logSeconds` activity call are silently discarded. Create the progress
+record (or at least still call `logSeconds`) instead of returning early.
+
+-   const progress = getCourseProgress(courseId)
+-   if (!progress) return
++   const progress = getCourseProgress(courseId) ?? {
++     courseId,
++     lastVisitedTab: '',
++     completedTabs: [],
++     lastUpdated: new Date().toISOString(),
++     timeSpent: 0
++   }
+  
+    progress.timeSpent += seconds
+    logSeconds(seconds)
+
+
+─── lib/siteUrl.ts:17-17 ───
+[bug · medium] The localhost detection regex has no host boundary, so it also matches lookalike
+origins that merely start with a local address. `http://localhost.evil.com` and
+`http://127.0.0.1.evil.com` both match `localhost`/`127.0.0.1` as a prefix, so in production
+`siteUrl()` would silently substitute FALLBACK for what may be the real deployment origin. Prefer an
+exact comparison against the parsed hostname (the URL parser already lowercases the host and returns
+`[::1]` for IPv6).
+
+- const isLocal = (u: string) => /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])/.test(u)
++ const isLocal = (u: string) => {
++   const hostname = new URL(u).hostname
++   return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
++ }
+
+
+─── lib/siteUrl.ts:21-21 ───
+[maintainability · low] Every failure path (missing, malformed, non-http(s),
+localhost-in-production) silently returns FALLBACK. The file's own comment calls this an invisible
+failure: canonical/sitemap/OG URLs point at the wrong origin with no signal anywhere. Emit a warning
+when falling back in a production build so a misconfigured `NEXT_PUBLIC_SITE_URL` is detectable in
+build logs rather than only after crawlers start following wrong canonical URLs.
+
+
+
+─── lib/siteUrl.ts:15-15 ───
+[maintainability · low] Hardcoded URL/path literals violate the project rule: FALLBACK
+'https://app.zabaqist.com' in lib/siteUrl.ts and the fallback '/home' in lib/safePath.ts. Extract a
+single configuration/route constant.
+
+
+
+─── lib/programme.ts:362-363 ───
+[bug · medium] The `?? PROGRAMMES.sx` fallback silently substitutes the Sciences Exp programme (11
+chapters) for any value that isn't a known filière. Because the parameter is typed `Filiere`,
+TypeScript sees the `??` as dead code, so this failure mode only exists at runtime — exactly where
+`f` can come from a stale or tampered device value (the comment above this function says the
+argument reaches here from `localStorage` on a public page). `lib/filiere.ts` already exports
+`isFiliere` and `readFiliere()` already validates, so the unknown case should be rejected at the
+storage boundary instead of being papered over with the SX programme: an SM student with a corrupted
+stored value would be shown the wrong plan. Consider returning `undefined` here and letting callers
+handle the unknown case (or validating with `isFiliere` before calling); `chaptersOfSemester`
+inherits the same behavior.
+
+- export const chaptersOf = (f: Filiere): ChapterMeta[] =>
+-   PROGRAMMES[f] ?? PROGRAMMES.sx
++ export const chaptersOf = (f: Filiere): ChapterMeta[] | undefined =>
++   PROGRAMMES[f]
+
+
+─── lib/programme.ts:225-226 ───
+[maintainability · low] `chapterOf` is evaluated while building `CHAPTERS_SM` at module load, so a
+typo, rename, or removal of any shared SX slug throws here and crashes every page that imports this
+module — and nothing catches it because it happens during import. TypeScript gives no compile-time
+guarantee that the slugs passed by the `chapterOf(...)` calls exist in `CHAPTERS_SX`
+(`ChapterMeta['slug']` is just `string`). Prefer a construction that fails at build time rather than
+at runtime: define the shared slugs as a `const` tuple and check them against `CHAPTERS_SX` (e.g.
+via a `satisfies`/mapped-type check on the slug union, or a small build-time self-test), or degrade
+to `undefined` and let the caller render the "coming soon" fallback instead of taking down the whole
+app.
+
+
+
+─── lib/publicPaths.ts:121-122 ───
+[bug · high] `alternatesFor` gates only on `ALLOW_INDEXING` and never consults `INDEXABLE_PATHS`.
+With `NEXT_PUBLIC_ALLOW_INDEXING=1` it therefore emits a self canonical plus a full hreflang set for
+public-but-non-indexable paths — `app/[locale]/signin/page.tsx` passes `/signin`, and
+`/signup`/`/demarrer` are the same shape — while `app/sitemap.ts` publishes only `/` and
+`app/robots.ts` derives `Disallow` rules for everything not in `INDEXABLE_PATHS` (including
+`/signin`). That recreates exactly the crawler-signal contradiction this module exists to prevent.
+Gate on the indexable list as well: `if (!ALLOW_INDEXING || !(INDEXABLE_PATHS as readonly
+string[]).includes(path)) return null`.
+
+  export function alternatesFor(path: string, locale: Locale): Alternates | null {
+-   if (!ALLOW_INDEXING) return null
++   if (!ALLOW_INDEXING || !(INDEXABLE_PATHS as readonly string[]).includes(path))
++     return null
+
+
+─── lib/safePath.ts:33-34 ───
+[security · medium] Validation only inspects the raw string, so percent-encoded separators and dot
+segments pass unchanged: `/%2f%2fevil.com`, `/%5c%5cevil.com` and `/%2e%2e/…` all have `raw[1] ===
+'%'` and match nothing in HOSTILE. The helper's contract is “an in-app path”, but that guarantee
+currently depends on every caller decoding exactly once *before* calling and no sink decoding
+*afterwards*. A double-encoded value (`?next=/%252f%252fevil.com`) arrives here as `/%2f%2fevil.com`
+and is accepted; any sink that later decodes/normalises the path (or a future caller passing an
+undecoded value — the exact “four callers rewrote the bug” situation this file exists to end)
+reintroduces `//host` / `\host`. Consider decoding until stable and re-running the checks before
+returning.
+
+    if (HOSTILE.test(raw)) return fallback
++   // `%2f`/`%5c` decode back into the separators rejected above; a caller that
++   // decodes after validation would reintroduce the open redirect. Decode until
++   // stable and re-validate the same invariants.
++   if (raw.includes('%')) {
++     let decoded = raw
++     for (let i = 0; i < 3; i++) {
++       try {
++         const next = decodeURIComponent(decoded)
++         if (next === decoded) break
++         decoded = next
++       } catch {
++         return fallback
++       }
++     }
++     if (decoded[1] === '/' || HOSTILE.test(decoded)) return fallback
++   }
+    return raw
+
+
+─── lib/safePath.ts:32-32 ───
+[maintainability · low] `raw[1] === '\\'` is redundant: HOSTILE already rejects any backslash
+anywhere in the string, and that check runs immediately after. The result is identical with only
+`raw[1] === '/'`, and the doc comment above already documents the `\` case.
+
+-   if (raw[1] === '/' || raw[1] === '\\') return fallback
++   if (raw[1] === '/') return fallback
+
+
+─── lib/selfCheck.ts:54-55 ───
+[bug · medium] These writes go straight to the shared `SELFCHECK_KEY` without consulting the device
+seal or owner. `claimDevice` archives/restores the key on handoff, but the synced stores
+additionally check `deviceIsSealed()` before writing, while self-check writes have no such guard. In
+the window between another tab's `claimDevice` and this tab's reload, a click still calls
+`writeSelfCheck`/`clearSelfCheck` and repopulates the new owner's flat key with the previous
+student's verdicts — the leak the claim exists to prevent. Consider bailing when the device is
+sealed (via a shared, non-circular flag) before writing.
+
+
+
+─── lib/selfCheck.ts:83-83 ───
+[bug · low] `Object.values(...).slice(0, total)` assumes the stored keys are exactly the item
+indices `0..total-1`. `Object.values` orders integer-like keys numerically, but any stale index left
+by a previously longer chapter (or a non-numeric key) is still counted, inflating `answered`/`shaky`
+and breaking the product's "every figure derives from the content" rule. Filter entries by valid
+index range instead of slicing raw values.
+
+-   const v = Object.values(readSelfCheck(slug)).slice(0, total)
++   const v = Object.entries(readSelfCheck(slug))
++     .filter(([k]) => Number(k) >= 0 && Number(k) < total)
++     .map(([, x]) => x)
+
+
+─── lib/supabase/config.ts:17-17 ───
+[documentation · low] The module-level doc refers to a `configured()` function that does not exist;
+the actual API is `supabaseConfig()`, which returns `null` (not `false`) when the config is
+unusable. Update the comment to match the real exports so readers aren't misled.
+
+-  * `configured()` returns false for anything unusable, and the callers treat
++  * `supabaseConfig()` returns null for anything unusable, and the callers treat
+
+
+─── lib/supabase/config.ts:44-44 ───
+[bug · medium] Only ASCII validity is checked for the URL, so a malformed ASCII value such as
+`not-a-url` or `http://` passes this guard and then fails inside the Supabase client with the exact
+kind of opaque error this module exists to prevent. Validate that it parses as an https URL and
+reject otherwise.
+
+    if (!isAscii(URL_)) return { ok: false, why: 'NEXT_PUBLIC_SUPABASE_URL contains a non-ASCII character' }
++   try {
++     const url = new URL(URL_)
++     if (url.protocol !== 'https:')
++       return { ok: false, why: 'NEXT_PUBLIC_SUPABASE_URL must be an https:// URL' }
++   } catch {
++     return { ok: false, why: 'NEXT_PUBLIC_SUPABASE_URL is not a valid URL' }
++   }
+
+
+─── lib/supabase/config.ts:48-48 ───
+[bug · medium] `/^eyJ/` matches every legacy JWT-shaped key, not just secret/service keys. Legacy
+*anon* (publishable) keys are also JWTs starting with `eyJ`, respect RLS, and are safe to ship; this
+check disables valid legacy configurations, and the error message ('SECRET or legacy service key')
+is wrong for them. Decode the JWT payload and check the `role` claim (e.g. `role ===
+'service_role'`) instead of rejecting by prefix, failing closed only when the payload cannot be
+decoded.
+
+
+
+─── lib/supabase/config.ts:65-65 ───
+[maintainability · low] `validate()` runs once at module load and its result is frozen for the
+process lifetime, with `warned` also latched. With Next.js `NEXT_PUBLIC_*` inlining this is normally
+fine, but in tests or any runtime where env vars are populated after import (e.g. `vi.stubEnv`),
+`supabaseConfig()` returns `null` forever and can never recover. Consider lazy, memoized validation
+on first use, or document that env vars must be present before import.
+
+
+
+─── lib/supabase/config.ts:75-76 ───
+[security · low] The doc comment promises the reason is 'never shown in production', but the
+function returns `result.why` unconditionally and the `NODE_ENV` gate lives only in the one current
+caller (`signin/page.tsx`). Any future or additional caller receives the env-variable wiring
+details. Enforce the invariant here so the module, not its callers, owns the production gate.
+
+  export const supabaseConfigError = (): string | null =>
+-   result.ok ? null : result.why
++   result.ok || process.env.NODE_ENV === 'production' ? null : result.why
+
+
+─── lib/supabase/server.ts:30-37 ───
+[bug · medium] This catch swallows every cookie-write failure, not just the "called from a Server
+Component" case. `createClient()` is also used by Server Actions and Route Handlers
+(`app/[locale]/signin/actions.ts`, `app/auth/callback/route.ts`, `app/auth/signout/route.ts`), where
+`cookies().set()` is permitted and is exactly how Supabase persists rotated session tokens and the
+OAuth PKCE verifier. If a write fails there for a real reason (oversized cookie, invalid options,
+unexpected error), the failure is silently dropped: sign-in/callback/sign-out can appear to succeed
+while the session cookies are never stored, with nothing in the logs to explain it. Next.js signals
+the server-component case with a distinct error (`ReadonlyRequestCookiesError`, message "Cookies can
+only be modified in a Server Action or Route Handler"), so narrow the catch to that and rethrow/log
+everything else.
+
+          setAll: (list) => {
+            try {
+              for (const { name, value, options } of list)
+                store.set(name, value, options)
+-           } catch {
+-             /* called from a server component — see the note above */
++           } catch (error) {
++             /* Only a Server Component cannot write cookies — see the note above. */
++             if (
++               !(error instanceof Error) ||
++               !error.message.includes('Server Action or Route Handler')
++             ) {
++               throw error
++             }
+            }
+          },
+
+
+─── tailwind.config.ts:61-64 ───
+[bug · high] Tailwind v3 cannot apply opacity modifiers to these bare `var(--zb-*)` colors. For
+utilities like `text-zb-ink/75`, `hover:border-zb-mint/40`, `bg-zb-mint/15` or `bg-zb-cream/85`
+(used throughout app/ and components/), Tailwind calls `withAlphaVariable`, which runs
+`parseColor('var(--zb-mint)')`; that returns `null`, so the plugin falls back to emitting the color
+unchanged and silently drops the `/NN` suffix (see
+node_modules/tailwindcss/lib/util/withAlphaVariable.js lines 53-59). The result is that every
+opacity-modified `zb` utility renders at full opacity, unlike the standard tokens above which are
+wrapped in `hsl(var(--x))` and therefore do support alpha. Define the `zb` colors so they accept
+`<alpha-value>` (e.g. store raw channels and use `oklch(var(--zb-mint) / <alpha-value>)`) or map
+`opacityValue` through a color function.
+
+          zb: {
+-           mint: "var(--zb-mint)",
+-           "mint-deep": "var(--zb-mint-deep)",
+-           "mint-soft": "var(--zb-mint-soft)",
++           mint: ({ opacityValue }) =>
++             opacityValue === undefined
++               ? "var(--zb-mint)"
++               : `color-mix(in srgb, var(--zb-mint) calc(${opacityValue} * 100%), transparent)`,
++           "mint-deep": ({ opacityValue }) =>
++             opacityValue === undefined
++               ? "var(--zb-mint-deep)"
++               : `color-mix(in srgb, var(--zb-mint-deep) calc(${opacityValue} * 100%), transparent)`,
++           "mint-soft": ({ opacityValue }) =>
++             opacityValue === undefined
++               ? "var(--zb-mint-soft)"
++               : `color-mix(in srgb, var(--zb-mint-soft) calc(${opacityValue} * 100%), transparent)`,
+
+
+─── tailwind.config.ts:3-3 ───
+[maintainability · low] This file mixes ESM (`import type`, `export default`) with CommonJS
+(`require`). Under `"type": "module"` or a strict ESM loader, `require` is undefined at module
+evaluation time; even in the current CommonJS build, `require` returns `any`, so `fontFamily` (and
+`fontFamily.sans`/`fontFamily.mono` spread below) is untyped. Use an ESM import for consistency and
+type safety.
+
+- const { fontFamily } = require("tailwindcss/defaultTheme")
++ import { fontFamily } from "tailwindcss/defaultTheme"
+
+
+─── proxy.ts:106-110 ───
+[performance · medium] Public paths and the E2E bypass are only evaluated AFTER `await
+currentUser(...)`. For any request that carries a Supabase session cookie — a signed-in visitor on
+`/` or `/demarrer`, for example — this still performs a `getUser()` network round-trip before the
+gate can short-circuit, so the landing page's latency/availability depends on Supabase despite the
+fail-closed intent (a slow or failing Supabase delays or times out even the marketing page). Compute
+`path` first and return `response` for `PUBLIC.includes(path) || hasE2EBypass(req)` before calling
+`currentUser`. Trade-off to weigh: skipping `currentUser` on public pages also skips token rotation
+for those requests, so refresh then happens on the next protected navigation.
+
+    const response = intl(req)
+-   const user = await currentUser(req, response)
+- 
+    const path = withoutLocale(req.nextUrl.pathname)
+-   if (user || PUBLIC.includes(path) || hasE2EBypass(req)) return response
++ 
++   // Cheap checks first: a public page or an E2E run must not pay the Supabase
++   // round-trip before being allowed through.
++   if (PUBLIC.includes(path) || hasE2EBypass(req)) return response
++ 
++   const user = await currentUser(req, response)
++   if (user) return response
+
+
+─── proxy.ts:128-128 ───
+[bug · medium] Clearing `url.search` before setting `next` discards the original query string, and
+only `pathname` is stored. A request to `/fr/courses?tab=3&utm_source=email` therefore returns from
+sign-in at `/fr/courses` with no query parameters, silently losing UTM/tracking values and any
+URL-encoded state. Preserve the original search in the `next` value.
+
++   const next = `${req.nextUrl.pathname}${req.nextUrl.search}`
+    url.search = ''
++   url.searchParams.set('next', next)
+
+
+─── proxy.ts:129-129 ───
+[security · low] `next` is forwarded to the sign-in callback and ultimately controls a post-login
+redirect, but it is taken from the raw pathname with no validation that it is a same-origin relative
+path. If a pathname such as `//evil.com` ever reaches here (or any consumer trusts `next` blindly),
+the post-auth redirect becomes an open redirect. As defense-in-depth, validate that `next` starts
+with a single `/` and not `//` (and contains no scheme/host) before storing it.
+
+
+
+─── proxy.ts:161-161 ───
+[bug · medium] The exclusion comment says `auth` (and `api`) must never run through this proxy, but
+both matcher patterns only exclude `api|auth|_next|_vercel` at the ROOT. The first regex's negative
+lookahead only inspects the segment immediately after the leading `/`, and the second pattern
+`/(fr|ar)/:path*` has no exclusions at all — so `/fr/auth/callback` and `/fr/api/*` still match and
+execute the proxy. For `/fr/auth/callback` this means next-intl strips the locale and the gate
+redirects to `/signin` (there is no session during the code exchange), re-introducing the exact
+OAuth-callback breakage the comment describes if the callback is ever reached under a locale prefix.
+Add a locale-prefixed pattern that applies the same exclusions after the locale.
+
+-   matcher: ['/((?!api|auth|_next|_vercel|.*\\..*).*)', '/(fr|ar)/:path*'],
++   matcher: [
++     '/((?!api|auth|_next|_vercel|.*\\..*).*)',
++     '/(fr|ar)/((?!api|auth|_next|_vercel).*)',
++   ],
+
+
+─── lib/sync.ts:192-194 ───
+[bug · high] The live device-local keys are destroyed before the archive write is attempted, and
+`writeJSON`'s boolean result is discarded. If that archive write fails — quota or private mode, both
+cases this module explicitly documents — the outgoing student's self-assessments and celebration
+markers are already gone and are lost permanently. Write the archive first (safe, because
+`resetLocalState` spares `ARCHIVE_PREFIX` keys) and only wipe once it has actually landed.
+
+        const theirs = deviceLocalEntries()
++       // Archive before wiping: once `resetLocalState` runs, `theirs` is the only copy.
++       if (Object.keys(theirs).length && !writeJSON(archiveKey(previous), theirs)) {
++         return false
++       }
+        resetLocalState()
+-       if (Object.keys(theirs).length) writeJSON(archiveKey(previous), theirs)
+
+
+─── lib/sync.ts:534-534 ───
+[bug · high] `remoteIsNewer` only tests whether the server row is newer than `PULLED_AT_KEY` (the
+last pull time); it never consults the local attempt's own `at`. A checkpoint attempted on this
+device after the last pull is therefore invisible to the comparison — an older remote row that also
+postdates the last pull is treated as fresher and overwrites the newer local attempt, resurrecting
+the failed attempt the "Réessayer" rule just cleared. The comment says "the date decides", but the
+date must be `row.updated_at` vs `local.at`, not the last pull time. Compare the two instants
+directly (`remoteIsNewer` then has no remaining caller and should be removed).
+
+-     const fresher = remoteIsNewer(row.updated_at)
++     const remoteAt = instant(row.updated_at)
++     const localAt = instant(local.at)
++     const fresher = remoteAt !== null && (localAt === null || remoteAt > localAt)
+
+
+─── lib/sync.ts:638-645 ───
+[bug · medium] `readJSON`, `readString` and `localCheckpoints` all swallow storage errors and return
+fallback values, so `pushAll` cannot distinguish "no data" from "storage unreadable". When
+`localStorage` access throws, this snapshot is all defaults (`owner: null`, empty maps/arrays), the
+ownership guard in `pushNow` (`snap.owner !== null && snap.owner !== userId`) is bypassed, and the
+push runs as if the student's device were empty — including a profile upsert that bumps
+`profiles.updated_at` with no real data read. Probe storage availability before snapshotting (or
+make the readers report failure) and skip the push when the real state cannot be read.
+
+
+
+─── lib/sync.ts:721-728 ───
+[bug · medium] `CourseProgress.lastUpdated` is read into the snapshot and merged back on pull, but
+the push rebuilds each row with `updated_at: now` and never sends `p.lastUpdated`. The change time
+is silently dropped on the round trip, and a progress row that has not changed in weeks is
+re-stamped with the upload time on every push — the exact "stale becomes fresh" failure the
+checkpoint path avoids via `UNDATED`. Send the carried value, e.g. `updated_at: p.lastUpdated ||
+now`.
+
+    const progressRows = Object.values(progress).map((p) => ({
+      user_id: userId,
+      course_slug: p.courseId,
+      last_visited_view: p.lastVisitedTab || null,
+      completed_views: p.completedTabs ?? [],
+      time_spent_seconds: p.timeSpent ?? 0,
+-     updated_at: now,
++     updated_at: p.lastUpdated || now,
+    }))
+
+
+─── lib/sync.ts:708-719 ───
+[bug · medium] `pullAll`'s filière rule is "the server wins unless this device chose more recently",
+and it reads `profiles.updated_at` as the server's choice time. But this upsert sends the local
+filière unconditionally and stamps `updated_at: now` on every push, even when the filière didn't
+change. `profiles_merge` then keeps the pushed (possibly stale) filière and bumps `updated_at` to
+the push time, so a device that chose more recently can be overruled by another device's unrelated
+push. Either carry the device's choice time (`FILIERE_AT_KEY`) to the server and let the trigger
+compare choice times, or omit `filiere`/`track` (and avoid the `updated_at` bump) when this device
+has no newer choice to assert.
+
+
+
+─── lib/sync.ts:547-547 ───
+[bug · low] `local.hints` is used unguarded here, while the comparison just below uses `local.hints
+?? 0`. A stored checkpoint that predates the `hints` field (or an object parsed without it) makes
+`Math.max(undefined, ...)` produce `NaN`, which is then JSON-serialized as `null` and written back,
+corrupting the checkpoint. Use `Math.max(local.hints ?? 0, row.hints ?? 0)`.
+
+-       hints: Math.max(local.hints, row.hints ?? 0),
++       hints: Math.max(local.hints ?? 0, row.hints ?? 0),
+
+
+─── lib/sync.ts:512-519 ───
+[performance · low] `changed = true` is set for every remote row on every pull, even when the merged
+value equals what is already stored. The checkpoint merge just below explicitly guards against
+exactly this because it made `SyncProvider` re-read the interface on every mount; the progress (and
+the activity loop's per-row `changed = true`) still do it, so any pull with remote data reports a
+change and triggers a needless re-render. Compare the merged object to `local` before setting
+`changed`.
+
+-       map[row.course_slug] = {
++       const next = {
+          courseId: row.course_slug,
+          lastVisitedTab: local?.lastVisitedTab || (row.last_visited_view ?? ''),
+          completedTabs: [...views],
+          lastUpdated: row.updated_at ?? local?.lastUpdated ?? new Date().toISOString(),
+          timeSpent: Math.max(local?.timeSpent ?? 0, row.time_spent_seconds ?? 0),
+        }
++       if (JSON.stringify(next) !== JSON.stringify(local)) {
++         map[row.course_slug] = next
+-       changed = true
++         changed = true
++       }
+
+
+─── app/[locale]/(with-header)/courses/LearningPaths.tsx:3-3 ───
+[maintainability · low] Remove unused `React`/`Image` imports under the automatic JSX runtime;
+applies to LearningPaths, BrowseAllCourses, home, landing, MainContent, Footer, AccountMenu,
+GoogleButton, and ViewHeader.
+
+
+
+─── app/[locale]/(with-header)/courses/LearningPaths.tsx:36-36 ───
+[bug · medium] Inline `gridTemplateColumns: 'repeat(2, 1fr)'` overrides Tailwind responsive
+`md:grid-cols-3 lg:grid-cols-6`; move base columns to `grid-cols-2` and drop the inline style.
+
+- <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}} className="md:grid-cols-3 lg:grid-cols-6">
++ <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+
+
+─── app/[locale]/(with-header)/courses/LearningPaths.tsx:20-20 ───
+[maintainability · low] Move static inline styles (layout, colors, typography, gradients, flex
+values) into CSS modules or Tailwind utility classes.
+
+
+
+─── components/ComebackCard.tsx:47-52 ───
+[maintainability · low] Extract `'zabaqist:progress'` to a shared `PROGRESS_EVENT` constant and
+import it on both dispatch and listen sides.
+
+-     for (const e of [ACTIVITY_EVENT, 'zabaqist:progress'])
++ import { ACTIVITY_EVENT, PROGRESS_EVENT } from '@/lib/activity'
++ // ...
++     for (const e of [ACTIVITY_EVENT, PROGRESS_EVENT])
+        window.addEventListener(e, read)
+      return () => {
+-       for (const e of [ACTIVITY_EVENT, 'zabaqist:progress'])
++       for (const e of [ACTIVITY_EVENT, PROGRESS_EVENT])
+          window.removeEventListener(e, read)
+      }
+
+
+─── app/[locale]/(with-header)/progres/page.tsx:20-20 ───
+[maintainability · low] Normalize/validate `ContentLocale` consistently instead of unsafe `locale
+=== 'ar' ? 'ar' : 'fr'` or blind `as ContentLocale`; reuse the existing helper/awaited params.
+
+-   const l = locale === 'ar' ? 'ar' : 'fr'
++   const l = await getLocale()
+
+
+─── app/[locale]/(with-header)/layout.tsx:91-102 ───
+[style · low] Project rules prohibit nested ternary expressions; replace these instances with
+if/else or per-state lookup/class maps.
+
+-   const user = account
+-     ? {
++   let user: User | typeof E2E_USER | undefined
++   if (account) {
++     user = {
+-         name: (meta.full_name ?? meta.name ?? null) as string | null,
++       name: (meta.full_name ?? meta.name ?? null) as string | null,
+-         email: account.email ?? null,
++       email: account.email ?? null,
+-         image: (meta.avatar_url ?? meta.picture ?? null) as string | null,
++       image: (meta.avatar_url ?? meta.picture ?? null) as string | null,
+-       }
++     }
+-     : // A bypassed request has passed the gate but holds no Supabase session,
+-       // so there is no profile to draw. Give the chrome a label rather than
+-       // leaving the account menu — and its sign-out — untestable.
+-       isE2E((await cookies()).get(E2E_COOKIE)?.value)
+-       ? E2E_USER
+-       : undefined
++   } else if (isE2E((await cookies()).get(E2E_COOKIE)?.value)) {
++     user = E2E_USER
++   }
+
+
+─── app/[locale]/(with-header)/home/page.tsx:40-43 ───
+[bug · high] Contain per-course document loading failures with try/catch or `Promise.allSettled`
+(and pair each course with its own doc rather than by position), so one malformed doc cannot 500 the
+page.
+
+    await Promise.all(
+      listCourses().map(async (c) => {
++       try {
+-       const doc = await loadCourseDoc(c.slug)
++         const doc = await loadCourseDoc(c.slug)
+-       if (!doc) return
++         if (!doc) {
++           console.warn(`courseDoc: no document for ${c.slug}`)
++           return
++         }
++         out[c.slug] = {
++           tabs: tabsOf(doc.views).map((t) => ({
++             id: t.viewIds[0]!,
++             label: t.label,
++             kind: t.kind,
++             viewIds: t.viewIds,
++           })),
++           views: doc.views.length,
++         }
++       } catch (err) {
++         console.error(`courseDoc: failed to load ${c.slug}`, err)
++       }
++     }),
++   )
+
+
+─── app/[locale]/(with-header)/subscribe/page.tsx:51-54 ───
+[maintainability · medium] Centralize hardcoded business values/URLs (prices, waitlist URL, legal
+URLs) into shared config/env so they cannot drift.
+
+
+
+─── app/[locale]/(with-header)/courses/[courseId]/CourseFallback.tsx:29-35 ───
+[maintainability · low] Centralize course/quiz route construction into a shared `courseHref(slug,
+sectionId?)` helper; derive chapter slugs from the catalog instead of hardcoding them.
+
+
+
+─── app/[locale]/(with-header)/progres/page.tsx:26-26 ───
+[maintainability · low] Centralize hardcoded app/auth/nav route paths (`/progres`, `/auth/signout`,
+`/home`, `/signin`, footer/header links, chrome-free paths) into shared route constants.
+
+
+
+─── app/[locale]/demarrer/page.tsx:180-180 ───
+[maintainability · low] No change needed: `useLocaleRouter.push(`/courses/${slug}`)` is the correct
+string form because routing defines no `pathnames`; next-intl adds locale prefixes automatically.
+
+
+
+─── app/[locale]/(with-header)/courses/page.tsx:31-35 ───
+[bug · medium] Root metadata merges shallowly, so child pages inherit root `openGraph.url`
+(homepage); set page-specific `openGraph`/`twitter` metadata or remove page-level URL from root
+layout.
+
+    return {
+      title: `${t('title')} · Zabaqist`,
+      description: t('sub'),
+      alternates: alternatesFor('/courses', l),
++     openGraph: {
++       title: `${t('title')} · Zabaqist`,
++       description: t('sub'),
++       url: localeHref(l, '/courses'),
++     },
+    }
+
+
+─── app/[locale]/layout.tsx:118-118 ───
+[maintainability · medium] Derive locale-specific metadata from helpers (`localeHref`) and validate
+unsupported locales consistently with `notFound()`; avoid hardcoded `/ar` suffix and silent
+default-locale coercion.
+
+-       url: l === 'fr' ? site : `${site}/ar`,
++       url: `${site}${localeHref(l, '/')}`,
+
+
+─── components/SyncProvider.tsx:116-118 ───
+[bug · high] Guard device-store reads/writes with `deviceIsSealed()`/`deviceOwner()` or
+account-scoped keys so a dispossessed tab/shared machine cannot show or credit another student's
+data.
+
+      const onFiliereChosen = () => {
+-       if (!pulling.current && !deviceIsSealed()) noteFiliereChange()
++       if (!pulling.current && !deviceIsSealed() && deviceOwner() === userId)
++         noteFiliereChange()
+      }
+
+
+─── components/ComebackCard.tsx:36-43 ───
+[bug · medium] Validate/catch corrupted localStorage values before use and fall back to empty/zero
+state instead of crashing.
+
+    const read = useCallback(() => {
++     try {
+-     const life = lifetime()
++       const life = lifetime()
+-     setTotal({
++       setTotal({
+-       xp: totalXp(listCourses().map((c) => c.slug)),
++         xp: totalXp(listCourses().map((c) => c.slug)),
+-       sections: life.sections,
++         sections: life.sections,
+-       minutes: Math.round(life.seconds / 60),
++         minutes: Math.round(life.seconds / 60),
+-     })
++       })
++     } catch {
++       /* storage unavailable — the card shows the zero state, which is honest */
++     }
+    }, [])
+
+
+─── components/course/ChapterComplete.tsx:61-65 ───
+[bug · high] Include `xpByView`/`cpsByView` maps in callback dependency arrays instead of
+suppressing the ESLint warning, so UI and XP calculations cannot use stale values.
+
+      setXp(viewIds.reduce((sum, id) => sum + (xpByView[id] ?? 0), 0))
+      setOpen(true)
+-     // xpByView is rebuilt each render but keyed by the ids.
+-     // eslint-disable-next-line react-hooks/exhaustive-deps
+-   }, [slug, idsKey])
++   }, [slug, idsKey, xpByView])
+
+
+─── components/course/Checkpoint.tsx:55-55 ───
+[bug · medium] Key or guard hydrated client state against `storageKey`/`slug` so changing
+course/checkpoint does not flash stale data before hydration.
+
+-   const { draft, tried, verdict, hints } = state
++   // Never show the previous checkpoint's work while its replacement hydrates.
++   const active = state.key === storageKey ? state : EMPTY_CHECKPOINT
++   const { draft, tried, verdict, hints } = active
+
+
+─── app/[locale]/(with-header)/courses/[courseId]/CourseFallback.tsx:60-64 ───
+[bug · medium] URL-encode user-controllable dynamic path/query values when constructing hrefs
+(`courseId` for `/quiz/${courseId}` and section ids for `?s=...`).
+
+                              <LinkButton
+-                                 href={`/quiz/${courseId}`}
++                                 href={`/quiz/${encodeURIComponent(courseId)}`}
+                                  color="mint"
+                                  leftSection={<IconTrophy size={16} />}
+                              >
+
+
+─── app/[locale]/demarrer/page.tsx:178-179 ───
+[bug · high] Do not default to `'sx'` when no filière is chosen; render a neutral/gate state and
+derive programme stats from the actual answer.
+
+
+
+─── app/[locale]/(with-header)/courses/LearningPaths.tsx:33-33 ───
+[bug · low] The `Continuer` CTA and the `Voir toutes les thématiques` button have no `onClick`
+handler or link, so both buttons are inert when clicked. If these are meant to navigate the user
+(continue the current path / expand the list), wire them up; otherwise remove the button affordance
+to avoid a dead control.
+
+
+
+─── app/[locale]/(with-header)/courses/BrowseAllCourses.tsx:27-27 ───
+[bug · medium] This component lives on a locale-aware route (`app/[locale]`, with headings already
+localized via `useTranslations('catalog')`), but the search placeholder, the category labels
+(`Toutes`, `Algèbre`, ...) and the `BAC` badge are hardcoded French. Non-French locales will still
+see French UI text. Move these strings into the `catalog` translation namespace and render them with
+`t(...)`.
+
+
+
+─── app/[locale]/(with-header)/courses/BrowseAllCourses.tsx:12-19 ───
+[maintainability · medium] The course list and its `BAC` badge are hardcoded in the component with
+no source of truth. Per the product rule that nothing shown may be invented, catalog entries and
+qualification badges should derive from actual content data (and localization), not from a static
+in-file array, so the UI does not display unverified content or claims.
+
+
+
+─── app/[locale]/(with-header)/courses/BrowseAllCourses.tsx:38-40 ───
+[maintainability · low] `categories` and `courses` are recreated on every render and keyed by array
+index. While these lists are currently static, prefer hoisting them to module scope and keying by a
+stable value (e.g. the category name / course title) so React reconciliation and future
+filtering/sorting do not rely on positional identity.
+
+
+
+─── app/[locale]/(with-header)/home/page.tsx:49-49 ───
+[maintainability · low] `t.viewIds[0]!` asserts an invariant that only `tabsOf` currently upholds —
+every tab is created with `viewIds: [v.id]` and folding only appends. The `!` is erased at runtime,
+so if that invariant ever breaks, `id` silently becomes `undefined` rather than throwing, and
+`ContinuePanel` would then render `key={undefined}` and `?s=undefined` links. Prefer an explicit
+guard/fallback so the failure is loud.
+
+-           id: t.viewIds[0]!,
++           id: t.viewIds[0] ?? t.id,
+
+
+─── app/[locale]/(with-header)/layout.tsx:43-43 ───
+[maintainability · medium] `let account = null` widens to the implicit `any` type, so every later
+read (`account.email`, `account.id`, `account.user_metadata`) is unchecked — a typo like
+`account.emial` would compile silently. This violates the "avoid `any`" rule and loses the type
+safety that the rest of the file relies on for the user object it constructs. Annotate the
+declaration with the Supabase `User` type (or derive the type from the first assignment) instead of
+leaving it inferred as `any`.
+
+-   let account = null
++   let account: User | null = null
+
+
+─── app/[locale]/(with-header)/subscribe/page.tsx:90-92 ───
+[performance · low] This runs on every request that renders the page and re-reads and re-parses
+every course markdown file just to count checklist items. Combined with the missing error handling
+above, this is a fragile and needlessly expensive path for a pricing page. Consider caching the
+loaded docs (e.g. React `cache()`/`unstable_cache`, or a derived static count) so the item total is
+not recomputed from scratch per request.
+
+
+
+─── app/[locale]/ClientLayout.tsx:63-63 ───
+[maintainability · low] This one-time mount effect removes a hardcoded magic class
+(`search_plugin_added`) from the global `document.body` with no guard, no cleanup, and no
+explanation of where the class comes from — it appears nowhere else in the repository. If the class
+is re-added by its owner after mount, or another provider relies on it, the removal silently stops
+working or breaks the other provider. Document the intent behind this workaround or remove it.
+
+
+
+─── app/[locale]/demarrer/page.tsx:133-137 ───
+[bug · critical] Direct URL access can complete onboarding without any answers. `stepIndex` clamps
+any `?e=` value to a valid index, and `answered` only enforces answers for `ask` steps
+(`motivation`, `filiere`, `option`). A reader visiting `/demarrer?e=programme` reaches the
+`programme` step with `answered === true` (because `step.kind !== 'ask'` is false but none of the
+`ask` conditions match, so it's not `ask`... wait — `programme` is a GIVE step with `step.kind !==
+'ask'`, so `answered` short-circuits to `true`). `commitAndGo` then writes `completedAt`, marking
+onboarding as finished even though `motivation`, `filiere` and `track` were never chosen. Guard the
+completion write on the answers actually having been provided.
+
+    const answered =
+-     step.kind !== 'ask' ||
+      (step.id === 'motivation' && !!motivation) ||
+      (step.id === 'filiere' && !!filiere) ||
+-     (step.id === 'option' && !!track)
++     (step.id === 'option' && !!track) ||
++     (step.id === 'programme' && !!motivation && !!filiere && !!track)
+
+
+─── app/[locale]/demarrer/page.tsx:243-246 ───
+[bug · high] Abandoned filière switch leaves stale persisted choices. On `filiere` change, only the
+in-memory `track` is cleared (`setTrack(null)`); the previous `track` (and old `filiere`) remain in
+localStorage until the reader recommits at the option step. If the reader closes the tab before
+reaching `option`, the next visit restores the old filière/track pair — including a track that no
+longer belongs to the newly selected filière (the `FILIERE_TRACKS` check only validates against the
+*stored* filière, not the in-memory one). Clear or rewrite the stored answers the moment the filière
+changes.
+
+                onChange={(id) => {
+                  setFiliere(id as Filiere)
+                  setTrack(null)
++                 saveAnswers({ track: undefined, filiere: id as Filiere })
+                }}
+
+
+─── app/[locale]/demarrer/page.tsx:113-114 ───
+[maintainability · low] `useCallback` is unnecessary here: `commitAndGo` closes over `step.id`,
+`motivation`, `track`, `filiere`, `go`, and `index`, and is recreated every render anyway (all of
+these change on each answer). The `useCallback` wrapper adds no memoization benefit and its
+dependency array is just an alias for the full dependency set. This is a minor maintainability nit —
+plain function is fine — but per the checklist it's worth noting that the memoization is not
+providing the stated benefit.
+
+
+
+─── app/[locale]/(with-header)/courses/[courseId]/page.tsx:225-230 ───
+[bug · high] `ChapterComplete` is only mounted in the `!requestedView` path branch, but a section is
+marked read in the `?s=` reader branch — `CourseProgressCard` there runs `markTabCompleted` with the
+default `markVisited` while the path branch passes `markVisited={false}`. So finishing the final
+section while reading happens with no `ChapterComplete` mounted: its `zabaqist:progress` listener
+isn't registered and its mount-time `check()` never runs, deferring the once-after-completion XP
+payout/celebration until the reader returns to the path view — which the reader branch provides no
+link to (back goes to `/courses`, prev/next stay on `?s=`). Mount `ChapterComplete` in the reader
+branch too (or hoist it above the conditional) so it fires at the moment the last section is read.
+
+
+
+─── app/[locale]/layout.tsx:160-162 ───
+[maintainability · medium] The App Router requires the root layout to render both `<html>` and
+`<body>`; here `<body>` is rendered by the client `ClientLayout` instead, and an empty `<head/>` is
+hand-written. Next.js uses the root layout to manage document/script injection and hydration, so
+delegating `<body>` to a client component violates the documented contract and is fragile (the
+`mounted ? 'client-side-classes' : ''` toggle on `<body>` is what pulled it in there). Keep `<body>`
+in this layout and have `ClientLayout` apply the post-mount class via `useEffect` on
+`document.body`.
+
+
+
+─── app/[locale]/signin/page.tsx:93-93 ───
+[security · high] Sanitizing before stripping the locale defeats `safeInternalPath`'s `//` guard.
+For `next = '/fr//evil.com'` (or `/ar//evil.com`), `safeInternalPath` accepts it because `raw[1]` is
+`'f'`/`'a'` and there is no backslash, then `unprefixed` slices off the locale and hands
+`'//evil.com'` to `redirect`. With `localePrefix: 'as-needed'` and default locale `fr`, next-intl
+passes that through unprefixed, and the resulting `Location: //evil.com` is protocol-relative — the
+exact form this file's `safeInternalPath` import exists to reject. Sanitize the value that is
+actually passed to `redirect`, i.e. strip first, then validate.
+
+-   if (user) redirect({ href: unprefixed(safeInternalPath(next)), locale })
++   if (user) redirect({ href: safeInternalPath(unprefixed(next ?? '')), locale })
+
+
+─── app/[locale]/signin/page.tsx:47-53 ───
+[maintainability · low] This function is a verbatim copy of `withoutLocale` in `proxy.ts`. Two
+copies of locale-stripping logic must stay in sync on every locale/path edge case (and `proxy.ts`
+already imports from `@/lib/*`, so a shared module is feasible). Extract the pure function into a
+shared `lib/` module and import it from both places — the security-sensitive ordering around
+`safeInternalPath` here makes a diverging copy especially risky.
+
+
+
+─── app/[locale]/filiere/page.tsx:69-71 ───
+[bug · medium] The fallback is a fully interactive `FilierePicker` wired to `/home`. On a hard load
+of `/filiere?next=/courses` (the "changer de filière" flow from the catalog), the server sends this
+fallback and it stays on screen until the `useSearchParams` boundary hydrates/resolves. A reader who
+confirms their pick in that window commits `saveFiliere` and is `router.push`-ed to `/home` instead
+of `/courses`, and any partial selection is discarded when the fallback unmounts. The comment says
+"nothing moves", but the destination is what differs. Make the fallback non-interactive (visually
+identical but disabled, or a spinner) so a commit can't fire before the real `next` is known.
+
+-             <Suspense fallback={<Picker next={DEFAULT_NEXT} />}>
++             <Suspense fallback={<FilierePicker disabled />}>
+                <PickerAtUrlDestination />
+              </Suspense>
+
+
+─── app/[locale]/filiere/page.tsx:33-33 ───
+[bug · low] `safeInternalPath` accepts locale-prefixed paths (e.g. `/ar/progres`) and the result is
+handed straight to the locale-aware `router.push`. The sign-in page documents the same hazard in
+detail: `proxy.ts` builds `next` from the full prefixed pathname, and a locale-aware redirect of an
+already-prefixed path produces `/ar/ar/progres` or drops the reader into French — which is why it
+strips the prefix first. Today no caller sends a prefixed `next` to `/filiere` (only `/courses` and
+the `/home` default), so this is latent, but the "no language in it" contract is enforced nowhere in
+this file. Strip the locale prefix before pushing (reuse the `unprefixed` logic from
+`signin/page.tsx`), or centralise the normalization in `safeInternalPath`.
+
+-   return <FilierePicker onDone={() => router.push(next)} />
++   return <FilierePicker onDone={() => router.push(unprefixed(next))} />
+
+
+─── app/[locale]/filiere/page.tsx:50-52 ───
+[other · low] This is the page's only heading and it renders as an `<h2>`; `Logo` renders a
+`<span>`, so the route has no `<h1>` and screen-reader heading navigation starts at level 2. Use
+`order={1}` (or a plain `<h1>` with equivalent styles) for the page title so the document outline is
+correct.
+
+
+
+─── app/global-error.tsx:52-53 ───
+[other · low] Because this boundary replaces the root layout, the document-level metadata the root
+layout normally renders (the `viewport` export / default viewport meta and the `<title>`) is no
+longer present. On mobile this page will be laid out at the default ~980px width and zoomed out, so
+the reassuring copy becomes tiny precisely for the users this fallback is meant to serve. Consider
+supplying your own `<head>` with a viewport meta (and a title) inside this component, e.g. `<meta
+name="viewport" content="width=device-width, initial-scale=1" />`.
+
+      <html lang="fr">
++       <head>
++         <meta name="viewport" content="width=device-width, initial-scale=1" />
++       </head>
+        <body
+
+
+─── components/CourseCard.tsx:56-56 ───
+[other · medium] `progress` is documented as 0–100 but not enforced by the type or the caller. When
+a value outside that range arrives (e.g. -5 or 120 from a data hiccup), the visual bar is clamped by
+`Math.min(100, Math.max(0, progress))`, but `aria-valuenow` is announced as the raw rounded value.
+That yields an invalid `progressbar` state (`aria-valuenow` must lie within
+`aria-valuemin`/`aria-valuemax`) and a mismatch between what sighted and assistive-technology users
+perceive. Clamp here too (or compute the clamped value once and reuse it for both the width and
+`aria-valuenow`).
+
+-           aria-valuenow={Math.round(progress)}
++           aria-valuenow={Math.round(Math.min(100, Math.max(0, progress)))}
+
+
+─── components/CourseCard.tsx:79-79 ───
+[other · medium] `aria-disabled` only has meaning on interactive controls. This fallback is a plain
+`div` with no role and no disabled state, so AT either ignores the attribute or announces a disabled
+control that doesn't exist — misleading users about the tile's availability. Since the tile is
+intentionally non-interactive, drop `aria-disabled`. (Also note that `shell` still applies
+`hover:-translate-y-1`/shadow and `group-hover:scale-105`, making the non-clickable tile look
+clickable, which conflicts with the 'not a link' intent in the comment above.)
+
+-     <div className={`${shell} cursor-default`} aria-disabled>
++     <div className={`${shell} cursor-default`}>
+
+
+─── components/CourseCard.tsx:55-55 ───
+[other · low] The progressbar has no accessible name. Screen readers will only announce 'progress
+bar, N%', so users cannot tell what it measures — especially on a page with many tiles. Add
+`aria-label` (localized, e.g. `${title} progress`) or `aria-labelledby` pointing at the `h3`.
+
+            role="progressbar"
++           aria-label={`${title} progress`}
+
+
+─── components/Footer.tsx:108-108 ───
+[bug · medium] `new Date().getFullYear()` runs during render. This is a client component but the App
+Router still server-renders it: the server evaluates the date in UTC while the browser evaluates it
+in the reader's local timezone, so around the Dec 31/Jan 1 boundary the two passes can compute
+different years and React will report a hydration mismatch for this paragraph (server markup year !=
+first client render year). Make it deterministic — e.g. add `suppressHydrationWarning` to this
+element, or hydrate the year in a `useEffect` so both sides render the same initial value.
+
++                     <p className="text-sm text-zb-cream/80" suppressHydrationWarning>
+                          {t('rights', {year: new Date().getFullYear()})}
++                     </p>
+
+
+─── components/Header.tsx:147-149 ───
+[maintainability · medium] The desktop nav (the `NAV.map(...)` around line 74) and this drawer nav
+render the same three links with the same `isActive`/`aria-current` logic, and the premium `Link` is
+also duplicated across both surfaces. Any route, icon, label, or styling change now has to be made
+twice, and the two surfaces will drift. Extract a module-level helper (e.g. a `NavLinks` component
+accepting a compact/variant prop, or a render function — not a component declared inside `Header`)
+so both navs share a single definition.
+
+-         <nav className="flex flex-col gap-1">
+-           {NAV.map(({ href, key, icon: Icon }) => {
+-             const active = isActive(href)
++ function NavLinks({ compact = false }: { compact?: boolean }) {
++   // shared isActive + NAV.map rendering for both surfaces
++   return null
++ }
+
+
+─── components/auth/AccountMenu.tsx:67-67 ───
+[bug · medium] The fallback only fires for `null`/`undefined`. If `name` is an empty or
+whitespace-only string, `??` does not fall through to `email`, and `.trim().charAt(0).toUpperCase()`
+evaluates to `''`, leaving the avatar button visually blank. Pick the first non-blank value
+explicitly instead.
+
+-   const initial = (name ?? email ?? '?').trim().charAt(0).toUpperCase()
++   const initial = ([name, email].find((v) => v && v.trim()) ?? '?')
++     .trim()
++     .charAt(0)
++     .toUpperCase()
+
+
+─── components/auth/AccountMenu.tsx:73-73 ───
+[bug · medium] Once `onError` sets `brokenSrc`, the `<img>` is never rendered again for that URL (no
+`onLoad` reset, no retry path), so a transient failure — a privacy extension, a dropped network
+connection, a one-off 403 — permanently degrades to the initial until the component remounts or the
+URL changes. Consider resetting `brokenSrc` when the menu is opened (or offering a retry) so a
+transient failure can recover.
+
+-         onClick={() => setOpen((v) => !v)}
++         onClick={() => {
++           setOpen((v) => !v)
++           // Retry a previously failed avatar the next time the menu opens.
++           if (!open) setBrokenSrc(null)
++         }}
+
+
+─── components/auth/AccountMenu.tsx:116-116 ───
+[bug · medium] The form submits `signOutAction` directly, with no pending state or error feedback.
+In `actions.ts`, `supabase.auth.signOut(...)` is not wrapped in a try/catch, so a transient failure
+throws from the server action and the reader sees no user-friendly message; the button also isn't
+disabled while the action runs. Use `useFormStatus` in a child component to disable the button while
+pending, and make the action catch/return errors so a readable message can be rendered.
+
+
+
+─── components/auth/GoogleButton.tsx:48-49 ───
+[bug · low] The only guard against the duplicate OAuth flow described in the module comment is this
+client-side `disabled={pending}`. `pending` only becomes `true` after React commits the form
+transition, so two activations in the same tick (a very fast double-activation before the re-render,
+or a programmatic `form.requestSubmit()` twice) can still dispatch `signInWithGoogle` twice, and the
+server action is not idempotent. This is best-effort; consider a server-side in-flight guard (e.g. a
+short-lived flag keyed by the session) as defense-in-depth rather than relying solely on the
+disabled button.
+
+
+
+─── components/StreakCard.tsx:122-123 ───
+[bug · low] `todayKey` is recomputed in render from a fresh `new Date()` while `thisWeek()` fixed
+its `future` flags against its own `new Date()` captured when `read()` ran. The two clocks can
+disagree: across midnight (or if the effect ran just before midnight and the render just after), the
+today ring and `workedToday` message can point at a different day than the week strip's future/past
+split, and a render-time date would also diverge between server and browser timezones if the week is
+ever pre-rendered non-empty. Capture one `now` at read time and store the resulting `todayKey` in
+the snapshot (or mark `today` inside `thisWeek`) so the render uses the same reference point as the
+week data.
+
+-   const todayKey = dayKey(new Date())
+-   const workedToday = s.week.some((d) => d.key === todayKey && d.worked)
++   const read = useCallback(() => {
++     const now = new Date()
++     const life = lifetime()
++     setS({
++       streak: currentStreak(),
++       best: longestStreak(),
++       days: life.days,
++       week: thisWeek(),
++       todayKey: dayKey(now),
++     })
++   }, [])
+
+
+─── components/StreakCard.tsx:61-61 ───
+[other · low] The day-mark SVG is `aria-hidden` and the visible label below it is only the weekday
+initial, so screen readers hear "M T W T F S S" with no indication of which days were worked, which
+is today, or which are still ahead — the card's core meaning is lost non-visually. Add a per-day
+accessible label (e.g. `aria-label` on the `<li>` or SVG, or sr-only text) describing the
+worked/today/future state.
+
+
+
+─── components/course/ChapterComplete.tsx:54-56 ───
+[bug · medium] The comment claims the celebration happens "once, in memory" when localStorage
+throws, but no in-memory flag exists. When storage is unavailable (private mode / quota), every
+`zabaqist:progress` event re-enters `check`, so after the reader dismisses the dialog a later
+progress event re-opens it and re-awards XP, defeating the intended once-per-chapter guarantee. Add
+a `useRef` guard that is set after the storage write attempt (or in the catch) and checked before
+`setXp`/`setOpen`.
+
+      } catch {
+-       /* storage unavailable — celebrate this once, in memory */
++       /* storage unavailable — fall through to the in-memory guard below */
+      }
++     if (celebratedRef.current) return
++     celebratedRef.current = true
+
+
+─── components/course/ChapterComplete.tsx:76-80 ───
+[bug · medium] This full-screen takeover declares `role="dialog"` and `aria-modal="true"` but has no
+accessible name, no initial focus, no focus trap, no focus restore on close, and no Escape handler.
+Keyboard and screen-reader users can be stranded behind the overlay with focus still on the
+underlying page. Add `aria-labelledby` referencing the heading (give the `h2` an id), move focus
+into the dialog (e.g. the CTA) when it opens via `useRef` + effect, keep Tab focus inside while
+open, close on Escape, and restore focus to the previously focused element when dismissed.
+
+      <div
+        role="dialog"
+        aria-modal="true"
++       aria-labelledby="chapter-complete-title"
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-zb-cream px-6 text-center"
+      >
+
+
+─── components/course/CourseCover.tsx:74-75 ───
+[bug · medium] Signed 32-bit wraparound breaks the intended ranges. `hash()` returns `Math.abs(h)`,
+which is an unsigned magnitude in [0, 2^31], but `>>` coerces back through `ToInt32`. For the ~half
+of seeds whose pre-abs hash had bit 31 set, `h >> 5` and `h >> 9` become negative, so `% 5` / `% 4`
+yield negative remainders: `ratio` can fall to 0.16 (intended floor 0.30) and `ringR` to 21
+(intended floor 30), shrinking satellites and tightening the ring for those chapters. Use unsigned
+right shift so the bit extraction keeps the magnitude.
+
+-   const ratio = 0.30 + ((h >> 5) % 5) * 0.035
+-   const ringR = 30 + ((h >> 9) % 4) * 3
++   const ratio = 0.30 + ((h >>> 5) % 5) * 0.035
++   const ringR = 30 + ((h >>> 9) % 4) * 3
+
+
+─── components/course/CourseCatalog.tsx:79-80 ───
+[other · low] When a student has a single branch group (the default/visitor state, since
+`DEFAULT_FILIERE` is `'sx'`, yields only `analyse`), this conditional suppresses the `h3` entirely,
+so the heading outline jumps from the section `h2` straight to the chapter `h4` cards. Screen-reader
+users navigating by heading level lose a level of structure (WCAG 1.3.1). Keep an `h3` in the
+outline even when it is visually hidden.
+
+-           {groups.length > 1 && (
+-             <h3 className="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.14em] text-zb-mint-deep">
++           <h3
++             className={`mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.14em] text-zb-mint-deep ${
++               groups.length === 1 ? 'sr-only' : ''
++             }`}
++           >
+
+
+─── components/course/Reveal.tsx:31-31 ───
+[bug · medium] The toggle exposes `aria-expanded` but never connects it to the panel it controls.
+There is no `aria-controls` on the button and no `id` on the content wrapper, so assistive tech
+cannot associate the button's expanded/collapsed state with the disclosure region. Add a stable id
+(e.g. via `React.useId`) to the panel and reference it from the button.
+
+-         aria-expanded={open}
++   const t = useTranslations('course')
++   const [open, setOpen] = useState(false)
++   const panelId = useId()
+
+
+─── components/course/Reveal.tsx:45-49 ───
+[performance · medium] Children are conditionally mounted (`{open && ...}`), so closing the panel
+unmounts and re-opening remounts everything inside. In `CourseDoc.tsx` these children can include
+stateful/expensive content such as a `GeogebraBlock` figure, whose internal state (and any setup
+cost) is destroyed on every toggle. The children are already part of the client payload, so keeping
+them mounted and toggling visibility does not expose any more of the answer. Prefer mounting once
+and hiding with the `hidden` attribute (also required for the `aria-controls`/`id` association
+above, since an element absent from the DOM can't be referenced).
+
+-       {open && (
+-         <div className="border-t border-gray-200 px-5 py-4 [&>p:first-child]:mt-0">
++       <div
++         id={panelId}
++         hidden={!open}
++         className="border-t border-gray-200 px-5 py-4 [&>p:first-child]:mt-0"
++       >
+-           {children}
++         {children}
+-         </div>
++       </div>
+-       )}
+
+
+─── components/SyncProvider.tsx:95-98 ───
+[bug · high] When the initial pull throws (offline/RLS) or returns `complete: false`,
+`pulling.current` is released anyway and there is no retry path. Any later `SYNC_EVENT` (e.g. the
+student answers a checkpoint once the network is back) then calls `pushAll` with the device's
+unmerged copy — exactly the 'delete the rows the pull failed to read' case the comment warns about.
+Keep the guard engaged until a pull actually completes (`if (complete) pulling.current = false`)
+and/or retry `pullAll` on the `online` event.
+
+        } catch {
+          /* offline, or RLS said no — the device copy still works */
+        } finally {
+-         pulling.current = false
++         // A pull that did not finish must keep the push guard engaged:
++         // the next event would otherwise push the unmerged device copy
++         // over rows the pull never read.
++         if (complete) pulling.current = false
+
+
+─── components/SyncProvider.tsx:150-157 ───
+[bug · medium] `onHide` flushes immediately but never clears `timer.current`, so a debounce already
+scheduled will still fire after the tab is hidden and issue a second, later push of the device state
+(a redundant network write). Clear the pending timer before flushing.
+
+      const onHide = () => {
+        if (
+          document.visibilityState === 'hidden' &&
+          !pulling.current &&
+          !deviceIsSealed()
+-       )
++       ) {
++         if (timer.current) clearTimeout(timer.current)
+          void pushAll(userId, email, { name, avatar })
++       }
+      }
+
+
+─── components/SyncProvider.tsx:58-58 ───
+[bug · low] `pulling.current` is initialized true once and set false by the first pull's `finally`,
+but the effect re-runs whenever `userId`/`email`/`name`/`avatar` change (they are dependencies of
+`push`, which is in the effect deps) and never resets it to true. A re-run's pull then dispatches
+`SYNC_EVENT`s while `pulling` is false, so `push`/`onFiliereChosen` treat the server's own writes as
+student actions (and the stale `finally` from the previous run can clear it mid-pull). Set
+`pulling.current = true` at the top of the effect and only clear it in `finally` when `!cancelled`.
+
+-   const pulling = useRef(true)
++   useEffect(() => {
++     let cancelled = false
++     pulling.current = true
+
+
+─── components/course/CourseTabs.tsx:63-65 ───
+[bug · low] Silent no-op: if `tabs.find` returns nothing (e.g. `onChange` receives `null`) or a tab
+has no first view, the click does nothing with no fallback or feedback. `tabsOf` currently
+guarantees a non-empty `viewIds`, but this guard silently swallows a malformed/empty chapter instead
+of failing loudly or landing somewhere. Give it a fallback (the course root) and bail out explicitly
+when the tab is unknown.
+
+          const tab = tabs.find((t) => t.id === id)
++         if (!tab) return
+          // Land on the tab's first section; the picker below moves within it.
+-         if (tab?.viewIds[0]) router.push(`/courses/${slug}?s=${tab.viewIds[0]}`)
++         router.push(
++           tab.viewIds[0] ? `/courses/${slug}?s=${tab.viewIds[0]}` : `/courses/${slug}`,
++         )
+
+
+─── components/course/CourseProgressCard.tsx:110-117 ───
+[performance · low] The `storage` listener calls `refresh` for every localStorage write from other
+tabs, not just progress writes. `refresh` runs `chapterTotals`, which scans the entire localStorage
+(`for (let i = 0; i < localStorage.length; i++)` over all `zabaqist:cp:` keys), and then calls
+`setTotals`/`setTimeSpent` with fresh values, forcing a re-render even when the event came from
+`zabaqist:activity` (written every 10s by another tab's time tracker), `zabaqist:filiere`,
+`zabaqist:onboarding`, or self-check keys. Filter on `event.key` (e.g. only
+`zabaqist_course_progress`, `zabaqist:cp:`, `zabaqist:course-shape`, `zabaqist:course-checkpoints`)
+before invoking `refresh`.
+
+
+
+─── components/course/CourseDoc.tsx:124-125 ───
+[bug · medium] Render-time mutation: `seen`, `checkpointIdx` and `revealIdx` are mutated while
+rendering. `slugifyHeading(..., seen)` mutates the map inside the `h2`/`h3` overrides, and
+`checkpointIdx++`/`revealIdx++` are evaluated while constructing the `blockquote` override's
+returned elements. React render must be pure; if react-markdown re-invokes these component overrides
+or React re-renders/interrupts this subtree, the counters can advance more than once. The persisted
+`checkpointKey(courseId, viewId, checkpointIdx++)` storage keys and the
+`key={`${viewId}:reveal:${revealIdx++}`}` values would then shift, and a student's saved
+checkpoint/reveal state detaches from the intended callout. Precompute the per-node indices (or
+derive them from each blockquote's source position, e.g. the HAST `node` prop `position`) instead of
+mutating counters during render.
+
+
+
+─── components/course/CourseDoc.tsx:212-213 ───
+[bug · high] `pre` is stripped unconditionally, so EVERY fenced code block loses its `<pre>` wrapper
+— not only the `language-geogebra` figure. For ordinary fences the `code` override returns an inline
+`<code className="rounded bg-gray-100 px-1.5 py-0.5 ...">` with no `block`/`whitespace-pre`, so a
+multi-line code block collapses onto a single line. Only bypass `<pre>` when the child code block is
+a geogebra fence; keep the `<pre>` element for all other code.
+
+-     // react-markdown wraps a fence in <pre>; the figure supplies its own frame.
+-     pre: ({ children }) => <>{children}</>,
++     // Only the geogebra figure supplies its own frame; other fences keep <pre>.
++     pre: ({ children }) => {
++       const child = Array.isArray(children) ? children[0] : children
++       return React.isValidElement(child) &&
++         /language-geogebra/.test(child.props.className ?? '') ? (
++         <>{children}</>
++       ) : (
++         <pre>{children}</pre>
++       )
++     },
+
+
+─── components/course/CourseDoc.tsx:203-204 ───
+[maintainability · low] When `parseSpec` returns `null` (a malformed geogebra fence), the component
+returns `null`, so the authored content silently disappears with no fallback and no diagnostic —
+students see an empty spot with no indication a figure was intended. Fall back to rendering the raw
+fence as a code block (or a visible invalid-figure placeholder) rather than dropping it.
+
+
+
+─── components/course/CourseDoc.tsx:92-92 ───
+[style · low] Project rules prohibit loose equality. `node == null` should be an explicit strict
+check for both null and undefined.
+
+-   if (node == null || typeof node === 'boolean') return ''
++   if (node === null || node === undefined || typeof node === 'boolean') return ''
+
+
+─── components/course/StickyNextCard.tsx:59-59 ───
+[other · low] The link's accessible name is only "Start"/"Continue". `next.label` is rendered in a
+separate `<p>` and is not programmatically associated with the link, so screen-reader users hear the
+verb without knowing which section it targets. Include the label in the link's accessible name, e.g.
+`aria-label={`${started ? t('pathContinue') : t('pathStart')}: ${next.label}`}`.
+
+
+
+─── components/course/StickyNextCard.tsx:48-50 ───
+[other · low] `dir` is applied to the main card but not to this all-done branch. On RTL courses
+(`dir="rtl"`) the completion message renders with the default LTR direction, which can misalign or
+misorder Arabic text. Apply `dir={dir}` here as well for consistency.
+
+-       <div className="sticky bottom-4 mt-8 rounded-2xl border border-zb-line bg-white p-4 text-center text-sm text-gray-600 shadow-lg">
++       <div dir={dir} className="sticky bottom-4 mt-8 rounded-2xl border border-zb-line bg-white p-4 text-center text-sm text-gray-600 shadow-lg">
+          {t('pathDoneAll')}
+        </div>
+
+
+─── components/landing/LandingHeader.tsx:73-73 ───
+[other · low] The XP chip is the only progress indicator on the landing page, and `max-sm:hidden`
+removes it exactly on the viewport this file's own comments call out as the primary audience ('the
+device this audience actually uses'). Unlike `components/Header.tsx`, which also hides `XpChip` in
+its top row but re-renders it (and `LangSwitch`) inside the mobile drawer (Header.tsx:175-178), this
+header has no drawer or other replacement — so on phones the reader's banked XP is silently absent.
+If the two-row mobile layout already gives the nav its own line, the chip could live there instead
+of being dropped. Either show it on mobile or document why it is intentionally suppressed here only.
+
+
+
+─── components/landing/ChapterPath.tsx:59-63 ───
+[bug · medium] The `current` node is resolved over the whole programme and only afterwards filtered
+by `semester`, which can leave the rendered trail with no `current` node at all. (a) The fallback
+`rows.find((r) => r.n === 1)` always targets the whole-programme first chapter (semester 1 in both
+`CHAPTERS_SX` and `CHAPTERS_SM`), so for `semester={2}` with no progress it gets filtered out and
+every chapter renders as `locked`. (b) If the first started-but-unfinished chapter lives in the
+other semester, the rendered semester shows all unfinished chapters as `locked` with no resume CTA —
+reachable today from the semester-1 trail whenever a student starts a semester-2 chapter from
+another surface. The zero-state initialiser (`state: c.n === 1 ? 'current' : 'locked'`) is
+semester-blind in the same way. Derive a per-semester fallback after filtering: when the visible
+list has no `current`, mark its first non-`done` chapter as current.
+
+-   if (!currentTaken && !rows.some((r) => r.state === 'done')) {
+-     const first = rows.find((r) => r.n === 1)
+-     if (first) first.state = 'current'
++   const visible = rows.filter((r) => r.semester === semester)
++   if (!visible.some((r) => r.state === 'current')) {
++     const next = visible.find((r) => r.state !== 'done')
++     if (next) next.state = 'current'
+    }
+-   return rows.filter((r) => r.semester === semester)
++   return visible
+
+
+─── components/landing/KhatimFigure.tsx:31-37 ───
+[maintainability · low] This re-implements the exact 16-vertex alternating-radius star loop already
+defined by `Khatam` in `components/landing/Zellige.tsx` (lines 43–51). The {8/2} geometry —
+including the KHATIM ratio derivation — now has two copies that must be kept in sync. Consider
+reusing `Khatam` (e.g. `<Khatam size={2 * R} cx={C} cy={C} fill="var(--zb-mint)" stroke="none" />`)
+or extracting a shared `starPoints(r, cx, cy)` helper so the vertex loop and its derivation live in
+one place.
+
+
+
+─── components/landing/KhatimFigure.tsx:75-79 ───
+[other · low] `role="img"` makes every descendant (including the three visible `<p>` captions in
+`Panel`) presentational, so assistive tech only hears `aria-label={alt}`. This is currently correct
+only because `geoFigureAlt` happens to repeat all three `steps` strings; if they drift apart, the
+step names silently disappear for screen-reader users. Consider deriving the accessible description
+from `steps` (or rendering a `figcaption`) so the captions and the image description cannot diverge.
+
+
+
+─── components/landing/KhatimFigure.tsx:80-83 ───
+[maintainability · low] The `[string, string, string]` tuple is compile-time only. `steps[1]` and
+`steps[2]` are indexed with no runtime guard, so a shorter array from the parent would render empty
+captions while the full `alt` is still announced — the visible figure would then disagree with its
+description. Guard the length or default each caption (e.g. `steps[1] ?? ''`) before rendering.
+
+
+
+─── components/home/ContinuePanel.tsx:49-49 ───
+[maintainability · low] The `views` field is populated by `chapterShape()` in
+`app/[locale]/(with-header)/home/page.tsx` but never read anywhere in this component (the total is
+recomputed via `tabs.flatMap((tab) => tab.viewIds)`). Same for `ChapterTab.kind`, which is populated
+but never referenced. Consider dropping the unused fields from the shared type to avoid a carried
+value that has no reader.
+
+- export type ChapterShape = Record<string, { tabs: ChapterTab[]; views: number }>
++ export type ChapterShape = Record<string, { tabs: ChapterTab[] }>
+
+
+─── components/landing/Logo.tsx:6-6 ───
+[maintainability · low] Remove unused React default imports. The project uses the automatic JSX
+runtime (`react-jsx`), so these imports are dead code and should be removed.
+
+
+
+─── components/landing/Logo.tsx:29-30 ───
+[other · low] In `compact` mode this component renders only an `aria-hidden` SVG with no
+accompanying text, so the mark is completely invisible to assistive technology. If the compact logo
+is ever used as a standalone control or as the sole content of a link, it needs an accessible name.
+Consider accepting an optional `aria-label`/`title` (or a `role="img"` with a label) for the compact
+variant, or documenting that callers must supply their own label.
+
+
+
+─── components/math/GeogebraViewer.tsx:53-56 ───
+[bug · medium] The `commands` prop is declared in `GeogebraViewerProps` and destructured with a
+default value, but it is never forwarded to `<Geogebra>` or otherwise used anywhere in the
+component. Callers who pass `commands` will have them silently ignored, so the documented intent
+(running commands against the applet) has no effect. Either pass it through to the GeoGebra applet
+if `react-geogebra` supports a `commands` prop, evaluate the commands via the API in
+`handleAppletOnLoad`, or remove the prop entirely to avoid a misleading API contract.
+
+
+
+─── components/math/GeogebraViewer.tsx:64-70 ───
+[bug · medium] Use the `appletOnLoad` API argument when provided; fall back to `window.ggbApplet`
+(or bounded polling) only when it is undefined, and clear any pending timeout on unmount.
+
+      if (appletOnLoad) {
+        try {
+-         appletOnLoad(api)
++         const ggbApi = api ?? (window as { ggbApplet?: unknown }).ggbApplet
++         appletOnLoad(ggbApi)
+        } catch (error) {
+          console.error('GeoGebra appletOnLoad failed:', error)
+        }
+      }
+
+
+─── components/math/GeogebraViewer.tsx:57-57 ───
+[maintainability · low] `isReady` is set to `true` in `handleAppletOnLoad` but is never read or
+rendered anywhere in the component. This is dead state. Either wire it up (e.g., to gate rendering
+or show a loading indicator) or remove both the state declaration and the `setIsReady(true)` call.
+
+
+
+─── components/math/GeogebraViewer.tsx:21-21 ───
+[maintainability · low] Multiple untyped `any` usages bypass TypeScript validation: `appletOnLoad?:
+(api: any) => void`, the `(api: any)` parameter in `handleAppletOnLoad`, and the `as any` cast on
+the dynamic import. Consider defining a minimal interface for the GeoGebra applet API (e.g.,
+`evalCommand`, `getValue`) and using it instead of `any`. If `any` is genuinely required (e.g., for
+a library without types), add an explanatory comment per the project rules.
+
+
+
+─── components/math/GeogebraViewer.tsx:77-77 ───
+[style · low] Static inline styles are discouraged by the project rules (only dynamic styles are
+allowed). This centering layout is static; consider using Mantine's `Flex` component (already
+available via `@mantine/core`, alongside `Card`) or a CSS class instead of the inline `style`
+object.
+
+
+
+─── components/landing/Zellige.tsx:64-64 ───
+[bug · medium] The default `id` is a constant (`'zellige'`), so every `<Zellige>` rendered without
+an explicit `id` emits a `<pattern>` with the same identifier. When the component is used more than
+once on a page (different colors/densities, multiple sections), `url(#zellige)` resolves to the
+first matching element in document order, and the later instances silently render with the first
+instance's pattern — the prop's own doc comment even warns 'two patterns sharing an id collide'.
+Make `id` required, or derive a deterministic per-instance id instead of shipping a colliding
+constant default.
+
+
+
+─── components/landing/Zellige.tsx:81-82 ───
+[bug · low] `density` is used directly as the SVG pattern `width`/`height` and scaled via `density *
+0.7` for the star, with no validation. Passing 0, a negative number, `NaN`, or `Infinity` produces
+invalid/invisible SVG (`width="0"`, `width="NaN"`, negative sizes) instead of a clear failure. Clamp
+to a sane minimum or validate the prop before using it (also apply the same value to the star size
+and corner circles).
+
+
+
+─── components/landing/Zellige.tsx:98-98 ───
+[bug · low] `id` is interpolated directly into a CSS `url(#...)` fragment without sanitizing. If the
+prop is ever dynamic or user-influenced, characters that break an unquoted `url()` (spaces, `#`,
+`(`, `)`, `"`, leading digits, etc.) will make the reference fail to resolve while the `id`
+attribute still renders — leaving the background empty. Validate/restrict the id (e.g.
+`/^[A-Za-z][\w-]*$/`) or escape it before use.
+
+
+
+─── components/math/MathContent.tsx:36-36 ───
+[security · high] The KaTeX error fallback in MathContent.tsx is unsafe and effectively unreachable
+with `throwOnError: false`. Use `textContent`/DOM APIs for any fallback, or remove the fallback /
+switch to `throwOnError: true` with a safe fallback.
+
+-           containerRef.current.innerHTML = `<span style="color: red;">Error rendering: ${children}</span>`
++           const errorEl = document.createElement('span')
++           errorEl.style.color = 'red'
++           errorEl.textContent = `Error rendering: ${children}`
++           containerRef.current.replaceChildren(errorEl)
+
+
+─── components/math/MathContent.tsx:30-31 ───
+[security · high] `trust: true` enables KaTeX commands such as `\href`, `\includegraphics`, and
+`\htmlClass`/`\htmlData`, which can produce arbitrary URLs and HTML attributes when `children` is
+user-controlled (XSS / data exfiltration via image loads). Remove `trust: true` (the default `trust:
+false` keeps these commands disabled) unless the input is explicitly trusted and sanitized.
+
+-           throwOnError: false,
+-           trust: true
++           throwOnError: false
+
+
+─── components/math/MathContent.tsx:43-44 ───
+[other · low] The rendered math has no accessible name for assistive technologies; KaTeX output is
+primarily visual. Add `role="math"` and `aria-label={children}` to the container so screen readers
+can announce the expression.
+
+      <span
+        ref={containerRef}
++       role="math"
++       aria-label={children}
+
+
+─── components/landing/LangSwitch.tsx:32-34 ───
+[bug · medium] `usePathname()` from `@/i18n/navigation` returns only the locale-stripped pathname —
+it does not include search parameters or the fragment. Passing it directly as `href` drops `?query`
+and `#hash` on the other-locale URL, so a reader switching language on e.g. `/courses?tag=limits`
+lands on `/ar/courses` and loses their filters, contradicting the stated goal of keeping the reader
+on the same page. Preserve search params by reading `useSearchParams()` from `next/navigation` and
+passing the object form `href={{ pathname, query }}` (next-intl's `Link` resolves it with the
+locale). Note the `#hash` is still not covered by this and, if scroll anchors matter, would need
+separate handling that does not read `window` during render.
+
+      <Link
+-       href={pathname}
++       href={{ pathname, query }}
+        locale={other}
+
+
+─── components/landing/LangSwitch.tsx:26-29 ───
+[maintainability · low] `useLocale()` returns `string`; the `as Locale` cast suppresses that, and
+`locale === 'fr' ? 'ar' : 'fr'` hardcodes the locale list already declared as `['fr', 'ar']` in
+`i18n/routing.ts`. Any future third locale (or an unexpected active locale) silently resolves to
+`fr` instead of being derived from or validated against the configured locales. Derive the other
+locale from `routing.locales` so the list stays single-sourced.
+
+-   const locale = useLocale() as Locale
++   const locale = useLocale()
+    const pathname = usePathname()
+    const t = useTranslations('lang')
+-   const other: Locale = locale === 'fr' ? 'ar' : 'fr'
++   const other = (routing.locales.find((l) => l !== locale) ?? routing.defaultLocale) as Locale
+
+
+─── components/math/GeogebraBlock.tsx:38-51 ───
+[bug · medium] A single failure anywhere in this block (an invalid command, an object name
+`setColor` doesn't recognize, etc.) throws, skips every remaining call, and the empty `catch`
+swallows it — leaving a silently half-configured figure. Wrap the per-object calls individually (or
+use a small `safe` helper) so one bad item doesn't abort the rest, and log the failure for
+diagnosis.
+
+-       try {
+-         if (spec.coords) api.setCoordSystem?.(...spec.coords)
+-         for (const cmd of spec.commands ?? []) api.evalCommand?.(cmd)
++       const safe = (fn?: Function, ...args: unknown[]) => {
++         try { fn?.(...args) } catch (e) { console.warn('GeoGebra setup failed', e) }
++       }
++       if (spec.coords) safe(api.setCoordSystem, ...spec.coords)
++       for (const cmd of spec.commands ?? []) safe(api.evalCommand, cmd)
+-         for (const [name, s] of Object.entries(spec.style ?? {})) {
++       for (const [name, s] of Object.entries(spec.style ?? {})) {
+-           if (s.color) api.setColor?.(name, ...s.color)
+-           if (s.thickness) api.setLineThickness?.(name, s.thickness)
++         if (s.color) safe(api.setColor, name, ...s.color)
++         if (s.thickness) safe(api.setLineThickness, name, s.thickness)
+-         }
++       }
+-         for (const [name, caption] of Object.entries(spec.points ?? {})) {
++       for (const [name, caption] of Object.entries(spec.points ?? {})) {
+-           api.setPointStyle?.(name, 3)
+-           api.setPointSize?.(name, 5)
+-           api.setCaption?.(name, caption)
+-           api.setLabelVisible?.(name, true)
++         safe(api.setPointStyle, name, 3)
++         safe(api.setPointSize, name, 5)
++         safe(api.setCaption, name, caption)
++         safe(api.setLabelVisible, name, true)
+-         }
++       }
+-       } catch {
+
+
+─── components/math/GeogebraBlock.tsx:61-61 ───
+[style · low] Nested ternary expressions are prohibited by project rules. Extract each into an
+if/else or helper in the affected components (GeogebraBlock.tsx, ProblemPreview.tsx,
+OnboardingShell.tsx, PlanReveal.tsx [two instances], ProgressDashboard.tsx).
+
+
+
+─── components/landing/ProblemPreview.tsx:151-151 ───
+[bug · medium] The `aria-live` region is always mounted and always contains a verdict. With `picked
+=== null`, `solved` is `false`, so the accessibility tree contains `t('wrong')` before the visitor
+has answered anything; `opacity-0` only hides it visually. Screen readers can announce a false
+"wrong" result on load. Only place a verdict in the live region after a choice is made so the
+initial accessible content is empty, e.g. `{picked && (solved ? t('correct') : t('wrong'))}`.
+
+-         {solved ? t('correct') : t('wrong')}
++         {picked && (solved ? t('correct') : t('wrong'))}
+
+
+─── components/landing/ProblemPreview.tsx:56-56 ───
+[maintainability · medium] The correct answer is encoded in two places: `correct: true` on the `'1'`
+choice (drives the button's `ok` styling) and `picked === '1'` here (drives the circle and the
+verdict). If the correct choice changes, the two sources silently diverge and the UI shows
+contradictory feedback. Derive `solved` from `CHOICES` so there is a single source of truth.
+
+-   const solved = picked === '1'
++   const solved = CHOICES.some((ch) => ch.id === picked && ch.correct === true)
+
+
+─── components/onboarding/ContinueButton.tsx:32-36 ───
+[other · high] The button has no `focus-visible` styling. This is the single fixed CTA for the whole
+funnel, but keyboard users tabbing onto it get no visible focus indicator (the browser default
+outline is also not overridden, and the hard offset shadow only exists in the enabled state). Add an
+explicit `focus-visible:` ring so focus is clearly visible in both states.
+
+-         className={`h-14 w-full max-w-[509px] rounded-full text-base font-semibold transition-all ${
++         className={`h-14 w-full max-w-[509px] rounded-full text-base font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zb-ink focus-visible:ring-offset-2 ${
+            disabled
+              ? 'cursor-not-allowed bg-gray-200 text-gray-400'
+              : 'bg-zb-ink text-white shadow-[0_3px_0_0_var(--zb-mint-deep),var(--zb-shadow-sm)] active:translate-y-[2px] active:shadow-[0_1px_0_0_var(--zb-mint-deep)]'
+          }`}
+
+
+─── components/onboarding/ContinueButton.tsx:27-27 ───
+[bug · medium] The fixed bottom wrapper only applies a constant `pb-8` and does not account for
+`env(safe-area-inset-bottom)`. On devices with a home indicator (iOS), the CTA can render
+inside/under the safe area and be hard to tap. Add the safe-area inset to the bottom padding.
+
+-     <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-zb-cream via-zb-cream to-transparent px-5 pb-8 pt-10">
++     <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-zb-cream via-zb-cream to-transparent px-5 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-10">
+
+
+─── components/onboarding/ChoiceGrid.tsx:46-51 ───
+[bug · medium] Do not assign `role='radio'` to buttons inside `role='radiogroup'` without
+implementing arrow-key navigation and roving tabindex. Prefer native `<input type='radio'>`
+controls, which provide keyboard semantics and accessible grouping for free.
+
+-           <button
+-             key={c.id}
+-             type="button"
+-             role="radio"
+-             aria-checked={active}
+-             onClick={() => onChange(c.id)}
++           <label key={c.id} className={...}>
++             <input
++               type="radio"
++               name="choice-grid"
++               checked={active}
++               onChange={() => onChange(c.id)}
++               className="sr-only"
++             />
++             ...card content...
++           </label>
+
+
+─── components/onboarding/ChoiceGrid.tsx:39-42 ───
+[bug · medium] The `radiogroup` has no accessible name: there is no `aria-label`/`aria-labelledby`
+and no `<fieldset>`/`<legend>` wrapper. Assistive technology will announce a group of radio options
+without telling the user what question the group answers, which is especially harmful in an
+onboarding funnel. Accept a label prop (or `aria-label`/`aria-labelledby`) and expose it on the
+group, e.g. render a visually-hidden `<legend>` inside a `<fieldset>`.
+
+-     <div
+-       role="radiogroup"
+-       className={`mt-8 grid gap-3 ${columns === 2 ? 'sm:grid-cols-2' : ''}`}
+-     >
++     <fieldset className={`mt-8 grid gap-3 ${columns === 2 ? 'sm:grid-cols-2' : ''}`}>
++       {ariaLabel && <legend className="sr-only">{ariaLabel}</legend>}
+
+
+─── components/onboarding/OnboardingShell.tsx:44-46 ───
+[bug · medium] When `onBack` is undefined (first step), the button is only hidden with `invisible`,
+so it stays in the tab order and is announced by screen readers as an inert control. Disable it and
+remove it from the accessibility tree when there is nowhere to go back to.
+
++           disabled={!onBack}
++           tabIndex={onBack ? undefined : -1}
++           aria-hidden={onBack ? undefined : true}
+            className={`grid size-9 shrink-0 place-items-center rounded-full transition-colors hover:bg-black/5 ${
+              onBack ? '' : 'invisible'
+            }`}
+
+
+─── components/onboarding/FiliereGate.tsx:25-25 ───
+[maintainability · medium] Hardcoded URL paths are prohibited by project rules. Use shared route
+constants/typed navigation for `/demarrer`, `/filiere`, `/courses/${slug}`, and `/quiz/${slug}` so
+route changes stay centralized.
+
+-     if (!readFiliere()) router.replace('/demarrer')
++     if (!readFiliere()) router.replace(DEMARRER_PATH)
+
+
+─── components/onboarding/FiliereGate.tsx:24-26 ───
+[maintainability · medium] The component's own contract (docstring and the `/home` page comment) is
+that this gate only runs on `/home`, but nothing enforces it. It is currently mounted only inside
+`app/[locale]/(with-header)/home/page.tsx`, so if it is ever reused in a shared layout (e.g.
+`ClientLayout`) a reader without a filière on any other page would be yanked to `/demarrer`. Guard
+on the actual path so the mount location cannot silently widen the gate. `usePathname` from
+`@/i18n/navigation` is locale-stripped, so `'/home'` matches both locales.
+
++   const pathname = usePathname()
++ 
+    useEffect(() => {
++     if (pathname !== '/home') return
+      if (!readFiliere()) router.replace('/demarrer')
+-   }, [router])
++   }, [pathname, router])
+
+
+─── components/onboarding/PlanReveal.tsx:38-42 ───
+[bug · medium] If no chapter has a course, `findIndex` returns `-1`, and `Math.max(-1, 0)` silently
+selects `chapters[0]` — a chapter that (by the comment's own reasoning) has no document behind it.
+The highlighted "Start here" node and the CTA `onStart(start.slug)` would then point at a chapter
+that cannot be opened, which is exactly the "broken promise" this block says it is avoiding. Handle
+the no-course case explicitly (e.g., render a disabled/empty state) instead of falling back to index
+0. Note: the `chapters[startIdx]!` non-null assertion also only holds because `chaptersOf` falls
+back to a non-empty programme; a `-1` start or an empty list would still crash during render.
+
+-   const startIdx = Math.max(
+-     chapters.findIndex((c) => courseBySlug(c.slug)),
+-     0,
+-   )
++   const startIdx = chapters.findIndex((c) => courseBySlug(c.slug))
++   // If no chapter has a document yet, there is no honest "start here" to promise.
++   if (startIdx === -1) return null
+    const start = chapters[startIdx]!
+
+
+─── components/premium/PlanPicker.tsx:40-41 ───
+[bug · high] When `plans` is empty (or has not yet loaded), `plan` is `undefined` because
+`plans.find(...) ?? plans[0]` evaluates to `undefined`. The render then shows a live waitlist CTA
+with a price block reading just " DH" (no figure) — a misleading pricing state on a pricing page.
+Additionally, `id` is only seeded from `plans[0]?.id` in the `useState` initialiser and never
+re-synced when the prop arrives late, so a monthly-only list arriving after first render displays
+the monthly price but the `annualNote`. Guard the render (e.g. `if (!plan) return null` or a loading
+placeholder) and/or derive the effective selection/note from `plan?.id` rather than the
+possibly-stale `id` state.
+
+    const [id, setId] = useState<Plan['id']>(plans[0]?.id ?? 'annual')
+    const plan = plans.find((p) => p.id === id) ?? plans[0]
++ 
++   if (!plan) return null
+
+
+─── components/premium/PlanPicker.tsx:94-94 ───
+[bug · low] The comment above says the per-month equivalent is "Rounded down to the dirham", but
+`Math.round` rounds half up (e.g. 599 / 12 = 49.92 → 50). This can overstate the per-month figure,
+contradicting both the comment and the honesty intent of the pricing page. Use `Math.floor` to match
+the documented behavior, or update the comment if nearest-dirham rounding is actually intended.
+
+-           {t('annualEquivalent', { n: Math.round(plan.price / 12) })}
++           {t('annualEquivalent', { n: Math.floor(plan.price / 12) })}
+
+
+─── components/premium/PlanPicker.tsx:77-84 ───
+[maintainability · medium] Localize hardcoded unit/currency labels (`DH`, `min`, `XP`) via i18n or
+caller-provided values instead of embedding them in JSX, so the UI remains consistent across
+locales.
+
+
+
+─── components/progress/ActivityChart.tsx:31-31 ───
+[bug · medium] The chart container declares `role="img"` but has no accessible name
+(`aria-label`/`aria-labelledby`). `role="img"` flattens the subtree into a single image, so
+assistive technology exposes none of the per-bucket labels or counts rendered inside, and the
+`title` attributes on the inner columns are not reliably announced either. Screen-reader users get
+an unlabeled image and no summary of the data. Add an accessible name that describes the window's
+buckets (or expose the data as a `figure`/`figcaption`).
+
+-       <div className="flex h-44 items-stretch gap-2" role="img">
++       <div
++         className="flex h-44 items-stretch gap-2"
++         role="img"
++         aria-label={buckets
++           .map((b) => `${b.label}: ${b.sections}`)
++           .join(', ')}
++       >
+
+
+─── components/progress/ActivityChart.tsx:36-36 ───
+[bug · low] React keys rely on `b.start.toISOString()`. `Bucket` has no `id`, so any two buckets
+sharing a start instant (overlapping or coalesced data) would produce duplicate keys and break
+reconciliation. Today `windowFor` generates distinct starts, so this is latent, but the invariant
+lives outside this component; a data-derived unique key (or a documented index fallback for the
+static bucket list) is more robust.
+
+
+
+─── components/progress/ActivityChart.tsx:52-52 ───
+[bug · medium] `Math.max(pct, 6)` clamps every non-zero bar to at least 6% height. When the max
+bucket is large this materially misrepresents small counts: e.g. with a max of 1000 sections,
+buckets of 1 and 50 sections are both drawn at 6% height even though one is 50× the other. The
+`title` and count label show the true number, but the visual encoding invents a larger bar. Prefer
+preserving the true proportion (the zero-bucket 3px sliver already handles the "no data" case
+separately), or document the clamp as a deliberate readability trade-off.
+
+-                 style={{ height: b.sections > 0 ? `${Math.max(pct, 6)}%` : 3 }}
++                 style={{ height: b.sections > 0 ? `${pct}%` : 3 }}
+
+
+─── components/quiz/BackLink.tsx:21-21 ───
+[maintainability · low] Type `href` from the locale-aware `Link` (e.g. `ComponentProps<typeof
+Link>['href']`) instead of `string`, so route paths are validated and object/query/hash forms remain
+supported.
+
+- export default function BackLink({ href, label }: { href: string; label: string }) {
++ export default function BackLink({ href, label }: { href: ComponentProps<typeof Link>['href']; label: string }) {
+
+
+─── components/quiz/BackLink.tsx:29-29 ───
+[other · low] The arrow icon is purely decorative, but the tabler SVG is rendered without
+`aria-hidden`, so assistive technology may announce it in addition to the visible label. Mark it
+hidden so the link announces only its text label.
+
+- <IconArrowLeft size={16} className="rtl:rotate-180" />
++ <IconArrowLeft size={16} aria-hidden="true" className="rtl:rotate-180" />
+
+
+─── components/quiz/ItemText.tsx:38-38 ───
+[maintainability · low] `throwOnError: false` makes invalid TeX in authored items degrade silently:
+KaTeX renders the raw source in red and puts the parse error only in a `title` attribute, with no
+console/log signal, so a typo inside `$...$` ships broken math that no one notices in development.
+Keeping rendering resilient is fine, but consider surfacing failures — e.g. a distinct `errorColor`
+and/or letting errors throw in a dev/test build so malformed items are caught before shipping.
+
+
+
+─── components/quiz/ItemText.tsx:39-39 ───
+[maintainability · low] Replacing the `p` renderer with a fragment assumes `text` is always a single
+inline paragraph. If an item ever contains a second paragraph, a list, heading, or code block, this
+flattens them into a run-on `<span>` and nests block-level elements inside a `<span>` (invalid
+HTML), losing the intended spacing/structure. Either enforce/document the single-line contract, or
+only unwrap the paragraph when it is the sole block-level child so multi-block content is preserved.
+
+
+
+─── components/quiz/ItemText.tsx:39-39 ───
+[performance · low] The `p` renderer is created inline, so each render of `ItemText` produces a new
+function identity. react-markdown treats that as a new component type, forcing React to
+unmount/remount the paragraph subtree (and re-run the KaTeX pipeline) on every parent re-render.
+Hoist the renderer to module scope (or memoize it) so the element type stays stable across renders.
+
+-         components={{ p: ({ children }) => <>{children}</> }}
++ const InlineParagraph = ({ children }: { children?: React.ReactNode }) => <>{children}</>
++ 
++ // in the component:
++ components={{ p: InlineParagraph }}
+
+
+─── components/ui/LinkButton.tsx:22-22 ───
+[bug · medium] Because `{...props}` is spread last, a caller-supplied `component` prop (ButtonProps
+includes Mantine's polymorphic `component`) will override `component={Link}`. The button then
+renders as whatever element/component the caller passed, silently breaking navigation — which is the
+wrapper's entire purpose. Move the spread before the explicit props, or destructure/omit `component`
+from `props` so it can never be overridden.
+
+-     <Button component={Link} href={href} {...props}>
++     <Button {...props} component={Link} href={href}>
+
+
+─── components/progress/ProgressDashboard.tsx:80-82 ───
+[bug · medium] `id in shape` walks the prototype chain, so inherited properties such as `toString`
+or `constructor` (or a polluted key) count as completed sections. The comment here already worries
+about impossible counts like "2 of 1", but `in` does not enforce own-property membership. Use
+`Object.hasOwn(shape, id)` (or `Object.prototype.hasOwnProperty.call`) so only the chapter's own
+section ids are counted.
+
+            const done = shape
+-             ? seen.filter((id) => id in shape).length
++             ? seen.filter((id) => Object.hasOwn(shape, id)).length
+              : seen.length
+
+
+─── components/progress/ProgressDashboard.tsx:100-101 ───
+[performance · low] Filter `storage` events to progress-related keys and still refresh on `key ===
+null`; update both add and removeEventListener accordingly so unrelated writes do not trigger
+rescans/refreshes.
+
+-     const EVENTS = [ACTIVITY_EVENT, 'zabaqist:progress', FILIERE_EVENT, 'storage']
++     const EVENTS = [ACTIVITY_EVENT, 'zabaqist:progress', FILIERE_EVENT]
++     const onStorage = (e: StorageEvent) => {
++       if (e.key === 'zabaqist:progress') refresh()
++     }
+      for (const e of EVENTS) window.addEventListener(e, refresh)
++     window.addEventListener('storage', onStorage)
++     return () => {
++       for (const e of EVENTS) window.removeEventListener(e, refresh)
++       window.removeEventListener('storage', onStorage)
++     }
+
+
+─── components/progress/ProgressDashboard.tsx:155-163 ───
+[other · low] `role="tablist"`/`role="tab"` is used without any associated `role="tabpanel"`,
+`aria-controls`, or arrow-key navigation, so this does not implement the ARIA tabs pattern and
+screen readers announce tabs with no panels. Either implement the full pattern (arrow-key roving
+focus + tabpanel), or use button-group/segmented-control semantics (e.g. `aria-pressed`) for this
+granularity switcher.
+
+
+
+─── components/ui/XpChip.tsx:45-45 ───
+[bug · medium] `xp <= 0` does not hide `NaN`. `totalXp` sums `chapterTotals(...).xp`, which
+multiplies the base XP read from `zabaqist:course-shape` in `xpFor`; if that stored shape ever holds
+a non-numeric/`NaN` value (it is JSON-parsed and cast with no validation in `readShapes`), the
+product becomes `NaN` and the whole sum is `NaN`. `NaN <= 0` is false, so the chip renders the
+literal text "NaN XP" (and the localized `aria-label` becomes "NaN points d’expérience gagnés")
+instead of staying hidden. Guard with `Number.isFinite` (or invert to `!(xp > 0)`).
+
+-   if (xp <= 0) return null
++   if (!Number.isFinite(xp) || xp <= 0) return null
+
+
+─── components/seo/OrganizationSchema.tsx:46-49 ───
+[maintainability · medium] These are hardcoded factual assertions about the programme, so they can
+silently go stale when the catalogue changes (filière reorder, subject rename, credential change) —
+the exact "built by guessing from prose" failure the file's own comment says it is removing. The
+page already derives its content from `listCourses()` in `lib/courseCatalog`; derive these fields
+from that single source of truth (or add a test that asserts them against the catalogue) so the
+structured data cannot drift from the content it claims to describe.
+
+
+
+─── components/seo/OrganizationSchema.tsx:35-35 ───
+[maintainability · low] This origin decision duplicates the identical ternary in
+`app/[locale]/layout.tsx` `generateMetadata` (line 96), which drives `metadataBase` and the
+canonical. The file's own comment explains that a canonical/JSON-LD disagreement is resolved by
+Google guessing, so the two decisions should live in one place — e.g. a `publicSiteOrigin()` helper
+exported from `lib/publicPaths.ts` — to prevent them from drifting again.
+
+
+
+─── components/quiz/RevisionPlan.tsx:111-114 ───
+[bug · medium] Verdicts are matched to capabilities purely by authored index (`given[i]`), and the
+store itself is keyed as `slug → item index → verdict`. If a chapter's `## Auto-évaluation` items
+are ever reordered or an item is inserted/removed, every previously-stored verdict silently
+reattaches to the wrong capability, producing a revision plan that misrepresents the reader's own
+answers. Prefer a stable key (e.g. a slug/hash of the item text, or a content schema version) so
+past answers survive authored edits without shifting.
+
+
+
+─── components/quiz/RevisionPlan.tsx:116-118 ───
+[maintainability · low] Each `shaky` entry stores `verdict`, but nothing in this file ever reads it
+— rendering uses only `s.text`, and counts use only `shaky.length`. Since `close` and `not-yet` are
+intentionally collapsed into one bucket (per `scoreOf`), the stored `verdict` is dead data. Either
+drop it (`shaky.push({ text })`) and narrow the `Row['shaky']` type, or actually surface it so the
+field is not carried for nothing.
+
+
+
+─── components/quiz/RevisionPlan.tsx:328-329 ───
+[bug · medium] When `chapters` is empty, `chapters[0]?.slug ?? ''` evaluates to `''`, so this CTA
+renders `href="/quiz/"` — a likely-invalid route rather than a usable entry point. The call to
+action should not render at all when there are no chapters (or should be suppressed alongside the
+rest of the empty state): `{judged === 0 && chapters.length > 0 && (...)}` and then
+`chapters[0].slug` is safe.
+
++         {judged === 0 && chapters.length > 0 && (
+            <Link
+-             href={`/quiz/${chapters[0]?.slug ?? ''}`}
++             href={`/quiz/${chapters[0].slug}`}
+
+
+─── components/quiz/SelfCheck.tsx:58-61 ───
+[bug · medium] `ready` is only ever set to `true` and `answers` is only replaced inside the effect,
+so when `slug` changes the render that runs before this effect still holds the previous chapter's
+`answers` with `ready === true`. If the previous chapter was fully answered, `complete` is true and
+the result section (plus the highlighted verdict buttons) paints the old chapter's data against the
+new items for at least one frame. Key the answers to the slug they belong to and gate the UI on
+that, e.g. track `readySlug` and derive `ready = readySlug === slug`, using a slug-gated `current`
+map in `chosen`/`answered`/`shaky`/`complete` instead of the raw `answers`.
+
++   const [answers, setAnswers] = useState<Record<string, Verdict>>({})
++   const [readySlug, setReadySlug] = useState<string | null>(null)
++ 
+    useEffect(() => {
+      setAnswers(readSelfCheck(slug))
+-     setReady(true)
++     setReadySlug(slug)
+    }, [slug])
++ 
++   const ready = readySlug === slug
++   const current = ready ? answers : {}
+
+
+─── components/quiz/SelfCheck.tsx:63-69 ───
+[security · high] `answer` writes to the device store keyed only by `slug`, with no check of who
+owns the device now. `SelfCheck` runs on the public `/quiz/[quizId]` route, which is outside the
+`(with-header)` shell that mounts `SyncProvider`, so nothing on this path runs `claimDevice` or
+seals the tab when the owner changes (`lib/sync.ts`'s storage listener lives only in
+`SyncProvider`). On a shared machine, a tab still owned by the previous student keeps writing into
+the next student's live `zabaqist:selfcheck` store — the cross-account leak `claimDevice` exists to
+prevent. Scope the write by the current owner (or bring this route under the same claim/owner-change
+protection), and re-read on `SELFCHECK_EVENT` so a handed-back store is reflected in the UI.
+
+
+
+─── .github/workflows/ci.yml:33-35 ───
+[security · medium] The `verify` job declares no `permissions:` key, so it runs with the
+repository's default GITHUB_TOKEN scopes (which may include `contents: write` and other write scopes
+depending on repo settings). This job only checks out code, builds, and runs tests — it never needs
+write access. On the `push` to `main` path, if a compromised dependency executes code during `npm
+ci`/`npm run build`, the persisted token could write back to the repository. Declare least privilege
+explicitly, e.g. `permissions: { contents: read }`.
+
+    verify:
+      runs-on: ubuntu-latest
+      timeout-minutes: 30
++     permissions:
++       contents: read
+
+
+─── .github/workflows/ci.yml:49-50 ───
+[security · medium] These placeholder Supabase credentials cause `db:check` to skip its live RLS,
+anonymous-write, allowlist, and signup-hook probes (the file's own comment says so). If the script
+still exits 0 when those probes are skipped, CI is green while the security-relevant assertions
+never actually ran — the gate is fail-open. Consider making `db:check` exit non-zero when mandatory
+probes were skipped, or wire real repo secrets so the probes actually execute on this pipeline.
+
+
+
+─── .github/workflows/ci.yml:79-82 ───
+[maintainability · medium] `wait-on` is not listed in package.json (only referenced here), so `npx
+wait-on` downloads the latest unpinned release at runtime on every run. That makes CI
+non-reproducible and adds an unversioned supply-chain/silent-breakage risk. Pin it: add `wait-on` to
+devDependencies (so `npx wait-on` resolves to the lockfile-pinned local install) or invoke a
+specific version inline.
+
+        - name: Start the built app
+          run: |
+            npm start -- -p 3111 &
+-           npx wait-on http://localhost:3111 --timeout 60000
++           npx --yes wait-on@8.0.3 http://localhost:3111 --timeout 60000
+
+
+─── .github/workflows/ci.yml:27-30 ───
+[maintainability · low] No `concurrency` group is defined. A `push` to `main` plus open PR runs (and
+force-push updates) can queue redundant, near-identical jobs, each running the full double-build +
+Playwright matrix. Add a `concurrency` group keyed on workflow + ref with `cancel-in-progress: true`
+so superseded runs are cancelled and runner time is not wasted.
+
+  on:
+    push:
+      branches: [main]
+    pull_request:
++ 
++ concurrency:
++   group: ci-${{ github.workflow }}-${{ github.ref }}
++   cancel-in-progress: true
+
+
+─── .gitignore:41-42 ───
+[maintainability · medium] `.loop/` has no leading slash, so Git ignores **any** directory named
+`.loop` at any depth in the tree (e.g. `src/.loop/` or a test fixture), not just the root-level
+run-state directory described in the comment. Anchor it to the repository root to avoid silently
+hiding unrelated files/directories.
+
+  # Loop-engineering run state (scripts/db-check.mjs)
+- .loop/
++ /.loop/
+
+
+─── .gitignore:29-29 ───
+[security · low] `.env*.local` leaves plain `.env` (and `.env.development` / `.env.production`)
+tracked. This matches Next.js's convention where those files hold shareable defaults, but if a
+secret is ever placed in a tracked `.env`, it will be committed. Confirm the project keeps secrets
+only in `.env*.local`; if plain `.env` is used for local secrets, switch to ignoring `.env*` and
+re-allow example files (e.g. `!.env.example`).
+
+
+
+─── .gitignore:21-21 ───
+[maintainability · low] `*.pem` is unanchored and matches any PEM file at any depth. While useful as
+a safety net, it also hides legitimate, non-secret certs (test fixtures, public keys) that may need
+to be tracked — re-adding them requires `git add -f`. Consider scoping this pattern (e.g.
+`/certs/*.pem`) or adding a negation if any PEM material is intentionally versioned.
+
+
+
+
+──────── Project Summary ────────
+
+### Top Issues
+
+1. **Open-redirect / path-sanitization bypass in auth flows.** Redirect targets are built from untrusted Host/`x-forwarded-host`/Origin request data, and the `next` path is not validated as a same-origin relative path. `lib/safePath.ts` accepts percent-encoded separators and dot segments (`/%2f%2fevil.com`, `/%2e%2e/…`), and `app/[locale]/signin/page.tsx` sanitizes before stripping the locale, which defeats the `//` guard. Affected: `app/auth/callback/route.ts`, `app/[locale]/signin/actions.ts`, `proxy.ts`, `lib/safePath.ts`, `app/[locale]/signin/page.tsx`, `app/[locale]/filiere/page.tsx`.
+
+2. **Device-local student data is neither isolated nor validated.** Progressive/activity/onboarding/filière keys are not scoped to the current account owner, and several write paths bypass `deviceIsSealed()`. JSON from `localStorage` is cast to typed shapes without runtime validation, and prototype-chain `in` checks accept `"constructor"`/`"toString"` as valid values. One student can read/credit another student's data on a shared machine. Affected: `lib/activity.ts`, `lib/courseProgress.ts`, `lib/onboarding.ts`, `lib/filiere.ts`, `lib/selfCheck.ts`, `components/quiz/SelfCheck.tsx`, `components/SyncProvider.tsx`.
+
+3. **Sync paths can silently lose or corrupt progress.** `lib/sync.ts` destroys device-local keys before attempting the archive write and ignores the write result; `remoteIsNewer` ignores the local attempt timestamp; `local.hints` can become `NaN`; and every pulled remote row is marked changed. `components/SyncProvider.tsx` releases the pulling guard after a failed initial pull with no retry and does not clear debounced timers. `proxy.ts` also drops the original query string from the post-login `next` value. Affected: `lib/sync.ts`, `components/SyncProvider.tsx`, `proxy.ts`.
+
+4. **Insecure or self-silencing math/GeoGebra rendering.** `components/math/MathContent.tsx` enables KaTeX `trust: true` and uses reachable-by-comment but unsafe fallback HTML. `lib/geogebraSpec.ts` lets arrays and arbitrary JSON objects pass as `GeogebraSpec`, and malformed GeoGebra fences silently render nothing in `components/course/CourseDoc.tsx`. `components/quiz/ItemText.tsx` replaces `p` with a fragment and silently degrades bad TeX. Affected: `components/math/MathContent.tsx`, `lib/geogebraSpec.ts`, `components/course/CourseDoc.tsx`, `components/quiz/ItemText.tsx`, `components/math/GeogebraBlock.tsx`.
+
+5. **Supabase/auth error paths leave live sessions or stale cookies.** The callback route redirects without signing out when the exchange succeeds but the user/email is missing; the sign-out route is a cross-site-destructive GET and failed sign-out can leave Supabase cookies intact; OAuth sign-in is not wrapped in a catch; and `lib/supabase/server.ts` swallows all cookie-write failures, not just Server Component calls. Affected: `app/auth/callback/route.ts`, `app/auth/signout/route.ts`, `app/[locale]/signin/actions.ts`, `lib/supabase/server.ts`.
+
+6. **Missing security headers and security-test bypasses.** The app has no CSP and no HSTS layer despite rendering markdown/KaTeX and handling uploads; the E2E bypass falls back to a predictable `e2e-local-only` secret and compares it in non-constant time; CI runs with default GITHUB_TOKEN permissions and placeholder Supabase credentials that let `db:check` skip live RLS/allowlist probes. Affected: `next.config.mjs`, `package.json`, `lib/e2e.ts`, `.github/workflows/ci.yml`.
+
+7. **Operational and test scripts are injection-prone or brittle.** `scripts/events.mjs` interpolates CLI values directly into PostgREST filter syntax, mishandles NULL `event`, non-JSON 2xx bodies, huge/negative limits, and unhandled network rejections. `scripts/whois.mjs` builds a SQL `INSERT` from raw argv with escaping hazards. `scripts/test-course.mjs` hardcodes catalogue totals, dereferences possibly-missing documents/views, and has unhandled Playwright rejections that mask later failures. Affected: `scripts/events.mjs`, `scripts/whois.mjs`, `scripts/test-course.mjs`.
+
+8. **Crawler/SEO and route surfaces disagree with each other.** `app/sitemap.ts` emits the root without a trailing slash and omits `x-default`, while the page head publishes it. `app/robots.ts` collapses dynamic segments so `INDEXABLE_PATHS` can never un-disallow a dynamic route, and it hardcodes private prefixes. `lib/publicPaths.ts` emits canonicals for `/signin` without consulting `INDEXABLE_PATHS`. Locale switching drops query/hash, and locale-stripping logic is duplicated. Affected: `app/sitemap.ts`, `app/robots.ts`, `lib/publicPaths.ts`, `components/landing/LangSwitch.tsx`, `proxy.ts`, `app/[locale]/signin/page.tsx`.
+
+### Module Hotspots
+
+- **`lib/`** — highest density of data-integrity and config issues, especially `lib/sync.ts`, `lib/activity.ts`, `lib/courseProgress.ts`, `lib/supabase/config.ts`, `lib/safePath.ts`, `lib/siteUrl.ts`, `lib/filiere.ts`, and `lib/geogebraSpec.ts`.
+- **`scripts/`** — `scripts/test-course.mjs` is the single most brittle file; `scripts/events.mjs` and `scripts/whois.mjs` combine CLI parsing, injection, and error-handling defects.
+- **Auth route cluster** — `app/auth/callback/route.ts`, `app/auth/signout/route.ts`, `app/[locale]/signin/actions.ts`, `app/[locale]/signin/page.tsx`, and `proxy.ts` concentrate redirect/session/CSRF-style issues.
+- **Math/course rendering** — `components/math/MathContent.tsx`, `components/math/GeogebraBlock.tsx`, `components/math/GeogebraViewer.tsx`, `components/course/CourseDoc.tsx`, and `lib/geogebraSpec.ts` have repeated silent-content-loss and untyped-API issues.
+- **Landing/onboarding/progress/quiz components** — `components/landing/`, `components/onboarding/`, `components/progress/`, and `components/quiz/` have many accessibility, dead-state, and local-storage defects.
+- **`app/[locale]/(with-header)/courses/*` and `app/[locale]/demarrer/page.tsx`** — hardcoded catalog/route values, brittle progress branching, and direct onboarding-step access.
+- **`components/premium/PlanPicker.tsx`, `components/CourseCard.tsx`, `components/auth/AccountMenu.tsx`** — localized single-component correctness and a11y issues.
+
+### Cross-Cutting Concerns
+
+- **Unvalidated browser storage everywhere.** `localStorage` reads/writes are scattered across `lib/activity.ts`, `lib/courseProgress.ts`, `lib/onboarding.ts`, `lib/progressTracking.ts`, `lib/selfCheck.ts`, `components/SyncProvider.tsx`, and `components/quiz/SelfCheck.tsx`; they generally lack owner scoping, shape validation, and device-seal checks.
+- **`any` and unsafe casts erode type safety.** `eslint.config.mjs` disables `@typescript-eslint/no-explicit-any` repo-wide, and the pattern reappears in `components/math/GeogebraViewer.tsx`, `app/[locale]/layout.tsx`, `lib/e2e.ts`, `lib/geogebraSpec.ts`, and `app/[locale]/signin/actions.ts` (`locale as never`).
+- **Broadly missing or too-broad error handling.** Scripts, server actions, and route handlers commonly fail with raw stack traces or silently swallow failures: `scripts/events.mjs`, `scripts/whois.mjs`, `i18n/request.ts`, `app/auth/callback/route.ts`, `app/[locale]/signin/actions.ts`, and `lib/supabase/server.ts`.
+- **Accessibility semantics are frequently incomplete.** Dialogs lack accessible names/focus traps, radio/tab roles are under-implemented, progressbars/charts/logos lack accessible names, and icon-only controls remain announced. Representative: `components/course/ChapterComplete.tsx`, `components/onboarding/ChoiceGrid.tsx`, `components/progress/ProgressDashboard.tsx`, `components/progress/ActivityChart.tsx`, `components/CourseCard.tsx`, `components/landing/Logo.tsx`.
+- **Hardcoded routes, counts, prices, and catalog data.** Business/route values are repeated in `lib/siteUrl.ts`, `lib/safePath.ts`, `components/onboarding/FiliereGate.tsx`, `app/[locale]/(with-header)/subscribe/page.tsx`, `app/[locale]/(with-header)/progres/page.tsx`, `components/seo/OrganizationSchema.tsx`, and `scripts/test-course.mjs`.
+- **Duplicated logic and dead/inert state.** Locale-stripping is copied between `proxy.ts` and `app/[locale]/signin/page.tsx`; the Khatim star geometry is duplicated in `components/landing/KhatimFigure.tsx` and `Zellige.tsx`; `GeogebraViewer` has unused `isReady` and ignored `commands`; `LearningPaths` has inert CTA buttons; `RevisionPlan` stores unread verdicts.
+- **Hydration/render-time side effects.** Renders read `localStorage`, mutate maps while rendering, or compute `new Date()`: `lib/activity.ts`, `components/course/CourseDoc.tsx`, `components/Footer.tsx`, `components/StreakCard.tsx`, `components/landing/LangSwitch.tsx`.
+- **Styling/token config cannot support intended utilities.** `tailwind.config.ts` bare `var(--zb-*)` colors cannot receive Tailwind opacity modifiers; `app/globals.css` has no dark values for `--zb-*` tokens; several components use static inline styles despite project rules.
+
+### Quick Wins
+
+- **Remove risky KaTeX trust and fallback HTML.** In `components/math/MathContent.tsx`, drop `trust: true`, replace the unsafe fallback with text/DOM APIs, and add `role="math"` plus `aria-label`.
+- **Reject arrays and validate GeoGebra specs minimally.** In `lib/geogebraSpec.ts`, add `Array.isArray`/shape checks before the `as GeogebraSpec` cast; in `components/course/CourseDoc.tsx`, render a visible fallback instead of returning `null` for malformed fences.
+- **Harden filière/prototype checks.** In `lib/filiere.ts`, use `Object.hasOwn` and guard `saveFiliere` against unknown `track` values.
+- **Patch one-line script defects.** In `scripts/events.mjs`, guard `event` before `padEnd`, validate/clamp `--n`, catch `fetch`/JSON failures, and treat filter values as literal strings. In `scripts/whois.mjs`, escape or parameterize the suggested SQL `INSERT`.
+- **Make the test secret fail fast.** Remove the `e2e-local-only` fallback from `package.json` and require `E2E_AUTH_SECRET`.
+- **Harden CI with low effort.** Add `permissions: contents: read`, a `concurrency` group with `cancel-in-progress`, and pin `wait-on` in devDependencies instead of `npx wait-on`.
+- **Fix package metadata.** Move `postcss-preset-mantine`/`postcss-simple-vars` to devDependencies; add `engines`; rewrite the `loop` script in portable shell.
+- **Narrow ESLint `any` suppression.** In `eslint.config.mjs`, replace the repo-wide override with targeted overrides for the GeoGebra and mock-API boundaries only.
+- **Add accessible names to simple progress indicators.** In `components/CourseCard.tsx` and `components/progress/ActivityChart.tsx`, add `aria-label`/`aria-labelledby`; announce the clamped value rather than the raw `progress`.
+- **Centralize repeated constants.** Extract `PROGRESS_EVENT`, the fallback app URL, and route path constants into shared modules and import them in `lib/activity.ts`, `components/ComebackCard.tsx`, `lib/siteUrl.ts`, `lib/safePath.ts`, `components/onboarding/FiliereGate.tsx`, and related pages.

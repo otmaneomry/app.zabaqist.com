@@ -2,6 +2,25 @@ import type {Config} from "tailwindcss"
 
 const { fontFamily } = require("tailwindcss/defaultTheme")
 
+/**
+ * A brand token, as a colour that can still take an opacity modifier.
+ *
+ * Written out as a bare `var(--zb-…)`, it could not. To apply `/40` Tailwind
+ * parses the colour and rebuilds it with an alpha channel; `parseColor` cannot
+ * read a `var()` and returns null, and the utility is then dropped ENTIRELY —
+ * not emitted at full opacity, simply never generated. `border-zb-mint/40`
+ * produced no rule at all, so those borders fell back to preflight's grey
+ * instead of mint. Twenty-five distinct `zb-…/NN` classes across app/ and
+ * components/ were inert.
+ *
+ * `<alpha-value>` is the placeholder Tailwind SUBSTITUTES rather than parses
+ * (with `1` when no modifier is given), and `color-mix` then applies it to a
+ * colour the build never has to understand. The tokens are oklch, so the mix
+ * happens in oklab and the hue survives it.
+ */
+const zb = (token: string) =>
+  `color-mix(in oklab, var(--zb-${token}) calc(<alpha-value> * 100%), transparent)`
+
 const config = {
   darkMode: "class" as const,
   content: [
@@ -59,24 +78,24 @@ const config = {
         // greens. Values live in app/globals.css; see the note there about the
         // two that are measured accessibility fixes.
         zb: {
-          mint: "var(--zb-mint)",
-          "mint-deep": "var(--zb-mint-deep)",
-          "mint-soft": "var(--zb-mint-soft)",
-          "mint-tint": "var(--zb-mint-tint)",
-          gold: "var(--zb-gold)",
-          "gold-deep": "var(--zb-gold-deep)",
-          "gold-soft": "var(--zb-gold-soft)",
-          "on-accent": "var(--zb-on-accent)",
-          cream: "var(--zb-cream)",
-          "cream-2": "var(--zb-cream-2)",
-          "cream-3": "var(--zb-cream-3)",
-          ink: "var(--zb-ink)",
-          "ink-2": "var(--zb-ink-2)",
-          "ink-3": "var(--zb-ink-3)",
-          rose: "var(--zb-rose)",
-          "rose-soft": "var(--zb-rose-soft)",
-          "rose-deep": "var(--zb-rose-deep)",
-          line: "var(--zb-line)",
+          mint: zb("mint"),
+          "mint-deep": zb("mint-deep"),
+          "mint-soft": zb("mint-soft"),
+          "mint-tint": zb("mint-tint"),
+          gold: zb("gold"),
+          "gold-deep": zb("gold-deep"),
+          "gold-soft": zb("gold-soft"),
+          "on-accent": zb("on-accent"),
+          cream: zb("cream"),
+          "cream-2": zb("cream-2"),
+          "cream-3": zb("cream-3"),
+          ink: zb("ink"),
+          "ink-2": zb("ink-2"),
+          "ink-3": zb("ink-3"),
+          rose: zb("rose"),
+          "rose-soft": zb("rose-soft"),
+          "rose-deep": zb("rose-deep"),
+          line: zb("line"),
         },
       },
       borderRadius: {

@@ -42,8 +42,17 @@ export async function GET(request: NextRequest) {
   }
 
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-  if (error || !data.user?.email)
+  if (error) return NextResponse.redirect(`${origin}/signin?error=1`)
+
+  // The exchange has ALREADY set the session cookies by the time it returns.
+  // An account this route cannot check is therefore an account the gate never
+  // saw: `proxy.ts` asks whether a session exists, not whether the address is
+  // on the list. The two refusals below both sign out before turning someone
+  // away, and this one was the only exit that did not.
+  if (!data.user?.email) {
+    await supabase.auth.signOut()
     return NextResponse.redirect(`${origin}/signin?error=1`)
+  }
 
   // Closed beta. `is_email_allowed` is SECURITY DEFINER and answers a yes/no —
   // the table itself has no RLS policy, so the guest list cannot be read out

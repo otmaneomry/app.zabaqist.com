@@ -90,7 +90,13 @@ export default async function SignInPage({
   // Already signed in: this page has nothing to offer. The locale-aware
   // redirect, or an Arabic reader is sent to the French copy of wherever they
   // were going.
-  if (user) redirect({ href: unprefixed(safeInternalPath(next)), locale })
+  // Strip first, THEN validate. The other order let `/fr//evil.com` through:
+  // `safeInternalPath` saw a single leading slash followed by `f` and passed
+  // it, `unprefixed` then removed `/fr` and handed `//evil.com` to a redirect
+  // that adds no prefix for the default locale — a protocol-relative Location
+  // header, reached through a genuine Zabaqist sign-in link. Sanitising the
+  // value that is actually redirected to is the only order that holds.
+  if (user) redirect({ href: safeInternalPath(unprefixed(next ?? '')), locale })
 
   const t = await getTranslations('auth')
   const notAllowed = error === 'not-allowed'
