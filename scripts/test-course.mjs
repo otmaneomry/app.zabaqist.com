@@ -916,10 +916,13 @@ section('Onboarding funnel')
   await settle()
 
   // The welcome step shows no progress bar — you commit before learning the length.
-  ok(
-    (await pg.locator('header div[aria-hidden]').count()) === 0,
-    'the welcome step shows no progress bar',
-  )
+  //
+  // `:has(div)` names the BAR rather than "any decorative div in the header".
+  // The bar is a wrapper around its segments; without the qualifier this also
+  // counted the empty spacer that holds the back chevron's place on step one,
+  // and the check failed on a change that had nothing to do with progress.
+  const bar = 'header div[aria-hidden]:has(div)'
+  ok((await pg.locator(bar).count()) === 0, 'the welcome step shows no progress bar')
   ok(
     (await pg.locator('footer').count()) === 0,
     'the funnel ships no footer — every exit is removed',
@@ -929,7 +932,7 @@ section('Onboarding funnel')
 
   ok(await cont().isDisabled(), 'Continue is disabled until the question is answered')
   ok(
-    (await pg.locator('header div[aria-hidden]').count()) > 0,
+    (await pg.locator(bar).count()) > 0,
     'the progress bar mounts on the first question',
   )
   await pg.getByRole('radio').first().click()

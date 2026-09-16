@@ -34,6 +34,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    # This job reads the repository and nothing else. Without the key it runs
+    # with whatever the repository default is, which can include
+    # `contents: write` — a token with push rights, sitting in the environment
+    # while `npm ci` and `next build` run third-party code.
+    permissions:
+      contents: read
+
     # Both sides of the indexing switch, because the launch side had never run
     # once. `NEXT_PUBLIC_ALLOW_INDEXING` is baked into the bundle by
     # `next build`, so it cannot be flipped at test time — the whole build has

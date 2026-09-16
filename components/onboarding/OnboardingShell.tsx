@@ -37,16 +37,23 @@ export default function OnboardingShell({
   return (
     <main className="flex min-h-dvh flex-col bg-zb-cream font-display text-zb-ink">
       <header className="flex items-center gap-4 px-5 pt-6 sm:px-8">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={backLabel}
-          className={`grid size-9 shrink-0 place-items-center rounded-full transition-colors hover:bg-black/5 ${
-            onBack ? '' : 'invisible'
-          }`}
-        >
-          <Chevron size={22} />
-        </button>
+        {/* `invisible` hid it from the eye and from nobody else: on the first
+            step it stayed in the tab order and announced itself as « Retour »
+            to a screen reader, a control that goes nowhere. The space it holds
+            is what keeps the title centred, so the space stays and the button
+            goes. */}
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={backLabel}
+            className="grid size-9 shrink-0 place-items-center rounded-full transition-colors hover:bg-black/5"
+          >
+            <Chevron size={22} />
+          </button>
+        ) : (
+          <div className="size-9 shrink-0" aria-hidden="true" />
+        )}
 
         {/* Mounted only from the first question onward. */}
         {step.kind !== 'welcome' && (

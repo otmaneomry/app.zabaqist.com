@@ -77,8 +77,12 @@ export default function ProgressDashboard() {
           // Only sections this chapter still has. A chapter that gains, loses
           // or renames one leaves the old id behind on the device, and counting
           // it unfiltered is how a card reads "2 of 1".
+          // `Object.hasOwn`, not `in`: `in` walks the prototype chain, so a
+          // stored section id of `toString` or `constructor` counted as a
+          // section this chapter has — the "2 of 1" the filter exists to stop,
+          // arrived at from the other direction.
           const done = shape
-            ? seen.filter((id) => id in shape).length
+            ? seen.filter((id) => Object.hasOwn(shape, id)).length
             : seen.length
           return {
             slug: c.slug,

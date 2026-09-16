@@ -41,8 +41,12 @@ export const FILIERE_EVENT = 'zabaqist:filiere'
 const isFiliere = (v: unknown): v is Filiere =>
   v === 'sm' || v === 'sx'
 
+// `Object.hasOwn`, not `in`: `in` walks the prototype chain, so
+// `isTrack('constructor')` was true and `readFiliere` handed back
+// `{ track: 'constructor', filiere: [Function: Object] }` from a device whose
+// stored choice said so.
 const isTrack = (v: unknown): v is Track =>
-  typeof v === 'string' && v in TRACK_FILIERE
+  typeof v === 'string' && Object.hasOwn(TRACK_FILIERE, v)
 
 /** The choice stored on this device, or null if the student has not picked yet. */
 export function readFiliere(): FiliereChoice | null {

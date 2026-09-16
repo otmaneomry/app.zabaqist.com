@@ -126,7 +126,14 @@ export default async function proxy(req: NextRequest) {
     ? `/${locale}/signin`
     : '/signin'
   url.search = ''
-  url.searchParams.set('next', req.nextUrl.pathname)
+  // Pathname AND query. The line above exists to drop the request's own query
+  // from the SIGN-IN url; storing only the pathname in `next` dropped it from
+  // the destination too, so a student sent to `/courses/limites?s=3` signed in
+  // and arrived at the top of the chapter instead of the section they had
+  // followed a link to. `safeInternalPath` accepts a query — it rejects other
+  // origins, not parameters — and `searchParams.set` encodes the whole thing
+  // as one value.
+  url.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search)
   const redirect = NextResponse.redirect(url)
 
   // Carry across what the two steps above already decided, or the redirect

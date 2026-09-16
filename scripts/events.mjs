@@ -77,7 +77,10 @@ const flag = (name) => {
 }
 const has = (name) => argv.includes(`--${name}`)
 
-const limit = Number(flag('n') ?? 30) || 30
+// Clamped, because `--n 0`, `--n -5` and `--n 1e9` all reach PostgREST as a
+// `limit` it answers 400 to — and a 400 here reads as "the journal is broken"
+// rather than "that is not a number of rows".
+const limit = Math.min(Math.max(Math.trunc(Number(flag('n') ?? 30)) || 30, 1), 1000)
 const who = flag('who')
 const event = flag('event')
 const deniedOnly = has('denied')

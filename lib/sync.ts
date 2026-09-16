@@ -63,8 +63,14 @@ const FILIERE_AT_KEY = 'zabaqist:filiere-at'
 export const OWNER_KEY = 'zabaqist:owner'
 /** `components/course/ChapterComplete.tsx` — one marker per chapter celebrated. */
 const CELEBRATED_PREFIX = 'zabaqist:celebrated:'
-/** Where a dispossessed student's device-local work waits for them. */
-const ARCHIVE_PREFIX = 'zabaqist:device-local:'
+/**
+ * Where a dispossessed student's device-local work waits for them.
+ *
+ * Exported for the same reason `DEVICE_KEY_PATTERN` is: `app/auth/signout`
+ * clears this device from a page that cannot import this module, and it has to
+ * spare exactly the keys `resetLocalState` spares.
+ */
+export const ARCHIVE_PREFIX = 'zabaqist:device-local:'
 /**
  * The shape of every key this app owns.
  *

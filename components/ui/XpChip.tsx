@@ -42,7 +42,10 @@ export default function XpChip({ className = '' }: { className?: string }) {
     }
   }, [refresh])
 
-  if (xp <= 0) return null
+  // `xp <= 0` is false for NaN, which is what a corrupted `course-shape`
+  // produces once it has been through the multiplication in `xpFor`. The chip
+  // then rendered the word NaN next to a student's name for it.
+  if (!(xp > 0)) return null
 
   return (
     <span

@@ -39,7 +39,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { E2E_COOKIE } from '@/lib/e2e'
 import { safeInternalPath } from '@/lib/safePath'
 import { createClient } from '@/lib/supabase/server'
-import { DEVICE_KEY_PATTERN } from '@/lib/sync'
+import { ARCHIVE_PREFIX, DEVICE_KEY_PATTERN } from '@/lib/sync'
 
 /** Only the reasons `app/[locale]/signin/page.tsx` knows how to render. */
 const REASONS = new Set(['not-allowed', 'check-failed'])
@@ -55,7 +55,15 @@ const escapeHtml = (s: string) =>
  * describe the same set of keys stop agreeing the moment one of them is edited
  * alone, and the one that would be wrong here is the one nothing tests.
  *
- * Everything goes, the owner included. That is the point of the button — the
+ * Everything goes EXCEPT the archives, which is the same subtraction
+ * `resetLocalState` makes and the reason the pattern is shared rather than
+ * retyped. It was not made here, so the two regexes agreed on their spelling
+ * and disagreed on their meaning: `^zabaqist[:_]` matches
+ * `zabaqist:device-local:<uuid>`, so signing out deleted the work
+ * `claimDevice` had set aside for whoever was on this machine BEFORE — the one
+ * thing no server can hand back, destroyed by a student who never met them.
+ *
+ * The owner key, though, goes. That is the point of the button — the
  * device stops belonging to this student — and keeping it was its own defect:
  * nothing else ever removed `zabaqist:owner`, so the last student's uuid sat on
  * the machine for good and the next genuine visitor, who answered the whole
@@ -68,6 +76,7 @@ function farewellPage(dest: string): string {
   // `JSON.stringify` for the string literal, and `<` neutralised so no
   // destination can close this script tag early.
   const js = JSON.stringify(dest).replace(/</g, '\\u003C')
+  const spared = JSON.stringify(ARCHIVE_PREFIX)
   return `<!doctype html>
 <html lang="fr">
 <head>
@@ -82,9 +91,10 @@ function farewellPage(dest: string): string {
   try {
     var doomed = []
     var re = new RegExp(${JSON.stringify(DEVICE_KEY_PATTERN)})
+    var spare = ${spared}
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i)
-      if (k && re.test(k)) doomed.push(k)
+      if (k && re.test(k) && k.indexOf(spare) !== 0) doomed.push(k)
     }
     for (var j = 0; j < doomed.length; j++) localStorage.removeItem(doomed[j])
   } catch (e) {
@@ -99,7 +109,26 @@ function farewellPage(dest: string): string {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
+  const { searchParams, origin } = new URL(request.url)
+
+  // A GET, on purpose — the layout's refusal redirects here, and `<noscript>`
+  // needs a destination it can follow without running anything. The cost is
+  // that any other site can send a reader here with a plain link, and the
+  // browser attaches the session cookies to a top-level navigation
+  // (`SameSite=Lax` does). That is a forced sign-out, which is a nuisance, and
+  // then the page below runs and clears every `zabaqist*` key — INCLUDING the
+  // `device-local:` archives, which hold the one thing no server can hand
+  // back. On a school machine that is several students' self-assessments,
+  // deleted by a link.
+  //
+  // `Sec-Fetch-Site` tells the two apart. Same-origin navigations and the
+  // address bar (`none`) are the real sign-out; nothing legitimate arrives
+  // here from another site, since the OAuth round trip lands on
+  // `/auth/callback`. A browser too old to send the header sends nothing, and
+  // is treated as it was before.
+  if (request.headers.get('sec-fetch-site') === 'cross-site')
+    return NextResponse.redirect(`${origin}/signin`, { status: 303 })
+
   const raw = searchParams.get('reason')
   const reason = raw && REASONS.has(raw) ? raw : null
 
