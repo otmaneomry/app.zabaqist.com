@@ -74,7 +74,15 @@ export async function signOutAction() {
   // `local`, not the default `global`. Global revokes every refresh token the
   // account holds, so signing out of a school computer would also sign the
   // student out on their phone — a punishment for tidying up after yourself.
-  await supabase?.auth.signOut({ scope: 'local' })
+  try {
+    await supabase?.auth.signOut({ scope: 'local' })
+  } catch {
+    // The comment above is only true if this cannot throw. It can — the call
+    // reaches the network — and an unhandled rejection in a server action
+    // answers the form with an error instead of signing the reader out, on
+    // the one path whose whole point is to work when the service does not.
+    // The cookies cleared below are what actually ends the session here.
+  }
 
   // The e2e bypass IS the session in a test run, so sign-out has to end it too.
   // Otherwise the gate keeps letting the browser through and the check that

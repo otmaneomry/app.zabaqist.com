@@ -9,7 +9,7 @@
  * costs one click and buys the attempt.
  */
 
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 
@@ -22,6 +22,10 @@ export default function Reveal({
 }) {
   const t = useTranslations('course')
   const [open, setOpen] = useState(false)
+  // `aria-expanded` on its own says "something is open" without saying what.
+  // A reader on a screen reader hears the state and then has to go looking
+  // for the panel it belongs to; `aria-controls` is what ties the two.
+  const panelId = useId()
 
   return (
     <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-gray-50/70">
@@ -29,6 +33,7 @@ export default function Reveal({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
+        aria-controls={panelId}
         className="flex w-full items-center justify-between gap-3 px-5 py-3 text-start transition-colors hover:bg-gray-100"
       >
         <span className="font-mono text-xs uppercase tracking-[0.14em] text-zb-gold">
@@ -43,7 +48,10 @@ export default function Reveal({
         </span>
       </button>
       {open && (
-        <div className="border-t border-gray-200 px-5 py-4 [&>p:first-child]:mt-0">
+        <div
+          id={panelId}
+          className="border-t border-gray-200 px-5 py-4 [&>p:first-child]:mt-0"
+        >
           {children}
         </div>
       )}

@@ -64,7 +64,10 @@ export default function AccountMenu({
     }
   }, [open])
 
-  const initial = (name ?? email ?? '?').trim().charAt(0).toUpperCase()
+  // `??` only falls through on null/undefined, and Google returns an empty
+  // `full_name` often enough: the avatar then drew a circle with no letter in
+  // it rather than falling back to the address.
+  const initial = ((name || email || '?').trim().charAt(0) || '?').toUpperCase()
 
   return (
     <div ref={box} className="relative">

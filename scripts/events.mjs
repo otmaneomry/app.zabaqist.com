@@ -97,13 +97,23 @@ if (who) params.append('email', `ilike.*${who}*`)
 if (event) params.append('event', `eq.${event}`)
 else if (deniedOnly) params.append('event', 'in.(signin_denied,signin_check_failed)')
 
-const r = await fetch(`${URL_}/rest/v1/auth_events?${params}`, {
-  headers: {
-    apikey: SECRET,
-    Authorization: `Bearer ${SECRET}`,
-    Accept: 'application/json',
-  },
-})
+// Everything else in this script explains itself when it fails; an unreachable
+// host used to be the one case that answered with a raw stack trace.
+let r
+try {
+  r = await fetch(`${URL_}/rest/v1/auth_events?${params}`, {
+    headers: {
+      apikey: SECRET,
+      Authorization: `Bearer ${SECRET}`,
+      Accept: 'application/json',
+    },
+  })
+} catch (e) {
+  console.error(`\n  Could not reach ${URL_}`)
+  console.error(`  ${e instanceof Error ? e.message : String(e)}`)
+  console.error('  Check NEXT_PUBLIC_SUPABASE_URL in .env.local, and the network.')
+  process.exit(1)
+}
 
 if (!r.ok) {
   console.error(`\n  Supabase refused: HTTP ${r.status}`)
@@ -113,7 +123,16 @@ if (!r.ok) {
   process.exit(1)
 }
 
-const rows = await r.json()
+// A 2xx that is not JSON — a proxy's sign-in page, an empty body — is a
+// different failure from a refusal, and it said `SyntaxError` before.
+let rows
+try {
+  rows = await r.json()
+} catch {
+  console.error('\n  Supabase answered 200 with something that is not JSON.')
+  console.error('  A proxy or captive portal is probably answering for it.')
+  process.exit(1)
+}
 
 /* ── report ─────────────────────────────────────────────────────────── */
 

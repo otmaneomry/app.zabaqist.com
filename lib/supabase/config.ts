@@ -24,6 +24,21 @@ const KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 /** Anything a header cannot carry. */
 const isAscii = (s: string) => !/[^\x20-\x7e]/.test(s)
+/**
+ * `new URL` in a try, not `URL.canParse`.
+ *
+ * This module is in the browser bundle, and a browser old enough to lack
+ * `canParse` would throw HERE — turning a check that exists to explain a
+ * misconfiguration into the thing that breaks the page.
+ */
+const parses = (u: string): boolean => {
+  try {
+    new URL(u)
+    return true
+  } catch {
+    return false
+  }
+}
 
 /**
  * Usable, or a reason it is not.
@@ -42,6 +57,16 @@ function validate(): { ok: true } | { ok: false; why: string } {
         '(Supabase → Project Settings → API Keys)',
     }
   if (!isAscii(URL_)) return { ok: false, why: 'NEXT_PUBLIC_SUPABASE_URL contains a non-ASCII character' }
+  // ASCII is not the same as a URL. `not-a-url` and `http://` both got past
+  // this and failed inside the Supabase client instead, where the message
+  // names neither the variable nor the value.
+  if (!/^https?:\/\//.test(URL_) || !parses(URL_))
+    return {
+      ok: false,
+      why:
+        'NEXT_PUBLIC_SUPABASE_URL is not an http(s) URL — it should look like ' +
+        'https://<project-ref>.supabase.co',
+    }
   // A SECRET key in the publishable slot. `client.ts` puts this value in every
   // browser bundle, and a secret key bypasses RLS: the whole design rests on
   // the key that ships being one Postgres will argue with.
