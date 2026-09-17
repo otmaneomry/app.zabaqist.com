@@ -120,7 +120,11 @@ const PLACEHOLDER = /\.(invalid|example|test)(:\d+)?\/?$/i
 const migrationsDir = path.join(ROOT, 'supabase', 'migrations')
 const sql = existsSync(migrationsDir)
   ? readdirSync(migrationsDir)
-      .filter((f) => f.endsWith('.sql'))
+      // Not `*.test.sql`. Those are proofs to paste into the SQL editor, and
+      // folding them in made "what the migrations declare" include whatever a
+      // test happened to write — a `create or replace function` in one would
+      // quietly become the last definition the checks below read.
+      .filter((f) => f.endsWith('.sql') && !f.endsWith('.test.sql'))
       .sort()
       .map((f) => readFileSync(path.join(migrationsDir, f), 'utf8'))
       .join('\n')
@@ -515,7 +519,7 @@ const probes = {
   auth_events: { event: '__probe' },
 }
 const LIVE_IDS = [
-  ...names.flatMap((t) => [`live-${t}`, `unread-${t}`, `leak-${t}`]),
+  ...names.flatMap((t) => [`live-${t}`, `unread-${t}`, `leak-${t}`, `columns-${t}`]),
   ...Object.keys(probes).filter((t) => tables[t]).map((t) => `write-${t}`),
   'allowlist-dots',
   'allowlist-open',
@@ -557,6 +561,7 @@ if (liveWhy) {
         'the migration has not been run against this database')
       skip(`unread-${t}`, `${t} does not exist in the project`)
       skip(`leak-${t}`, `${t} does not exist in the project`)
+      skip(`columns-${t}`, `${t} does not exist in the project`)
       continue
     }
     // Reached. Registered as a check that RAN and passed, so that a later run
@@ -571,7 +576,38 @@ if (liveWhy) {
       `${t}: could not be read to verify it`,
       `HTTP ${r.status} — ${body.slice(0, 60)}`)) {
       skip(`leak-${t}`, `${t} could not be read (HTTP ${r.status})`)
+      skip(`columns-${t}`, `${t} could not be read (HTTP ${r.status})`)
       continue
+    }
+
+    /**
+     * Every COLUMN the migrations declare, not just the table.
+     *
+     * `select=*` on an empty table returns `[]` and proves nothing about its
+     * shape, so a migration that only adds a column — 0009, 0010 — could sit
+     * unrun for weeks with this script saying "well structured" the whole
+     * time. That is the one question anybody actually asks it: did I run the
+     * migration? Naming the columns makes PostgREST answer, because it
+     * refuses a select for one that is not there.
+     */
+    const declaredCols = tables[t] ?? []
+    if (declaredCols.length === 0) {
+      skip(`columns-${t}`, `${t} declares no columns this parser could read`)
+    } else {
+      const cr = await fetch(
+        `${URL_}/rest/v1/${t}?select=${declaredCols.join(',')}&limit=1`,
+        { headers: h },
+      )
+      const cbody = await cr.text()
+      const missing = [...cbody.matchAll(/column "?(?:\w+\.)?(\w+)"? does not exist/gi)]
+        .map((m) => m[1])
+      check(cr.status === 200, 'fail', `columns-${t}`,
+        missing.length
+          ? `${t}: ${missing.join(', ')} declared in SQL but not in the project`
+          : `${t}: its declared columns could not be verified`,
+        missing.length
+          ? 'a migration that adds a column has not been run against this database'
+          : `HTTP ${cr.status} — ${cbody.slice(0, 80)}`)
     }
     // Anonymous read must return nothing. Rows coming back means RLS is off or
     // a policy is wider than intended.

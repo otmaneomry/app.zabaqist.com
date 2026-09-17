@@ -457,7 +457,7 @@ export async function pullAll(userId: string): Promise<PullResult> {
   const [profile, progress, checkpoints, activity] = await Promise.all([
     supabase
       .from('profiles')
-      .select('filiere, track, onboarding, updated_at')
+      .select('filiere, track, onboarding, updated_at, filiere_at')
       .eq('id', userId)
       .maybeSingle(),
     supabase.from('course_progress').select('*').eq('user_id', userId),
@@ -478,7 +478,7 @@ export async function pullAll(userId: string): Promise<PullResult> {
 
   // ── Filière and the funnel's answers.
   if (profile.data) {
-    const { filiere, track, onboarding, updated_at: profileAt } = profile.data
+    const { filiere, track, onboarding, filiere_at: chosenThere } = profile.data
 
     // The profile row is the one place a student's filière exists for all their
     // devices, so a pull has to be able to change this device's mind.
@@ -495,10 +495,16 @@ export async function pullAll(userId: string): Promise<PullResult> {
     // that has a filière but no stamp cannot prove it chose anything — it
     // stored that value before this rule existed — so the server wins there
     // too. The cost is at most one re-pick; the alternative is the deadlock.
+    //
+    // `profiles.filiere_at` (0010), not `updated_at`. The old comparison asked
+    // "has the row been written since I chose", and every push writes the row
+    // — including one sent because a chapter was read. A phone carrying last
+    // week's filière could therefore overrule a choice made on the laptop ten
+    // minutes earlier. `filiere_at` moves only when the filière does.
     const stored = readJSON<FiliereChoice | null>(FILIERE_KEY, null)
     if (filiere && track) {
       const chosenHere = instant(readStamp(FILIERE_AT_KEY))
-      const serverAt = instant(profileAt)
+      const serverAt = instant(chosenThere)
       const serverWins =
         stored === null ||
         chosenHere === null ||
@@ -508,7 +514,7 @@ export async function pullAll(userId: string): Promise<PullResult> {
           // Dated by the server, not by the clock of the device adopting it:
           // otherwise this pull would look like a local choice and the next one
           // would refuse to adopt anything.
-          writeStamp(FILIERE_AT_KEY, profileAt ?? new Date().toISOString())
+          writeStamp(FILIERE_AT_KEY, chosenThere ?? new Date().toISOString())
           changed = true
         }
       }
@@ -690,6 +696,10 @@ export function pushAll(
   const snapshot = {
     owner: deviceOwner(),
     filiere: readJSON<FiliereChoice | null>(FILIERE_KEY, null),
+    // The date travels with the choice. Without it the server has no way to
+    // tell this device's answer from the one it stored last week, and 0010's
+    // trigger refuses a filière that cannot say when it was picked.
+    filiereAt: readStamp(FILIERE_AT_KEY),
     onboarding: readJSON<Answers>(ONBOARDING_KEY, {}),
     progress: readJSON<Record<string, CourseProgress>>(PROGRESS_KEY, {}),
     activity: readJSON<Record<string, DayActivity>>(ACTIVITY_KEY, {}),
@@ -704,6 +714,8 @@ export function pushAll(
 type Snapshot = {
   owner: string | null
   filiere: FiliereChoice | null
+  /** When this device chose it, or null if it cannot say. */
+  filiereAt: string | null
   onboarding: Answers
   progress: Record<string, CourseProgress>
   activity: Record<string, DayActivity>
@@ -737,7 +749,7 @@ async function pushNow(
 
   const supabase = createClient()
 
-  const { filiere, onboarding, progress, activity, checkpoints } = snap
+  const { filiere, filiereAt, onboarding, progress, activity, checkpoints } = snap
   const now = new Date().toISOString()
 
   const jobs: PromiseLike<unknown>[] = []
@@ -765,6 +777,11 @@ async function pushNow(
       avatar_url: identity.avatar,
       filiere: (filiere?.filiere ?? null) as Filiere | null,
       track: (filiere?.track ?? null) as Track | null,
+      // Null when this device has no stamp — it had a filière before the rule
+      // existed and cannot prove when it chose it. 0010 keeps the stored one
+      // in that case, which is the same answer `pullAll` gives such a device
+      // in the other direction.
+      filiere_at: filiereAt,
       onboarding,
       updated_at: now,
     }),
